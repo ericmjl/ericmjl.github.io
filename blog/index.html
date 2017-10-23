@@ -92,6 +92,88 @@
   <link rel="stylesheet" href="../static/pygments.css">
   <div>
   
+    <h1><a href="../blog/2017/10/19/network-propagation/">Network Propagation</a></h1>
+  
+  <p class="meta">
+    written by
+    
+      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on 2017-10-19
+  </p>
+  <h2 id="introduction">Introduction</h2><p>I recently read a <a href="http://www.nature.com/nrg/journal/vaop/ncurrent/abs/nrg.2017.38.html">review paper on network propagation</a>. It looks like a very useful thing in data science, particularly where networks are involved, and I wanted to share it with everybody.</p>
+<p>Before I go on, I will start off by assuming we have a dataset modelled as a "network", or a "graph", in which the nodes are entities in the graph, and edges are relationships between those entities. In the context of my work, I encounter biological networks of many kinds - gene-gene interactions, protein-protein interactions, protein-RNA interactions, evolutionary networks, and more.</p>
+<p>What kind of problems can network propagation solve? The problem class generally follows this logic: I start with some nodes of interest, and I'm most interested in finding other nodes of interest based on these "seed" nodes. Knowing that path-based methods can often end up over-prioritizing highly connected nodes, we need a different principled method for finding these nodes. One way would be to take a random walk on the graph, and find out how often we land on a particular set of nodes on the graph. This random walk is what we call "network propagation".</p>
+<h2 id="how-network-propagation-works">How network propagation works</h2><p>Network propagation follows this intuition: Imagine nodes contain information, and edges dictate which nodes information can be shared with. Network propagation shares the information with other nodes, according to the following rules:</p>
+<ol>
+<li>I can only share by copying to my neighbours in the graph,</li>
+<li>I must share everything that I have with my neighbours, and</li>
+<li>Exchanges in the graph happen simultaneously.</li>
+</ol>
+<p>An animation of how this works is shown below.</p>
+<p>TODO: make animation - a video on YouTube.</p>
+<p>If you take my DataCamp course, you'll learn that networks can be represented as matrices on a computer. The adjacency matrix can be a 1/0 (i.e. binary) matrix that describes how nodes (rows and columns) are connected, and nodes can have their own vector of information (i.e. whether they are "seed" nodes or not). As it turns out, network propagation has a very nice matrix representation:</p>
+<p>TODO: make figure - one round of network propagation.</p>
+<h2 id="how-to-implement-network-propagation">How to implement network propagation</h2><p>So, how do we do network propagation with NetworkX, <code>numpy</code> and Python? Let's take a look at code. Firstly, <strong>how do you convert a graph to a <code>numpy</code> matrix</strong>?</p>
+<div class="hll"><pre><span></span><span class="c1"># Assume we have a graph G. Convert it to a numpy matrix.</span>
+<span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">A</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">to_numpy_matrix</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">A</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+<span class="n">matrix</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">]])</span>
+</pre></div>
+<p>Great! Now, let's mark out some "seed" nodes. These are the "nodes" of interest. To represent this, we use a binary vector - each slot in the vector represents one node in the graph. Let's start by highlighting two nodes, the second and third one:</p>
+<div class="hll"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+<p>The <code>.reshape(A.shape[0], 1)</code> is done for convenience, so that each axis is aligned appropriately for the following matrix multiplication:</p>
+<div class="hll"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="n">A</span> <span class="err">@</span> <span class="n">M</span>
+<span class="n">matrix</span><span class="p">([[</span> <span class="mf">1.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">1.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">1.</span><span class="p">]])</span>
+</pre></div>
+<p>After the end of one round, nodes 2 and 3 have no information held on them, but their neighbours do. Let's do two rounds of propagation, rather than just one.</p>
+<div class="hll"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="n">A</span> <span class="err">@</span> <span class="p">(</span><span class="n">A</span> <span class="err">@</span> <span class="n">M</span><span class="p">)</span>
+<span class="n">matrix</span><span class="p">([[</span> <span class="mf">2.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">1.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">2.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">2.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">2.</span><span class="p">]])</span>
+</pre></div>
+<p>After two rounds of information, information is shared back with the original nodes, but not necessarily evenly - it all depends on the connectivity of each node.</p>
+<p>It'll get really verbose doing 100 rounds; imagine doing <code>A @ (A @ (A @ (A @ .....)))</code>. Instead of doing that, a recursive function may be better. At the same time, with many rounds of network propagation, we will end up with really large numbers. Therefore, it will be helpful to also normalize the result of matrix multiplication.</p>
+<div class="hll"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+   <span class="o">...</span><span class="p">:</span>     <span class="k">return</span> <span class="n">arr</span> <span class="o">/</span> <span class="n">arr</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">7</span><span class="p">]:</span> <span class="k">def</span> <span class="nf">recursive_propagate</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+   <span class="o">...</span><span class="p">:</span>     <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+   <span class="o">...</span><span class="p">:</span>         <span class="k">return</span> <span class="n">recursive_propagate</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">normalize</span><span class="p">(</span><span class="n">A</span> <span class="err">@</span> <span class="n">M</span><span class="p">),</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+   <span class="o">...</span><span class="p">:</span>     <span class="k">else</span><span class="p">:</span>
+   <span class="o">...</span><span class="p">:</span>         <span class="k">return</span> <span class="n">normalize</span><span class="p">(</span><span class="n">A</span> <span class="err">@</span> <span class="n">M</span><span class="p">)</span>
+   <span class="o">...</span><span class="p">:</span>
+</pre></div>
+<p>On a previous blog post, I've alluded to the fact that recursive functions are pretty darn useful!</p>
+<h2 id="result">Result</h2><p>So, let's take a look at the result of a few rounds of propagation.</p>
+<p><img src="../blog/2017/10/19/network-propagation/figure_1_sm.png" alt=""></p>
+<p>The first thing that I'd like to highlight is that the information propagation process converges on a final result fairly quickly. The second thing I'd like to highlight is that the purple nodes (there are two lines!), which weren't highlighted at the start, ended up having the highest propagation scores, followed by the red node.</p>
+<p>For those who are familiar with Markov chains, I believe network propagation has strong parallels with that.</p>
+<h2 id="conclusion">Conclusion</h2><p>Network propagation is conceptually simple, and easy to implement in Python.</p>
+
+  </div>
+
+    <p><i>Did you enjoy this blog post? <a href="../blog/2017/10/19/network-propagation/#disqus">Let's discuss more</a>!</i></p>
+    <hr class="fancy">
+  
+    
+  <!-- <div class="blog-post"> -->
+  <link rel="stylesheet" href="../static/pygments.css">
+  <div>
+  
     <h1><a href="../blog/2017/10/11/pypy-impressive/">PyPy: Impressive!</a></h1>
   
   <p class="meta">
@@ -446,41 +528,6 @@ $ echo $PATH
   </div>
 
     <p><i>Did you enjoy this blog post? <a href="../blog/2017/10/7/a-data-scientists-guide-to-environment-variables/#disqus">Let's discuss more</a>!</i></p>
-    <hr class="fancy">
-  
-    
-  <!-- <div class="blog-post"> -->
-  <link rel="stylesheet" href="../static/pygments.css">
-  <div>
-  
-    <h1><a href="../blog/2017/10/3/new-habits/">New Habits</a></h1>
-  
-  <p class="meta">
-    written by
-    
-      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
-    
-    on 2017-10-03
-  </p>
-  <p>Ever since "going corporate", it's meant picking up more new productivity/coding habits. Here's a sampling of what I've learned.</p>
-<p><strong>(1) Living by my calendar</strong></p>
-<p>Basically, the "work calendar" defines everything about the day. I've had to make sure that if I am not going to be pencilled in for a meeting, I have to block out time on the calendar first.</p>
-<p>Also, sending invites to people + rooms -- the latter being the newest habit I've had to pick up.</p>
-<p>Finally, setting informative titles for calendar events - if I want to have coffee or lunch with X, I can't just write "Coffee with X" - it literally shows up as "Coffee with X" on X's calendar, which is super awkward, as if they're having coffee with themselves! Something more informative, like, "Eric <> X coffee" really helps the other person, who might be super busy and thus only glances at their calendar once in a while.</p>
-<p><strong>(2) Flagging emails and applying rules</strong></p>
-<p>Emails fly everywhere. It gets super overwhelming after a while.</p>
-<p>If there's stuff that needs to be followed-up on, it stays in my Inbox until it's done. It also gets flagged, which automatically creates a Todo on my task list. (If this sounds like Outlook - yes, it's Outlook. On macOS. With no "email snoozing" feature...)</p>
-<p><strong>(3) Hacking through legacy code and shared compute resources</strong></p>
-<p>Working on a compute cluster with a code base that's built for legacy versions of programming languages is super frustrating! Thankfully I know enough about the differences between Python 2 and Python 3 to hack my way through.</p>
-<p>Shared compute resources means using <code>modules</code>, but not everybody sets up <code>modules</code> with the same set of assumptions as others. Some create virtual environments inside a module, others append to <code>$PATH</code>, and getting the right combinations in a modular way is really tricky. It means I have some really painful one-off <code>$PATH</code> hacks to make stuff work. Documentation is paramount - without putting in docs, I'll never remember what I did...</p>
-<p><strong>(4) Adapting to others' coding styles</strong></p>
-<p>Not everybody is a Python programmer, and not everybody is a Pythonic programmer. The usual Python idioms that I'm used to (whether functional or object-oriented) sometimes get thrown out in favour of some other style (globals, anybody?), and I have to adapt to figure out what's going on. Thankfully my colleagues are open to me modifying their code, as long as I can demonstrate that the new version works fine, and I've been working hard to bring in Pythonic code style.</p>
-<p><strong>(5) Performance reviews</strong></p>
-<p>Gotta start getting used to this. I had a taste of it while volunteering as part of Tang Hall's student leadership, but now it's for real.</p>
-
-  </div>
-
-    <p><i>Did you enjoy this blog post? <a href="../blog/2017/10/3/new-habits/#disqus">Let's discuss more</a>!</i></p>
     <hr class="fancy">
   
 

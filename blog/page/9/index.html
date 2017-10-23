@@ -92,6 +92,42 @@
   <link rel="stylesheet" href="../../../static/pygments.css">
   <div>
   
+    <h1><a href="../../../blog/2017/1/17/building-bokeh-apps/">Building Bokeh Apps!</a></h1>
+  
+  <p class="meta">
+    written by
+    
+      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on 2017-01-17
+  </p>
+  <p>I finally did it - I built a Bokeh server app for myself!</p>
+<p>All of last week, I brought my UROP student Vivian and a fellow church friend Lin to the "Data Science with Python" <a href="http://computefest.seas.harvard.edu">skill-building workshop series</a>, hosted by the <a href="http://iacs.seas.harvard.edu">Harvard IACS</a>.</p>
+<p>As I already knew most of what was going to be taught, I decided that it'd be a fun thing to try playing with the dataset that they used for the contest. (Having a contest was also extra motivation to try building something I've never done before.)</p>
+<p>The goal of the contest was "to build a visualization of the UCI forest dataset that would help an analyst make decisions". The UCI forest dataset basically asks us to predict forest cover type from cartographic variables. As I had always wanted to use Bokeh to build a data dashboard, I thought I should give it a shot with the UCI dataset.</p>
+<p>What I eventually built were two things. The first one was a linked scatter-plot dashboard to visualize how the quantitative variables varied with one another and how they grouped by forest cover type. Here, the user can select the two variables that they want to visualize together, using drop-down menus.</p>
+<p><a href="../../../blog/2017/1/17/building-bokeh-apps/bokehscatter-full.png"><img src="../../../blog/2017/1/17/building-bokeh-apps/bokehscatter-small.png" alt="Bokeh scatterplot"></a></p>
+<p>The second one was a bar chart showing the mutual information between the categorical variable values and the forest cover type. Here, the user can select from over 40+ variables, and their mutual information score will be displayed as one of the bars in the bar chart.</p>
+<p><a href="../../../blog/2017/1/17/building-bokeh-apps/bokehselect-full.png"><img src="../../../blog/2017/1/17/building-bokeh-apps/bokehselect-small.png" alt="Bokeh select"></a></p>
+<p>As usual, I copied heavily from the examples and then modified it for my own use. Breaking the copied app helped me figure out where my cognitive blind spots were.</p>
+<p>Here's what I've learned.</p>
+<p>Firstly, I finally have wrapped my head around callback functions and their use in GUI applications. The idea behind callbacks is that when I click on a GUI element (e.g. button) or change the GUI element's state (e.g. selecting a checkbox, typing into a textbox), that function is called that "does something". What's that something? Well, it's any action I decide that needs to be taken.</p>
+<p>Secondly, I finally figured out how non-intimidating Bokeh server really is. It's like... Flask, except for data visualizations. And it takes care of most of the HTML hard lifting for the data visualization portion.</p>
+<p>Thirdly, I finally got 'linked plots' working, in which the axes scales or data selections are shared across plots. I noticed it works when using the mid-level "plotting" interface, but doesn't work when using the high-level "charts" interface. Definitely something to keep in mind.</p>
+<p>Fourthly, I saw how Bokeh server allows us to write custom Python code for callbacks. At least for me, it's much more user-friendly this way, as I find JS idioms to be a bit wonky. Maybe I'm just not used to them. Either way, being able to use custom Python means I'm able to do things like filtering Pandas DataFrames before pushing the data onto the plot.</p>
+<p>Finally, I got to use the VBar contribution I made to the Bokeh library last year! Though I eventually moved my bar plots to the "charts"-level API, my initial implementation was done using the "plotting"-level API. It brought me a modicum of satisfaction to use the <code>vbar</code> glyph, something that I had contributed (of course, acknowledging the amount of hand-holding provided by Sarah Bird and Bryan Van De Ven, who are the lead developers of Bokeh).</p>
+<p>My code can be found online <a href="https://github.com/ericmjl/iacs2017">here</a>.</p>
+
+  </div>
+
+    <p><i>Did you enjoy this blog post? <a href="../../../blog/2017/1/17/building-bokeh-apps/#disqus">Let's discuss more</a>!</i></p>
+    <hr class="fancy">
+  
+    
+  <!-- <div class="blog-post"> -->
+  <link rel="stylesheet" href="../../../static/pygments.css">
+  <div>
+  
     <h1><a href="../../../blog/2017/1/5/on-learning-math/">On Learning Math</a></h1>
   
   <p class="meta">
@@ -516,39 +552,6 @@ Hello Eric!
   </div>
 
     <p><i>Did you enjoy this blog post? <a href="../../../blog/2016/12/24/how-to-make-your-python-scripts-callable-from-the-command-line/#disqus">Let's discuss more</a>!</i></p>
-    <hr class="fancy">
-  
-    
-  <!-- <div class="blog-post"> -->
-  <link rel="stylesheet" href="../../../static/pygments.css">
-  <div>
-  
-    <h1><a href="../../../blog/2016/12/20/female-doctors-are-better-than-male-doctors-for-real/">Female Doctors are Better than Male Doctors - For Real?</a></h1>
-  
-  <p class="meta">
-    written by
-    
-      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
-    
-    on 2016-12-20
-  </p>
-  <p>For real. Read on for the statistical perspective on why.</p>
-<p>I saw this article published by JAMA, posted by a number of my friends on Facebook. The claim here was that patients treated by women doctors show lower readmission rates than patients treated by men, controlling for as many other factors as can be plausibly controlled for.</p>
-<p>When I saw the clickbait-y headlines and posts by my mostly left-leaning friends basically going "women are better than men", my first instinct was "go check the stats". (I'm probably best labelled as centrist.) Indeed, I think I would have made Prof. Allen Downey proud - I didn't buy the p-values at face value. Rather, I was most interested in the effect size.</p>
-<p>If you check the main figure on the paper, it'll look like this:</p>
-<p><img src="http://jamanetwork.com/data/Journals/INTEMED/0/m_ioi160102f1.png" alt="Figure 1, linked from the article"></p>
-<p>Peeking into the text for a bit more context for mortality (it's roughly the same magnitude difference elsewhere).</p>
-<blockquote><p><strong>Physician Sex and Patient Mortality</strong></p>
-<p>The final sample for the analyses of 30-day mortality rates included 1 583 028 hospitalizations treated by 57 896 physicians. Overall 30-day mortality for the entire sample was 179 162 (11.32%). Patients cared for by female physicians had lower 30-day mortality than did patients treated by male physicians (10.82% vs 11.49%; risk difference [RD], –0.67%; 95% CI, –0.80% to –0.54%; P < .001; number needed to treat [NNT] to prevent 1 death, 149) after accounting for patient characteristics (Table 2). The difference in mortality persisted after adjustment for hospital fixed effects (female physicians, 10.91% vs male physicians, 11.46%; adjusted RD, –0.55%; 95% CI, –0.67% to –0.42%; P < .001; NNT, 182). Further adjusting for physician characteristics had a limited effect on these results (female physicians, 11.07% vs male physicians, 11.49%; adjusted RD, –0.43%; 95% CI –0.57% to –0.28%; P < .001; NNT, 233).</p>
-</blockquote>
-<p>If you look at just the difference between the two 'treatment' groups (male-treated vs. female-treated patients), there only seems to be a 0.42% difference in mortality rates after controlling for hospital patient characteristics, hospital fixed effects, physician characteristics, length of stay, use of care, discharge location, patient volume, and physicians’ years of practice. Damn, that's a really small difference! The effect size (here improperly defined as ratio of larger to smaller) is only 1.03. Hardly an effect worth mentioning, isn't it?</p>
-<p>Wrong!</p>
-<p>That 0.42% difference occurred from a sample size of more than ~1.5 million hospitalizations. This is mortality that we're speaking of here, so in context, we're talking about ~6,600+ fewer deaths when women treat patients. 6,600+! Hospitalizations happen frequently and in large numbers, so a small percentage difference still means large numbers of people. If you happen to be pro-life, this is something that you really should care about.</p>
-<p>I still take issue with the article's emphasis on "statistically significant or not" method of reporting the results, but I think that's a flaw of the medical literature publishing culture, and something that the authors probably had to conform to in order to successfully publish the results. Nonetheless, if you even just skim the text of the paper, the data are consistent across all comparisons made, regardless of whether the results were "statistically significant" or not. That's pretty strong evidence, in my opinion.</p>
-
-  </div>
-
-    <p><i>Did you enjoy this blog post? <a href="../../../blog/2016/12/20/female-doctors-are-better-than-male-doctors-for-real/#disqus">Let's discuss more</a>!</i></p>
     <hr class="fancy">
   
 

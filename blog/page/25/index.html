@@ -92,6 +92,198 @@
   <link rel="stylesheet" href="../../../static/pygments.css">
   <div>
   
+    <h1><a href="../../../blog/2015/11/28/profiling-pypy-vs-python-for-agent-based-simulation/">Profiling PyPy vs. Python for Agent-Based Simulation</a></h1>
+  
+  <p class="meta">
+    written by
+    
+      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on 2015-11-28
+  </p>
+  <h2 id="outline">Outline</h2><ol>
+<li>Introduction:<ol>
+<li>Motivation</li>
+<li>Model description</li>
+<li>Link to code</li>
+</ol>
+</li>
+<li>Environment Setup</li>
+<li>Performance<ol>
+<li>Python vs. PyPy on one parameter set.</li>
+<li>Vary number of hosts, record time.</li>
+</ol>
+</li>
+</ol>
+<h2 id="introduction">Introduction</h2><p>As part of my PhD dissertation, I wanted to investigate the role of host ecology on the generation of reassortant viruses. Knowing myself to be a fairly algebra-blind person, I decided that an agent-based model (ABM) was going to be much more manageable than writing ODEs. (Actually, the real reason is that I"m modelling discrete states, rather than continuous states, but yes, I will admit that I do take longer than your average programmer with algebra.)</p>
+<h3 id="model-description">Model Description</h3><p>Starting with our intuition of host-pathogen interactions, I implemented a custom ABM using Python classes - "Hosts" and "Viruses".</p>
+<h4 id="viruses">Viruses</h4><p>"Viruses" had two segments, representing a segmented virus (like the Influenza or Lassa virus), each with a color (red or blue), and can infect Hosts (which are likewise red or blue). Viruses that are of a particular color prefer to infect hosts of the same color, but can still infect hosts of of a different colour, just at a lower probability. If two viruses are present in the same host, then there can be, at some small probability, the opportunity for gene sharing to occur.</p>
+<p>One of the virus' segments determines host immunity; if the virus encounters a host which has immunity against its color, then the probability of infection drastically decreases, and it is likely that the virus will eventually be cleared.</p>
+<h4 id="hosts">Hosts</h4><p>"Hosts" are where viruses replicate. Hosts gain immunity to one of the segment's colors, after a set number of days of infection. When a host gains immunity to a particular virus color, it can much more successfully fend off a new infection with that same color. Hosts also interact with one another. They may have a strong preference for a host of the same color, a.k.a. homophily.</p>
+<h3 id="code">Code</h3><p>My code for the simulations can be found on <a href="http://github.com/ericmjl/reassortment-simulator">this Github repository</a>. The details of the simulation are still a work in progress, as these ideas are still early stage. My point on this blog post here will be to try to compare PyPy against CPython on performance. However, I do welcome further comments on the modelling, if you've taken the time to read through my code.</p>
+<p>Code for the statistical draws can be found on <a href="http://github.com/ericmjl/pypy_stats">this other Github repository</a>.</p>
+<p><h2 id="environment-setup">Environment Setup</h2>
+My CPython environment is managed by <code>conda</code>. (Highly recommended! Download <a href="https://www.continuum.io/downloads">here</a>. Make sure to get Python 3!)</p>
+<p>I installed <code>pypy</code> and <code>pypy3</code> under my home directory on Ubuntu Linux, and ensured that my bash shell <code>$PATH</code> variable also pointed to <code>~/pypy[3]/bin</code>.</p>
+<h2 id="performance">Performance</h2><p>Let's take a look at the performance of the CPython vs. PyPy using pure-Python code.</p>
+<h3 id="default-parameters">Default parameters</h3><p>I first started with 1000 agents in the simulation, with the simulation running for 150 time steps.</p>
+<p>Under these circumstances, on an old Asus U30J with 8GB RAM and an SSD hard disk, Core i3 2.27GHz, executing the simulation with PyPy required only 13.4 seconds, while executing with CPython required 110.5 seconds. 10x speedup.</p>
+<h3 id="varying-number-of-hosts-in-the-model">Varying number of hosts in the model</h3><p>I wanted to measure the time complexity of the simulation as a function of the number of hosts. Therefore, I varied the number of hosts from 100 to 1600, in steps of 300.</p>
+<p>Partial (mostly because of laziness) results are tabulated below. (Yes, this degree of laziness would never fly in grad school.)</p>
+<table><colgroup> <col /> <col /> <col /> <col /> <col /> <col /> <col /> </colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Agents</th>
+<th style="text-align: left;">PyPy Trial 1</th>
+<th style="text-align: left;">PyPy Trial 2</th>
+<th style="text-align: left;">PyPy Trial 3</th>
+<th style="text-align: left;">CPython Trial 1</th>
+<th style="text-align: left;">CPython Trial 2</th>
+<th style="text-align: left;">CPython Trial 3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1000</td>
+<td style="text-align: left;">13.4</td>
+<td style="text-align: left;">12.8</td>
+<td style="text-align: left;">12.9</td>
+<td style="text-align: left;">110.5</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">700</td>
+<td style="text-align: left;">8.63</td>
+<td style="text-align: left;">9.02</td>
+<td style="text-align: left;">8.65</td>
+<td style="text-align: left;">53.7</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">400</td>
+<td style="text-align: left;">4.35</td>
+<td style="text-align: left;">4.33</td>
+<td style="text-align: left;">4.66</td>
+<td style="text-align: left;">18.2</td>
+<td style="text-align: left;">18.2</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">100</td>
+<td style="text-align: left;">1.03</td>
+<td style="text-align: left;">1.00</td>
+<td style="text-align: left;">1.17</td>
+<td style="text-align: left;">1.47</td>
+<td style="text-align: left;">1.48</td>
+<td style="text-align: left;">1.45</td>
+</tr>
+</tbody></table><p>As we can see, PyPy wins when the number of iterations is large.</p>
+<h3 id="statistical-draws">Statistical Draws</h3><p>I use statistical Bernoulli trials (biased coin flips) extensively in the simulation. Yet, one thing that is conspicuously unavialable to PyPy users (in an easily installable format) is the scientific Python stack. Most of that boils down to <code>numpy</code>. Rather than fiddle with trying to get <code>numpy</code>, <code>scipy</code> and other packages installed, I re-implemented my own <code>bernoulli</code> function.
+    ```python
+    from random import random</p>
+<pre><code>class bernoulli(object):
+    """
+    docstring for bernoulli
+    """
+    def __init__(self, p):
+        super(bernoulli, self).__init__()
+        self.p = p
+
+    def rvs(self, num_draws):
+        draws = []
+        for i in range(num_draws):
+            draws.append(int(random() &amp;gt; self.p))
+
+        return draws
+</code></pre>
+<p>This is <em>almost</em> a drop-in replacement for <code>scipy.stats.bernoulli</code>. (The API isn't exactly the same.) I wanted to know whether the calling <code>bernoulli</code> function I wrote performed better than calling on the <code>scipy.stats</code> function. I therefore setup a series of small tests to determine at what scale of function calls it makes more sense to use PyPy vs. CPython.</p>
+<p>I then wrote a simple block of code that times the Bernoulli draws. For the PyPy version:
+    ```python
+    from stats.bernoulli import bernoulli
+    from time import time</p>
+<pre><code>start = time()
+bern_draws = bernoulli(0.5).rvs(10000)
+mean = sum(bern_draws) / len(bern_draws)
+end = time()
+
+print(end - start)&lt;/code&gt;&lt;/pre&gt;
+And for the CPython/scipy version:
+&lt;pre&gt;&lt;code&gt;from scipy.stats import bernoulli
+from time import time
+
+start = time()
+bern_draws = bernoulli(0/5).rvs(10000)
+mean = sum(bern_draws) / len(bern_draws)   
+end = time()
+
+print(end - start)
+</code></pre>
+<table><colgroup> <col /> <col /> <col /> <col /> <col /> <col /> <col /> </colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Bernoulli Draws</th>
+<th style="text-align: center;">PyPy + Custom (1)</th>
+<th style="text-align: center;">PyPy + Custom (2)</th>
+<th style="text-align: center;">PyPy + Custom (3)</th>
+<th style="text-align: center;">CPython + SciPy (1)</th>
+<th style="text-align: center;">CPython + SciPy (2)</th>
+<th style="text-align: center;">CPython + SciPy (3)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1000000</td>
+<td style="text-align: center;">0.271</td>
+<td style="text-align: center;">0.241</td>
+<td style="text-align: center;">0.206</td>
+<td style="text-align: center;">0.486</td>
+<td style="text-align: center;">0.513</td>
+<td style="text-align: center;">0.481</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">100000</td>
+<td style="text-align: center;">0.0437</td>
+<td style="text-align: center;">0.0421</td>
+<td style="text-align: center;">0.0473</td>
+<td style="text-align: center;">0.0534</td>
+<td style="text-align: center;">0.0794</td>
+<td style="text-align: center;">0.0493</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">10000</td>
+<td style="text-align: center;">0.0311</td>
+<td style="text-align: center;">0.0331</td>
+<td style="text-align: center;">0.0345</td>
+<td style="text-align: center;">0.00393</td>
+<td style="text-align: center;">0.00410</td>
+<td style="text-align: center;">0.00387</td>
+</tr>
+</tbody></table><p>As we can see, <code>scipy</code> is quite optimized, and outperforms at lower number of statistical draws. Things only become better for PyPy as the number of draws increases.</p>
+<h3 id="summary">Summary</h3><p>Some things that I've learned from this exercise:</p>
+<ol>
+<li>For pure-Python code, PyPy can serve as a drop-in replacement for CPython.</li>
+<li>Because of the JIT compiler, PyPy is blazing fast when doing iterations!</li>
+<li><code>numpy</code> is not, right now, easily <code>pip</code>-installable. Because of this, the rest of the Scientific Python stack is also not <code>pip</code>-installable in a PyPy environment. (I will admit to still being a learner here - I wouldn't be able to articulate why <code>numpy</code> doesn't work with PyPy out-of-the-box. Experts chime in please?)</li>
+</ol>
+<p>Some things I hope will happen:</p>
+<ol>
+<li>Let's port the scientific Python stack code to make it PyPy compatible! (Yeah, wishful thinking...)</li>
+<li>Alternatively, let's hope the <code>numba</code> project allows JIT compilation when using Python objects instead.</li>
+</ol>
+<p>As is the usual case for me, starting a new project idea gave me the impetus to try out a new thing, as I wouldn't have to risk breaking workflows that have worked for existing projects. If you find yourself in the same spot, I would encourage you to try out PyPy, especially for pure-Python code (i.e. no external libraries are used).</p>
+
+  </div>
+
+    <p><i>Did you enjoy this blog post? <a href="../../../blog/2015/11/28/profiling-pypy-vs-python-for-agent-based-simulation/#disqus">Let's discuss more</a>!</i></p>
+    <hr class="fancy">
+  
+    
+  <!-- <div class="blog-post"> -->
+  <link rel="stylesheet" href="../../../static/pygments.css">
+  <div>
+  
     <h1><a href="../../../blog/2015/9/28/predicting-hiv-drug-resistance-phenotype-from-genotype/">Predicting HIV Drug Resistance Phenotype from Genotype</a></h1>
   
   <p class="meta">
@@ -231,37 +423,6 @@
   </div>
 
     <p><i>Did you enjoy this blog post? <a href="../../../blog/2015/7/13/on-the-humbleness-of-conference-attendees/#disqus">Let's discuss more</a>!</i></p>
-    <hr class="fancy">
-  
-    
-  <!-- <div class="blog-post"> -->
-  <link rel="stylesheet" href="../../../static/pygments.css">
-  <div>
-  
-    <h1><a href="../../../blog/2015/7/13/scipy-2015-done/">SciPy 2015 - Done!</a></h1>
-  
-  <p class="meta">
-    written by
-    
-      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
-    
-    on 2015-07-13
-  </p>
-  <p>The conference is over! I get to go home now, but I also will miss being a part of the community. Hope to go back next year!</p>
-<h2 id="thoughts">Thoughts</h2><ol>
-<li>It was fun to set so many new people from a variety of disciplines. This conference was right in the sweet spot of nerdy-ness and social interaction. I think I lost track of the number of business cards I handed out to people, but it's definitely dented my collection!</li>
-<li>I learned a lot, particularly about the variety of packages that other people have developed to solve a variety of problems.</li>
-<li>Swag! This time it was in the form of a free book by Kurt Smith, on using Cython to speed up Python code. Also got a bunch of stickers. At PyCon, I didn't know where to stick them, and I was hesitant to stick them to my laptop (I like a clean laptop), so I stuck them to my poster tube instead.</li>
-<li>I gave a lightning talk on Testing Data, for data integrity purposes. Later, I was contacted by Greg, who leads the Software Carpentry (SWC)initiative, on providing some material on doing data tests. Looks like it could be fun! And I cannot wait to get my own SWC instructor training - c'mon Greg!</li>
-<li>My roommate, Chuan, was a physician from China, who was in the Houston area doing a year of research. I had a great time conversing about code and culture with him, and I learned a lot about contemporary Chinese medicine from him.</li>
-<li>Finally, I participated in my first ever coding sprint! It was with the matplotlib team. It was a great learning experience, participating in the actual modern git workflows of software development. I helped with making changes to the documented examples, a task suitable to first timer sprinters (as it doesn't risk messing up the established code logic). Seeing my first merged PR to a major software project gave me an absolute thrill :). I also got to observe how to do Continuous Integration with auto testing. Next conference I will most certainly make time for at least part of a coding sprint.</li>
-<li>I missed a bunch of talks on the second and third day, because I needed some headspace to finish up thinking about this paper that I am writing. However, because of the great efforts by the AV team that Enthought hired, it's possible to view them online after the conference. This also have those who couldn't attend the conference a chance to access the conference materials. Kudos to them!</li>
-</ol>
-<p>This year's conference was a really great experience. I learned lots, learned about the many people doing cool stuff with the scientific Python stack, and made new connections with them too. I would highly recommend joining SciPy 2016, and I hope to make it an annual thing with PyCon!</p>
-
-  </div>
-
-    <p><i>Did you enjoy this blog post? <a href="../../../blog/2015/7/13/scipy-2015-done/#disqus">Let's discuss more</a>!</i></p>
     <hr class="fancy">
   
 
