@@ -92,6 +92,54 @@
   <link rel="stylesheet" href="../../../static/pygments.css">
   <div>
   
+    <h1><a href="../../../blog/2017/5/3/managing-conda-environments/">Managing conda environments</a></h1>
+  
+  <p class="meta">
+    written by
+    
+      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on 2017-05-03
+  </p>
+  <p>I recently got around to hacking a system for managing my <code>conda</code> environments better. Previously, my coding projects mostly relied on one master environment (with exceptions, e.g. <code>bokeh</code> development, or my Network Analysis Made Simple tutorial), but conflicts started cropping up. Thus, I decided to separate out my environments. However, keeping track of which environments go with which projects began getting tedious.</p>
+<p>I thus decided to automate some of the steps involved in maintaining environments, and keep everything centrally managed so my brain doesn't overload. It involves a bit of GitHub and a bit of bash scripting, but altogether gives a ton of flexibility and control over keeping my environments updated.</p>
+<p>I start by keeping a central repository of <code>conda</code> environment YAML specifications. Mine is kept <a href="https://github.com/ericmjl/conda-envs">here</a>. Each YAML specification includes just the minimum set of packages that I need; <code>conda</code> manages the dependencies.</p>
+<p>For example, my environment specification for Bayesian statistical analyses looks as such:</p>
+<div class="hll"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">bayesian</span>  <span class="c1"># for Bayesian analysis</span>
+<span class="l l-Scalar l-Scalar-Plain">channels</span><span class="p p-Indicator">:</span> <span class="kt">!!python/tuple</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">conda-forge</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">defaults</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ericmjl</span>
+<span class="l l-Scalar l-Scalar-Plain">dependencies</span><span class="p p-Indicator">:</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">python=3.6</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">matplotlib</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">numpy</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">scipy</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">seaborn</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pymc3</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">jupyter</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">jupyterlab</span>
+</pre></div>
+<p>Now, I've not pinned specific versions here, because I like to keep up with the latest stable releases. However, if version pinning is desired, it's totally possible to pin specific packages to particular versions, using the same syntax as I did for <code>python=3.6</code>.</p>
+<p>In each project repository, I have an <code>update_env.sh</code> script, that looks something like this:</p>
+<div class="hll"><pre><span></span>wget https://raw.githubusercontent.com/ericmjl/conda-envs/master/lektor.yml -O environment.yml
+conda env update -f environment.yml
+</pre></div>
+<p>The key idea here is that I download only the relevant YAML file, export it as a generic <code>environment.yml</code> file, and then run the <code>conda env update</code> command on it to keep the environment up-to-date.</p>
+<p>Now, here's the magic. I hacked Christine Doig's <code>conda-auto-env</code> script  to execute <code>update_env.sh</code>, and then auto-activate the environment.</p>
+<p>If my environment needs change, I can always update the environment YAML spec file (e.g. <code>lektor.yml</code>, or <code>bayesian.yml</code>) in the central repository, and use that to automatically update individual project environments.</p>
+
+  </div>
+
+    <p><i>Did you enjoy this blog post? <a href="../../../blog/2017/5/3/managing-conda-environments/#disqus">Let's discuss more</a>!</i></p>
+    <hr class="fancy">
+  
+    
+  <!-- <div class="blog-post"> -->
+  <link rel="stylesheet" href="../../../static/pygments.css">
+  <div>
+  
     <h1><a href="../../../blog/2017/4/28/defended/">Defended!</a></h1>
   
   <p class="meta">
@@ -209,31 +257,6 @@
   </div>
 
     <p><i>Did you enjoy this blog post? <a href="../../../blog/2017/4/7/staying-nimble/#disqus">Let's discuss more</a>!</i></p>
-    <hr class="fancy">
-  
-    
-  <!-- <div class="blog-post"> -->
-  <link rel="stylesheet" href="../../../static/pygments.css">
-  <div>
-  
-    <h1><a href="../../../blog/2017/3/28/thesis/">Thesis</a></h1>
-  
-  <p class="meta">
-    written by
-    
-      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
-    
-    on 2017-03-28
-  </p>
-  <p>I've finally turned in a polished draft of my thesis (<a href="http://ericmjl.github.io/thesis">HTML</a> or <a href="http://www.ericmjl.com/cv/thesis.pdf">PDF</a>) to my committee! My thesis topic is on the development of an algorithm to identify reassortant influenza viruses from large sequence databases, and its application to the study of influenza's evolution and ecology.</p>
-<p>Well, actually, it was last week when I finished it, but I've been doing the job hunt the past week that I've delayed on writing this blog post.</p>
-<p>Apart from the written summary of the work that I've been doing, I wanted to simultaneously write for PDFs and for the web, so I started assembling a software toolchain that compiles my raw markdown files, converts figures from PDF to JPG, and simultaneously builds the PDF and the HTML versions. A lot of Python packages, including <a href="https://github.com/mplewis/csvtomd"><code>csv2md</code></a>, the <a href="https://github.com/tomduck/pandoc-xnos">pandoc-xnos</a> series, and non-Python tools, including ImageMagick (<a href="https://www.imagemagick.org/script/index.php">https://www.imagemagick.org/script/index.php</a>).</p>
-<p>Yes, I know I could have done most of this with Authorea, but being me, building things and doing reverse engineering is also kind of fun! (Especially for learning purposes.)</p>
-<p>I hope you enjoy my thesis!</p>
-
-  </div>
-
-    <p><i>Did you enjoy this blog post? <a href="../../../blog/2017/3/28/thesis/#disqus">Let's discuss more</a>!</i></p>
     <hr class="fancy">
   
 

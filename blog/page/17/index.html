@@ -92,6 +92,49 @@
   <link rel="stylesheet" href="../../../static/pygments.css">
   <div>
   
+    <h1><a href="../../../blog/2016/7/16/principles-of-network-visualization/">Principles of Network Visualization</a></h1>
+  
+  <p class="meta">
+    written by
+    
+      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on 2016-07-16
+  </p>
+  <p>I use networks as part of my research, and visualization is a very important part of it. The problem with network visualizations is that most people default to node-link diagrams that end up looking like <a href="https://duckduckgo.com/?q=network+visualization+hairball&amp;t=osx&amp;ia=web">hairballs</a>.</p>
+<p>Thankfully, if we put some thought into visualizing networks rationally, we can get aesthetic, beautiful and simultaneously informative network visualizations that are much more appealing than hairballs. My time at <a href="http://scipy2016.scipy.org">SciPy 2016</a>, hearing the keynote by <a href="http://www.physics.calpoly.edu/faculty/bgranger">Brian Granger</a> about <a href="https://github.com/ellisonbg/altair">Altair</a>, and talking with <a href="http://aric.hagberg.org">Aric Hagberg</a>, has given me a ton of inspiration on how rational network visualizations can be done right.</p>
+<p>What does it mean to be drawn “rationally”? I think it means following the principles of good data visualization - in which size, shape, location, colour and transparency are all used to convey meaning. As applied to network visualizations, the key is in placing and styling the nodes in some “rational” or “logical” fashion:</p>
+<ol>
+<li>Spatial location (i.e. <code>(x, y)</code> coordinates) follows some regular organization (e.g. in a shape, or along lines), based on grouping or ordering.</li>
+<li>Node colour follows some grouping, or ordering, or scaling. (Note - it is in that order - colour doesn’t work well for scale.)</li>
+<li>Highlights, such as borders, can be used to accentuate nodes of interest.</li>
+</ol>
+<p>Once the <code>(x, y)</code> coordinates for each node are computed, drawing edges is a much easier matter. Meaning can be attached to edges by:</p>
+<ol>
+<li>Filtering out edges that are unnecessary to display.</li>
+<li>Adjusting line thickness to convey quantitative data.</li>
+<li>Colouring lines to convey grouping of edges.</li>
+<li>Highlights, such as using different line styles, thickness, or colour (as long as they are not used to convey other things), to accentuate edges of interest.</li>
+</ol>
+<p>Finally, it may be better to show panels of subsets of the graph, rather than the whole graph itself, rather than shove the entire graph into one visualization. This is because extracting subsets of edges (and even just the relevant nodes) and displaying them on separate plots reduces visual clutter.</p>
+<p>Hive Plots and Circos Plots are two examples of network visualizations done well, for they conform to these principles. They will both be available in the <a href="https://github.com/ericmjl/nxviz"><code>nxviz</code></a> package that I will be co-developing, and I hope to use <code>nxviz</code> to highlight these details. I think there are other creative layouts as well, such as Arc Plots and Parallel Line Plots that can help us gain a more rational view of the structure of our network data.</p>
+<p>From an API design perspective, the “grammar”-based API that specifies how things are coloured makes a ton of sense. For example, a HivePlot API may look as such:</p>
+<div class="hll"><pre><span></span><span class="n">h</span> <span class="o">=</span> <span class="n">HivePlot</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">node_groupby</span><span class="o">=</span><span class="n">groupby_key</span><span class="p">,</span> <span class="n">node_colorby</span><span class="o">=</span><span class="n">colorby_key</span><span class="p">,</span> <span class="n">edge_colorby</span><span class="o">=</span><span class="n">colorby_key</span><span class="p">)</span>
+<span class="n">h</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+</pre></div>
+<p>The user need not specify how individual nodes are coloured, as long as the <code>groupby_key</code> is present in the metadata. Likewise for node colours and edge colours.</p>
+<p>Implementing this into <code>nxviz</code>, I think, is going to be a really challenging, fun and rewarding thing to do!</p>
+
+  </div>
+
+    <p><i>Did you enjoy this blog post? <a href="../../../blog/2016/7/16/principles-of-network-visualization/#disqus">Let's discuss more</a>!</i></p>
+    <hr class="fancy">
+  
+    
+  <!-- <div class="blog-post"> -->
+  <link rel="stylesheet" href="../../../static/pygments.css">
+  <div>
+  
     <h1><a href="../../../blog/2016/7/16/scipy-2016-hallway-track/">SciPy 2016 Hallway Track</a></h1>
   
   <p class="meta">
@@ -191,49 +234,6 @@
   </div>
 
     <p><i>Did you enjoy this blog post? <a href="../../../blog/2016/7/6/leaders-provide-safe-zones-to-fail/#disqus">Let's discuss more</a>!</i></p>
-    <hr class="fancy">
-  
-    
-  <!-- <div class="blog-post"> -->
-  <link rel="stylesheet" href="../../../static/pygments.css">
-  <div>
-  
-    <h1><a href="../../../blog/2016/7/4/the-shaping-of-an-effective-leader-chapter-2/">The Shaping of an Effective Leader: Chapter 2</a></h1>
-  
-  <p class="meta">
-    written by
-    
-      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
-    
-    on 2016-07-04
-  </p>
-  <h3 id="leadership-tasks">Leadership Tasks</h3><p>These are the leadership tasks that lead to effectiveness:</p>
-<ol>
-<li>Developing a plan of action.</li>
-<li>Determining a method of analysis</li>
-<li>Cultivating an understanding of the tools needed.</li>
-<li>Making decisions.</li>
-<li>Committing to a course of action, allocating resources so that the greatest opportunities can be realized.</li>
-</ol>
-<blockquote><p>The purpose of an organization is to get uncommon results from common individuals.</p>
-</blockquote>
-<h3 id="effective-practices">Effective Practices</h3><ol>
-<li>Ask what needs to be done.</li>
-<li>Focus not on what you like to do but on what is right for this organization.</li>
-<li>Develop a bias for action and develop plans reflective of that bias.</li>
-<li>Work to make effective decisions - and follow them up.</li>
-<li>Communicate the appropriate amount of information at the appropriate level of transparency.</li>
-<li>Maintain a focus on opportunities and innovations rather than problems.</li>
-<li>Coordinate and run productive and effective team meetings.</li>
-<li>Build an effective team.</li>
-</ol>
-<p>Beebe gave the example of U.S. President Harry Truman. He was widely regarded as being strong in domestic policy and weak in foreign policy. Truman didn't inherit a country at peace internationally; rather he came into the presidency in the middle of international turmoil. Truman surrounded himself with foreign policy experts, who in turn helped him "level up" his foreign policy skills.</p>
-<p>In striving for effectiveness, treating people with "fairness" (on paper) is actually ineffective. Beebe states that Peter Drucker argues that leaders should focus on motivating the small handful/percentage of people who deliver the largest amount of desired results, keeping them motivated in line with the mission of the organization.</p>
-<h3 id="challenges">Challenges</h3><p>The challenge that a leader faces here is that of envy. There may be direct or indirect reports who are stronger in a particular skill, relative to myself. I have to avoid envy cropping up, as that will diminish my effectiveness in motivating, rewarding, and retaining the services of those individuals. People we enlist/hire to help us on our mission should be better than us in some respect, otherwise it's wasteful effort duplication cropping up again.</p>
-
-  </div>
-
-    <p><i>Did you enjoy this blog post? <a href="../../../blog/2016/7/4/the-shaping-of-an-effective-leader-chapter-2/#disqus">Let's discuss more</a>!</i></p>
     <hr class="fancy">
   
 

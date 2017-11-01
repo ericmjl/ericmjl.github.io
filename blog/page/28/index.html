@@ -92,6 +92,35 @@
   <link rel="stylesheet" href="../../../static/pygments.css">
   <div>
   
+    <h1><a href="../../../blog/2015/6/2/thoughts-on-open-data-science-conference/">Thoughts on Open Data Science Conference</a></h1>
+  
+  <p class="meta">
+    written by
+    
+      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on 2015-06-02
+  </p>
+  <ol>
+<li>Great turnout! People from everywhere - Conneticut, Michigan, Boston, Ukraine etc. Many companies as well. </li>
+<li>Hiccups with the workshops.</li>
+</ol>
+<h3 id="on-talks">On Talks</h3><p>All-round mostly high quality talks. Favorites: Booz Allen Hamilton’s opener (4th of the opening talks), in which they encouraged Data Scientists to go beyond correlations and move into finding out causations. Best point I’ve seen about the data science world.</p>
+<h3 id="on-job-booths">On Job Booths</h3><p>Darn! It looks like the Broad is more interested in post-docs than staff computational biologists. :( I hope my impressions are wrong.</p>
+<h3 id="on-workshops">On Workshops</h3><p>I would run the workshops in the style of PyCon Tutorials. Concentrate them, require participants to pre-register for them, and perhaps pay a refundable deposit for their spot. Refundable deposits via EventBrite are not impossible.</p>
+<h3 id="other-suggestions">Other Suggestions</h3><p>Try booking a venue much closer to the entrance, perhaps?</p>
+<p>Food - okay, maybe at a low registration fee, not possible to provide. But catering for 1000+ people might be more cost effective than having us buy our own lunches?</p>
+
+  </div>
+
+    <p><i>Did you enjoy this blog post? <a href="../../../blog/2015/6/2/thoughts-on-open-data-science-conference/#disqus">Let's discuss more</a>!</i></p>
+    <hr class="fancy">
+  
+    
+  <!-- <div class="blog-post"> -->
+  <link rel="stylesheet" href="../../../static/pygments.css">
+  <div>
+  
     <h1><a href="../../../blog/2015/5/30/how-to-do-testing-as-a-practice-in-data-analysis/">How to do Testing as a Practice in Data Analysis</a></h1>
   
   <p class="meta">
@@ -278,88 +307,6 @@ E assert dtype('O') == float
     <p><i>Did you enjoy this blog post? <a href="../../../blog/2015/4/3/semantic-versioning-for-papers-a-manifesto/#disqus">Let's discuss more</a>!</i></p>
     <hr class="fancy">
   
-    
-  <!-- <div class="blog-post"> -->
-  <link rel="stylesheet" href="../../../static/pygments.css">
-  <div>
-  
-    <h1><a href="../../../blog/network-propagation/">Network Propagation</a></h1>
-  
-  <p class="meta">
-    written by
-    
-      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
-    
-    on 
-  </p>
-  <h2 id="introduction">Introduction</h2><p>I recently read a <a href="http://www.nature.com/nrg/journal/vaop/ncurrent/abs/nrg.2017.38.html">review paper on network propagation</a>. It looks like a very useful thing in data science, particularly where networks are involved, and I wanted to share it with everybody.</p>
-<p>Before I go on, I will start off by assuming we have a dataset modelled as a "network", or a "graph", in which the nodes are entities in the graph, and edges are relationships between those entities. In the context of my work, I encounter biological networks of many kinds - gene-gene interactions, protein-protein interactions, protein-RNA interactions, evolutionary networks, and more.</p>
-<p>What kind of problems can network propagation solve? The problem class generally follows this logic: I start with some nodes of interest, and I'm most interested in finding other nodes of interest based on these "seed" nodes. Knowing that path-based methods can often end up over-prioritizing highly connected nodes, we need a different principled method for finding these nodes. One way would be to take a random walk on the graph, and find out how often we land on a particular set of nodes on the graph. This random walk is what we call "network propagation".</p>
-<h2 id="how-network-propagation-works">How network propagation works</h2><p>Network propagation follows this intuition: Imagine nodes contain information, and edges dictate which nodes information can be shared with. Network propagation shares the information with other nodes, according to the following rules:</p>
-<ol>
-<li>I can only share by copying to my neighbours in the graph,</li>
-<li>I must share everything that I have with my neighbours, and</li>
-<li>Exchanges in the graph happen simultaneously.</li>
-</ol>
-<p>An animation of how this works is shown below.</p>
-<p>If you take my DataCamp course, you'll learn that networks can be represented as matrices on a computer. The adjacency matrix can be a 1/0 (i.e. binary) matrix that describes how nodes (rows and columns) are connected, and nodes can have their own vector of information (i.e. whether they are "seed" nodes or not). As it turns out, network propagation has a very nice matrix representation:</p>
-<h2 id="how-to-implement-network-propagation">How to implement network propagation</h2><p>So, how do we do network propagation with NetworkX, <code>numpy</code> and Python? Let's take a look at code. Firstly, <strong>how do you convert a graph to a <code>numpy</code> matrix</strong>?</p>
-<div class="hll"><pre><span></span><span class="c1"># Assume we have a graph G. Convert it to a numpy matrix.</span>
-<span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">A</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">to_numpy_matrix</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
-
-<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">A</span>
-<span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
-<span class="n">matrix</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">],</span>
-        <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
-        <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">],</span>
-        <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">],</span>
-        <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">]])</span>
-</pre></div>
-<p>This basically corresponds to the following graph:</p>
-<p><img src="../../../blog/network-propagation/graph.png" alt=""></p>
-<p>Great! Now, let's mark out some "seed" nodes. These are the "nodes" of interest. To represent this, we use a binary vector - each slot in the vector represents one node in the graph. Let's start by highlighting two nodes, the second and third one:</p>
-<div class="hll"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
-</pre></div>
-<p>The <code>.reshape(A.shape[0], 1)</code> is done for convenience, so that each axis is aligned appropriately for the following matrix multiplication:</p>
-<div class="hll"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="n">A</span> <span class="err">@</span> <span class="n">M</span>
-<span class="n">matrix</span><span class="p">([[</span> <span class="mf">1.</span><span class="p">],</span>
-        <span class="p">[</span> <span class="mf">0.</span><span class="p">],</span>
-        <span class="p">[</span> <span class="mf">0.</span><span class="p">],</span>
-        <span class="p">[</span> <span class="mf">1.</span><span class="p">],</span>
-        <span class="p">[</span> <span class="mf">1.</span><span class="p">]])</span>
-</pre></div>
-<p>After the end of one round, nodes 2 and 3 have no information held on them, but their neighbours do. Let's do two rounds of propagation, rather than just one.</p>
-<div class="hll"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="n">A</span> <span class="err">@</span> <span class="p">(</span><span class="n">A</span> <span class="err">@</span> <span class="n">M</span><span class="p">)</span>
-<span class="n">matrix</span><span class="p">([[</span> <span class="mf">2.</span><span class="p">],</span>
-        <span class="p">[</span> <span class="mf">1.</span><span class="p">],</span>
-        <span class="p">[</span> <span class="mf">2.</span><span class="p">],</span>
-        <span class="p">[</span> <span class="mf">2.</span><span class="p">],</span>
-        <span class="p">[</span> <span class="mf">2.</span><span class="p">]])</span>
-</pre></div>
-<p>After two rounds of information, information is shared back with the original nodes, but not necessarily evenly - it all depends on the connectivity of each node.</p>
-<p>It'll get really verbose doing 100 rounds; imagine doing <code>A @ (A @ (A @ (A @ .....)))</code>. Instead of doing that, a recursive function may be better. At the same time, with many rounds of network propagation, we will end up with really large numbers. Therefore, it will be helpful to also normalize the result of matrix multiplication.</p>
-<div class="hll"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
-   <span class="o">...</span><span class="p">:</span>     <span class="k">return</span> <span class="n">arr</span> <span class="o">/</span> <span class="n">arr</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-
-<span class="n">In</span> <span class="p">[</span><span class="mi">7</span><span class="p">]:</span> <span class="k">def</span> <span class="nf">recursive_propagate</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-   <span class="o">...</span><span class="p">:</span>     <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-   <span class="o">...</span><span class="p">:</span>         <span class="k">return</span> <span class="n">recursive_propagate</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">normalize</span><span class="p">(</span><span class="n">A</span> <span class="err">@</span> <span class="n">M</span><span class="p">),</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-   <span class="o">...</span><span class="p">:</span>     <span class="k">else</span><span class="p">:</span>
-   <span class="o">...</span><span class="p">:</span>         <span class="k">return</span> <span class="n">normalize</span><span class="p">(</span><span class="n">A</span> <span class="err">@</span> <span class="n">M</span><span class="p">)</span>
-   <span class="o">...</span><span class="p">:</span>
-</pre></div>
-<p>On a previous blog post, I've alluded to the fact that recursive functions are pretty darn useful!</p>
-<h2 id="result">Result</h2><p>So, let's take a look at the result of a few rounds of propagation.</p>
-<p><img src="../../../blog/network-propagation/figure_1_sm.png" alt=""></p>
-<p>The first thing that I'd like to highlight is that the information propagation process converges on a final result fairly quickly. The second thing I'd like to highlight is that the purple nodes (there are two lines!), which weren't highlighted at the start, ended up having the highest propagation scores, followed by the red node.</p>
-<p>For those who are familiar with Markov chains, I believe network propagation has strong parallels with that.</p>
-<h2 id="conclusion">Conclusion</h2><p>Network propagation is conceptually simple, and easy to implement in Python.</p>
-
-  </div>
-
-    <p><i>Did you enjoy this blog post? <a href="../../../blog/network-propagation/#disqus">Let's discuss more</a>!</i></p>
-    <hr class="fancy">
-  
 
   
   <div class="pagination">
@@ -368,7 +315,7 @@ E assert dtype('O') == float
     
     | 28 |
     
-      <span class="disabled">Next &raquo;</span>
+      <a href="../../../blog/page/29/">Next &raquo;</a>
     
   </div>
 

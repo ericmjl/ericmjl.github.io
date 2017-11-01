@@ -92,6 +92,30 @@
   <link rel="stylesheet" href="../static/pygments.css">
   <div>
   
+    <h1><a href="../blog/2017/10/31/always-check-your-data/">Always Check Your Data</a></h1>
+  
+  <p class="meta">
+    written by
+    
+      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on 2017-10-31
+  </p>
+  <p>True story, just happened today. I was trying to fit a Poisson likelihood to estimate event cycle times (in discreet weeks). For certain columns, everything went perfectly fine. Yet for other columns, I was getting negative infinity’s likelihoods, and was banging my head over this problem for over an hour and a half.</p>
+<p>As things turned out, those columns that gave me negative infinity likelihood initializations were doing so because of negative values in the data. Try fitting a Poisson likelihood, which only has positive support, on that!</p>
+<p><img src="https://i.imgflip.com/1yl6ki.jpg" alt=""></p>
+<p>This lost hour and a half was a good lesson in data checking/testing: <strong>always be sure to sanity check basic stats associated with the data - bounds (min/max), central tendency (mean/median/mode) and spread (variance, quartile range) - always check!</strong></p>
+
+  </div>
+
+    <p><i>Did you enjoy this blog post? <a href="../blog/2017/10/31/always-check-your-data/#disqus">Let's discuss more</a>!</i></p>
+    <hr class="fancy">
+  
+    
+  <!-- <div class="blog-post"> -->
+  <link rel="stylesheet" href="../static/pygments.css">
+  <div>
+  
     <h1><a href="../blog/2017/10/27/random-forests-a-good-default-model/">Random Forests: A Good Default Model?</a></h1>
   
   <p class="meta">
@@ -363,126 +387,6 @@ J -&gt; I -&gt; F -&gt; root
   </div>
 
     <p><i>Did you enjoy this blog post? <a href="../blog/2017/10/10/recursive-programming-and-dags/#disqus">Let's discuss more</a>!</i></p>
-    <hr class="fancy">
-  
-    
-  <!-- <div class="blog-post"> -->
-  <link rel="stylesheet" href="../static/pygments.css">
-  <div>
-  
-    <h1><a href="../blog/2017/10/7/a-data-scientists-guide-to-environment-variables/">A Data Scientist&#39;s Guide to Environment Variables</a></h1>
-  
-  <p class="meta">
-    written by
-    
-      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
-    
-    on 2017-10-07
-  </p>
-  <p>You might have encountered a piece of software asking you for permission to modify your <code>PATH</code> variable, or another program's installation instructions cryptically telling you that you have to "set your <code>LD_LIBRARY_PATH</code> variable correctly".</p>
-<p>As a data scientist, you might encounter other environment variable issues when interacting with your compute stack (particularly if you don't have full control over it, like I do). This post is meant to demystify what an environment variable is, and how it gets used in a data science context.</p>
-<h2 id="what-is-an-environment-variable?">What Is An Environment Variable?</h2><p>First off, let me explain what an environment variable is, by going in-depth into the <code>PATH</code> environment variable. I'd encourage you to execute the commands here inside your bash terminal (with appropriate modifications -- read the text to figure out what I'm doing!).</p>
-<p>When you log into your computer system, say, your local computer’s terminal or your remote server via SSH, your bash interpreter needs to know where to look for particular programs, such as <code>nano</code> (the text editor), or <code>git</code> (your version control software), or your Python executable. This is controlled by your PATH variable. It specifies the paths to folders where your executable programs are found.</p>
-<p>By historical convention, command line programs, such as <code>nano</code>, <code>which</code>, and <code>top</code>, are found in the directory <code>/usr/bin</code>. (By historical convention, the <code>/bin</code> folder is for software binaries, which is why they are named <code>/bin</code>.) These are the ones that are bundled with your operating system, and as such, need special permissions to upgrade.</p>
-<p>Try it out in your terminal:</p>
-<pre><code>$ which which
-/usr/bin/which
-$ which top
-/usr/bin/top
-</code></pre>
-<p>Other programs are installed (for whatever reason) into <code>/bin</code> instead. <code>ls</code> is one example:</p>
-<pre><code>$ which ls
-/bin/ls
-</code></pre>
-<p>Yet other programs might be installed in other special directories:</p>
-<pre><code>$ which nano
-/usr/local/bin/nano
-</code></pre>
-<p>How does your Bash terminal figure out where to go to look for stuff? It uses the <code>PATH</code> environment variable. It looks something like this:</p>
-<pre><code>$ echo $PATH
-/usr/bin:/bin:/usr/local/bin
-</code></pre>
-<p>The most important thing to remember about the <code>PATH</code> variable is that it is "colon-delimited". That is, each directory path is separated by the next using a "colon" (<code>:</code>) character. The order in which your bash terminal is looking for programs goes from left to right:</p>
-<ul>
-<li><code>/usr/bin</code></li>
-<li><code>/bin</code></li>
-<li><code>/usr/local/bin</code></li>
-</ul>
-<p>On my particular computer, when I type in <code>ls</code>, my bash interpreter will look inside the <code>/usr/bin</code> directory first. It'll find that <code>ls</code> doesn't exist in <code>/usr/bin</code>, and so it'll move to the next directory, <code>/bin</code>. Since my <code>ls</code> exists under <code>/bin</code>, it'll execute the <code>ls</code> program from there.</p>
-<p>You can see, then, that this is simultaneously super flexible for customizing your compute environment, yet also potentially super frustrating if a program modified your <code>PATH</code> variable without you knowing.</p>
-<p>Wait, you can actually modify your <code>PATH</code> variable? Yep, and there's a few ways to do this.</p>
-<h2 id="how-to-modify-the-path-variable">How To Modify the <code>PATH</code> variable</h2><h3 id="using-a-bash-session">Using a Bash Session</h3><p>The first way is transient, or temporary, and only occurs for your particular bash session. You can make a folder have higher priority than the existing paths by "pre-pending" it to the <code>PATH</code> variable:</p>
-<pre><code>$ export PATH=/path/to/my/folder:$PATH
-$ echo $PATH
-/path/to/my/folder:/usr/bin:/bin:/usr/local/bin
-</code></pre>
-<p>Or I can make it have a lower priority than existing paths by "appending" it to the <code>PATH</code> variable:</p>
-<pre><code>$ export PATH=$PATH:/path/to/my/folder
-$ echo $PATH
-/usr/bin:/bin:/usr/local/bin:/path/to/my/folder
-</code></pre>
-<p>The reason this is temporary is because I only export it during my current bash session.</p>
-<h3 id="bashrc-or-.bash_profile-file"><code>bashrc</code> or <code>.bash_profile</code> File</h3><p>If I wanted to make my changes somewhat more permanent, then I would include inside my <code>.bashrc</code> or <code>.bash_profile</code> file. (I recommend using the <code>.bashrc</code> file.) The <code>.bashrc</code>/<code>.bash_profile</code> file lives inside your home directory (your <code>$HOME</code> environment variable specifies this), and is a file that your bash interpreter will execute first load. It will execute all of the commands inside there. This means, you can change your PATH variable by simply putting inside your <code>.bashrc</code>:</p>
-<pre><code>...other stuff above...
-# Make /path/to/folder have higher priority
-export PATH=/path/to/folder:$PATH
-
-# Make /path/to/other/folder have lower priority
-export PATH=$PATH:/path/to/folder
-...other stuff below...
-</code></pre>
-<h2 id="data-science-and-the-path-environment-variable">Data Science and the <code>PATH</code> environment variable</h2><p>Now, <strong>how is this relevant to data scientists?</strong> Well, if you're a data scientist, chances are that you use Python, and that your Python interpreter comes from the Anaconda Python distribution (a seriously awesome thing, go get it!). What the Anaconda Python installer does is prioritize the <code>/path/to/anaconda/bin</code> folder in the <code>PATH</code> environment variable. You might have other Python interpreters installed on your system (that is, Apple ships its own). However, this <code>PATH</code> modification ensures that each time you type <code>python</code> into your Bash terminal, you execute the Python interpreter shipped with the Anaconda Python distribution. In my case, after installing the Anaconda Python distribution, my <code>PATH</code> looks like:</p>
-<pre><code>$ echo $PATH
-/Users/ericmjl/anaconda/bin:/usr/bin:/bin:/usr/local/bin
-</code></pre>
-<p>Even better, what conda environments do is prepend the path to the conda environment binaries folder while the environment is activated. For example, with my blog, I keep it in an environment named <code>lektor</code>. Thus...</p>
-<pre><code>$ echo $PATH
-/Users/ericmjl/anaconda/bin:/usr/bin:/bin:/usr/local/bin
-$ which python
-/Users/ericmjl/anaconda/bin/python
-$ source activate lektor
-$ echo $PATH
-/Users/ericmjl/anaconda/envs/lektor/bin:/Users/ericmjl/anaconda/bin:/usr/bin:/bin:/usr/local/bin
-$ which python
-/Users/ericmjl/anaconda/envs/lektor/bin/python
-</code></pre>
-<p>Notice how the bash terminal now preferentially picks the Python inside the higher-priority <code>lektor</code> environment.</p>
-<p>If you've gotten to this point, then you'll hopefully realize there's a few important concepts listed here. Let's recap them:</p>
-<ul>
-<li><code>PATH</code> is an environment variable stored as a plain text string used by the bash interpreter to figure out where to find executable programs.</li>
-<li><code>PATH</code> is colon-delimited; higher priority directories are to the left of the string, while lower priority directories are to the right of the string.</li>
-<li><code>PATH</code> can be modified by prepending or appending directories to the environment variable. It can be done transiently inside a bash session by running the <code>export</code> command at the command prompt, or it can be done permanently across bash sessions by adding an <code>export</code> line inside your <code>.bashrc</code> or <code>.bash_profile</code>.</li>
-</ul>
-<h2 id="other-environment-variables-of-interest">Other Environment Variables of Interest</h2><p>Now, what other environment variables might a data scientist encounter? These are a sampling of them that you might see, and might have to fix, especially in contexts where your system administrators are off on vacation (or taking too long to respond).</p>
-<p><strong>For general use</strong>, you'll definitely want to know where your <code>HOME</code> folder is -- on Linux systems, it's often <code>/home/username</code>, while on macOS systems, it's often <code>/Users/username</code>.  You can figure out what <code>HOME</code> is by doing:</p>
-<pre><code>$ echo $HOME
-/Users/ericmjl
-</code></pre>
-<p><strong>If you're a Python user</strong>, then the <code>PYTHONPATH</code> is one variable that might be useful. It is used by the Python interpreter, and specifies where to find Python modules/packages.</p>
-<p><strong>If you have to deal with C++ libraries</strong>, then knowing your <code>LD_LIBRARY_PATH</code> environment variable is going to be very important. I'm not well-versed enough in this to espouse on it intelligently, so I would defer to <a href="http://xahlee.info/UnixResource_dir/_/ldpath.html">this website</a> for more information on best practices for using the <code>LD_LIBRARY_PATH</code> variable.</p>
-<p><strong>If you're working with Spark</strong>, then the <code>PYSPARK_PYTHON</code> environment variable would be of interest. This essentially tells Spark which Python to use for both its driver and its workers; you can also set the <code>PYSPARK_DRIVER_PYTHON</code> to be separate from the <code>PYSPARK_PYTHON</code> environment variable, if needed.</p>
-<h3 id="hack-your-environment-variables">Hack Your Environment Variables</h3><p>This is where the most fun happens! Follow along for some stuff you might be able to do by hacking your environment variables.</p>
-<p><strong>Hack #1: Enable access to PyPy.</strong> I occasionally keep up with the development of PyPy, but because PyPy is not yet the default Python interpreter, and is not yet <code>conda install</code>-able, I have to put it in its own <code>$HOME/pypy/bin</code> directory. To enable access to the PyPy interpreter, I have to make sure that my <code>/path/to/pypy</code> is present in the <code>PATH</code> environment variable, but at a lower priority than my regular CPython interpreter.</p>
-<p><strong>Hack #2: Enable access to other language interpreters/compilers.</strong> This is analogous to PyPy. I once was trying out Lua's JIT interpreter to use Torch for deep learning, and needed to add a path to there in my <code>.bashrc</code>.</p>
-<p><strong>Hack #3: Install Python packages to your home directory.</strong> On shared Linux compute systems that use the <code>modules</code>  system rather than <code>conda</code> environments, a <code>modulefile</code> that you load might be configured with a virtual environment that <em>you don't have permissions to modify</em>. If you need to install a Python package, you might want to <code>pip install --user my_pkg_name</code>. This will install it to <code>$HOME/.local/lib/python-[version]/site-packages/</code>. Ensuring that your <code>PYTHONPATH</code> includes <code>$HOME/.local/lib/python-[version]/site-packages</code> at a high enough priority is going to be important in this case.</p>
-<p><strong>Hack 4: Debugging when things go wrong.</strong> In case something throws an error, or you have unexpected behaviour -- something I encountered before was my Python interpreter not being found correctly after loading all of my Linux modules -- then a way to debug is to temporarily set your PATH environment variable to some sensible "defaults" and sourcing that, effectively "resetting" your PATH variable, so that you can manually prepend/append while debugging.</p>
-<p>To do this, place the following line inside a file named <code>.path_default</code>, inside your home directory:</p>
-<pre><code>export PATH=""  # resets PATH to an empty string.
-export PATH=/usr/bin:/bin:/usr/local/bin:$PATH  # this is a sensible default; customize as needed.
-</code></pre>
-<p>After something goes wrong, you can reset your PATH environment variable by using the "source" command:</p>
-<pre><code>$ echo $PATH
-/some/complicated/path:/more/complicated/paths:/really/complicated/paths
-$ source ~/.path_default
-$ echo $PATH
-/usr/bin:/bin:/usr/local/bin
-</code></pre>
-<p>Note - you can also execute the exact same commands inside your bash session; the interactivity may also be helpful.</p>
-<h3 id="conclusion">Conclusion</h3><p>I hope you enjoyed this article, and that it'll give you a, ahem, path forward whenever you encounter these environment variables!</p>
-
-  </div>
-
-    <p><i>Did you enjoy this blog post? <a href="../blog/2017/10/7/a-data-scientists-guide-to-environment-variables/#disqus">Let's discuss more</a>!</i></p>
     <hr class="fancy">
   
 

@@ -92,6 +92,84 @@
   <link rel="stylesheet" href="../../../static/pygments.css">
   <div>
   
+    <h1><a href="../../../blog/2016/12/24/how-to-make-your-python-scripts-callable-from-the-command-line/">How to make your Python scripts callable from the command-line</a></h1>
+  
+  <p class="meta">
+    written by
+    
+      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on 2016-12-24
+  </p>
+  <p>So you've written this awesome Python module/script that does awesome stuff, but now you want to call it from the command line. I'm going to show you how to make this happen.</p>
+<p>First off, create your Python script. Below, borrowing from the <a href="http://click.pocoo.org/5/">Click</a> package documentation, I'm going to show a script that is just slightly more complex than a simple "hello world".</p>
+<div class="hll"><pre><span></span><span class="c1"># helloworld.py</span>
+<span class="kn">import</span> <span class="nn">click</span>
+
+<span class="nd">@click.command</span><span class="p">()</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s1">&#39;--count&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Number of greetings.&#39;</span><span class="p">)</span>
+<span class="nd">@click.option</span><span class="p">(</span><span class="s1">&#39;--name&#39;</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="s1">&#39;Your name&#39;</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The person to greet.&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Simple program that greets NAME for a total of COUNT times.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+        <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Hello </span><span class="si">%s</span><span class="s1">!&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">hello</span><span class="p">()</span>
+</pre></div>
+<p>Let's say this script is saved as <code>helloworld.py</code> in your project directory:</p>
+<pre><code>+-- my_project/
+    +-- helloworld.py
+    +-- LICENSE
+    +-- README.md
+    +-- setup.py
+</code></pre>
+<p>What you'd want to put in your <code>setup.py</code> script is the following:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span> <span class="nn">setuptools</span> <span class="kn">import</span> <span class="n">setup</span>
+
+
+<span class="k">def</span> <span class="nf">readfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+
+<span class="n">setup</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;helloworld&quot;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;2016.12.24&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">long_description</span><span class="o">=</span><span class="n">readfile</span><span class="p">(</span><span class="s1">&#39;README.md&#39;</span><span class="p">),</span>
+    <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Eric J. Ma&quot;</span><span class="p">,</span>
+    <span class="n">author_email</span><span class="o">=</span><span class="s2">&quot;ericmajinglong@gmail.com&quot;</span><span class="p">,</span>
+    <span class="n">url</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">py_modules</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;helloworld&#39;</span><span class="p">],</span>
+    <span class="n">license</span><span class="o">=</span><span class="n">readfile</span><span class="p">(</span><span class="s1">&#39;LICENSE&#39;</span><span class="p">),</span>
+    <span class="n">entry_points</span><span class="o">=</span><span class="p">{</span>
+        <span class="s1">&#39;console_scripts&#39;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s1">&#39;aloha = helloworld:hello&#39;</span>
+        <span class="p">]</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+<p>The key magic point here is <code>entry_points</code>. What this portion is effectively saying is, "attach the 'hello' function under the <code>helloworld</code> script to the console command <code>aloha</code>. (I'm being playful here for clarity; it may make much more sense to name your console command the same name as the Python module you're distributing.)</p>
+<p>Now, if you open a new terminal session, you can run <code>helloworld.py</code> using the <code>aloha</code> command, and use all of the command-line arguments that Click provides:</p>
+<div class="hll"><pre><span></span>$ aloha --count <span class="m">3</span>
+Your name: Eric
+Hello Eric!
+Hello Eric!
+Hello Eric!
+</pre></div>
+
+  </div>
+
+    <p><i>Did you enjoy this blog post? <a href="../../../blog/2016/12/24/how-to-make-your-python-scripts-callable-from-the-command-line/#disqus">Let's discuss more</a>!</i></p>
+    <hr class="fancy">
+  
+    
+  <!-- <div class="blog-post"> -->
+  <link rel="stylesheet" href="../../../static/pygments.css">
+  <div>
+  
     <h1><a href="../../../blog/2016/12/20/female-doctors-are-better-than-male-doctors-for-real/">Female Doctors are Better than Male Doctors - For Real?</a></h1>
   
   <p class="meta">
@@ -200,32 +278,6 @@
   </div>
 
     <p><i>Did you enjoy this blog post? <a href="../../../blog/2016/12/1/the-renaissance-researcher/#disqus">Let's discuss more</a>!</i></p>
-    <hr class="fancy">
-  
-    
-  <!-- <div class="blog-post"> -->
-  <link rel="stylesheet" href="../../../static/pygments.css">
-  <div>
-  
-    <h1><a href="../../../blog/2016/11/10/book-thoughts-the-theory-that-would-not-die/">Book Thoughts: The Theory That Would Not Die</a></h1>
-  
-  <p class="meta">
-    written by
-    
-      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
-    
-    on 2016-11-10
-  </p>
-  <p>One of two eBooks I bought to read on this trip to Vienna was "The Theory That Would Not Die". It was a good read, and I definitely have come to appreciate more the history behind Bayes' rule and its multiple deaths and resurrections.</p>
-<p>Three things stuck out for me.</p>
-<p>Firstly, I didn't realize how big of a genius Laplace was, and how prior to the two great wars, the epicentre of scientific inquiry was in France. Laplace basically touched a wide variety of foundational topics that later generations have built on, and his mastery of concepts as diverse as probability, calculus and the likes is amazing. I definitely can appreciate how he was able to connect many disciplines together.</p>
-<p>Secondly, many of the great breakthroughs of the past came from people dabbling in a problem for over a decade. Compare that to the expected constant output by professional scientists now. It seems to me that it is a truism that scientific inquiry can only really be conducted under certain circumstances, and funding crunches, KPIs and publication metrics, and distracted service to an academy aren't the ways to get it done.</p>
-<p>Finally, the role of the military was such a catalyst for new advances! Yet the military's role in research results in a paradox. We all want new breakthroughs to be open, freely accessible, and used for peaceful, civilian purposes. Yet the military provides the catalytic impetus for accelerating new technologies and ideas for practical use; not even capitalism has that force. The book highlighted how Bayes remained highly theoretical and impractical in the academic realm for decades after the military already started pushing through practical applications of it.</p>
-<p>All in all, good book, highly recommended to read!</p>
-
-  </div>
-
-    <p><i>Did you enjoy this blog post? <a href="../../../blog/2016/11/10/book-thoughts-the-theory-that-would-not-die/#disqus">Let's discuss more</a>!</i></p>
     <hr class="fancy">
   
 
