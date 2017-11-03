@@ -92,6 +92,47 @@
   <link rel="stylesheet" href="../../../static/pygments.css">
   <div>
   
+    <h1><a href="../../../blog/2017/6/30/using-bokeh-in-fluforecaster/">Using Bokeh in FluForecaster</a></h1>
+  
+  <p class="meta">
+    written by
+    
+      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on 2017-06-30
+  </p>
+  <p>Author: Eric J. Ma, Insight Health Data Science Fellow (Boston 2017b)</p>
+<p><strong>Summary</strong></p>
+<p>In this blog post, I will show how Bokeh featured in my Insight project, FluForecaster.</p>
+<p><strong>Motivation</strong></p>
+<p>As a Health Data Fellow at Insight, we spend about 3 weeks executing on a data project, which we demo at companies that are hiring. I built <a href="https://fluforecaster.herokuapp.com/">FluForecaster</a>, which was a project aimed at forecasting influenza sequence evolution using deep learning.</p>
+<p>My choice of project was strategically aligned with my goals on a few levels. Firstly, I wanted to make sure my project showcased deep learning, as it's currently one of the hottest skills to have. Secondly, I had components of the code base written in separate Jupyter notebooks prior to Insight, meaning, I could execute on it quickly within the three weeks we had. Thirdly, I had intended to join Insight primarily with the goal of networking with the Insight community, and that basically meant 'being a blessing' to others on their journey too - if I could execute fast and well on my own stuff, then there'd be time to be a team player with other Fellows in the session, and help them get their projects across the finish line.</p>
+<p>Each of us had to demo a "final product". Initially, I was thinking about a "forecasting dashboard", but one of our program directors, Ivan, suggested that I include more background information. As such, I decided to make the dashboard an interactive blog post instead. Thus, with FluForecaster being a web-first project, I finally had a project in which I could use Bokeh as part of the front-end.</p>
+<p><strong>Applying Bokeh</strong></p>
+<p>Bokeh was used mainly for displaying three data panels in the browser. Firstly, I wanted to show how flu vaccine efficacy rarely crossed the 60% threshold over the years. Secondly, I wanted to show a breakdown of the number of sequences collected per year (as used in my dataset). Thirdly, I wanted to show a visual display of influenza evolution.</p>
+<p>For yearly vaccine effectiveness, it was essentially a line and scatter chart, with the Y-axis constrained between 0 and 100%. I added a hover tooltip to enable my readers to see the exact value of vaccine effectiveness as measured by the US CDC.</p>
+<p>To show the number of sequences per year in the dataset, the same kind of chart was deployed.</p>
+<p>Bokeh magic became really evident later when I wanted to show sequence evolution in 3 dimensions. Because 3D charts are generally a poor choice for a flat screen, I opted to show pairs of dimensions at a time. A nice side-effect of this is that because my <code>ColumnDataSource</code> was shared amongst each of the three pairs of coordinates, panning and selection was automatically linked for free.</p>
+<p><strong>Usage Pros and Cons</strong></p>
+<p>Bokeh's API is very powerful, in that it supplies many plotting primitive objects (glyphs, particularly), and that makes it a big plus for users who are experienced with the library, who are creating complex interactive charts.</p>
+<p>Most of my fellow Fellows at Insight ended up using the <code>bokeh.plotting</code> interface, and I did too. I think the <code>bokeh.plotting</code> interface provides the best balance between ease-of-use and flexibility. If you take a look at the code <a href="https://github.com/ericmjl/flu-sequence-predictor/blob/master/utils/webplots.py#L15">here</a>, you'll notice that there's often a bit of boilerplate that gets repeated with variation, such as in the configuration of custom hover tools. I think this is the tradeoff we make for configurability... or I might just be not writing code most efficiently. :)</p>
+<p>There were times where I was tempted to just use the <code>bkcharts</code>' declarative interface instead. It's a lot more easy to use. However, I did have some time on hand, and wanted to get familiar with the <code>bokeh.plotting</code> interface, because there's a possibility that I might want to make wrappers for other visualizations that can lend themselves to a declarative API.</p>
+<p><strong>Embedding Visualizations</strong></p>
+<p>I built my interactive blog post using a combination of Flask, hand-crafted HTML, Bootstrap CSS & JS, and Bokeh - which took care of the bulk of visuals. I drew static figures using Illustrator.</p>
+<p>Embedding the necessary Bokeh components wasn't difficult. Very good documentation is available on the <a href="http://bokeh.pydata.org/en/latest/docs/user_guide/embed.html">Bokeh docs</a>. The key insight that I had learned was that I could have the <code>components</code> passed into my Flask app functions' <code>return</code> statements, and embed them using Jinja2 templating syntax. An example can be found <a href="https://github.com/ericmjl/flu-sequence-predictor/blob/master/templates/index.html#L81">here</a>. Basically, <code>components</code> returns a <code>div</code> and a <code>js</code> object, which are essentially just strings. To embed them in the templates, we use the syntax <code>{{ div|safe }}</code> and <code>{{ js|safe }}</code>. That <code>|safe</code> is very important: it tells the Jinja2 templating engine that it's safe to render those pieces of Javascript and HTML.</p>
+<p><strong>Conclusion</strong></p>
+<p>Through the project, I became a lot more familiar with the Bokeh plotting library. Now I feel a bit torn! I've contributed to both the Bokeh and <code>matplotlib</code> projects, and I love them both! I've also come to deeply respect the lead developers of both projects, having interacted with them many times. If I were to make a comment on "where to use what" based on my experience, it'd probably still be the conservative view of "<code>matplotlib</code> for papers, <code>bokeh</code> for the web"... but I'm sure that will be outdated soon. Who knows how the Python plotting landscape will evolve - it's exciting times ahead, and at least for now, I'm happy for the experience driving a dataviz project with Bokeh!</p>
+
+  </div>
+
+    <p><i>Did you enjoy this blog post? <a href="../../../blog/2017/6/30/using-bokeh-in-fluforecaster/#disqus">Let's discuss more</a>!</i></p>
+    <hr class="fancy">
+  
+    
+  <!-- <div class="blog-post"> -->
+  <link rel="stylesheet" href="../../../static/pygments.css">
+  <div>
+  
     <h1><a href="../../../blog/2017/6/24/insight-week-4/">Insight Week 4</a></h1>
   
   <p class="meta">
@@ -199,38 +240,6 @@
   </div>
 
     <p><i>Did you enjoy this blog post? <a href="../../../blog/2017/6/10/insight-week-2/#disqus">Let's discuss more</a>!</i></p>
-    <hr class="fancy">
-  
-    
-  <!-- <div class="blog-post"> -->
-  <link rel="stylesheet" href="../../../static/pygments.css">
-  <div>
-  
-    <h1><a href="../../../blog/2017/6/2/insight-week-1/">Insight Week 1</a></h1>
-  
-  <p class="meta">
-    written by
-    
-      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
-    
-    on 2017-06-02
-  </p>
-  <p>Insight's Week 1 is done! Here's some of my thoughts so far.</p>
-<p>Firstly, the Fellows at Insight is very fast at learning things. Everybody is either a PhD or MD, some have done post-doctoral work, and even fewer have become professors, but everybody is interested in doing data stuff, and are very fast at picking up new things. I think at the same time, we're also good at thinking strategically upon being given feedback; once an idea sounds infeasible, new ideas come out of the pivot or even switch.</p>
-<p>Secondly, I see now the importance of developing a great data product. I think of a data product in terms of the <strong>input data</strong>, the <strong>transformation</strong> applied to the data, and the <strong>insight</strong> returned from the data. Think of it as a Python function:</p>
-<pre><code>def data_product(data):
-    insight = transformation(data)
-    return insight
-</code></pre>
-<p>Most of the "data products" being developed are consumer-facing type projects that a user can interact with, but a small number of them, mine included, are "dashboard-style" products that can continually ingest continually updated data and return continually updated insights. Both are good ideas.</p>
-<p>Thirdly, I've become clear on the importance of first clearly defining the problem we want to solve, and then working backwards to define what we build, particularly for the <strong>m</strong>inimum <strong>v</strong>iable <strong>p</strong>roduct (MVP). This way of thinking keeps us agile, and prevents us from being stuck in a rut.</p>
-<p>Fourthly, other fellows know lots of good stuff that I've been able to learn about. For example, in deep learning, there's been a few steps I wasn't sure about w.r.t. convolutional neural networks in autoencoders. One other fellow, a post-doc from UC Berkeley, gave me the master-class run-through on what happens at the vector/matrix level with convolutional neural networks.</p>
-<hr>
-<p>Thus far, really nice. I've noticed we don't generally end up competing with one another, and the atmosphere is very collaborative. We're working with one another, talking with one another, building trust and the likes. I'm looking forward to the coming weeks!</p>
-
-  </div>
-
-    <p><i>Did you enjoy this blog post? <a href="../../../blog/2017/6/2/insight-week-1/#disqus">Let's discuss more</a>!</i></p>
     <hr class="fancy">
   
 

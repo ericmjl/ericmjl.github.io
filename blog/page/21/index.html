@@ -92,6 +92,58 @@
   <link rel="stylesheet" href="../../../static/pygments.css">
   <div>
   
+    <h1><a href="../../../blog/2016/6/7/how-to-speed-up-scientific-python-code/">How to speed up scientific Python code</a></h1>
+  
+  <p class="meta">
+    written by
+    
+      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on 2016-06-07
+  </p>
+  <h3 id="introduction">Introduction</h3><p>For scientists who are looking to take their Python code to the next level, options are abound. I’ve decided to put down in writing a short summary of what I’ve learned so far.</p>
+<p>Disclaimers:</p>
+<ul>
+<li>the “best use cases” part comes from personal experience, not from referenced literature, and is by necessity going to be of limited scope.</li>
+<li>your mileage… ahem, <em>speed increases</em> may vary. (yada yada yada)</li>
+<li><strong>your algorithm complexity matters more than these tools below.</strong></li>
+<li>learn how to profile your code, and then profile, profile, and profile before you optimize.</li>
+</ul>
+<p>Now that the disclaimers are out of the way, here’s the shortlist, in no particular order:</p>
+<hr>
+<h4 id="pypy">PyPy</h4><p>Great if you have only pure Python code, have to deal with things in Python objects, and import other modules that are only pure Python.</p>
+<p><strong>My use cases:</strong> Agent-based simulations, re-implementing random draws from a variety of distributions.</p>
+<p><strong>Upsides:</strong> Speedups can be massive; in my hands anywhere between 8-100X. PyPy is a really simple drop-in replacement for the regular CPython that we’re all used to.</p>
+<p><strong>Downsides:</strong> Have to download an alternate Python interpreter. I have yet to successfully use PyPy as my <code>jupyter</code> backend. Need to tweak environment variables to get <code>pip</code> to install packages/modules such that they’re accessible by <code>pypy</code>.</p>
+<hr>
+<h4 id="numpy-and-scipy"><code>numpy</code> and <code>scipy</code></h4><p>Great if you’re writing things that are, by nature, arrays of stuff, with operations that can be vectorized across all rows (or columns).</p>
+<p><strong>My use cases:</strong> Matrix math.</p>
+<p><strong>Upsides:</strong> <code>numpy</code> and <code>scipy</code> are well-supported, community-favoured, thoroughly tested and all-round great standard scientific computing libraries to use. Easily installable via <code>conda</code>!</p>
+<p><strong>Downsides:</strong> Very few, except that Python overhead is incurred every time a function is called, so one has to get used to avoid calling same function over and over in a <code>for</code> loop.</p>
+<hr>
+<h4 id="numba"><code>numba</code></h4><p>Exciting stuff from Continuum Analytics developer team! Basically a JIT compiler (not unlike PyPy) but for numeric code instead. Can speed up <code>numpy</code> code, according to their claims.</p>
+<p><strong>My use cases:</strong> Matrix math and numeric code.</p>
+<p><strong>Upsides:</strong> Uses the CPython interpreter that we’re all used to. Speedups gained by simply adding a function decorator. Also easily installable by <code>conda</code>!</p>
+<p><strong>Downsides:</strong> Doesn’t work with Python objects very well right now.</p>
+<hr>
+<h4 id="cython">Cython</h4><p>Only for the brave of heart! A simple way to continue writing Python-ish code that then gets compiled to C, which is blazing fast.</p>
+<p><strong>My use cases:</strong> Not sure yet. It is good, don’t get me wrong.</p>
+<p><strong>Upsides:</strong> I’ve done a head-to-head <code>numpy</code> vs. Cython version  of what I’m trying to do. 25X speed-up. And again, easily installable by <code>conda</code>. (It’s probably clear by now that I’m a Continuum Analytics fanboi.)</p>
+<p><strong>Downside:</strong> Have to learn a new-ish language with some intricacies in order to really get the massive speed-ups. I initially could only write Cython code that didn’t break, but would end up with little speed-up (1-1.5X max). Going faster needed a lot more tweaking, probably lots more practice.</p>
+<hr>
+<h3 id="bonus">Bonus!</h3><p>How did I pick up each of these? It was some mixture of following online tutorials, trying to modify examples myself, reading Stack Overflow, and coding with another advanced person who was willing to teach me stuff. I found the last one to be the most effective of them all, as the back-and-forth is great for learning.</p>
+<p>Hope this post helps you decide what to try next for speeding up your code!</p>
+
+  </div>
+
+    <p><i>Did you enjoy this blog post? <a href="../../../blog/2016/6/7/how-to-speed-up-scientific-python-code/#disqus">Let's discuss more</a>!</i></p>
+    <hr class="fancy">
+  
+    
+  <!-- <div class="blog-post"> -->
+  <link rel="stylesheet" href="../../../static/pygments.css">
+  <div>
+  
     <h1><a href="../../../blog/2016/6/3/the-pycon-ers-guide-to-the-hallway-track/">The PyCon attendee&#39;s Guide to the Hallway Track</a></h1>
   
   <p class="meta">
@@ -212,52 +264,6 @@
   </div>
 
     <p><i>Did you enjoy this blog post? <a href="../../../blog/2016/5/29/pycon-2016-tutorials-days-1-and-2/#disqus">Let's discuss more</a>!</i></p>
-    <hr class="fancy">
-  
-    
-  <!-- <div class="blog-post"> -->
-  <link rel="stylesheet" href="../../../static/pygments.css">
-  <div>
-  
-    <h1><a href="../../../blog/2016/5/22/odsc-east/">ODSC East</a></h1>
-  
-  <p class="meta">
-    written by
-    
-      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
-    
-    on 2016-05-22
-  </p>
-  <p>I had a ton of fun delivering a <a href="https://www.odsc.com/boston/detailed-speaker-page#eric-ma">workshop</a> on network analysis fundamentals at <a href="https://www.odsc.com/boston">ODSC East</a> yesterday! This is my bullet-point journal version of my thoughts over ODSC East.</p>
-<ol>
-<li>Learned a ton from <a href="http://clearscience.info/wp/">Bang Wong</a> (of the <a href="https://www.broadinstitute.org">Broad Institute</a>) and Mark Schindler (of <a href="http://groupvisual.io/tag/dvux/">GroupVisual</a>) about <a href="http://www.dvuxworkshop.com">DataViz &amp; User Experience (DVUX)</a>.</li>
-<li>Didn’t expect that the workshop would be over-subscribed! I was expecting the topic to be a bit more niche. <a href="https://twitter.com/oksitosin/status/734205909828800512">Lots</a> of <a href="https://twitter.com/anoushnajarian/status/734063485802418178">kind</a> <a href="https://twitter.com/sharon000/status/734088058048516096">tweets</a> and <a href="https://twitter.com/DataSawr/status/734052971697311746">feedback</a>. Material are all available on <a href="http://github.com/ericmjl/Network-Analysis-Made-Simple">GitHub</a>.</li>
-<li>Invited to contribute content to <a href="https://www.datacamp.com">DataCamp</a> on network analysis. Timeline approximately Fall 2016 or Spring 2017. Strongly considering it.</li>
-<li>Talked one-on-one with a manager in the Facebook infrastructure data science team. FB gets a lot of stick for privacy reasons; after this talk, I realize they have bigger, altruistic plans that rarely get talked about. The short story is that there always some degree of tradeoff, and it sometimes takes a company amassing resources in order to do things that require a big jump rather than incremental improvements.</li>
-<li>I like <a href="http://dask.pydata.org/en/latest/">Dask</a>, great talk by <a href="http://matthewrocklin.com">Matthew Rocklin</a> (<a href="http://matthewrocklin.com/slides/odsc-2016-boston.html#/">slides</a>). Time to try it out.</li>
-<li>Great to see biological applications featured at ODSC, especially on Sunday. <a href="https://www.odsc.com/boston/detailed-speaker-page#paul-kowalczyk">Neglected tropical diseases</a> and <a href="https://www.odsc.com/boston/detailed-speaker-page#anne-carpenter">big microscopy analysis</a>.</li>
-</ol>
-<p><strong>the tweets:</strong></p>
-<p>The tweets are archived here. It'll serve as my "feel good" memory stack if I ever need to return to it.</p>
-<blockquote class="twitter-tweet" data-lang="en">
-<p dir="ltr" lang="en">great workshop on <a href="<a href="https://twitter.com/hashtag/networkanalysis?src=hash&quot;&gt;#networkanalysis">https://twitter.com/hashtag/networkanalysis?src=hash&quot;&gt;#networkanalysis</a></a> by <a href="<a href="https://twitter.com/ericmjl&quot;&gt;@ericmjl">https://twitter.com/ericmjl&quot;&gt;@ericmjl</a></a> &amp; Open Data Science Conference (ODSC) <a href="<a href="https://twitter.com/odsc&quot;&gt;@odsc">https://twitter.com/odsc&quot;&gt;@odsc</a></a> <a href="<a href="https://twitter.com/hashtag/odsc?src=hash&quot;&gt;#odsc">https://twitter.com/hashtag/odsc?src=hash&quot;&gt;#odsc</a></a></p>
-— dan addyson (@DataSawr) <a href="<a href="https://twitter.com/DataSawr/status/734052971697311746&quot;&gt;May">https://twitter.com/DataSawr/status/734052971697311746&quot;&gt;May</a> 21, 2016</a></blockquote>
-<script src="//platform.twitter.com/widgets.js" async="" charset="utf-8"></script>
-
-<blockquote class="twitter-tweet" data-lang="en">
-Awesome Network Analysis workshop by <a href="<a href="https://twitter.com/ericmjl&quot;&gt;@ericmjl">https://twitter.com/ericmjl&quot;&gt;@ericmjl</a></a> at <a href="<a href="https://twitter.com/hashtag/ODSC?src=hash&quot;&gt;#ODSC">https://twitter.com/hashtag/ODSC?src=hash&quot;&gt;#ODSC</a></a> • <a href="<a href="https://t.co/pCvbT8OhTZ&quot;&gt;https://t.co/pCvbT8OhTZ">https://t.co/pCvbT8OhTZ&quot;&gt;https://t.co/pCvbT8OhTZ</a></a> <a href="<a href="https://twitter.com/hashtag/DataScience?src=hash&quot;&gt;#DataScience">https://twitter.com/hashtag/DataScience?src=hash&quot;&gt;#DataScience</a></a> 🕸 <a href="<a href="https://t.co/HTfulTIcFF&quot;&gt;pic.twitter.com/HTfulTIcFF">https://t.co/HTfulTIcFF&quot;&gt;pic.twitter.com/HTfulTIcFF</a></a>
-
-— Anoush Najarian (@anoushnajarian) <a href="<a href="https://twitter.com/anoushnajarian/status/734063485802418178&quot;&gt;May">https://twitter.com/anoushnajarian/status/734063485802418178&quot;&gt;May</a> 21, 2016</a></blockquote><script src="//platform.twitter.com/widgets.js" async="" charset="utf-8"></script>
-<blockquote class="twitter-tweet" data-lang="en">
-<p dir="ltr" lang="en">Network Analysis Made Simple: <a href="https://twitter.com/ericmjl">@ericmjl</a> posted his Python tutorial online at <a href="https://t.co/6gqDGofLDx">https://t.co/6gqDGofLDx</a> <a href="https://twitter.com/hashtag/ODSC?src=hash">#ODSC</a> <a href="https://twitter.com/hashtag/Python?src=hash">#Python</a></p>
-— Sharon Machlis (@sharon000) <a href="https://twitter.com/sharon000/status/734088058048516096">May 21, 2016</a></blockquote>
-<script src="//platform.twitter.com/widgets.js" async="" charset="utf-8"></script><blockquote class="twitter-tweet" data-lang="en">
-'Network-Analysis-Made-Simple' an informative &amp; simple talk from <a href="<a href="https://twitter.com/ericmjl&quot;&gt;@ericmjl">https://twitter.com/ericmjl&quot;&gt;@ericmjl</a></a> on <a href="<a href="https://twitter.com/odsc&quot;&gt;@odsc">https://twitter.com/odsc&quot;&gt;@odsc</a></a> day 2 <a href="<a href="https://t.co/VFxyHK3K4o&quot;&gt;https://t.co/VFxyHK3K4o">https://t.co/VFxyHK3K4o&quot;&gt;https://t.co/VFxyHK3K4o</a></a> <a href="<a href="https://twitter.com/hashtag/ODSCBoston?src=hash&quot;&gt;#ODSCBoston">https://twitter.com/hashtag/ODSCBoston?src=hash&quot;&gt;#ODSCBoston</a></a>
-
-— Nilufer Polat (@oksitosin) <a href="<a href="https://twitter.com/oksitosin/status/734205909828800512&quot;&gt;May">https://twitter.com/oksitosin/status/734205909828800512&quot;&gt;May</a> 22, 2016</a></blockquote><script src="//platform.twitter.com/widgets.js" async="" charset="utf-8"></script>
-  </div>
-
-    <p><i>Did you enjoy this blog post? <a href="../../../blog/2016/5/22/odsc-east/#disqus">Let's discuss more</a>!</i></p>
     <hr class="fancy">
   
 

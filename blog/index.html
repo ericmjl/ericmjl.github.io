@@ -92,6 +92,33 @@
   <link rel="stylesheet" href="../static/pygments.css">
   <div>
   
+    <h1><a href="../blog/2017/11/3/boston-bayesians-talk-an-attempt-at-demystifying-bayesian-deep-learning/">Boston Bayesians Talk: An Attempt at Demystifying Bayesian Deep Learning</a></h1>
+  
+  <p class="meta">
+    written by
+    
+      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on 2017-11-03
+  </p>
+  <p>It's confirmed! I will be rehearsing my PyData NYC talk <a href="https://www.meetup.com/Boston-Bayesians/events/244731222">at Boston Bayesians</a>, held at McKinsey's office.</p>
+<p>This time round, I've challenged myself with making the slides without using PowerPoint or Keynote, and I think I've successfully done it! Check them out:</p>
+<ul>
+<li><a href="https://github.com/ericmjl/bayesian-deep-learning-demystified">GitHub repository</a></li>
+<li><a href="https://ericmjl.github.io/bayesian-deep-learning-demystified">Online slides</a></li>
+</ul>
+<p>Side note, I'm starting to really love what we can do with the web!</p>
+
+  </div>
+
+    <p><i>Did you enjoy this blog post? <a href="../blog/2017/11/3/boston-bayesians-talk-an-attempt-at-demystifying-bayesian-deep-learning/#disqus">Let's discuss more</a>!</i></p>
+    <hr class="fancy">
+  
+    
+  <!-- <div class="blog-post"> -->
+  <link rel="stylesheet" href="../static/pygments.css">
+  <div>
+  
     <h1><a href="../blog/2017/10/31/always-check-your-data/">Always Check Your Data</a></h1>
   
   <p class="meta">
@@ -286,107 +313,6 @@
   </div>
 
     <p><i>Did you enjoy this blog post? <a href="../blog/2017/10/10/pydata-nyc-2017/#disqus">Let's discuss more</a>!</i></p>
-    <hr class="fancy">
-  
-    
-  <!-- <div class="blog-post"> -->
-  <link rel="stylesheet" href="../static/pygments.css">
-  <div>
-  
-    <h1><a href="../blog/2017/10/10/recursive-programming-and-dags/">Recursive Programming and DAGs</a></h1>
-  
-  <p class="meta">
-    written by
-    
-      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
-    
-    on 2017-10-10
-  </p>
-  <p>Over the past few days, I've found myself using recursive programming to implement a "model specification" system with inheritance for deep learning. The goal here is to enable reproducible computational experiments for particular deep learning hyperparameter sets. Reproducibility is something I learned from the Software/Data Carpentry initiative, thus I wanted to ensure that my own work was reproducible, even if it's not (because of corporate reasons) open-able, because it's the right thing to do.</p>
-<p>So, how do these "model spec" files work? I call them "experiment profiles", and they specify a bunch of things: <strong>model architecture</strong>, <strong>training parameters</strong>, and <strong>data tasks</strong>. These experiment profiles are stored in YAML files on disk. A profile essentially looks like the following (dummy examples provided, naturally):</p>
-<div class="hll"><pre><span></span><span class="c1"># Name: default.yaml</span>
-<span class="l l-Scalar l-Scalar-Plain">parent</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
-<span class="l l-Scalar l-Scalar-Plain">data_tasks</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">tasks</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">task1</span><span class="p p-Indicator">,</span> <span class="nv">task2</span><span class="p p-Indicator">,</span> <span class="nv">task3</span><span class="p p-Indicator">]</span>
-<span class="l l-Scalar l-Scalar-Plain">model_architecture</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">hidden_layers</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">20</span><span class="p p-Indicator">,</span> <span class="nv">20</span><span class="p p-Indicator">,</span> <span class="nv">20</span><span class="p p-Indicator">]</span>
-    <span class="l l-Scalar l-Scalar-Plain">hidden_dropouts</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">0.1</span><span class="p p-Indicator">,</span> <span class="nv">0.2</span><span class="p p-Indicator">,</span> <span class="nv">0.3</span><span class="p p-Indicator">]</span>
-<span class="l l-Scalar l-Scalar-Plain">training_parameters</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">optimizer</span><span class="p p-Indicator">:</span> <span class="s">&quot;sgd&quot;</span>
-    <span class="l l-Scalar l-Scalar-Plain">optimizer_options</span><span class="p p-Indicator">:</span>
-        <span class="l l-Scalar l-Scalar-Plain">n_epochs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">20</span>
-</pre></div>
-<p>In this YAML file, the key-value pairs essentially match the API of the tooling I've built on top of Keras' API to make myself more productive. (From the example, it should be clear that we're dealing with only feed-forward neural networks and nothing else more complicated.) The key here (pun unintended) is that I have a <code>parent</code> key-value pair that specifies another experiment profile that I can inherit from.</p>
-<p>Let's call the above example <code>default.yaml</code>. Let's say I want to run another computational experiment that uses the <code>adam</code> optimizer instead of plain vanilla <code>sgd</code>. Instead of re-specifying the entire YAML file, by implementing an inheritance scheme, I can re-specify only the optimizer and optimizer_options.</p>
-<div class="hll"><pre><span></span><span class="c1"># Name: adam.yaml</span>
-<span class="l l-Scalar l-Scalar-Plain">parent</span><span class="p p-Indicator">:</span> <span class="s">&quot;default.yaml&quot;</span>
-<span class="l l-Scalar l-Scalar-Plain">training_parameters</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">optimizer</span><span class="p p-Indicator">:</span> <span class="s">&quot;adam&quot;</span>
-</pre></div>
-<p>Finally, let's say I find out that 20 epochs (inherited from <code>default.yaml</code>) is too much for Adam - after all, Adam is one of the most efficient gradient descent algorithms out there - and I want to change it to 3 epochs instead. I can do the following:</p>
-<div class="hll"><pre><span></span><span class="c1"># Name: adam-3.yaml</span>
-<span class="l l-Scalar l-Scalar-Plain">parent</span><span class="p p-Indicator">:</span> <span class="s">&quot;adam.yaml&quot;</span>
-<span class="l l-Scalar l-Scalar-Plain">training_parameters</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">optimizer_options</span><span class="p p-Indicator">:</span>
-        <span class="l l-Scalar l-Scalar-Plain">n_epochs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">3</span>
-</pre></div>
-<p>Okay, so specifying YAML files with inheritance is all good, but how do I ensure that I get the entire parameter set out correctly, without writing verbose code? This is where the power of recursive programming comes in. Using recursion, I can solve this problem with <strong>a single function that calls itself on one condition, and returns a result on another condition</strong>. That's a recursive function in its essence.</p>
-<p>The core of this problem is traversing the inheritance path, from <code>adam-3.yaml</code> to <code>adam.yaml</code> to <code>default.yaml</code>. Once I have the inheritance path specified, loading the YAML files as a dictionary becomes the easy part.</p>
-<p>How would this look like in code? Let's take a look at an implementation.</p>
-<div class="hll"><pre><span></span><span class="kn">import</span> <span class="nn">yaml</span> 
-
-<span class="k">def</span> <span class="nf">inheritance_path</span><span class="p">(</span><span class="n">yaml_file</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param str yaml_file: The path to the yaml file of interest.</span>
-<span class="sd">    :param list path: A list specifying the existing inheritance path. First</span>
-<span class="sd">        entry is the file of interest, and parents are recursively appended to</span>
-<span class="sd">        the end of the list.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">yaml_file</span><span class="p">,</span> <span class="s1">&#39;r+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;parent&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">path</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;parent&#39;</span><span class="p">])</span>
-            <span class="k">return</span> <span class="n">inheritance_path</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;parent&#39;</span><span class="p">],</span> <span class="n">path</span><span class="p">)</span>
-</pre></div>
-<p>The most important part of the function is in the <code>if</code>/<code>else</code> block. If I have reached the "root" of the inheritance path, (that is, I have hit <code>default.yaml</code> which has no parent), then I return the <code>path</code> traversed. Otherwise, I return into the <code>inheritance_path</code> function call again, but with an updated <code>path</code> list, and a different <code>yaml_file</code> to read. It's a bit like doing a <code>while</code> loop, but in my opinion, a bit more elegant aesthetically.</p>
-<p>Once I've gotten the path list, I can finally load the parameters using a single function that calls on <code>inheritance_path</code>.</p>
-<div class="hll"><pre><span></span><span class="k">def</span> <span class="nf">load_params</span><span class="p">(</span><span class="n">yaml_file</span><span class="p">):</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="n">inheritance_path</span><span class="p">(</span><span class="n">yaml_file</span><span class="p">,</span> <span class="p">[</span><span class="n">yaml_file</span><span class="p">])</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">data_tasks</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span> 
-             <span class="n">model_architecture</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span> 
-             <span class="n">training_parameters</span><span class="o">=</span><span class="nb">dict</span><span class="p">())</span>
-    <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">path</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># go in reverse!</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="s1">&#39;r+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                    <span class="n">p</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">p</span>
-</pre></div>
-<p>This is the equivalent of traversing a Directed Acyclic Graph (DAG), or in some special cases, a tree data structure, but in a way where we don't have to know the entire tree structure ahead of time. The goal is to reach the root from any node:</p>
-<pre><code>root
-    |- A
-        |- B
-        |- C
-            |- D
-            |- E
-    |- F
-        |- G
-        |- H
-        |- I 
-            |- J
-</code></pre>
-<p>Also, because we only have one pointer in each YAML file to its parent, we have effectively created a "Linked List" that we can use to trace a path back to the "root" node, along the way collecting the information that we need together. By using this method of traversal, we only need to know the neighbors, and at some point (however long it takes), we will reach the root.</p>
-<pre><code>D -&gt; C -&gt; A -&gt; root
-E -&gt; C -&gt; A -&gt; root
-J -&gt; I -&gt; F -&gt; root
-</code></pre>
-<p>If you were wondering why linked lists, trees and other data structures might be useful as a data scientist, I hope this illustrates on productive example!</p>
-
-  </div>
-
-    <p><i>Did you enjoy this blog post? <a href="../blog/2017/10/10/recursive-programming-and-dags/#disqus">Let's discuss more</a>!</i></p>
     <hr class="fancy">
   
 
