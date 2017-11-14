@@ -92,6 +92,69 @@
   <link rel="stylesheet" href="../../../static/pygments.css">
   <div>
   
+    <h1><a href="../../../blog/2016/10/23/reinventing-statistical-language-in-science/">Reinventing Statistical Language in Science</a></h1>
+  
+  <p class="meta">
+    written by
+    
+      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on 2016-10-23
+  </p>
+  <p>There's the <a href="http://fivethirtyeight.com/features/statisticians-found-one-thing-they-can-agree-on-its-time-to-stop-misusing-p-values/">p-value</a> vs. <a href="http://www.nature.com/news/scientific-method-statistical-errors-1.14700">significance</a> problem. I think it's widely agreed that education and training have a big role to play in fixing the culture of p-hacking. I think apart from the math-y parts of the problem, scientists are also stuck with a language problem.</p>
+<p><img src="https://imgs.xkcd.com/comics/p_values.png" alt="XKCD p-values"></p>
+<p>For example, I think you'd find this familiar: a statistically poorly-trained scientist will ask "whether the data show the hypothesis to be significant or not". I won't dive into an analysis as to how misleading the phrasing is, but I hope that the error in logical thinking is evident. Data don't decide whether a hypothesis is significant or not. The nature of the scientific question, and future historians' evaluation of the question, define the "significance" of the hypothesis being tested.</p>
+<p>Less poorly informed scientists may ask, "is there a significant difference between my treatment and control?" That really depends on the magnitude of the difference, whether it's percentage/fractional/fold difference, or absolute difference, or odds ratios. Note here, p-values don't tell that. I'd point the reader to Allen Downey's <a href="https://sites.google.com/site/pyinference/home/scipy-2015">excellent set of material</a> that introduce this concept.</p>
+<p>I'd assert here that for a scientist, the language that's used in describing the analyses and interpretations absolutely matter, and that taking away the "language of p-values" without providing something as a replacement will only result in the language of p-values returning. Here's my humble attempt at solving this problem, shamelessly borrowing ideas from <a href="http://www.allendowney.com/">other</a> <a href="https://jakevdp.github.io/">heroes</a> in the PyData world.</p>
+<hr>
+<p><strong>(1) Instead of describing a "significant difference", describe the difference.</strong></p>
+<p>Replace the following phrasing:</p>
+<blockquote><p>our results showed a significant difference between treatment and control (INCORRECT)</p>
+</blockquote>
+<p>with:</p>
+<blockquote><p>"the treatment exhibited 220% the activity level of the control". (CORRECT)</p>
+</blockquote>
+<hr>
+<p><strong>(2) Instead of reporting a p-value, report the effect size.</strong></p>
+<p>Following on from the statement, instead of saying:</p>
+<blockquote><p>our results showed that the treatment exhibited 220% the activity level of the control (p < 0.05) (INCORRECT)</p>
+</blockquote>
+<p>replace it instead with:</p>
+<blockquote><p>our results showed that the treatment exhibited 220% the activity level of the control (cohen's d: 2.5) (CORRECT)</p>
+</blockquote>
+<hr>
+<p><strong>(3) Report uncertainty.</strong></p>
+<p>Let's build on that statement with uncertainty. Instead of:</p>
+<blockquote><p>our results showed that the treatment exhibited 220% the activity level of the control (cohen's d: 2.5) (INCOMPLETE)</p>
+</blockquote>
+<p>replace it instead with:</p>
+<blockquote><p>our results showed that the treatment exhibited (220 ± 37%) the activity level of the control (100 ± 15%) (cohen's d: 2.5) (MORE COMPLETE)</p>
+</blockquote>
+<hr>
+<p><strong>(4) Go Bayesian.</strong></p>
+<p>With a generative model for the data (not necessarily a mechanistic one), uncertainty can be better represented in the figures and in the text. I'll show here just what the text would look like.</p>
+<p>Here's the old version:</p>
+<blockquote><p>our results showed that the treatment exhibited (220 ±37%) the activity level of the control (100 ± 15%) (cohen's d: 2.5) (GOOD)</p>
+</blockquote>
+<p>And here's the better version:</p>
+<blockquote><p>our results showed that the treatment exhibited 220% (95% HPD: (183, 257)) the activity level of the control (100%, 95% HPD: (85, 115)) (cohen's d: 2.5) (BETTER)</p>
+</blockquote>
+<p>A quick thought on this final phrasing: The <code>± x%</code> phrasing is inflexible for reporting distributions that may be more skewed than others, and assumes that the posterior distribution of the parameter is symmetrical.This is why I'd prefer reporting the 95% HPD, which if I'm not mistaken, is equivalent to the 95% confidence intervals when making certain prior assumptions in the Bayesian framework.</p>
+<p>Update 24 October 2016: Just after making this post live, I saw a <a href="http://bebi103.caltech.edu/2016/tutorials/t5a_credible_regions.html">very helpful set of material</a> by Justin Bois on how to decide which error bars to report. The <code>±x</code> errorbars don't respect the bounds of the posterior distribution.</p>
+<hr>
+<p>If accompanied by figures that report the estimated posterior distribution of values, we can properly visualize whether two posterior distributions overlap, touch, or are separated. That should provide the "statistical clue" about whether the results can differ from "statistical noise" or not. (Note: it <em>still</em> doesn't tell us whether the results are "significant" or not!)</p>
+<p>What do you think about the need for language change?</p>
+
+  </div>
+
+    <p><i>Did you enjoy this blog post? <a href="../../../blog/2016/10/23/reinventing-statistical-language-in-science/#disqus">Let's discuss more</a>!</i></p>
+    <hr class="fancy">
+  
+    
+  <!-- <div class="blog-post"> -->
+  <link rel="stylesheet" href="../../../static/pygments.css">
+  <div>
+  
     <h1><a href="../../../blog/2016/10/18/3d-printing/">3D Printing!</a></h1>
   
   <p class="meta">
@@ -205,27 +268,6 @@
   </div>
 
     <p><i>Did you enjoy this blog post? <a href="../../../blog/2016/10/11/collaborations-between-experimentalists-and-statisticians/#disqus">Let's discuss more</a>!</i></p>
-    <hr class="fancy">
-  
-    
-  <!-- <div class="blog-post"> -->
-  <link rel="stylesheet" href="../../../static/pygments.css">
-  <div>
-  
-    <h1><a href="../../../blog/2016/10/9/reproducible-pi-manifesto/">Reproducible PI Manifesto</a></h1>
-  
-  <p class="meta">
-    written by
-    
-      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
-    
-    on 2016-10-09
-  </p>
-  <p>I found this set of slides by <a href="http://lorenabarba.com">Lorena Barba</a>: the Reproducible PI Manifesto. I love it, and I hope other PIs take it up!</p>
-<iframe src="https://widgets.figshare.com/articles/104539/embed?show_title=1" width="568" height="716" frameborder="0"></iframe>
-  </div>
-
-    <p><i>Did you enjoy this blog post? <a href="../../../blog/2016/10/9/reproducible-pi-manifesto/#disqus">Let's discuss more</a>!</i></p>
     <hr class="fancy">
   
 

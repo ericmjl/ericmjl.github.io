@@ -92,6 +92,36 @@
   <link rel="stylesheet" href="../../../static/pygments.css">
   <div>
   
+    <h1><a href="../../../blog/2017/7/22/bayesian-neural-networks/">Bayesian Neural Networks</a></h1>
+  
+  <p class="meta">
+    written by
+    
+      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on 2017-07-22
+  </p>
+  <p>During this week, while us Insight Fellows begin going out to interview with other companies, my "side hustle" has been working on my <a href="https://github.com/ericmjl/bayesian-analysis-recipes">Bayesian Analysis Recipes</a> repository.</p>
+<p>Two particularly interesting problems I've wanted to write my own implementation for are multinomial classification and Bayesian deep learning. I finally got both of them done today, after about 2-3 days of hacking on them.</p>
+<p>Multinomial classification (<a href="https://github.com/ericmjl/bayesian-analysis-recipes/blob/master/multiclass-logistic-regression-cover-type.ipynb">notebook here</a>) is the problem where we try to classify an item as being one of multiple classes. This is the natural extension to binary classification (done by logistic regression). To do this, I took the <a href="https://archive.ics.uci.edu/ml/datasets/covertype">forest cover dataset</a> and used PyMC3 to implement multinomial logistic regression. Seeing how to do it with PyMC3 was the most important aspect of this; actual accuracy wasn't much of a concern for me.</p>
+<p>However, having seen the classification report (at the bottom of the notebook), and having read that the dataset was originally classified using neural networks, I immediately had the thought of doing a Bayesian neural network for multi-class classification, having seen it implemented for binary classification on the PyMC3 website.</p>
+<p>Bayesian neural networks are not hard to intuit - basically, we place priors on the weights, rather than learning point estimates. In doing so, we are able to propagate uncertainty forward to predictions. Speaking as a non-expert in the field, I think the tricky part is the sampling algorithms needed.</p>
+<p>One thing nice about the field of Bayesian deep learning is the use of variational inference to approximate the true distribution of predictions with a mathematically more tractable one (e.g. a Gaussian). In doing so, we gain a fast way towards approximately learning the uncertainty in predictions - essentially we trade a little bit of accuracy for a lot of speed. For complex models like neural nets, this can be very valuable, as the number of parameters to learn grows very, very quickly with model complexity, so anything fast can make iteration easier.</p>
+<p>Starting with the code <a href="http://twiecki.github.io/blog/2016/06/01/bayesian-deep-learning/">from Thomas Wiecki's website</a>, I hacked together a few utility functions and boiled down the example to its essentials. Feed-forward neural nets aren't difficult to write - just a bunch of matrix ops and we're done. The <a href="https://github.com/ericmjl/bayesian-analysis-recipes/blob/master/multiclass-classification-neural-network.ipynb">notebook is available as well</a>. One nice little feature is that by going with a deep neural network, we have additional predictive accuracy!</p>
+<p>Moving forward, I'd like to improve on that notebook a bit more, by somehow implementing/developing a visualization for multiclass classification <strong>uncertainty</strong> which is the thing we gain from going Bayesian. Hopefully I'll be able to get to that next week - it's shaping up to look quite hectic!</p>
+<p>As a side note, I found a bug with the multinomial distribution implementation in PyMC3, and am working with one of the core developers to get it fixed in PyMC3's master branch. (Thanks a ton, Junpeng, if you ever get to read this! ) In the meantime, I simply took his patch, modified mine a little bit, and used the patched up PyMC3 for my own purposes.</p>
+<p>This is why I think open source is amazing - I can literally patch the source code to get it to do what I need correctly! Wherever I work next has to be supportive of things like this, and have to allow re-release of generally/broadly useful code that I touch - it is the right thing to do!</p>
+
+  </div>
+
+    <p><i>Did you enjoy this blog post? <a href="../../../blog/2017/7/22/bayesian-neural-networks/#disqus">Let's discuss more</a>!</i></p>
+    <hr class="fancy">
+  
+    
+  <!-- <div class="blog-post"> -->
+  <link rel="stylesheet" href="../../../static/pygments.css">
+  <div>
+  
     <h1><a href="../../../blog/2017/7/17/lessons-learned-during-insight/">Lessons Learned During Insight</a></h1>
   
   <p class="meta">
@@ -214,38 +244,6 @@
   </div>
 
     <p><i>Did you enjoy this blog post? <a href="../../../blog/2017/7/8/insight-week-6/#disqus">Let's discuss more</a>!</i></p>
-    <hr class="fancy">
-  
-    
-  <!-- <div class="blog-post"> -->
-  <link rel="stylesheet" href="../../../static/pygments.css">
-  <div>
-  
-    <h1><a href="../../../blog/2017/7/1/insight-week-5/">Insight Week 5</a></h1>
-  
-  <p class="meta">
-    written by
-    
-      <a href="https://twitter.com/ericmjl">Eric J. Ma</a>
-    
-    on 2017-07-01
-  </p>
-  <p>First off, Happy Canada Day!</p>
-<p>Week 5 is primarily focused on interview prep as a bunch of us go out for our demos.</p>
-<p>We kicked off Monday with an interview prep field day. The main areas of focus for us were CS fundamentals, machine learning, SQL, and behavioral interviewing. I found SQL to be my weakest point, and I'll definitely be focusing a lot of efforts on there. I had a chance to explain gradient descent and regularization using algebra - something I never thought I would do!</p>
-<p>On Tuesday, Fellows began going outside for demos. My first demo will be at Boston Health Economics this Thursday, followed by (in no particular order) MGH, Biogen, Merck, OM1, and Immuneering. Definitely looking forward to presenting Flu Forecaster to them!</p>
-<p>On the side, we also started thinking through computer science fundamentals problems, and doing data analytics challenges. CS fundamentals are what you think it would be, covering data structures and algorithms. I found myself to be particularly fond of recursion, and implemented a recursive algorithm for something that could be solved in linear time without recursion. It was good to see my biases, and to try my hand at implementing the same thing in fundamentally two different styles.</p>
-<p>In the evening, Nick (one of the fellows) gave us a run through on SQL. It was very useful to have his perspective, which was basically that most of the problems we will encounter involve some degree of nested searches, and that we have to work backwards from what we want. I also had a good perspective from my alumni mentor on how to approach describing my thesis to interviewers.</p>
-<p>On Wednesday, the interview prep continued with more coding challenges, demo trips, and fellow-led workshops. Together with Jeff and Jigar, we led a deep learning fundamentals workshop, in which we went through how deep learning works for feed forward neural networks and convolutions neural networks.</p>
-<p>Thursday came my first demo, which was at Boston Health Economics. Overall, I thought the demo session went well, and that Catherine, our host, kept engaged with the presentations. I very much appreciate her intellect. Additionally, I took the approach of "free styling it" (of course conditioned on having previously rehearsed it enough times), which resulted in a demo presentation that was overall smoother than what I had previously delivered</p>
-<p>Apart from that, we continued our interview prep. This involved more CS fundamentals for me, getting more practice with common algorithms, and finishing the coding exercises that Ivan gave us.</p>
-<p>On Friday, we did an interview simulator, in which we practiced interviewing one another. This gave me a better view into the thought process that an interviewer might be going through, particularly when conducting a technical interview. From prior experience interviewing, I remembered that my most pleasant interviews were with individuals who kept the atmosphere positive, encouraging, and provided hints along the way. Thus, I tried to conduct the mock interviews in the same way.</p>
-<p>In the afternoon, I gave a very short workshop on how to write Pythonic code, which covered <a href="https://www.python.org/dev/peps/pep-0008/#introduction"><code>PEP8</code></a> (which is now check-able using <a href="https://github.com/PyCQA/pycodestyle"><code>pycodestyle</code></a>). It was fun seeing everybody go, "Whoa! Atom can do that?!" and then promptly going ahead to clean up their code according to the <code>flake8</code> linter's recommendations.</p>
-<p>Interspersed throughout the week, I made an effort to summarize my thesis work a bit more. I think I have a few ways/hooks to explain it to a 'recruiter without a technical background', a 'computer scientist without biology background', and a 'biologist without a computing background'. Making it concise with a good "hook" was the hardest part, but I think I have something good now.</p>
-
-  </div>
-
-    <p><i>Did you enjoy this blog post? <a href="../../../blog/2017/7/1/insight-week-5/#disqus">Let's discuss more</a>!</i></p>
     <hr class="fancy">
   
 
