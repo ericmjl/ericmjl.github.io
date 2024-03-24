@@ -1,0 +1,481 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+    </style>
+    <!-- Import stylesheet -->
+    <link rel="stylesheet" href="../../../../../static/pygments.css">
+
+    
+<!-- Syntax Highlighter. Use both pygments and hl.js. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+    
+
+<meta property="og:title" content="How to choose a (conda) distribution of Python">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/how-to-choose-a-conda-distribution-of-python' />
+
+
+
+    <!-- Google Analytics -->
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-12498603-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+
+
+    <style>
+        .blog-card-container {
+            display: flex;
+        }
+
+        .blog-card-left {
+            flex: 1;
+        }
+
+        .blog-card-right {
+            flex: 3;
+        }
+
+    </style>
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+</head>
+
+<title>How to choose a (conda) distribution of Python - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <h1 class="logo">
+            <a style="color:black" href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">How to choose a (conda) distribution of Python</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2023-10-07</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/conda/">
+        conda
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/anaconda/">
+        anaconda
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/miniforge/">
+        miniforge
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python distribution/">
+        python distribution
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/pip/">
+        pip
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/tooling/">
+        tooling
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+    
+    
+    <img src="logo.webp" style="padding: 10px;" >
+    
+
+    <span id="post_body" name="post_body">
+      <p><em>Note: This is an excerpt from my Data Science Bootstrap Notes, which is freely available online <a href="https://ericmjl.github.io/data-science-bootstrap-notes/get-bootstrapped-on-your-data-science-projects/">here</a>. If you find the notes useful and wish to support my work, please consider either purchasing a digital copy on <a href="https://leanpub.com/dsbootstrap">LeanPub</a> or sending coffee money via <a href="https://github.com/ericmjl">GitHub Sponsor</a> or <a href="https://www.patreon.com/ericmjl">Patreon</a>.</em></p>
+<p>If you're a <code>conda</code> user, you may have heard of the Anaconda distribution of Python.
+In this set of notes, however, I've also referenced the Miniforge distribution of Python.
+What's the difference here?
+How do you pick which one to use?
+To answer those questions, we must first understand what is a <em>distribution</em> of Python.</p>
+<h2 id="python-distributions">Python distributions</h2><p>Python can get <em>distributed</em> to users in many ways.
+You can download it directly from the official Python Software Foundation's (PSF) website.
+Or you can install it onto your system using the official Anaconda installer,
+through Homebrew,
+or through your official Linux package manager.
+Each way of installing Python can be thought of as a distribution of Python.
+Each distribution of Python differs ever so slightly.
+Official Python from the PSF comes with just the standard library.
+Anaconda, however, ships with the standard library
+and many other packages that are relevant for data science.</p>
+<p>What is common across all Python distributions, however,
+is that it will ship with a Python executable that, at the end of installation,
+should be discoverable on your <code>PATH</code> environment variable.</p>
+<p>Most commonly, there will be a Python package installer
+that ships with the distribution as well.
+This can be <code>pip</code>, the official tool for installing Python packages,
+or it could be <code>conda</code>, which was developed by the company Anaconda.</p>
+<p>As such, the anatomy of a distribution is essentially nothing more than:</p>
+<ul>
+<li>A Python interpreter that can be discovered on your <code>PATH</code>,</li>
+<li>A Python package manager, and</li>
+<li>Any other default Python packages that the distributor thinks you might want</li>
+</ul>
+<p>With that aside,
+let's look at three distributions of Python that are relevant to this set of notes.</p>
+<h2 id="anaconda-python">Anaconda Python</h2><p>The Anaconda distribution of Python is the official distribution from Anaconda.
+It ships with a modern version of Python,
+both <code>pip</code> and <code>conda</code> package managers,
+and a whole slew of default data science packages
+(<code>pandas</code>, <code>numpy</code>, <code>scikit-learn</code>, <code>scipy</code>, <code>matplotlib</code>, for example).
+With the Anaconda distribution,
+<code>conda</code> is configured such that
+packages are installed from the <code>anaconda</code> repository of packages,
+hosted by Anaconda itself.
+Its default installation location is <code>~/anaconda</code> or <code>~/anaconda3</code>.</p>
+<h2 id="miniconda-python">Miniconda Python</h2><p>The Miniconda Python distribution also comes from Anaconda.
+It looks like Anaconda except it ships with fewer packages in the base environment.
+You wouldn't, for example, find <code>pandas</code> installed for you.
+This was mostly intended to keep the base environment small for use within Docker containers.</p>
+<p>Its default installation location is <code>~/miniconda</code> or <code>~/miniconda3</code>.</p>
+<h2 id="miniforge-python">Miniforge Python</h2><p>This distribution of Python comes from the open-source developer team behind <code>conda-forge</code>.
+Miniforge looks like Miniconda, but instead of configuring <code>conda</code> to pull packages from the <code>anaconda</code> repository,
+<code>conda</code> packages are instead pulled from the <code>conda-forge</code> repository of packages by default.
+This has the advantage of being able to pull more bleeding-edge versions of packages that you may use.
+Additionally, Miniforge Python ships with <code>mamba</code> as well.</p>
+<h2 id="summary-table">Summary Table</h2><p>Here's a summary table of these features.</p>
+<table>
+<thead><tr>
+<th>Attribute</th>
+<th>Anaconda Python</th>
+<th>Miniconda Python</th>
+<th>Miniforge Python</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Origin</strong></td>
+<td>Official distribution from Anaconda</td>
+<td>Comes from Anaconda</td>
+<td>From open-source developer team behind <code>conda-forge</code></td>
+</tr>
+<tr>
+<td><strong>Version of Python</strong></td>
+<td>Modern</td>
+<td>Similar to Anaconda</td>
+<td>Similar to Miniconda</td>
+</tr>
+<tr>
+<td><strong>Package Managers</strong></td>
+<td><code>pip</code> and <code>conda</code></td>
+<td>Similar to Anaconda</td>
+<td><code>pip</code>, <code>conda</code> and <code>mamba</code></td>
+</tr>
+<tr>
+<td><strong>Default Data Science Packages</strong></td>
+<td><code>pandas</code>, <code>numpy</code>, <code>scikit-learn</code>, <code>scipy</code>, <code>matplotlib</code></td>
+<td>Fewer packages (e.g., <code>pandas</code> not pre-installed)</td>
+<td>Similar to Miniconda</td>
+</tr>
+<tr>
+<td><strong>Conda Configuration</strong></td>
+<td>Pulls from <code>anaconda</code> repository</td>
+<td>Pulls from <code>anaconda</code> repository</td>
+<td>Pulls from <code>conda-forge</code> repository by default</td>
+</tr>
+<tr>
+<td><strong>Primary Use Case</strong></td>
+<td>General-purpose with lots of pre-installed data science packages</td>
+<td>Keeping base environment small, e.g., for Docker containers</td>
+<td>Access to bleeding-edge versions of packages.</td>
+</tr>
+</tbody>
+</table>
+<p>Tip: All of the distributions can be installed into the <code>~/anaconda</code> directory
+if you desire consistent behaviour regardless of the installation source.
+All three installers provide the <code>-p</code> flag when executing it,
+thus allowing us to specify the <em>prefix</em> directory in which to install.
+We would thus do something like:</p>
+<div class="hll"><pre><span></span>bash<span class="w"> </span>Miniforge3.sh<span class="w"> </span>-b<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span><span class="s2">/anaconda&quot;</span>
+</pre></div>
+<h2 id="which-to-use">Which to use?</h2><p>Depends on your persona!
+If you're an indie hacker type, I would strongly recommend the Miniforge Python
+as it is lightweight and fast to get set up with and fully open source.
+On the other hand, if you're more inclined to want enterprise support,
+vetting of packages,
+and wish to support a company that backs so much of the Python open source world,
+then I would recommend reaching out to Anaconda and talking with their sales reps.</p>
+
+    </span>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for organizations
+        who are seeking guidance on how to best leverage this technology. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+
+</div>
+
+
+<a name="disqus"></a>
+<div class="comments">
+<div id="disqus_thread"></div>
+<script>
+  var disqus_config = function() { this.page.identifier = "/blog/how-to-choose-a-conda-distribution-of-python"; this.page.url = "https://ericmjl.github.io/blog/2023/10/7/how-to-choose-a-conda-distribution-of-python/"; };
+  (function() {
+    var d = document, s = d.createElement('script');
+    s.src = '//ericmjl.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript"
+    rel="nofollow">comments powered by Disqus.</a>
+</noscript>
+</div>
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://twitter.com/ericmjl" rel="">
+                            Twitter</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://octodon.social/@ericmjl" rel="me">
+                            Octodon</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://stackoverflow.com/users/1274908/ericmjl" rel="">
+                            Stack Overflow</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://www.shortwhale.com/ericmjl" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+</body>
