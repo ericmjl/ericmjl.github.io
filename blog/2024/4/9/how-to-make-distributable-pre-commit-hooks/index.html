@@ -1,0 +1,407 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+    </style>
+    <!-- Import stylesheet -->
+    <link rel="stylesheet" href="../../../../../static/pygments.css">
+
+    
+<!-- Syntax Highlighter. Use both pygments and hl.js. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+    
+
+<meta property="og:title" content="How to make distributable pre-commit hooks">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/how-to-make-distributable-pre-commit-hooks' />
+
+
+
+    <!-- Google Analytics -->
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-12498603-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+
+
+    <style>
+        .blog-card-container {
+            display: flex;
+        }
+
+        .blog-card-left {
+            flex: 1;
+        }
+
+        .blog-card-right {
+            flex: 3;
+        }
+
+    </style>
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+</head>
+
+<title>How to make distributable pre-commit hooks - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <h1 class="logo">
+            <a style="color:black" href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">How to make distributable pre-commit hooks</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-04-09</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/pre-commit/">
+        pre-commit
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/webp/">
+        webp
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/optimization/">
+        optimization
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+    
+    
+    <img src="logo.webp" style="padding: 10px;" >
+    
+
+    <span id="post_body" name="post_body">
+      <p>Following my <a href="https://ericmjl.github.io/blog/2023/10/14/how-i-made-a-local-pre-commit-hook-to-resize-images/">previous blog post on how to make pre-commit hooks</a>, I finally made my first <em>distributable</em> pre-commit hook that is installable by the <a href="https://pre-commit.com/"><code>pre-commit</code></a> framework! The pre-commit hook is called <code>convert-to-webp</code>, and is housed in the repo <a href="https://github.com/ericmjl/webp-pre-commit"><code>ericmjl/webp-pre-commit</code></a>.</p>
+<p>Pre-commit hooks are fantastic! They enable us to run automatic checks on files to be committed into a repository before they are committed. This allows us to automatically ensure that, for example, large files are not committed into the repository or, in the case of <code>convert-to-webp</code>, images are converted to the highly optimized <code>.webp</code> format before being committed.</p>
+<p>Having just learned how to make a distributable pre-commit hook, I am documenting how it works here for future reference.</p>
+<h2 id="essential-configuration-files-in-the-source-repository">Essential configuration files in the source repository</h2><p>The most important configuration file we need within the repository is called <code>.pre-commit-hooks.yaml</code>. This defines what hooks are available from within the repository. In my case, I have only one defined, <code>convert-to-webp</code>, and it is configured as follows:</p>
+<div class="hll"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">convert-to-webp</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Convert images to WebP</span>
+<span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">This hook converts image files to WebP format.</span>
+<span class="w">  </span><span class="nt">entry</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">webp-hook</span>
+<span class="w">  </span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="w">  </span><span class="nt">files</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">\.(png|jpg|jpeg|gif|bmp|tiff)$</span>
+<span class="w">  </span><span class="nt">additional_dependencies</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Pillow</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">typer</span>
+</pre></div>
+<p>Let's explain what each line is:</p>
+<ul>
+<li><code>id</code>: This is the name identifier of the pre-commit hook to run.</li>
+<li><code>name</code>: This is the display name of the hook when it is run at the terminal.</li>
+<li><code>description</code>: Something human-readable.</li>
+<li><code>entry</code>: This is the command that gets run. All relevant files are added as arguments automatically, so in this case, it'll be <code>$ webp-hook file1.png file2.tiff file3.bmp</code> etc.</li>
+<li><code>language</code>: This is the programming language that it's written in.</li>
+<li><code>files</code>: A regex pattern for the kind of file extensions that will be subject to checks by this hook.</li>
+<li><code>additional_dependencies</code>: An array of dependencies necessary to run the hook. In this case, I have a list of package dependencies.</li>
+</ul>
+<p>A few questions may be lingering here: what is this <code>webp-hook</code> command that I wrote?</p>
+<p>It turns out to be a Typer CLI! This is implemented within the <code>webp_hook</code> directory:</p>
+<div class="hll"><pre><span></span>drwxr-xr-x<span class="w">     </span>-<span class="w"> </span>ericmjl<span class="w">  </span><span class="m">7</span><span class="w"> </span>Apr<span class="w"> </span><span class="m">23</span>:56<span class="w">   </span>--<span class="w"> </span>├──<span class="w"> </span>webp_hook
+.rw-r--r--<span class="w">   </span><span class="m">922</span><span class="w"> </span>ericmjl<span class="w">  </span><span class="m">8</span><span class="w"> </span>Apr<span class="w"> </span><span class="m">08</span>:38<span class="w">   </span>--<span class="w"> </span>│<span class="w">  </span>└──<span class="w"> </span>cli.py
+</pre></div>
+<p>To ensure that the CLI gets run as a command entry point at the command line, we configure this in <code>pyproject.toml</code>:</p>
+<div class="hll"><pre><span></span><span class="k">[project.scripts]</span>
+<span class="n">webp-hook</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;webp_hook.cli:app&quot;</span>
+</pre></div>
+<p>Because there's only one command in <code>cli.py</code> (defined under the <code>convert</code> function) I can get away with using <code>webp-hook</code> as the command to run rather than <code>webp-hook convert</code> as the command.</p>
+<p>Another crucial thing is to have tagged versions of the repository. To ensure this is done efficiently, I use <code>bumpversion</code> (but should upgrade to <code>bump-my-version</code> soon) when cutting a new tagged release. This tagged version is referenced in my individual project repo's configuration files.</p>
+<h2 id="obtaining-the-pre-commit-hook">Obtaining the pre-commit hook</h2><p>To obtain the pre-commit hook, all we need to do is add the following line into the <code>.pre-commit-config.yaml</code> (not to be confused with the <code>.pre-commit-hooks.yaml</code>) file:</p>
+<div class="hll"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">repo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/ericmjl/webp-pre-commit</span><span class="w"> </span><span class="c1"># &lt;-- URL to repository</span>
+<span class="w">  </span><span class="nt">rev</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v0.0.8</span><span class="w"> </span><span class="c1"># &lt;-- this is the tagged version</span>
+<span class="w">  </span><span class="nt">hooks</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">convert-to-webp</span><span class="w"> </span><span class="c1"># &lt;-- this is the `id` defined above</span>
+</pre></div>
+<p>Now, the <code>pre-commit</code> framework will automatically manage the installation of the pre-commit hook within its own virtual environment, install dependencies, and run the command <code>webp-hook</code> upon committing new files. The output should look like this:</p>
+<div class="hll"><pre><span></span>❯<span class="w"> </span>git<span class="w"> </span>commit
+check<span class="w"> </span>yaml...........................................<span class="o">(</span>no<span class="w"> </span>files<span class="w"> </span>to<span class="w"> </span>check<span class="o">)</span>Skipped
+fix<span class="w"> </span>end<span class="w"> </span>of<span class="w"> </span>files.....................................<span class="o">(</span>no<span class="w"> </span>files<span class="w"> </span>to<span class="w"> </span>check<span class="o">)</span>Skipped
+trim<span class="w"> </span>trailing<span class="w"> </span>whitespace.............................<span class="o">(</span>no<span class="w"> </span>files<span class="w"> </span>to<span class="w"> </span>check<span class="o">)</span>Skipped
+Convert<span class="w"> </span>images<span class="w"> </span>to<span class="w"> </span>WebP...............................<span class="o">(</span>no<span class="w"> </span>files<span class="w"> </span>to<span class="w"> </span>check<span class="o">)</span>Skipped
+<span class="c1"># notice the name of the pre-commit hook above!</span>
+</pre></div>
+<h2 id="summary-of-steps">Summary of steps</h2><p>Let's recap how do we create a pre-commit hook that can be distributed to others. The key steps, in order, are:</p>
+<ol>
+<li>Create a new repository in which you develop an installable and distributable command-line tool.</li>
+<li>In that repository, ensure that you have a <code>.pre-commit-hooks.yaml</code> configuration file that declares that the pre-commit hook is.</li>
+<li>Use <code>bump-my-version</code> (or manual git tagging) to cut new tagged releases of your pre-commit hook.</li>
+<li>In a different project repository, add the hook to your <code>.pre-commit-config.yaml</code> file.</li>
+</ol>
+<p>As you develop the hook, continue cutting new releases through <code>git</code> tags. When you cut new releases, go to your downstream project code and ask <code>pre-commit</code> to update the hooks by running <code>pre-commit autoupdate</code>.</p>
+<h2 id="for-teams..">For teams...</h2><p>Now that you know how to build your own pre-commit hooks, you can be empowered to create custom checks for your code that hold it to your company's own internal standards! I can also imagine many creative uses, including the use of LLM APIs within the pre-commit hooks that get run that parse code for issues that are difficult to detect using programmatic rules, not unlike <a href="https://ericmjl.github.io/llamabot/cli/git/">writing commit messages based on git diffs</a>!</p>
+<p>Happy code checking!</p>
+
+    </span>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for organizations
+        who are seeking guidance on how to best leverage this technology. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+
+</div>
+
+
+<a name="disqus"></a>
+<div class="comments">
+<div id="disqus_thread"></div>
+<script>
+  var disqus_config = function() { this.page.identifier = "/blog/how-to-make-distributable-pre-commit-hooks"; this.page.url = "https://ericmjl.github.io/blog/2024/4/9/how-to-make-distributable-pre-commit-hooks/"; };
+  (function() {
+    var d = document, s = d.createElement('script');
+    s.src = '//ericmjl.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript"
+    rel="nofollow">comments powered by Disqus.</a>
+</noscript>
+</div>
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://twitter.com/ericmjl" rel="">
+                            Twitter</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://octodon.social/@ericmjl" rel="me">
+                            Octodon</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://stackoverflow.com/users/1274908/ericmjl" rel="">
+                            Stack Overflow</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://www.shortwhale.com/ericmjl" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+</body>

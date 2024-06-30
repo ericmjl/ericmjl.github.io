@@ -1,0 +1,383 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+    </style>
+    <!-- Import stylesheet -->
+    <link rel="stylesheet" href="../../../../../static/pygments.css">
+
+    
+<!-- Syntax Highlighter. Use both pygments and hl.js. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+    
+
+<meta property="og:title" content="Your embedding model can be different from your text generation model">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/your-embedding-model-can-be-different-from-your-text-generation-model' />
+
+
+
+    <!-- Google Analytics -->
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-12498603-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+
+
+    <style>
+        .blog-card-container {
+            display: flex;
+        }
+
+        .blog-card-left {
+            flex: 1;
+        }
+
+        .blog-card-right {
+            flex: 3;
+        }
+
+    </style>
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+</head>
+
+<title>Your embedding model can be different from your text generation model - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <h1 class="logo">
+            <a style="color:black" href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Your embedding model can be different from your text generation model</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-01-15</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/embedding models/">
+        embedding models
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/retrieval augmented generation/">
+        retrieval augmented generation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/semantic search/">
+        semantic search
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/text generation/">
+        text generation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/vector databases/">
+        vector databases
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/documentstore/">
+        documentstore
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/sentence transformer/">
+        sentence transformer
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+    
+    
+    <img src="logo.webp" style="padding: 10px;" >
+    
+
+    <span id="post_body" name="post_body">
+      <p>This is a misconception I used to have: I assumed that my embedding model had to be from the same provider when doing retrieval augmented generation. For example, if I were using an OpenAI model like gpt-3.5-turbo, I would assume that if I wanted to do RAG, I would need to use the OpenAI embedding model. This turns out to be untrue!</p>
+<p>We embed a document to perform a semantic (or vector similarity) search, a distinct step from text generation. As long as two texts are embedded using the same model, their embeddings are comparable. Using embeddings and semantic search, we are retrieving a collection of documents (or document chunks) purportedly relevant to a query text we provide. Vector databases usually store the text and embedding next to one another, or at least link them together, so that once we know which embedding is similar to our query, we can also learn what text was associated with that embedding. </p>
+<p>Once we have that text retrieved, the rest of what we do is to use that text as part of the prompt that we provide to an LLM, which can generate text without using the embeddings, just the text. See the diagram below to make this clear:</p>
+<p><img src="rag-embedding-vs-llm.webp" alt=""></p>
+<p>In this way, embedding models are decoupled from the text generation model — the latter does not use the output of the former. But they are nonetheless linked by the text associated with the embedding.</p>
+<h2 id="which-embedding-should-we-use">Which embedding should we use?</h2><p>Will embedding choice affect our text generation model? For RAG purposes, the short answer is "probably not directly." But the long answer is, "It's a bit more complicated."</p>
+<p>To start, we should dispel the notion that our choice of embeddings will directly affect the performance of our text generator. As my diagram showed, the retrieval function in the most common RAG setup separates text generation and embedding usage. At most, the embedding choice will affect the quality of our similarity measure, affecting the kind of content we retrieve from the vector database and the content we pass to the text generator.</p>
+<p>I prefer to have sane defaults in life to handle most Pareto-distributed scenarios. The same applies here. The most important thing to look at here is which embedding model has the best performance, measured along a few axes. As a pragmatic start, I would consider the following criteria:</p>
+<ol>
+<li>Hardware requirements</li>
+<li>MTEB (Massive Text Embedding Benchmark) performance (see <a href="https://arxiv.org/abs/2210.07316">this paper</a> and the <a href="https://huggingface.co/spaces/mteb/leaderboard">leaderboard here</a>)</li>
+<li>Cost of operation</li>
+</ol>
+<p>A detailed comparison is likely the topic of a different blog post. However, after test-driving a few embedding models (OpenAI's <code>text-ada-002</code>, Mistral's embedding model, and the <code>SentenceTransformer</code> that ChromaDB uses by default), I now use <code>SentenceTransformer</code> on the basis that it is the cheapest -- it is free and runs on my hardware. It is also the (sane) default encoded within LlamaBot's new and shiny <code>DocumentStore</code>.</p>
+<h2 id="llamabot-encodes-this-knowledge">LlamaBot encodes this knowledge.</h2><p>Speaking of <a href="https://ericmjl.github.io/llamabot/">LlamaBot</a>, I updated it to reflect this new knowledge. In doing so, we can now freely compose embeddings from various models with text generation performed by other models. Come check it out!</p>
+
+    </span>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for organizations
+        who are seeking guidance on how to best leverage this technology. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+
+</div>
+
+
+<a name="disqus"></a>
+<div class="comments">
+<div id="disqus_thread"></div>
+<script>
+  var disqus_config = function() { this.page.identifier = "/blog/your-embedding-model-can-be-different-from-your-text-generation-model"; this.page.url = "https://ericmjl.github.io/blog/2024/1/15/your-embedding-model-can-be-different-from-your-text-generation-model/"; };
+  (function() {
+    var d = document, s = d.createElement('script');
+    s.src = '//ericmjl.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript"
+    rel="nofollow">comments powered by Disqus.</a>
+</noscript>
+</div>
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://twitter.com/ericmjl" rel="">
+                            Twitter</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://octodon.social/@ericmjl" rel="me">
+                            Octodon</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://stackoverflow.com/users/1274908/ericmjl" rel="">
+                            Stack Overflow</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://www.shortwhale.com/ericmjl" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+</body>
