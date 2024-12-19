@@ -1,0 +1,830 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Deploying Ollama on Modal">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/deploying-ollama-on-modal' />
+
+
+
+    <!-- Google Analytics -->
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-12498603-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+
+
+    <style>
+        .blog-card-container {
+            display: flex;
+        }
+
+        .blog-card-left {
+            flex: 1;
+        }
+
+        .blog-card-right {
+            flex: 3;
+        }
+
+    </style>
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+</head>
+
+<title>Deploying Ollama on Modal - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <h1 class="logo">
+            <a style="color:black" href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Deploying Ollama on Modal</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-11-14</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/modal/">
+        modal
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/deployment/">
+        deployment
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/open source/">
+        open source
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/api/">
+        api
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/cloud/">
+        cloud
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/gpu/">
+        gpu
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/software/">
+        software
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/models/">
+        models
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ollama/">
+        ollama
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/large language models/">
+        large language models
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" style="padding: 10px;" >
+    
+
+    
+    <div class="post-summary" style="font-size: 0.9em; color: #666; margin-bottom: 2em; font-style: italic;">
+      <p>In this blog post,
+I share my journey of deploying Ollama to Modal,
+enhancing my understanding of Modal's capabilities.
+I detail the script used,
+the setup of the Modal app,
+and the deployment process,
+which includes ensuring the Ollama service is ready and operational.
+I also implement an OpenAI-compatible endpoint
+that makes it easy to use the deployment with existing tools and libraries.
+This exploration not only expanded my technical skills
+but also created a practical solution for using open-source models in production.
+Curious about how this deployment could streamline your projects?</p>
+
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I recently learned how to deploy <a href="https://ollama.com/">Ollama</a> to <a href="https://modal.com/">Modal</a>!
+I mostly copied code from another source
+but modified it just enough
+that I think I have upgraded my mental model of Modal
+and want to leave notes.
+My motivation here was to gain access to open source models
+that are larger than can fit comfortably on my 16GB M1 MacBook Air.</p>
+<h2>Credits</h2>
+<p>In this case,
+I feel obliged to give credit where credit is due:</p>
+<ul>
+<li>The <a href="https://modal.com/blog/how_to_run_ollama_article">Modal Blog</a> has a lot of great resources.</li>
+<li>The <a href="https://github.com/irfansharif/ollama-modal/tree/master">original code</a> by Irfan Sharif was great for my learning journey.</li>
+</ul>
+<h2>The script</h2>
+<p>If you're here just for the script,
+then this is what you'll want:</p>
+<div class="hll"><pre><span></span><span class="c1"># file: endpoint.py</span>
+<span class="kn">import</span> <span class="nn">modal</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="n">MODEL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;MODEL&quot;</span><span class="p">,</span> <span class="s2">&quot;llama3.1&quot;</span><span class="p">)</span>
+
+<span class="n">DEFAULT_MODELS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;llama3.1&quot;</span><span class="p">,</span> <span class="s2">&quot;gemma2:9b&quot;</span><span class="p">,</span> <span class="s2">&quot;phi3&quot;</span><span class="p">,</span> <span class="s2">&quot;qwen2.5:32b&quot;</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">pull</span><span class="p">():</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;systemctl&quot;</span><span class="p">,</span> <span class="s2">&quot;daemon-reload&quot;</span><span class="p">])</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;systemctl&quot;</span><span class="p">,</span> <span class="s2">&quot;enable&quot;</span><span class="p">,</span> <span class="s2">&quot;ollama&quot;</span><span class="p">])</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;systemctl&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;ollama&quot;</span><span class="p">])</span>
+    <span class="n">wait_for_ollama</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">DEFAULT_MODELS</span><span class="p">:</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;ollama&quot;</span><span class="p">,</span> <span class="s2">&quot;pull&quot;</span><span class="p">,</span> <span class="n">model</span><span class="p">],</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">wait_for_ollama</span><span class="p">(</span><span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span> <span class="n">interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wait for Ollama service to be ready.</span>
+
+<span class="sd">    :param timeout: Maximum time to wait in seconds</span>
+<span class="sd">    :param interval: Time between checks in seconds</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">httpx</span>
+    <span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;http://localhost:11434/api/version&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Ollama service is ready&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">ConnectError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span> <span class="o">&gt;</span> <span class="n">timeout</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="s2">&quot;Ollama service failed to start&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Waiting for Ollama service... (</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="p">)</span><span class="si">}</span><span class="s2">s)&quot;</span>
+            <span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
+
+
+<span class="n">image</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">modal</span><span class="o">.</span><span class="n">Image</span><span class="o">.</span><span class="n">debian_slim</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">apt_install</span><span class="p">(</span><span class="s2">&quot;curl&quot;</span><span class="p">,</span> <span class="s2">&quot;systemctl&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">run_commands</span><span class="p">(</span>  <span class="c1"># from https://github.com/ollama/ollama/blob/main/docs/linux.md</span>
+        <span class="s2">&quot;curl -L https://ollama.com/download/ollama-linux-amd64.tgz -o ollama-linux-amd64.tgz&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tar -C /usr -xzf ollama-linux-amd64.tgz&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;useradd -r -s /bin/false -U -m -d /usr/share/ollama ollama&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;usermod -a -G ollama $(whoami)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="o">.</span><span class="n">copy_local_file</span><span class="p">(</span><span class="s2">&quot;ollama.service&quot;</span><span class="p">,</span> <span class="s2">&quot;/etc/systemd/system/ollama.service&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">pip_install</span><span class="p">(</span><span class="s2">&quot;ollama&quot;</span><span class="p">,</span> <span class="s2">&quot;httpx&quot;</span><span class="p">,</span> <span class="s2">&quot;loguru&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">run_function</span><span class="p">(</span><span class="n">pull</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">modal</span><span class="o">.</span><span class="n">App</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;ollama&quot;</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">)</span>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">cls</span><span class="p">(</span>
+    <span class="n">gpu</span><span class="o">=</span><span class="n">modal</span><span class="o">.</span><span class="n">gpu</span><span class="o">.</span><span class="n">A10G</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+    <span class="n">container_idle_timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">class</span> <span class="nc">Ollama</span><span class="p">:</span>
+    <span class="nd">@modal</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;systemctl&quot;</span><span class="p">,</span> <span class="s2">&quot;daemon-reload&quot;</span><span class="p">])</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;systemctl&quot;</span><span class="p">,</span> <span class="s2">&quot;enable&quot;</span><span class="p">,</span> <span class="s2">&quot;ollama&quot;</span><span class="p">])</span>
+
+    <span class="nd">@modal</span><span class="o">.</span><span class="n">enter</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">enter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;systemctl&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;ollama&quot;</span><span class="p">])</span>
+        <span class="n">wait_for_ollama</span><span class="p">()</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;ollama&quot;</span><span class="p">,</span> <span class="s2">&quot;pull&quot;</span><span class="p">,</span> <span class="n">MODEL</span><span class="p">])</span>
+
+    <span class="nd">@modal</span><span class="o">.</span><span class="n">asgi_app</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">serve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Serve the FastAPI application.</span>
+
+<span class="sd">        :return: FastAPI application instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">api</span>
+</pre></div>
+<h2>Breakdown</h2>
+<p>Let me break down what I'm doing in each function.</p>
+<p>Firstly,
+the <code>pull</code> function is used during the image build definition
+(more on that later).
+I have decided that my image should bake in at least the default models
+as defined by the <code>DEFAULT_MODELS</code> list.</p>
+<div class="hll"><pre><span></span><span class="n">DEFAULT_MODELS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;llama3.1&quot;</span><span class="p">,</span> <span class="s2">&quot;gemma2:9b&quot;</span><span class="p">,</span> <span class="s2">&quot;phi3&quot;</span><span class="p">,</span> <span class="s2">&quot;qwen2.5:32b&quot;</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">pull</span><span class="p">():</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;systemctl&quot;</span><span class="p">,</span> <span class="s2">&quot;daemon-reload&quot;</span><span class="p">])</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;systemctl&quot;</span><span class="p">,</span> <span class="s2">&quot;enable&quot;</span><span class="p">,</span> <span class="s2">&quot;ollama&quot;</span><span class="p">])</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;systemctl&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;ollama&quot;</span><span class="p">])</span>
+    <span class="n">wait_for_ollama</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">DEFAULT_MODELS</span><span class="p">:</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;ollama&quot;</span><span class="p">,</span> <span class="s2">&quot;pull&quot;</span><span class="p">,</span> <span class="n">model</span><span class="p">],</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+</pre></div>
+<p>The Image build definition starts with a <code>debian_slim</code> base image.
+We then further install other linux system packages
+and <code>pip</code> install additional dependencies.
+Finally,
+we run the <code>pull</code> function
+so that we have the pre-baked models ready within the container.
+This design choice increases the container size by gigabytes,
+but it allows us to sidestep waiting for models to download on-the-fly
+when we are running the container live.</p>
+<div class="hll"><pre><span></span><span class="n">image</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">modal</span><span class="o">.</span><span class="n">Image</span><span class="o">.</span><span class="n">debian_slim</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">apt_install</span><span class="p">(</span><span class="s2">&quot;curl&quot;</span><span class="p">,</span> <span class="s2">&quot;systemctl&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">run_commands</span><span class="p">(</span>  <span class="c1"># from https://github.com/ollama/ollama/blob/main/docs/linux.md</span>
+        <span class="s2">&quot;curl -L https://ollama.com/download/ollama-linux-amd64.tgz -o ollama-linux-amd64.tgz&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tar -C /usr -xzf ollama-linux-amd64.tgz&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;useradd -r -s /bin/false -U -m -d /usr/share/ollama ollama&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;usermod -a -G ollama $(whoami)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="o">.</span><span class="n">copy_local_file</span><span class="p">(</span><span class="s2">&quot;ollama.service&quot;</span><span class="p">,</span> <span class="s2">&quot;/etc/systemd/system/ollama.service&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">pip_install</span><span class="p">(</span><span class="s2">&quot;ollama&quot;</span><span class="p">,</span> <span class="s2">&quot;httpx&quot;</span><span class="p">,</span> <span class="s2">&quot;loguru&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">run_function</span><span class="p">(</span><span class="n">pull</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+<p>With the container image defined,
+I then define the modal App:</p>
+<div class="hll"><pre><span></span><span class="n">app</span> <span class="o">=</span> <span class="n">modal</span><span class="o">.</span><span class="n">App</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;ollama&quot;</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">)</span>
+</pre></div>
+<p>This creates a Modal app.
+From there,
+I can create the actual app class where execution happens.</p>
+<div class="hll"><pre><span></span><span class="nd">@app</span><span class="o">.</span><span class="n">cls</span><span class="p">(</span>
+    <span class="n">gpu</span><span class="o">=</span><span class="n">modal</span><span class="o">.</span><span class="n">gpu</span><span class="o">.</span><span class="n">A10G</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+    <span class="n">container_idle_timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">class</span> <span class="nc">Ollama</span><span class="p">:</span>
+    <span class="nd">@modal</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;systemctl&quot;</span><span class="p">,</span> <span class="s2">&quot;daemon-reload&quot;</span><span class="p">])</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;systemctl&quot;</span><span class="p">,</span> <span class="s2">&quot;enable&quot;</span><span class="p">,</span> <span class="s2">&quot;ollama&quot;</span><span class="p">])</span>
+
+    <span class="nd">@modal</span><span class="o">.</span><span class="n">enter</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">enter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;systemctl&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;ollama&quot;</span><span class="p">])</span>
+        <span class="n">wait_for_ollama</span><span class="p">()</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;ollama&quot;</span><span class="p">,</span> <span class="s2">&quot;pull&quot;</span><span class="p">,</span> <span class="n">MODEL</span><span class="p">])</span>
+
+    <span class="nd">@modal</span><span class="o">.</span><span class="n">asgi_app</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">serve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Serve the FastAPI application.</span>
+
+<span class="sd">        :return: FastAPI application instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">api</span>
+</pre></div>
+<p>In this class,
+I am taking advantage of the fact
+that I can explicitly define what happens within the container lifecycle.
+On <code>build</code>,
+after building the image,
+we ensure that <code>ollama</code> is enabled,
+and as soon as we <code>enter</code> into the image runtime,
+we start <code>ollama</code>.
+Finally,
+we have the <code>serve</code> method decorated with <code>@modal.asgi_app()</code>
+that exposes our FastAPI application.
+This is the crucial piece that ties everything together -
+it tells Modal to serve our FastAPI application,
+which includes our OpenAI-compatible endpoint,
+making it accessible over HTTP.
+I also make sure that we are using a GPU-enabled container.</p>
+<p>The <code>serve()</code> method is particularly important here.
+By decorating it with <code>@modal.asgi_app()</code>,
+we're telling Modal that this method should be used to serve our web application.
+The method simply returns our FastAPI <code>api</code> instance,
+which contains all our route definitions,
+including the OpenAI-compatible <code>/v1/chat/completions</code> endpoint.
+Modal takes care of all the underlying infrastructure needed to expose this API to the internet,
+including setting up the proper HTTP server and routing.</p>
+<p>I have a <code>wait_for_ollama</code> function,
+which is used within the App definition:</p>
+<div class="hll"><pre><span></span><span class="k">def</span> <span class="nf">wait_for_ollama</span><span class="p">(</span><span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span> <span class="n">interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wait for Ollama service to be ready.</span>
+
+<span class="sd">    :param timeout: Maximum time to wait in seconds</span>
+<span class="sd">    :param interval: Time between checks in seconds</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">httpx</span>
+    <span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;http://localhost:11434/api/version&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Ollama service is ready&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">ConnectError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span> <span class="o">&gt;</span> <span class="n">timeout</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="s2">&quot;Ollama service failed to start&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Waiting for Ollama service... (</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="p">)</span><span class="si">}</span><span class="s2">s)&quot;</span>
+            <span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
+</pre></div>
+<p>This function exists because I noticed
+that there were occasions when the Ollama service needed additional wait time
+to come live before I could interact with it.
+In these circumstances,
+having the <code>wait_for_ollama</code> function available
+allowed me to avoid having the program error out
+just because Ollama wasn't ready at that exact moment.</p>
+<h2>Deploy</h2>
+<p>Now,
+with this Python script in place,
+we can deploy it onto Modal:</p>
+<div class="hll"><pre><span></span>modal<span class="w"> </span>deploy<span class="w"> </span>endpoint.py
+</pre></div>
+<p>Modal will build the container on the cloud and deploy it:</p>
+<div class="hll"><pre><span></span>❯<span class="w"> </span>modal<span class="w"> </span>deploy<span class="w"> </span>endpoint.py
+✓<span class="w"> </span>Created<span class="w"> </span>objects.
+├──<span class="w"> </span>🔨<span class="w"> </span>Created<span class="w"> </span>mount<span class="w"> </span>/Users/ericmjl/github/incubator/ollama-modal/endpoint.py
+├──<span class="w"> </span>🔨<span class="w"> </span>Created<span class="w"> </span>mount<span class="w"> </span>ollama.service
+├──<span class="w"> </span>🔨<span class="w"> </span>Created<span class="w"> </span><span class="k">function</span><span class="w"> </span>pull.
+├──<span class="w"> </span>🔨<span class="w"> </span>Created<span class="w"> </span><span class="k">function</span><span class="w"> </span>Ollama.build.
+├──<span class="w"> </span>🔨<span class="w"> </span>Created<span class="w"> </span><span class="k">function</span><span class="w"> </span>Ollama.*.
+└──<span class="w"> </span>🔨<span class="w"> </span>Created<span class="w"> </span>web<span class="w"> </span><span class="k">function</span><span class="w"> </span>Ollama.v1_chat_completions<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span>https://&lt;autogenerated_subdomain&gt;.modal.run
+✓<span class="w"> </span>App<span class="w"> </span>deployed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">3</span>.405s!<span class="w"> </span>🎉
+
+View<span class="w"> </span>Deployment:<span class="w"> </span>https://modal.com/apps/&lt;username&gt;/main/deployed/&lt;app_name&gt;
+</pre></div>
+<p>It won't always be ~3 sec;
+usually,
+on first build,
+this will take ~5 minutes or so.</p>
+<p>Now,
+because of the <code>docs=True</code> parameter set in the <code>v1_chat_completions</code> method decorator,
+I have access to the Swagger API that is auto-generated,
+which lets me hand-test the API before I try to call on it:</p>
+<p><img src="swagger.webp" alt="Swagger API" /></p>
+<h2>OpenAI-Compatible Endpoint</h2>
+<p>After my initial deployment,
+I realized that making the endpoint OpenAI-compatible
+would make it much easier to integrate with existing tools.
+The updated code now includes a proper OpenAI-compatible chat completions endpoint
+that follows the same format as OpenAI's API:</p>
+<div class="hll"><pre><span></span><span class="k">class</span> <span class="nc">ChatMessage</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A single message in a chat completion request.</span>
+
+<span class="sd">    Represents one message in the conversation history, following OpenAI&#39;s chat format.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">role</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The role of the message sender (e.g. &#39;user&#39;, &#39;assistant&#39;)&quot;</span><span class="p">)</span>
+    <span class="n">content</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The content of the message&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ChatCompletionRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Request model for chat completions.</span>
+
+<span class="sd">    Follows OpenAI&#39;s chat completion request format, supporting both streaming</span>
+<span class="sd">    and non-streaming responses.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">MODEL</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The model to use for completion&quot;</span><span class="p">)</span>
+    <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ChatMessage</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The messages to generate a completion for&quot;</span><span class="p">)</span>
+    <span class="n">stream</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to stream the response&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@api</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/v1/chat/completions&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">v1_chat_completions</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">ChatCompletionRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Handle chat completion requests in OpenAI-compatible format.</span>
+
+<span class="sd">    :param request: Chat completion parameters</span>
+<span class="sd">    :return: Chat completion response in OpenAI-compatible format, or StreamingResponse if streaming</span>
+<span class="sd">    :raises HTTPException: If the request is invalid or processing fails</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">messages</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Messages array is required and cannot be empty&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">stream</span><span class="p">:</span>
+            <span class="k">async</span> <span class="k">def</span> <span class="nf">generate_stream</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span>
+                    <span class="n">model</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                    <span class="n">messages</span><span class="o">=</span><span class="p">[</span><span class="n">msg</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">messages</span><span class="p">],</span>
+                    <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+                    <span class="n">chunk_data</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;chat-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())),</span>
+                        <span class="s2">&quot;object&quot;</span><span class="p">:</span> <span class="s2">&quot;chat.completion.chunk&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;created&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()),</span>
+                        <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                        <span class="s2">&quot;choices&quot;</span><span class="p">:</span> <span class="p">[</span>
+                            <span class="p">{</span>
+                                <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                                <span class="s2">&quot;delta&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;assistant&quot;</span><span class="p">,</span>
+                                    <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">chunk</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">][</span><span class="s2">&quot;content&quot;</span><span class="p">],</span>
+                                <span class="p">},</span>
+                                <span class="s2">&quot;finish_reason&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                            <span class="p">}</span>
+                        <span class="p">],</span>
+                    <span class="p">}</span>
+                    <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;data: </span><span class="si">{</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">chunk_data</span><span class="p">)</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+
+                <span class="n">final_chunk</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;chat-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())),</span>
+                    <span class="s2">&quot;object&quot;</span><span class="p">:</span> <span class="s2">&quot;chat.completion.chunk&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;created&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()),</span>
+                    <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                    <span class="s2">&quot;choices&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="p">{</span>
+                            <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                            <span class="s2">&quot;delta&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;finish_reason&quot;</span><span class="p">:</span> <span class="s2">&quot;stop&quot;</span><span class="p">,</span>
+                        <span class="p">}</span>
+                    <span class="p">],</span>
+                <span class="p">}</span>
+                <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;data: </span><span class="si">{</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">final_chunk</span><span class="p">)</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                <span class="k">yield</span> <span class="s2">&quot;data: [DONE]</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+
+            <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span>
+                <span class="n">generate_stream</span><span class="p">(),</span>
+                <span class="n">media_type</span><span class="o">=</span><span class="s2">&quot;text/event-stream&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Non-streaming response</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">messages</span><span class="o">=</span><span class="p">[</span><span class="n">msg</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span> <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">messages</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;chat-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())),</span>
+            <span class="s2">&quot;object&quot;</span><span class="p">:</span> <span class="s2">&quot;chat.completion&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;created&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()),</span>
+            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+            <span class="s2">&quot;choices&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;assistant&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">][</span><span class="s2">&quot;content&quot;</span><span class="p">],</span>
+                    <span class="p">},</span>
+                    <span class="s2">&quot;finish_reason&quot;</span><span class="p">:</span> <span class="s2">&quot;stop&quot;</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;usage&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;prompt_tokens&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># Ollama doesn&#39;t provide token counts</span>
+                <span class="s2">&quot;completion_tokens&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                <span class="s2">&quot;total_tokens&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Error processing chat completion: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+</pre></div>
+<p>This implementation provides both streaming and non-streaming responses
+in the exact same format as OpenAI's API.
+The endpoint is accessible at <code>/v1/chat/completions</code>,
+making it a drop-in replacement for OpenAI's API
+in tools like LlamaBot that use LiteLLM as their API switchboard.</p>
+<p>The endpoint supports:</p>
+<ul>
+<li>Full chat history with multiple messages</li>
+<li>Streaming responses for real-time text generation</li>
+<li>OpenAI-compatible response format</li>
+<li>Error handling with appropriate HTTP status codes</li>
+</ul>
+<p>With this in place,
+I can now use my Modal-deployed Ollama endpoint
+with any tool that supports OpenAI's API format.
+For example,
+with LlamaBot,
+I just need to specify the base URL of my Modal deployment:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span> <span class="nn">llamabot</span> <span class="kn">import</span> <span class="n">SimpleBot</span>
+
+<span class="n">bot</span> <span class="o">=</span> <span class="n">SimpleBot</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;ollama/qwq&quot;</span><span class="p">,</span>  <span class="c1"># Specifying the Ollama model</span>
+    <span class="n">api_base</span><span class="o">=</span><span class="s2">&quot;https://&lt;my-modal-deployment&gt;.modal.run/v1&quot;</span><span class="p">,</span>  <span class="c1"># Point to Modal deployment</span>
+    <span class="n">system_prompt</span><span class="o">=</span><span class="s2">&quot;You are a helpful assistant.&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="s2">&quot;Hello!&quot;</span><span class="p">)</span>
+</pre></div>
+<p>This makes it incredibly easy to experiment with different open-source models
+while maintaining compatibility with existing tools and workflows.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll">
+    <pre>
+<span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-deploying-modal</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Deploying Ollama on Modal}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{11}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{14}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/11/14/deploying-ollama-on-modal}</span>,
+}
+  </span></pre>
+    </div>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+
+</div>
+
+
+
+<a name="disqus"></a>
+<div class="comments">
+<div id="disqus_thread"></div>
+<script>
+  var disqus_config = function() { this.page.identifier = "/blog/deploying-ollama-on-modal"; this.page.url = "https://ericmjl.github.io/blog/2024/11/14/deploying-ollama-on-modal/"; };
+  (function() {
+    var d = document, s = d.createElement('script');
+    s.src = '//ericmjl.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript"
+    rel="nofollow">comments powered by Disqus.</a>
+</noscript>
+</div>
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://twitter.com/ericmjl" rel="">
+                            Twitter</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://octodon.social/@ericmjl" rel="me">
+                            Octodon</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://stackoverflow.com/users/1274908/ericmjl" rel="">
+                            Stack Overflow</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://koalamail.ericmjl.com/send/ericmjl" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+</body>
