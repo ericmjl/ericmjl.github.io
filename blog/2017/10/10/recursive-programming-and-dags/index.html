@@ -1,0 +1,446 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Recursive Programming and DAGs">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/recursive-programming-and-dags' />
+
+
+
+    <!-- Google Analytics -->
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-12498603-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+
+
+    <style>
+        .blog-card-container {
+            display: flex;
+        }
+
+        .blog-card-left {
+            flex: 1;
+        }
+
+        .blog-card-right {
+            flex: 3;
+        }
+
+    </style>
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+</head>
+
+<title>Recursive Programming and DAGs - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <h1 class="logo">
+            <a style="color:black" href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Recursive Programming and DAGs</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2017-10-10</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/programming/">
+        programming
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/code snippets/">
+        code snippets
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    
+    <div class="post-summary" style="font-size: 0.9em; color: #666; margin-bottom: 2em; font-style: italic;">
+      <p>As a data scientist, I routinely find programming skills to be very important. This blog post shows an example of why knowing our data structures and algorithms can really help!</p>
+
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Over the past few days, I've found myself using recursive programming to implement a &quot;model specification&quot; system with inheritance for deep learning. The goal here is to enable reproducible computational experiments for particular deep learning hyperparameter sets. Reproducibility is something I learned from the Software/Data Carpentry initiative, thus I wanted to ensure that my own work was reproducible, even if it's not (because of corporate reasons) open-able, because it's the right thing to do.</p>
+<p>So, how do these &quot;model spec&quot; files work? I call them &quot;experiment profiles&quot;, and they specify a bunch of things: <strong>model architecture</strong>, <strong>training parameters</strong>, and <strong>data tasks</strong>. These experiment profiles are stored in YAML files on disk. A profile essentially looks like the following (dummy examples provided, naturally):</p>
+<div class="hll"><pre><span></span><span class="c1"># Name: default.yaml</span>
+<span class="nt">parent</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="nt">data_tasks</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">tasks</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">task1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">task2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">task3</span><span class="p p-Indicator">]</span>
+<span class="nt">model_architecture</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">hidden_layers</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">20</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">20</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">hidden_dropouts</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0.1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.3</span><span class="p p-Indicator">]</span>
+<span class="nt">training_parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">optimizer</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;sgd&quot;</span>
+<span class="w">    </span><span class="nt">optimizer_options</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">n_epochs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
+</pre></div>
+<p>In this YAML file, the key-value pairs essentially match the API of the tooling I've built on top of Keras' API to make myself more productive. (From the example, it should be clear that we're dealing with only feed-forward neural networks and nothing else more complicated.) The key here (pun unintended) is that I have a <code>parent</code> key-value pair that specifies another experiment profile that I can inherit from.</p>
+<p>Let's call the above example <code>default.yaml</code>. Let's say I want to run another computational experiment that uses the <code>adam</code> optimizer instead of plain vanilla <code>sgd</code>. Instead of re-specifying the entire YAML file, by implementing an inheritance scheme, I can re-specify only the optimizer and optimizer_options.</p>
+<div class="hll"><pre><span></span><span class="c1"># Name: adam.yaml</span>
+<span class="nt">parent</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;default.yaml&quot;</span>
+<span class="nt">training_parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">optimizer</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;adam&quot;</span>
+</pre></div>
+<p>Finally, let's say I find out that 20 epochs (inherited from <code>default.yaml</code>) is too much for Adam - after all, Adam is one of the most efficient gradient descent algorithms out there - and I want to change it to 3 epochs instead. I can do the following:</p>
+<div class="hll"><pre><span></span><span class="c1"># Name: adam-3.yaml</span>
+<span class="nt">parent</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;adam.yaml&quot;</span>
+<span class="nt">training_parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">optimizer_options</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">n_epochs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+</pre></div>
+<p>Okay, so specifying YAML files with inheritance is all good, but how do I ensure that I get the entire parameter set out correctly, without writing verbose code? This is where the power of recursive programming comes in. Using recursion, I can solve this problem with <strong>a single function that calls itself on one condition, and returns a result on another condition</strong>. That's a recursive function in its essence.</p>
+<p>The core of this problem is traversing the inheritance path, from <code>adam-3.yaml</code> to <code>adam.yaml</code> to <code>default.yaml</code>. Once I have the inheritance path specified, loading the YAML files as a dictionary becomes the easy part.</p>
+<p>How would this look like in code? Let's take a look at an implementation.</p>
+<div class="hll"><pre><span></span><span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="k">def</span> <span class="nf">inheritance_path</span><span class="p">(</span><span class="n">yaml_file</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param str yaml_file: The path to the yaml file of interest.</span>
+<span class="sd">    :param list path: A list specifying the existing inheritance path. First</span>
+<span class="sd">        entry is the file of interest, and parents are recursively appended to</span>
+<span class="sd">        the end of the list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">yaml_file</span><span class="p">,</span> <span class="s1">&#39;r+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;parent&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;parent&#39;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">inheritance_path</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;parent&#39;</span><span class="p">],</span> <span class="n">path</span><span class="p">)</span>
+</pre></div>
+<p>The most important part of the function is in the <code>if</code>/<code>else</code> block. If I have reached the &quot;root&quot; of the inheritance path, (that is, I have hit <code>default.yaml</code> which has no parent), then I return the <code>path</code> traversed. Otherwise, I return into the <code>inheritance_path</code> function call again, but with an updated <code>path</code> list, and a different <code>yaml_file</code> to read. It's a bit like doing a <code>while</code> loop, but in my opinion, a bit more elegant aesthetically.</p>
+<p>Once I've gotten the path list, I can finally load the parameters using a single function that calls on <code>inheritance_path</code>.</p>
+<div class="hll"><pre><span></span><span class="k">def</span> <span class="nf">load_params</span><span class="p">(</span><span class="n">yaml_file</span><span class="p">):</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">inheritance_path</span><span class="p">(</span><span class="n">yaml_file</span><span class="p">,</span> <span class="p">[</span><span class="n">yaml_file</span><span class="p">])</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">data_tasks</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+             <span class="n">model_architecture</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+             <span class="n">training_parameters</span><span class="o">=</span><span class="nb">dict</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">path</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># go in reverse!</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="s1">&#39;r+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">p</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">p</span>
+</pre></div>
+<p>This is the equivalent of traversing a Directed Acyclic Graph (DAG), or in some special cases, a tree data structure, but in a way where we don't have to know the entire tree structure ahead of time. The goal is to reach the root from any node:</p>
+<pre><code>root
+    |- A
+        |- B
+        |- C
+            |- D
+            |- E
+    |- F
+        |- G
+        |- H
+        |- I
+            |- J
+</code></pre>
+<p>Also, because we only have one pointer in each YAML file to its parent, we have effectively created a &quot;Linked List&quot; that we can use to trace a path back to the &quot;root&quot; node, along the way collecting the information that we need together. By using this method of traversal, we only need to know the neighbors, and at some point (however long it takes), we will reach the root.</p>
+<pre><code>D -&gt; C -&gt; A -&gt; root
+E -&gt; C -&gt; A -&gt; root
+J -&gt; I -&gt; F -&gt; root
+</code></pre>
+<p>If you were wondering why linked lists, trees and other data structures might be useful as a data scientist, I hope this illustrates on productive example!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll">
+    <pre>
+<span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2017-recursive-dags</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Recursive Programming and DAGs}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2017}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{10}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{10}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2017/10/10/recursive-programming-and-dags}</span>,
+}
+  </span></pre>
+    </div>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+
+</div>
+
+
+
+<a name="disqus"></a>
+<div class="comments">
+<div id="disqus_thread"></div>
+<script>
+  var disqus_config = function() { this.page.identifier = "/blog/recursive-programming-and-dags"; this.page.url = "https://ericmjl.github.io/blog/2017/10/10/recursive-programming-and-dags/"; };
+  (function() {
+    var d = document, s = d.createElement('script');
+    s.src = '//ericmjl.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript"
+    rel="nofollow">comments powered by Disqus.</a>
+</noscript>
+</div>
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://twitter.com/ericmjl" rel="">
+                            Twitter</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://octodon.social/@ericmjl" rel="me">
+                            Octodon</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://stackoverflow.com/users/1274908/ericmjl" rel="">
+                            Stack Overflow</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://koalamail.ericmjl.com/send/ericmjl" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+</body>
