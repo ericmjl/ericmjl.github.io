@@ -1,0 +1,544 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="A blueprint for data-driven molecule engineering">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/a-blueprint-for-data-driven-molecule-engineering' />
+
+
+
+    <!-- Google Analytics -->
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-12498603-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+
+
+    <style>
+        .blog-card-container {
+            display: flex;
+        }
+
+        .blog-card-left {
+            flex: 1;
+        }
+
+        .blog-card-right {
+            flex: 3;
+        }
+
+        /* Add rounded corners to banner images */
+        .banner-image {
+            border-radius: 8px;
+            max-width: 98%;
+            height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+    </style>
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>A blueprint for data-driven molecule engineering - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <h1 class="logo">
+            <a style="color:black" href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">A blueprint for data-driven molecule engineering</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-03-06</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/biotech/">
+        biotech
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/molecule discovery/">
+        molecule discovery
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/experiment design/">
+        experiment design
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/machine learning/">
+        machine learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/protein engineering/">
+        protein engineering
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    
+    <div class="post-summary" style="font-size: 0.9em; color: #666; margin-bottom: 2em; font-style: italic; padding-top: 2em;">
+      <p>In this blog post, I explore how cross-functional teams in biotech can accelerate molecule discovery using a strategic playbook. Through the story of a fictitious biotech, Catalyst Therapeutics, I highlight the importance of robust experimental design, integrating data science with human intuition, and balancing computational methods with practical insights. The team's journey reveals how better experiments lead to better models and ultimately, better molecules. Are you ready to discover how these principles can transform your biotech projects?</p>
+
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Recently, I've been writing about my thoughts on data science in the biotech world, especially for those who are molecule hunters. You can find some of those posts below:</p>
+<ul>
+<li><a href="https://ericmjl.github.io/blog/2025/2/23/reliable-biological-data-requires-physical-quantities-not-statistical-artifacts/">Reliable biological data requires physical quantities, not statistical artifacts</a></li>
+<li><a href="https://ericmjl.github.io/blog/2025/1/19/why-data-from-preclinical-biotech-lab-experiments-make-machine-learning-challenging/">Why data from preclinical biotech lab experiments make machine learning challenging</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/11/22/a-modest-proposal-for-data-catalogues-at-biotechs/">A modest proposal for data catalogues at biotechs</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/10/25/the-human-dimension-to-clean-distributable-and-documented-data-science-code/">The Human Dimension to Clean, Distributable, and Documented Data Science Code</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/10/18/keys-to-effective-collaborative-data-science/">Keys to effective collaborative data science</a></li>
+</ul>
+<p>This post kicks off a series on how cross-functional molecule design teams can achieve operational speed and efficiency. Through the lens of a fictitious startup, Catalyst Therapeutics (any similarities to real companies are coincidental), I'll share insights drawn from patterns and challenges that I have seen and heard. This series represents a strategic playbook I've developed to accelerate molecule discovery to what I call &quot;the speed of thought.&quot;</p>
+<p>Here's my goal: I want to illustrate that none of this has to be fancy. <strong>It just has to be a stable enough crank to be turned into a flywheel.</strong></p>
+<p>Throughout this series, I'll address the crucial aspects every biotech data science team must master: data capture and engineering, with statistical modeling at its core, supercharged with machine learning and proper experimental design. Catalyst's mission—developing novel protein binders for an oncology target that has eluded conventional methods—serves as the perfect vehicle to demonstrate the principles in this playbook. If your interest is piqued, read on, and I hope you enjoy it :).</p>
+<h2>The Catalyst Therapeutics story: designing a novel protein binder</h2>
+<p>When I first walked into their lab, I met the core team who would become the heroes of this story:</p>
+<p><strong>Maya</strong>, the protein engineer with a decade of wet lab experience and a healthy skepticism about computational methods. &quot;Models are nice,&quot; she often said, &quot;but proteins don't read papers.&quot;</p>
+<p><strong>Dev</strong>, the junior scientist fresh from a top-tier PhD program, eager to apply cutting-edge techniques but still learning the gap between academic benchmarks and real-world biology.</p>
+<p><strong>Sophie</strong>, the pragmatic data scientist with stints at three different biotechs—one acquired, one failed, and one struggling with scaling challenges. As she told me, &quot;I've seen enough ways this can go wrong across different contexts. I'm here to avoid repeating those mistakes.&quot;</p>
+<p>This team was about to embark on a campaign to develop a novel protein scaffold that could bind to their target with high specificity and favorable biophysical properties. What made their approach work—when so many similar efforts fail—was their integrated approach to experimental design from day one.</p>
+<h2>First Meeting: Setting the Foundation</h2>
+<p>I sat in on their kickoff meeting, where Sophie immediately steered the conversation away from fancy algorithms.</p>
+<p>&quot;Before we talk about deep learning or any computational methods,&quot; she said, &quot;let's map out what we're measuring and how we'll account for variables that have nothing to do with our protein sequences.&quot;</p>
+<p>Maya nodded enthusiastically. &quot;In my last role, we spent six months optimizing the wrong property because our assay was actually measuring something else entirely.&quot;</p>
+<p>They spent the entire first day diagramming their experimental workflow on a whiteboard, identifying every potential confounder:</p>
+<p>&quot;If we use different plates on different days, we need to track that,&quot; Sophie noted, creating a column in her spreadsheet.</p>
+<p>&quot;The position in the plate matters too,&quot; Dev added. &quot;Edge wells behave differently due to evaporation.&quot;</p>
+<p>&quot;And don't forget who's running the experiment,&quot; Maya said. &quot;Different hands, different results.&quot;</p>
+<p>What struck me was how Sophie approached this not as a statistics problem but as a practical data collection issue. She wasn't trying to impress anyone with complex experimental designs—she was making sure their foundation was solid.</p>
+<p>&quot;Every variable we don't account for now becomes noise that we can't remove later,&quot; she explained. &quot;And noise puts a hard ceiling on what our models can achieve.&quot;</p>
+<h2>The experimental design takes shape</h2>
+<p>Over the next week, the team developed an experimental plan:</p>
+<ul>
+<li>Every plate would include control proteins in the same positions—a practical compromise since truly randomized placement would be statistically ideal but experimentally infeasible</li>
+<li>Each experimental run would include samples from previous runs to detect day-to-day drift</li>
+<li>They included standardized control samples that both Maya and Dev would process independently once a week to quantify operator effects, also taking advantage of these controls to measure well position effects</li>
+<li>They created detailed metadata sheets that captured everything from reagent lot numbers to ambient temperature</li>
+</ul>
+<p>&quot;Slow is smooth, and smooth is fast,&quot; Maya said when Dev worried about the extra controls. &quot;Taking time to set this up properly now will save us months of troubleshooting later.&quot;</p>
+<p>When I asked Dev if this felt like overkill, his response was telling: &quot;Sophie showed us simulations of how much signal we'd lose if we didn't do this. The extra work now saves months later.&quot;</p>
+<p>These simulations revealed Sophie's deeper approach to experimental design. Rather than focusing on traditional power calculations to determine sample sizes, she had modeled how each source of variability would impact their ability to detect meaningful signals about molecular properties.</p>
+<p>&quot;Think about it this way,&quot; Sophie explained to me later. &quot;Every time we run an experiment, we're not just collecting data points. We're updating our beliefs about how these molecules behave. That's why this is fundamentally a Bayesian problem.&quot;</p>
+<p>What Catalyst understood—that biotech data science teams may miss—is that effective experimental design in molecular discovery is about maximizing the information we gain from each experiment while explicitly accounting for sources of uncertainty. Sophie's approach treated every experimental result as a way to update their beliefs about molecular properties, requiring them to carefully model all sources of noise that could obscure the signal they actually cared about.</p>
+<p>Sophie explained her philosophy: &quot;In biotech, we're not trying to publish a paper with p-values and hypothesis tests. We're building a Bayesian model that explicitly represents all the factors influencing our measurements. The traditional approach asks 'what's the probability of seeing this data given my hypothesis?' But we need to instead ask, 'what's the probability my molecule has this property given all the confounding factors in my data?' That means our north star is signal-to-noise ratio and explicit modeling of uncertainty, not statistical significance.&quot;</p>
+<h2>Initial data collection reveals biases in data</h2>
+<p><strong>Week 2:</strong> Two weeks into their campaign, the first data started coming in. During their analysis meeting, Sophie projected a heatmap showing expression levels across their first set of variants.</p>
+<p>&quot;See this pattern?&quot; she asked, pointing to subtly higher values on the right side of each plate on the control plates. &quot;This is a systematic bias in the reader. Thankfully we planned to control for well position. If not, we might have thought these sequences were actually better.&quot;</p>
+<p>Maya looked concerned. &quot;So we throw out the data?&quot;</p>
+<p>&quot;No,&quot; Sophie smiled. &quot;Because we designed for this. We can model the positional effect and subtract it out.&quot; She pulled up her statistical model, which included terms for plate, position, date, and operator.</p>
+<p>This moment illustrated something crucial: good experimental design means experiments where you can identify and account for imperfections. No perfect experiment exists, but if we can capture as much data as possible up-front, we afford ourselves the chance of controlling for those confounding imperfections.</p>
+<p>The team continued their first round, generating expression and binding data for their initial library of 500 variants. Unlike many campaigns that rush to make thousands of variants, they deliberately kept this round small.</p>
+<p>&quot;We need to validate our measurement pipeline before scaling,&quot; Sophie explained. &quot;A thousand noisy measurements are worth less than a hundred clean ones.&quot;</p>
+<h2>Statistical estimation of molecular property</h2>
+<p><strong>Week 4:</strong> One month in, they had enough data to build their first statistical models. I watched Sophie work through this methodically:</p>
+<p>&quot;The first thing we need to do is to build a protein property estimation model that regresses out all our known confounders,&quot; she explained to the team. &quot;We're not trying to predict anything yet—we're just trying to get clean property estimates for each sequence, while quantifying the fundamental noise level that we have not measured.&quot;</p>
+<p>She walked them through her model, which looked approximately like:</p>
+<pre><code>Binding Observation = f(Sequence) + Expression Level + Plate + Position + Date + Operator + (Instrument × Date) + ε
+</code></pre>
+<p>&quot;This is crucial to understand,&quot; Sophie explained. &quot;Our binding observation is the sum of the true property value dictated by the sequence—that's the f(Sequence) part—plus the effect of expression level, plus all these shifts induced by experimental factors, plus <code>ε</code>, which represents the remaining noise intrinsic to the system that cannot be explained by the rest of the factors.&quot;</p>
+<p>&quot;Notice that last term,&quot; she pointed out. &quot;We think the instrument behaves differently on different days, so we have an interaction term to capture that.&quot;</p>
+<p>Dev seemed confused. &quot;Couldn't a machine learning model figure this out automatically?&quot;</p>
+<p>Sophie shook her head. &quot;ML models can find patterns, but they can't tell you which patterns matter for your science and which are just experimental artifacts. We need to be explicit about our assumptions.&quot;</p>
+<p>When she fitted the model, it provided estimates for how much each factor contributed to the measurements. The plate effect was substantial. The position effect was moderate. The operator effect was surprisingly small.</p>
+<p>&quot;Good news,&quot; Sophie told Maya and Dev. &quot;You two are performing the assay very consistently. That's one less factor to worry about.&quot;</p>
+<p>This analysis gave them clean property estimates for each sequence, with confounders regressed out. But it also provided something equally valuable: a measure of their experimental noise.</p>
+<p>&quot;Our statistical analysis shows that the unexplained variance,  <code>ε</code>, is about 1.3 in our binding measurement, while the total variance of our measurements is about 3.0,&quot; Sophie noted. &quot;That means our theoretical maximum variance explained can be calculated as 1 - (variance of noise/total variance of measurements), which gives us about 56.7%. No model, no matter how sophisticated, can exceed that ceiling. That's our measurement limit.&quot;</p>
+<p>This reality check sparked immediate action from the team. Maya studied the plate effect data and suggested modifications to their protocol. &quot;If we pre-equilibrate the plates for 30 minutes at room temperature before reading, we might reduce that variance,&quot; she hypothesized. Meanwhile, Dev focused on the position effect, designing a randomization scheme that would distribute key variants across different plate positions in future experiments.</p>
+<p>&quot;Every bit of noise we eliminate now increases what our models can learn later,&quot; Sophie reminded them. &quot;Let's implement these improvements for our next round.&quot;</p>
+<p>This reality check is something many teams miss. If your experimental precision is low, no amount of modeling sophistication will overcome it.</p>
+<h2>Predictive modeling of molecular properties</h2>
+<p><strong>Week 6:</strong> With clean property estimates in hand, the team moved to the predictive modeling phase. Sophie started simple:</p>
+<p>&quot;Before we try anything fancy, let's establish a baseline with a random forest on one-hot encoded sequences,&quot; she told the team. &quot;This gives us the simplest possible pipeline from sequence to prediction, with minimal choices to debug.&quot;</p>
+<p>She showed them her approach in code, explaining both the model source definition and the training procedure:</p>
+<p>&quot;There are two distinct parts to this exercise. First, our model source—the code that defines how we transform sequences and what algorithm we use. Second, our model version—the actual trained model with parameters fit to our specific dataset.&quot;</p>
+<p>Sophie's baseline consisted of:</p>
+<ul>
+<li>A simple flattened one-hot encoding for sequence featurization</li>
+<li>A default random forest implementation with minimal hyperparameter tuning</li>
+<li>A clear evaluation protocol that would remain consistent across iterations</li>
+</ul>
+<p>&quot;This entire pipeline should take under an hour to implement and train, especially with AI assistance,&quot; she explained. &quot;It establishes our lower bound on expected performance. I bet a deep neural network model could work, but it would be quite a bit more time to code up and verify that it's working correctly. This model gives me a baseline to work with for our prioritization efforts.&quot;</p>
+<p>When the results came back, the model explained about 30% of the variance in binding affinity.</p>
+<p>&quot;Is that good?&quot; Dev asked.</p>
+<p>&quot;It's promising,&quot; Sophie replied. &quot;Given our experimental noise and total measurement variance, the theoretical maximum is about 56.7%. We're capturing more than half of the explainable signal, which is reasonable for a first pass.&quot;</p>
+<p>Dev continued, &quot;I also heard there are other featurization methods, would you want to test-drive them?&quot;</p>
+<p>&quot;Maybe, but I'm more concerned about our computational workflow being scaffolded out end-to-end,&quot; Sophie replied., &quot;and modularizing it such that we can target individual components for improvements later on. The more important thing is for us to find binders; we can test the effect of computational design workflows opportunistically later.&quot;</p>
+<p>Maya had a practical question, asking, &quot;Can we use it to find better binders?&quot;</p>
+<p>&quot;That's the real test,&quot; Sophie agreed. &quot;But there's another benefit to this simple baseline—it helps us diagnose whether our modeling task is even feasible. If we'd gotten variance explained of 0.1 or 0.2, we'd probably need to revisit our statistical estimation or experimental design. The baseline tells us that this is a tractable problem.&quot;</p>
+<p>What I appreciated about Sophie's approach was her pragmatism. She wasn't trying to publish a methods paper—she was trying to help the team find better molecules. She later quickly evaluated several model architectures, but always with an eye toward practical utility rather than theoretical sophistication.</p>
+<p>&quot;A model that explains 5% more variance but takes a week longer to build isn't worth it at this stage,&quot; she explained. &quot;Speed of iteration matters more than squeezing out the last bits of performance. We version both our code and our trained models, but we don't let perfect be the enemy of good.&quot;</p>
+<h2>Generation and prioritization</h2>
+<p><strong>Week 8:</strong> Two months into the campaign, the team was ready to generate new candidates. Sophie convened a strategy meeting where each member brought different ideas to the table: computational predictions from her model, Maya's structural insights, and Dev's literature-derived variants.</p>
+<p>&quot;We have budget for about 1,000 new sequences,&quot; Maya said. &quot;Given our lab capacity, reagent costs, and screening throughput, that's our practical limit for this round. Let's allocate our experimental real estate thoughtfully instead of just picking the top model predictions.&quot;</p>
+<p>Sophie nodded in agreement. &quot;A mentor of mine who was a computational chemist used to say, 'Show me your hypothesis in the form of a molecule.' That's what we're doing here—translating our different hypotheses into actual sequences we can test.&quot;</p>
+<p>After a focused afternoon of debate, they divided their budget:</p>
+<ul>
+<li>512 sequences for model-guided optimization</li>
+<li>243 for testing Maya's structural hypotheses</li>
+<li>217 for exploring diverse regions of sequence space</li>
+<li>28 for controls and replicates</li>
+</ul>
+<p>This wasn't arbitrary allocation, and in a later post I will detail the method by which they arrived at this budget allocation. Sophie reminded them that their model explained 30% variance against a theoretical maximum of 56.7% - &quot;Good enough to guide us, but not to trust blindly.&quot;</p>
+<p>Maya argued for her structural approaches: &quot;The model finds patterns but doesn't understand physics.&quot; Dev pushed for diversity of mutations sourced from the literature: &quot;That's how we'll improve the model most efficiently.&quot; Sophie mediated, pushing them to quantify their confidence in each approach.</p>
+<p>They ultimately balanced exploitation (model-guided sequences) with exploration (structural hypotheses and diversity) while maintaining experimental quality control. This embodied a key principle: models serve the science, not vice versa. The goal was finding molecules that would actually work, not optimizing model metrics.</p>
+<h2>Learning and iteration</h2>
+<p>The results from their second round were enlightening. The model-guided sequences showed improved binding, but two of Maya's structural hypotheses produced even better variants.</p>
+<p>&quot;This is why we need both approaches,&quot; Sophie explained during their review. &quot;The model found the local optimum, but Maya's intuition helped us jump to a different part of the fitness landscape.&quot;</p>
+<p>What was equally impressive was the impact of their experimental improvements. Thanks to Maya's plate pre-equilibration protocol and Dev's position randomization scheme, the unexplained assay variability had decreased from 56.7% to just 31.4%.</p>
+<p>&quot;Look at this,&quot; Sophie highlighted during their review meeting. &quot;Our noise floor dropped substantially. The theoretical maximum variance we can explain is now 68.6% instead of 56.7%.&quot;</p>
+<p>They updated their models with the new data, and the predictive performance improved substantially. The model now explained nearly 47.2% of the variance—a significant improvement in absolute terms, but even more impressive relative to their new theoretical maximum.</p>
+<p>&quot;The model is getting better because we're giving it better data,&quot; Sophie pointed out. &quot;This is the virtuous cycle we want: better experiments lead to better models lead to better designs lead to better experiments.&quot;</p>
+<p>Dev nodded appreciatively. &quot;It's not just about more data—it's about cleaner data.&quot;</p>
+<p>&quot;Exactly,&quot; Sophie agreed. &quot;We're not just climbing the hill faster; we've actually made the hill higher.&quot;</p>
+<h2>Lessons for biotech data science leads</h2>
+<p>Catalyst's story illustrates several principles that biotech founders should embrace:</p>
+<p><strong>1. Integration is more important than specialization</strong> Sophie's ability to work across experimental design, statistics, and machine learning was more valuable than deep expertise in any one area. Look for data scientists who can bridge these domains rather than hiring separate specialists.</p>
+<p><strong>2. Experimental design sets your ceiling</strong> No computational method can extract information that isn't in your data. Invest heavily in experimental design before scaling data collection.</p>
+<p><strong>3. Control what you can, measure what you can't</strong> You can't eliminate all experimental variability, but you can measure and account for it. Track everything that might confound your measurements, or find plausible and logical surrogates for them.</p>
+<p><strong>4. Know your noise floor</strong> Measure your experimental precision early. It tells you the theoretical maximum performance of any predictive model.</p>
+<p><strong>5. Start simple, add complexity carefully</strong> Begin with baseline models that establish performance benchmarks. Add complexity <em>only when it demonstrably improves decisions, not metrics</em>.</p>
+<p><strong>6. Balance computation and intuition</strong> The most powerful approaches combine computational methods with human expertise and intuition.</p>
+<p><strong>7. Allocate experimental resources thoughtfully</strong> Don't just test the top predictions from your model. Allocate your experimental budget across different strategies.</p>
+<hr />
+<p>In the next parts of this series, we'll see how:</p>
+<ol>
+<li>The team designed the experiment collaboratively and why that was important,</li>
+<li>The use of Bayesian estimation was crucial for generating archival data,</li>
+<li>Sophie approached model building with speed and pragmatism put together (hint: AI was used!), and</li>
+<li>The team specifically arrived at that design budget allocation.</li>
+</ol>
+<p>Stay tuned for more!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll">
+    <pre>
+<span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-a-engineering</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{A blueprint for data-driven molecule engineering}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{03}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{06}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/3/6/a-blueprint-for-data-driven-molecule-engineering}</span>,
+}
+  </span></pre>
+    </div>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+
+</div>
+
+
+
+<a name="disqus"></a>
+<div class="comments">
+<div id="disqus_thread"></div>
+<script>
+  var disqus_config = function() { this.page.identifier = "/blog/a-blueprint-for-data-driven-molecule-engineering"; this.page.url = "https://ericmjl.github.io/blog/2025/3/6/a-blueprint-for-data-driven-molecule-engineering/"; };
+  (function() {
+    var d = document, s = d.createElement('script');
+    s.src = '//ericmjl.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript"
+    rel="nofollow">comments powered by Disqus.</a>
+</noscript>
+</div>
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://twitter.com/ericmjl" rel="">
+                            Twitter</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://octodon.social/@ericmjl" rel="me">
+                            Octodon</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://stackoverflow.com/users/1274908/ericmjl" rel="">
+                            Stack Overflow</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://koalamail.ericmjl.com/send/ericmjl" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+</body>
