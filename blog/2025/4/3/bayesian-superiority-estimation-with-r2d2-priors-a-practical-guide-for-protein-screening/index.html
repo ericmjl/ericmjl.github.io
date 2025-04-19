@@ -1,0 +1,1400 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Bayesian Superiority Estimation with R2D2 Priors: A Practical Guide for Protein Screening">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/bayesian-superiority-estimation-with-r2d2-priors-a-practical-guide-for-protein-screening' />
+
+
+
+    <!-- Google Analytics -->
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-12498603-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+
+
+    <style>
+        .blog-card-container {
+            display: flex;
+        }
+
+        .blog-card-left {
+            flex: 1;
+        }
+
+        .blog-card-right {
+            flex: 3;
+        }
+
+        /* Add rounded corners to banner images */
+        .banner-image {
+            border-radius: 8px;
+            max-width: 98%;
+            height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+    </style>
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Bayesian Superiority Estimation with R2D2 Priors: A Practical Guide for Protein Screening - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <h1 class="logo">
+            <a style="color:black" href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Bayesian Superiority Estimation with R2D2 Priors: A Practical Guide for Protein Screening</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-04-03</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/bayesian/">
+        bayesian
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/r2d2/">
+        r2d2
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/variance modelling/">
+        variance modelling
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/fluorescence/">
+        fluorescence
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/experimental design/">
+        experimental design
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/probability of superiority/">
+        probability of superiority
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/probabilistic modelling/">
+        probabilistic modelling
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/statistics/">
+        statistics
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    
+    <div class="post-summary" style="font-size: 0.9em; color: #666; margin-bottom: 2em; font-style: italic; padding-top: 2em;">
+      <p>In this blog post, I explore how to tackle experimental noise and candidate ranking in protein screening using Bayesian methods. By employing R2D2 priors, we can decompose variance into interpretable components, helping us understand the true biological signal versus experimental artifacts. Additionally, Bayesian superiority calculation allows us to quantify the probability that one protein outperforms another, providing a more robust comparison than traditional methods. These techniques are not only applicable to protein screening but also to drug discovery, materials science, and more. Are you ready to enhance your experimental insights with Bayesian logic?</p>
+
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Recently, I've been thinking and writing a lot about statistics.
+It's because good statistical practice is both under-rated, under-taught, and under-valued
+amongst machine learning practitioners <em>and</em> laboratory scientists,
+and yet it underpins the ability of machine learning practitioners in life sciences
+to build high performing machine learning models that accelerate decisions in the lab.
+It also enables laboratory scientists to design experiments that yield interpretable,
+and actionable results.</p>
+<p>My prior experience doing the full spectrum of laboratory and computational science
+is one of the reasons why it pains me to see potentially good data go to waste
+due to poor experimental design and statistical analysis.
+Without good statistical practice underlying the data generating process --
+and by that I mean good experimental design,
+and explicit quantification of uncertainty --
+all ML models become equal: equally bad.</p>
+<p>In this blog post, I want to show you how to use Bayesian methods
+to tackle two critical questions:</p>
+<ol>
+<li>Is our experimental setup actually measuring the effect we care about
+(vs. experimental noise)?</li>
+<li>Which candidates are truly superior to others?</li>
+</ol>
+<p>As always, I go back to my favorite example: screening proteins.
+But as you read, note the generalities: they aren't specific to protein screening at all!</p>
+<hr />
+<blockquote>
+<p>Note: The original <code>marimo</code> notebook can be found <a href="protein_estimation.py">here</a>.
+If there are discrepancies between my blog post and the original marimo notebook,
+I note that the original notebook is correct.
+To run it, download it, and then execute:</p>
+<div class="hll"><pre><span></span>uvx<span class="w"> </span>marimo<span class="w"> </span>edit<span class="w"> </span>--sandbox<span class="w"> </span>https://ericmjl.github.io/blog/2025/4/3/bayesian-superiority-estimation-with-r2d2-priors-a-practical-guide-for-protein-screening/protein_estimation.py
+</pre></div>
+</blockquote>
+<p>When screening hundreds of molecules, proteins, or interventions,
+two critical questions often arise:</p>
+<ol>
+<li>Is our experimental setup actually measuring the effect we care about
+(vs. experimental noise)?</li>
+<li>Which candidates are truly superior to others?</li>
+</ol>
+<p>In this tutorial, we'll tackle both challenges using a practical example:
+a protein screening experiment with fluorescence readouts.
+We'll show how <strong>R2D2 priors</strong> help interpret variance decomposition,
+and how <strong>Bayesian superiority calculation</strong>
+enables robust ranking of candidates.
+Both techniques generalize to drug discovery, material science,
+or any domain requiring rigorous comparison of multiple alternatives.</p>
+<h2>The Protein Screening Example</h2>
+<p>We'll use a dataset with fluorescence measurements for over 100 proteins
+across multiple experiments and replicates, with an experimental design that includes:</p>
+<ul>
+<li>A control protein present in all experiments and replicates</li>
+<li>&quot;Crossover&quot; proteins measured across all experiments</li>
+<li>Unique test proteins in each experiment</li>
+</ul>
+<p>This design is common in high-throughput screening where measuring all proteins in all conditions is impractical.
+We'll implement our analysis using PyMC, a powerful probabilistic programming framework for Bayesian modeling.</p>
+<div class="hll"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pymc</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pm</span>
+</pre></div>
+<h2>Generating Synthetic Data</h2>
+<p>To demonstrate our approach, we'll generate synthetic data that mimics a realistic protein screening experiment with:</p>
+<ul>
+<li>3 experiments with 2 replicates each</li>
+<li>A control protein and crossover proteins present in all experiments</li>
+<li>Test proteins unique to each experiment</li>
+<li>Systematic experiment effects (batch effects)</li>
+<li>Replicate-level variation</li>
+<li>Measurement noise</li>
+</ul>
+<div class="hll"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="c1"># Set random seed for reproducibility</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+
+<span class="c1"># Define parameters</span>
+<span class="n">n_experiments</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">n_replicates</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">n_proteins_per_exp</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">n_crossover</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1"># Create protein names</span>
+<span class="n">control</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Control&quot;</span><span class="p">]</span>
+<span class="n">crossover_proteins</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Crossover_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_crossover</span><span class="p">)]</span>
+<span class="n">other_proteins</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Protein_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)]</span>
+
+<span class="c1"># Base fluorescence values</span>
+<span class="n">base_values</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">base_values</span><span class="p">[</span><span class="s2">&quot;Control&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">crossover_proteins</span><span class="p">:</span>
+    <span class="n">base_values</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">other_proteins</span><span class="p">:</span>
+    <span class="n">base_values</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+
+<span class="c1"># Create experiment effects</span>
+<span class="n">exp_effects</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">n_experiments</span><span class="p">)</span>
+<span class="n">rep_effects</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="p">(</span><span class="n">n_experiments</span><span class="p">,</span> <span class="n">n_replicates</span><span class="p">))</span>
+
+<span class="c1"># Generate data</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">exp</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_experiments</span><span class="p">):</span>
+    <span class="c1"># Select proteins for this experiment</span>
+    <span class="n">exp_proteins</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">control</span> <span class="o">+</span> <span class="n">crossover_proteins</span> <span class="o">+</span> <span class="n">other_proteins</span><span class="p">[</span><span class="n">exp</span> <span class="o">*</span> <span class="mi">30</span> <span class="p">:</span> <span class="p">(</span><span class="n">exp</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">30</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">rep</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_replicates</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">protein</span> <span class="ow">in</span> <span class="n">exp_proteins</span><span class="p">:</span>
+            <span class="c1"># Add noise and effects</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">base_values</span><span class="p">[</span><span class="n">protein</span><span class="p">]</span>
+                <span class="o">*</span> <span class="n">exp_effects</span><span class="p">[</span><span class="n">exp</span><span class="p">]</span>
+                <span class="o">*</span> <span class="n">rep_effects</span><span class="p">[</span><span class="n">exp</span><span class="p">,</span> <span class="n">rep</span><span class="p">]</span>
+                <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;Experiment&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Exp_</span><span class="si">{</span><span class="n">exp</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Replicate&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Rep_</span><span class="si">{</span><span class="n">rep</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Protein&quot;</span><span class="p">:</span> <span class="n">protein</span><span class="p">,</span>
+                    <span class="s2">&quot;Fluorescence&quot;</span><span class="p">:</span> <span class="n">value</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+<span class="c1"># Convert to DataFrame</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<p></style></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Experiment</th>
+      <th>Replicate</th>
+      <th>Protein</th>
+      <th>Fluorescence</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Exp_1</td>
+      <td>Rep_1</td>
+      <td>Control</td>
+      <td>1087.476281</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Exp_1</td>
+      <td>Rep_1</td>
+      <td>Crossover_0</td>
+      <td>1054.176224</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Exp_1</td>
+      <td>Rep_1</td>
+      <td>Crossover_1</td>
+      <td>955.647739</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Exp_1</td>
+      <td>Rep_1</td>
+      <td>Crossover_2</td>
+      <td>1091.751188</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Exp_1</td>
+      <td>Rep_1</td>
+      <td>Crossover_3</td>
+      <td>1189.344109</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>205</th>
+      <td>Exp_3</td>
+      <td>Rep_2</td>
+      <td>Protein_85</td>
+      <td>1765.149428</td>
+    </tr>
+    <tr>
+      <th>206</th>
+      <td>Exp_3</td>
+      <td>Rep_2</td>
+      <td>Protein_86</td>
+      <td>1595.422298</td>
+    </tr>
+    <tr>
+      <th>207</th>
+      <td>Exp_3</td>
+      <td>Rep_2</td>
+      <td>Protein_87</td>
+      <td>1889.585595</td>
+    </tr>
+    <tr>
+      <th>208</th>
+      <td>Exp_3</td>
+      <td>Rep_2</td>
+      <td>Protein_88</td>
+      <td>1394.395041</td>
+    </tr>
+    <tr>
+      <th>209</th>
+      <td>Exp_3</td>
+      <td>Rep_2</td>
+      <td>Protein_89</td>
+      <td>1411.831297</td>
+    </tr>
+  </tbody>
+</table>
+<p>210 rows × 4 columns</p>
+</div>
+<p>In the synthetic dataset we've created, we simulated:</p>
+<ul>
+<li>3 experiments with 2 replicates each</li>
+<li>A control protein and 4 crossover proteins present in all experiments</li>
+<li>100 other proteins distributed across experiments</li>
+<li>Multiplicative experiment effects (mean=1, sd=0.3)</li>
+<li>Multiplicative replicate effects (mean=1, sd=0.1)</li>
+<li>Multiplicative measurement noise (mean=1, sd=0.05)</li>
+</ul>
+<p>This structure simulates a typical screening setup
+where batch effects between experiments are stronger than replicate variation,
+and both contribute significantly to the observed fluorescence values.
+The setting mirrors real experimental challenges
+where we need to separate biological signal from technical noise.</p>
+<h2>Examining the Raw Data</h2>
+<p>Before modeling, let's visualize the control and crossover proteins to understand experimental variation:</p>
+<div class="hll"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+
+<span class="c1"># Filter for Control and Crossover samples</span>
+<span class="n">mask</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Protein&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s2">&quot;Control|Crossover&quot;</span><span class="p">)</span>
+<span class="n">filtered_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+
+<span class="c1"># Create the swarm plot</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">swarmplot</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">filtered_df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;Experiment&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;Fluorescence&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;Protein&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">8</span>
+<span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Activity for Controls and Crossover Samples&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Fluorescence&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+</pre></div>
+<p><img src="protein_estimation_8_0.webp" alt="png" /></p>
+<p>Notice the dramatic shift in fluorescence values across experiments.
+Experiment 3 shows substantially higher fluorescence readings (around 1500-2000 units)
+compared to Experiments 1 and 2 (mostly below 1300 units).</p>
+<p>This pattern illustrates a common challenge in high-throughput screening:
+significant batch effects between experiments that can mask the true biological signal.
+Without accounting for these experimental factors, we might incorrectly attribute
+higher activity to proteins simply because they were measured in Experiment 3.</p>
+<p>Our modeling approach needs to account for both between-experiment and within-experiment
+sources of variation to accurately compare proteins across the entire dataset.</p>
+<h2>The R2D2 Prior for Variance Decomposition</h2>
+<p>The <a href="https://arxiv.org/abs/2111.10718">R2D2 prior (R-squared Dirichlet decomposition)</a> provides an interpretable framework
+for variance decomposition by placing a prior on the Bayesian coefficient of determination ($R^2$),
+which then induces priors on individual parameters.</p>
+<p>The core idea is simple but powerful:</p>
+<ol>
+<li>Place a $\text{Beta}(a,b)$ prior on $R^2$ (the proportion of variance explained by the model)</li>
+<li>Induce a prior on the global variance parameter representing total variance</li>
+<li>Decompose the global variance into components via a Dirichlet distribution</li>
+</ol>
+<p>This approach has key advantages over traditional hierarchical models:</p>
+<ul>
+<li>Instead of specifying arbitrary priors for each variance component separately, we control
+total explained variance through a single interpretable parameter ($R^2$)</li>
+<li>The variance partition becomes meaningful through the Dirichlet distribution</li>
+<li>The hierarchical nature ensures regularization of variance estimates</li>
+</ul>
+<p>Here's our implementation of the model:</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_</span><span class="p">():</span>
+    <span class="c1"># Create categorical indices</span>
+    <span class="n">exp_idx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Experiment&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">codes</span>
+    <span class="n">rep_idx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Replicate&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">codes</span>
+    <span class="n">prot_idx</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Protein&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">codes</span>
+
+    <span class="c1"># Define coordinates for dimensions</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;experiment&quot;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Experiment&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">(),</span>
+        <span class="s2">&quot;replicate&quot;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Replicate&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">(),</span>
+        <span class="s2">&quot;protein&quot;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Protein&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">(),</span>
+    <span class="p">}</span>
+
+    <span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+        <span class="c1"># Explicitly define R² prior (core of R2D2)</span>
+        <span class="n">r_squared</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Beta</span><span class="p">(</span><span class="s2">&quot;r_squared&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Global parameters</span>
+        <span class="n">global_mean</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span>
+            <span class="s2">&quot;global_mean&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>  <span class="c1"># log scale for fluorescence</span>
+
+        <span class="c1"># Prior on total variance, which will be scaled by R²</span>
+        <span class="c1"># before being decomposed into components.</span>
+        <span class="n">sigma_squared</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfNormal</span><span class="p">(</span><span class="s2">&quot;sigma_squared&quot;</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Global variance derived from R² and residual variance</span>
+        <span class="c1"># For normal models: W = sigma² * r²/(1-r²)</span>
+        <span class="n">global_var</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span>
+            <span class="s2">&quot;global_var&quot;</span><span class="p">,</span> <span class="n">sigma_squared</span> <span class="o">*</span> <span class="n">r_squared</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r_squared</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">global_sd</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span>
+            <span class="s2">&quot;global_sd&quot;</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">global_var</span><span class="p">)</span>
+        <span class="p">)</span>  <span class="c1"># noqa: F841</span>
+
+        <span class="c1"># R2D2 decomposition parameters</span>
+        <span class="c1"># 4 components: experiment, replicate (nested in experiment), protein,</span>
+        <span class="c1"># and unexplained</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Dirichlet</span><span class="p">(</span><span class="s2">&quot;props&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+
+        <span class="c1"># Component variances (for interpretability)</span>
+        <span class="n">exp_var</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;exp_var&quot;</span><span class="p">,</span> <span class="n">props</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">global_var</span><span class="p">)</span>
+        <span class="n">rep_var</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;rep_var&quot;</span><span class="p">,</span> <span class="n">props</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">global_var</span><span class="p">)</span>
+        <span class="n">prot_var</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;prot_var&quot;</span><span class="p">,</span> <span class="n">props</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">global_var</span><span class="p">)</span>
+        <span class="n">unexplained_var</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;unexplained_var&quot;</span><span class="p">,</span> <span class="n">props</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">global_var</span><span class="p">)</span>
+
+        <span class="c1"># Component standard deviations</span>
+        <span class="n">exp_sd</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;exp_sd&quot;</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">exp_var</span><span class="p">))</span>
+        <span class="n">rep_sd</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;rep_sd&quot;</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">rep_var</span><span class="p">))</span>
+        <span class="n">prot_sd</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;prot_sd&quot;</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">prot_var</span><span class="p">))</span>
+        <span class="n">unexplained_sd</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span>
+            <span class="s2">&quot;unexplained_sd&quot;</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">unexplained_var</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Component effects</span>
+        <span class="n">exp_effect</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;exp_effect&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">exp_sd</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;experiment&quot;</span><span class="p">)</span>
+        <span class="n">rep_effect</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span>
+            <span class="s2">&quot;rep_effect&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">rep_sd</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;experiment&quot;</span><span class="p">,</span> <span class="s2">&quot;replicate&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">prot_effect</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;prot_effect&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">prot_sd</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;protein&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Protein activity (what we&#39;re ultimately interested in)</span>
+        <span class="n">prot_activity</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span>  <span class="c1"># noqa: F841</span>
+            <span class="s2">&quot;prot_activity&quot;</span><span class="p">,</span> <span class="n">global_mean</span> <span class="o">+</span> <span class="n">prot_effect</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;protein&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Expected value</span>
+        <span class="n">y_hat</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">global_mean</span>
+            <span class="o">+</span> <span class="n">exp_effect</span><span class="p">[</span><span class="n">exp_idx</span><span class="p">]</span>
+            <span class="o">+</span> <span class="n">rep_effect</span><span class="p">[</span><span class="n">exp_idx</span><span class="p">,</span> <span class="n">rep_idx</span><span class="p">]</span>
+            <span class="o">+</span> <span class="n">prot_effect</span><span class="p">[</span><span class="n">prot_idx</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Calculate model R² directly (for verification)</span>
+        <span class="n">model_r2</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span>  <span class="c1"># noqa: F841</span>
+            <span class="s2">&quot;model_r2&quot;</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">exp_var</span> <span class="o">+</span> <span class="n">rep_var</span> <span class="o">+</span> <span class="n">prot_var</span><span class="p">)</span>
+            <span class="o">/</span> <span class="p">(</span><span class="n">exp_var</span> <span class="o">+</span> <span class="n">rep_var</span> <span class="o">+</span> <span class="n">prot_var</span> <span class="o">+</span> <span class="n">unexplained_var</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Likelihood</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span>  <span class="c1"># noqa: F841</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">y_hat</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">unexplained_sd</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Fluorescence&quot;</span><span class="p">])</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Sample</span>
+        <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
+            <span class="mi">2000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">return_inferencedata</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nuts_sampler</span><span class="o">=</span><span class="s2">&quot;nutpie&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">trace</span>
+
+<span class="n">model</span><span class="p">,</span> <span class="n">trace</span> <span class="o">=</span> <span class="n">_</span><span class="p">()</span>
+</pre></div>
+<h2>Model Convergence and Variance Analysis</h2>
+<p>After fitting our model, zero divergent transitions confirm good convergence.</p>
+<p>Let's examine how variance is partitioned across components:</p>
+<div class="hll"><pre><span></span><span class="n">trace</span><span class="o">.</span><span class="n">sample_stats</span><span class="o">.</span><span class="n">diverging</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+<p>:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}</p>
+<p>html[theme=&quot;dark&quot;],
+html[data-theme=&quot;dark&quot;],
+body[data-theme=&quot;dark&quot;],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1f1f1f;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}</p>
+<p>.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}</p>
+<p>.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}</p>
+<p>.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}</p>
+<p>.xr-header &gt; div,
+.xr-header &gt; ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}</p>
+<p>.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}</p>
+<p>.xr-obj-type {
+  color: var(--xr-font-color2);
+}</p>
+<p>.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 0 20px 0 20px;
+}</p>
+<p>.xr-section-item {
+  display: contents;
+}</p>
+<p>.xr-section-item input {
+  display: inline-block;
+  opacity: 0;
+  height: 0;
+}</p>
+<p>.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}</p>
+<p>.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}</p>
+<p>.xr-section-item input:focus + label {
+  border: 2px solid var(--xr-font-color0);
+}</p>
+<p>.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}</p>
+<p>.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}</p>
+<p>.xr-section-summary &gt; span {
+  display: inline-block;
+  padding-left: 0.5em;
+}</p>
+<p>.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}</p>
+<p>.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: &quot;►&quot;;
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}</p>
+<p>.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}</p>
+<p>.xr-section-summary-in:checked + label:before {
+  content: &quot;▼&quot;;
+}</p>
+<p>.xr-section-summary-in:checked + label &gt; span {
+  display: none;
+}</p>
+<p>.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}</p>
+<p>.xr-section-inline-details {
+  grid-column: 2 / -1;
+}</p>
+<p>.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}</p>
+<p>.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}</p>
+<p>.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}</p>
+<p>.xr-array-wrap &gt; label {
+  grid-column: 1;
+  vertical-align: top;
+}</p>
+<p>.xr-preview {
+  color: var(--xr-font-color3);
+}</p>
+<p>.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}</p>
+<p>.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}</p>
+<p>.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}</p>
+<p>.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}</p>
+<p>.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}</p>
+<p>.xr-dim-list:before {
+  content: &quot;(&quot;;
+}</p>
+<p>.xr-dim-list:after {
+  content: &quot;)&quot;;
+}</p>
+<p>.xr-dim-list li:not(:last-child):after {
+  content: &quot;,&quot;;
+  padding-right: 5px;
+}</p>
+<p>.xr-has-index {
+  font-weight: bold;
+}</p>
+<p>.xr-var-list,
+.xr-var-item {
+  display: contents;
+}</p>
+<p>.xr-var-item &gt; div,
+.xr-var-item label,
+.xr-var-item &gt; .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}</p>
+<p>.xr-var-item &gt; .xr-var-name:hover span {
+  padding-right: 5px;
+}</p>
+<p>.xr-var-list &gt; li:nth-child(odd) &gt; div,
+.xr-var-list &gt; li:nth-child(odd) &gt; label,
+.xr-var-list &gt; li:nth-child(odd) &gt; .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}</p>
+<p>.xr-var-name {
+  grid-column: 1;
+}</p>
+<p>.xr-var-dims {
+  grid-column: 2;
+}</p>
+<p>.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}</p>
+<p>.xr-var-preview {
+  grid-column: 4;
+}</p>
+<p>.xr-index-preview {
+  grid-column: 2 / 5;
+  color: var(--xr-font-color2);
+}</p>
+<p>.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}</p>
+<p>.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}</p>
+<p>.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}</p>
+<p>.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data,
+.xr-index-data-in:checked ~ .xr-index-data {
+  display: block;
+}</p>
+<p>.xr-var-data &gt; table {
+  float: right;
+}</p>
+<p>.xr-var-name span,
+.xr-var-data,
+.xr-index-name div,
+.xr-index-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}</p>
+<p>.xr-attrs,
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  grid-column: 1 / -1;
+}</p>
+<p>dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}</p>
+<p>.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}</p>
+<p>.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}</p>
+<p>.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}</p>
+<p>.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}</p>
+<p>.xr-icon-database,
+.xr-icon-file-text2,
+.xr-no-icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray 'diverging' ()&gt; Size: 8B
+array(0)</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'diverging'</div></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-4463479b-9f49-4c6a-8025-687743d46d84' class='xr-array-in' type='checkbox' checked><label for='section-4463479b-9f49-4c6a-8025-687743d46d84' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>0</span></div><div class='xr-array-data'><pre>array(0)</pre></div></div></li><li class='xr-section-item'><input id='section-adc69949-5564-4636-858b-a9577cd99d5d' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-adc69949-5564-4636-858b-a9577cd99d5d' class='xr-section-summary'  title='Expand/collapse section'>Coordinates: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'></ul></div></li><li class='xr-section-item'><input id='section-11bd5671-ae29-48a2-9b6e-4667045e7d6e' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-11bd5671-ae29-48a2-9b6e-4667045e7d6e' class='xr-section-summary'  title='Expand/collapse section'>Indexes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'></ul></div></li><li class='xr-section-item'><input id='section-04e2fe7d-455e-432b-b246-247023813939' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-04e2fe7d-455e-432b-b246-247023813939' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></p>
+<p>In the ridgeline plot below, we see that unexplained variance contributes minimally to total variation,
+while experiment and replicate effects—which ideally should contribute little—are actually
+significant contributors to the readout variation. This serves as a metric of laboratory consistency.</p>
+<p>Ideally, the protein variation (our biological signal of interest) should be the dominant source
+of variation. This analysis suggests that improving experimental protocols to reduce batch effects
+would substantially improve our signal-to-noise ratio.</p>
+<div class="hll"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">arviz</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">az</span>
+
+<span class="n">axes_posterior_props</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">plot_posterior</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;props&quot;</span><span class="p">],</span> <span class="n">grid</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">axes_posterior_props</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;experiment&quot;</span><span class="p">)</span>
+<span class="n">axes_posterior_props</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;replicate&quot;</span><span class="p">)</span>
+<span class="n">axes_posterior_props</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;protein&quot;</span><span class="p">)</span>
+<span class="n">axes_posterior_props</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;unexplained&quot;</span><span class="p">)</span>
+</pre></div>
+<p><img src="protein_estimation_15_0.webp" alt="png" /></p>
+<p>These posterior plots show the distributions of the variance components. Each represents the proportion of total variance attributed to that component. We can see clear differences in the contributions from each source.</p>
+<p>We can also look at the total $R^2$ value, which represents the proportion of variance explained by the model:</p>
+<div class="hll"><pre><span></span><span class="n">az</span><span class="o">.</span><span class="n">plot_posterior</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;model_r2&quot;</span><span class="p">])</span>
+</pre></div>
+<p><img src="protein_estimation_17_0.webp" alt="png" /></p>
+<p>Taken together, we can interpret that the model fits the data very well (<code>model_r2</code> close to 1), but it is concerning to me that protein only explains 19% of the variation in readout, while experiment and replicate explains more than 70% of the output variation, which signals to me that the measurements are not particularly tight, and a lot could be done to control experiment-to-experiment variation.</p>
+<h2>Protein Activity Estimates</h2>
+<p>Now that we've decomposed the variance and accounted for experimental effects,
+let's examine the protein activity estimates—the &quot;true&quot; biological signal after
+removing experimental noise:</p>
+<div class="hll"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">plot_forest</span><span class="p">(</span><span class="n">trace</span><span class="o">.</span><span class="n">posterior</span><span class="p">[</span><span class="s2">&quot;prot_activity&quot;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;log(protein activity)&quot;</span><span class="p">)</span>
+</pre></div>
+<p><img src="protein_estimation_20_0.webp" alt="png" /></p>
+<p>The forest plot displays posterior distributions of protein activity (log scale),
+with horizontal lines representing 94% credible intervals.</p>
+<p>A key challenge emerges: despite similar uncertainty across proteins,
+overlapping credible intervals make it difficult to determine which proteins
+are truly superior. Simply ranking by posterior means could lead us to prioritize
+proteins with slightly higher point estimates when uncertainty makes their actual
+superiority ambiguous.</p>
+<p>This is a fundamental limitation of ranking by point estimates alone:
+it fails to properly account for uncertainty. A protein with a slightly lower mean
+but narrower credible intervals might be a better candidate than one with a higher
+mean but wider uncertainty bounds.</p>
+<h2>Why not calculate the effect sizes?</h2>
+<p>While effect sizes quantify difference magnitudes, they have important limitations:</p>
+<ol>
+<li>They still have posterior distributions with uncertainty</li>
+<li>They require an arbitrary reference protein</li>
+<li>Scale interpretation is subjective</li>
+<li>They don't directly answer &quot;which is better?&quot;</li>
+</ol>
+<p>This is where the probability of superiority calculation shines: it integrates over
+the entire posterior distribution to directly answer our key question:
+&quot;What is the probability that protein A is better than protein B?&quot;</p>
+<p>The probability of superiority:</p>
+<ol>
+<li>For each posterior sample, compares protein A's activity to protein B's</li>
+<li>Counts the proportion of samples where A &gt; B</li>
+<li>Results in P(A &gt; B) - a single number from 0 to 1</li>
+</ol>
+<p>This approach integrates over uncertainty, directly answers our question,
+avoids arbitrary references, and produces an intuitive metric for decision-making.</p>
+<p>Let's illustrate this with a comparison between two specific proteins:</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_</span><span class="p">():</span>
+    <span class="c1"># Get posterior samples</span>
+    <span class="n">prot_activity</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">posterior</span><span class="p">[</span><span class="s2">&quot;prot_activity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">prot_activity_flat</span> <span class="o">=</span> <span class="n">prot_activity</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">prot_activity</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="c1"># Get protein names</span>
+    <span class="n">protein_names</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">posterior</span><span class="p">[</span><span class="s2">&quot;protein&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="c1"># Choose two proteins to compare</span>
+    <span class="n">protein1</span> <span class="o">=</span> <span class="s2">&quot;Protein_12&quot;</span>  <span class="c1"># A high performer</span>
+    <span class="n">protein2</span> <span class="o">=</span> <span class="s2">&quot;Protein_66&quot;</span>  <span class="c1"># Another high performer</span>
+
+    <span class="n">idx1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">protein_names</span> <span class="o">==</span> <span class="n">protein1</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">idx2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">protein_names</span> <span class="o">==</span> <span class="n">protein2</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Extract their posterior samples</span>
+    <span class="n">samples1</span> <span class="o">=</span> <span class="n">prot_activity_flat</span><span class="p">[:,</span> <span class="n">idx1</span><span class="p">]</span>
+    <span class="n">samples2</span> <span class="o">=</span> <span class="n">prot_activity_flat</span><span class="p">[:,</span> <span class="n">idx2</span><span class="p">]</span>
+
+    <span class="c1"># Calculate differences for each posterior sample</span>
+    <span class="n">differences</span> <span class="o">=</span> <span class="n">samples1</span> <span class="o">-</span> <span class="n">samples2</span>
+
+    <span class="c1"># Calculate superiority probability</span>
+    <span class="n">prob_superiority</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">differences</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Plot the posterior of differences</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+    <span class="c1"># Histogram of differences</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">differences</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+
+    <span class="c1"># Add vertical line at zero</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Shade the area where protein1 &gt; protein2</span>
+    <span class="n">positive_mask</span> <span class="o">=</span> <span class="n">differences</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">differences</span><span class="p">[</span><span class="n">positive_mask</span><span class="p">]),</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>  <span class="c1"># Half height for visibility</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;P(</span><span class="si">{</span><span class="n">protein1</span><span class="si">}</span><span class="s2"> &gt; </span><span class="si">{</span><span class="n">protein2</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">prob_superiority</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Activity Difference (</span><span class="si">{</span><span class="n">protein1</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">protein2</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Frequency&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span>
+        <span class="s2">&quot;Posterior Distribution of Activity Difference &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;Between </span><span class="si">{</span><span class="n">protein1</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">protein2</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="n">_</span><span class="p">()</span>
+</pre></div>
+<p><img src="protein_estimation_23_0.webp" alt="png" /></p>
+<p>This visualization demonstrates the core concept. The green shaded area represents
+the proportion of posterior samples where the first protein outperforms the second.
+This proportion is the probability of superiority.</p>
+<p>Rather than reducing our rich posterior distributions to point estimates or effect sizes
+that still require interpretation, the superiority probability directly integrates over
+all uncertainty to answer our precise question: &quot;How likely is it that this protein is
+better than that one?&quot;</p>
+<p>Now let's calculate this for all pairs of proteins to create a comprehensive superiority matrix:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">tqdm.auto</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_</span><span class="p">():</span>
+    <span class="n">n_proteins</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">posterior</span><span class="p">[</span><span class="s2">&quot;prot_activity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">prot_activity</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">posterior</span><span class="p">[</span><span class="s2">&quot;prot_activity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_proteins</span><span class="p">)</span>
+
+    <span class="n">superiority_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_proteins</span><span class="p">,</span> <span class="n">n_proteins</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_proteins</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_proteins</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">:</span>
+                <span class="n">superiority_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
+                    <span class="n">prot_activity</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">prot_activity</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span>
+                <span class="p">)</span>
+    <span class="k">return</span> <span class="n">superiority_matrix</span>
+
+<span class="n">superiority_matrix</span> <span class="o">=</span> <span class="n">_</span><span class="p">()</span>
+</pre></div>
+<p>0%|                                                                                       | 0/95 [00:00&lt;?, ?it/s]</p>
+<p>62%|███████████████████████████████████████████████▊                             | 59/95 [00:00&lt;00:00, 585.08it/s]</p>
+<p>100%|█████████████████████████████████████████████████████████████████████████████| 95/95 [00:00&lt;00:00, 587.17it/s]</p>
+<p>This superiority matrix gives us, for each pair of proteins (i, j), the probability
+that protein i has higher activity than protein j, incorporating all model uncertainty.</p>
+<p>The calculation yields a probability interpretation: &quot;There's an 85% chance that
+protein A is superior to protein B&quot; rather than the frequentist &quot;protein A is
+significantly better than protein B with p&lt;0.05.&quot;</p>
+<p>Let's visualize this matrix:</p>
+<div class="hll"><pre><span></span><span class="c1"># Create heatmap</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">superiority_matrix</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;YlOrRd&quot;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Superiority Matrix&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+</pre></div>
+<p><img src="protein_estimation_27_0.webp" alt="png" /></p>
+<p>We can rank proteins by their average probability of superiority across all comparisons:</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_</span><span class="p">():</span>
+    <span class="c1"># Calculate average probability of superiority and sort proteins</span>
+    <span class="n">avg_superiority</span> <span class="o">=</span> <span class="n">superiority_matrix</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">protein_names</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Protein&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+    <span class="n">superiority_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">&quot;Protein&quot;</span><span class="p">:</span> <span class="n">protein_names</span><span class="p">,</span> <span class="s2">&quot;Avg_Superiority&quot;</span><span class="p">:</span> <span class="n">avg_superiority</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">sorted_superiority</span> <span class="o">=</span> <span class="n">superiority_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+        <span class="s2">&quot;Avg_Superiority&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+
+    <span class="c1"># Create plot</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+    <span class="c1"># For each protein, plot individual points and mean line</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">protein</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_superiority</span><span class="p">[</span><span class="s2">&quot;Protein&quot;</span><span class="p">]):</span>
+        <span class="n">protein_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">protein_names</span> <span class="o">==</span> <span class="n">protein</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">protein_probs</span> <span class="o">=</span> <span class="n">superiority_matrix</span><span class="p">[</span><span class="n">protein_idx</span><span class="p">]</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">([</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">protein_probs</span><span class="p">),</span> <span class="n">protein_probs</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="n">avg_superiority</span><span class="p">[</span><span class="n">protein_idx</span><span class="p">],</span> <span class="n">i</span> <span class="o">-</span> <span class="mf">0.25</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mf">0.25</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span>
+        <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sorted_superiority</span><span class="p">)),</span> <span class="n">sorted_superiority</span><span class="p">[</span><span class="s2">&quot;Protein&quot;</span><span class="p">],</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Probability of Superiority&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Distribution of Superiority Probabilities by Protein&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+
+<span class="n">_</span><span class="p">()</span>
+</pre></div>
+<p><img src="protein_estimation_29_0.webp" alt="png" /></p>
+<p>This ranking differs from what we might conclude by examining forest plots alone.
+The superiority metric directly quantifies the probability that one protein
+outperforms others, properly accounting for the full posterior distribution
+and uncertainty in each comparison.</p>
+<p>To better understand how protein activity relates to superiority probability,
+let's compare their posterior mean activity with two superiority measures:</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_</span><span class="p">():</span>
+    <span class="c1"># Calculate probability of superiority distribution for each protein</span>
+    <span class="n">superiority_dist</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">superiority_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">j</span><span class="p">],</span> <span class="n">superiority_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]])</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">superiority_matrix</span><span class="p">)))</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Get protein activity statistics from trace</span>
+    <span class="n">protein_activity_mean</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">trace</span><span class="o">.</span><span class="n">posterior</span><span class="p">[</span><span class="s2">&quot;prot_activity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;chain&quot;</span><span class="p">,</span> <span class="s2">&quot;draw&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">values</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Create scatter plot</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+    <span class="c1"># Plot points</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+        <span class="n">protein_activity_mean</span><span class="p">,</span>
+        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span> <span class="k">for</span> <span class="n">dist</span> <span class="ow">in</span> <span class="n">superiority_dist</span><span class="p">],</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;mean p(superior)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+        <span class="n">protein_activity_mean</span><span class="p">,</span>
+        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">dist</span> <span class="ow">in</span> <span class="n">superiority_dist</span><span class="p">],</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;minimum p(superior)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Posterior Mean Protein Activity (log scale)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Probability of Superiority&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Protein Activity vs Probability of Superiority&quot;</span><span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+
+<span class="n">_</span><span class="p">()</span>
+</pre></div>
+<p><img src="protein_estimation_31_0.webp" alt="png" /></p>
+<p>This plot reveals that:</p>
+<ol>
+<li>The relationship between activity and superiority is non-linear</li>
+<li>Proteins with similar activities can have different superiority probabilities
+depending on the certainty of their estimates</li>
+<li>The minimum probability of superiority provides a conservative decision-making
+measure—a protein with high minimum superiority is more likely to be the superior
+candidate</li>
+</ol>
+<h2>Conclusion</h2>
+<p>When screening candidates, two questions are critical: &quot;Are we measuring what matters?&quot;
+and &quot;Which candidates are truly superior?&quot; Traditional approaches using point estimates
+and p-values inadequately address these questions when dealing with experimental noise
+and multiple comparisons.</p>
+<p>A Bayesian model with explicitly modeled terms offers a powerful alternative:</p>
+<ol>
+<li><strong>R2D2 priors</strong> decompose variance into interpretable components, revealing how
+much signal comes from the biological effect versus experimental artifacts.
+This guides concrete improvements to experimental protocols.</li>
+<li><strong>Bayesian superiority calculation</strong> directly quantifies the probability that
+one candidate outperforms others, properly accounting for uncertainty and
+avoiding the pitfalls of simple rank ordering.</li>
+</ol>
+<p>These techniques transform screening data into actionable insights and apply to
+any domain requiring robust comparison of multiple candidates under noisy conditions:
+drug discovery, materials science, A/B testing, clinical trials, and more.</p>
+<p>Bayesian methods move us beyond simplistic &quot;winners and losers&quot; to a nuanced
+understanding of which candidates are most likely to succeed, with what degree
+of certainty, and how we can improve our measurement process itself.
+It lets us move beyond simplistic &quot;winners and losers&quot;
+to a nuanced understanding of which candidates are most likely to succeed,
+with what degree of certainty, and how we can improve our measurement process itself.</p>
+<p>And more meta-level: none of this needs fancy names.
+It's just logic and math, applied to data.
+Wasn't that what statistics was supposed to be?</p>
+<p><em>With thanks to Jackie Valeri for sanity-checking the code while also learning the ins-and-outs of the R2D2 prior,
+and Virgile Andreani for first introducing me to the R2D2 prior!</em></p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll">
+    <pre>
+<span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-bayesian-screening</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Bayesian Superiority Estimation with R2D2 Priors: A Practical Guide for Protein Screening}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{04}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{03}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/4/3/bayesian-superiority-estimation-with-r2d2-priors-a-practical-guide-for-protein-screening}</span>,
+}
+  </span></pre>
+    </div>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+
+</div>
+
+
+
+<a name="disqus"></a>
+<div class="comments">
+<div id="disqus_thread"></div>
+<script>
+  var disqus_config = function() { this.page.identifier = "/blog/bayesian-superiority-estimation-with-r2d2-priors-a-practical-guide-for-protein-screening"; this.page.url = "https://ericmjl.github.io/blog/2025/4/3/bayesian-superiority-estimation-with-r2d2-priors-a-practical-guide-for-protein-screening/"; };
+  (function() {
+    var d = document, s = d.createElement('script');
+    s.src = '//ericmjl.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript"
+    rel="nofollow">comments powered by Disqus.</a>
+</noscript>
+</div>
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://twitter.com/ericmjl" rel="">
+                            Twitter</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+</body>
