@@ -1,0 +1,659 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Good practices for AI-assisted development from a live protein calculator demo">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/good-practices-for-ai-assisted-development-from-a-live-protein-calculator-demo' />
+
+
+
+    <!-- Google Analytics -->
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-12498603-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+
+    <style>
+        .blog-card-container {
+            display: flex;
+        }
+
+        .blog-card-left {
+            flex: 1;
+        }
+
+        .blog-card-right {
+            flex: 3;
+        }
+
+        /* Add rounded corners to banner images */
+        .banner-image {
+            border-radius: 8px;
+            max-width: 98%;
+            height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+    </style>
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Good practices for AI-assisted development from a live protein calculator demo - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Good practices for AI-assisted development from a live protein calculator demo</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-04-19</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/standardization/">
+        standardization
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/coding/">
+        coding
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/protein/">
+        protein
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/mass/">
+        mass
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/tools/">
+        tools
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/project/">
+        project
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/collaboration/">
+        collaboration
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/development/">
+        development
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share my experience from a live coding demo at BioIT World 2025, where I built a protein mass spectrometry calculator tool. I emphasize the importance of standardization in data science, starting with a design document, and using AI assistance for rapid development. Despite a live demo hiccup, I showcased the tool's capabilities and highlighted key lessons in AI collaboration, such as the value of context and interactive communication. How can AI tools enhance your development process while maintaining human oversight and creativity?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p><a href="../../2/how-to-standardize-data-science-ways-of-working-to-unlock-your-teams-creativity/">In a previous blog post</a>, I explored how standardization helps data science teams fly and actually unleashes creativity rather than constraining it. Here, I'd like to share my experience from a live coding demonstration I gave at BioIT World 2025 as part of the AI in Software Engineering track.</p>
+<h2>What I built</h2>
+<p>During my presentation, I built a protein mass spectrometry calculator tool live in front of the audience. This command-line tool mirrors the delivery model that I helped co-design at work, where we typically deliver our solutions as command-line tools. For this demonstration, I specifically chose to build a tool that simulates proteolytic digests and calculates mass spectra.</p>
+<p>The goal was to create a tool that could:</p>
+<ul>
+<li>Accept a protein sequence input in various file formats</li>
+<li>Simulate proteolytic digestion</li>
+<li>Calculate what the mass spectra would look like</li>
+<li>Display results as a plot or PNG file</li>
+</ul>
+<p>I wanted this tool to have three interfaces:</p>
+<ol>
+<li>A Python library for notebook interaction</li>
+<li>A command-line interface using the Python library</li>
+<li>A web frontend backed by an API (though I didn't implement this during the demo)</li>
+</ol>
+<h2>Starting with structure</h2>
+<p>I began by scaffolding a new project repository using my personal open-source tool called <a href="./"><code>pyds-cli</code></a>. This automatically creates a standardized project structure - something I emphasized is critical for collaborative data science work.</p>
+<p>&quot;Standardization is really important for a data science team to fly,&quot; I explained. &quot;We've standardized our ways of working such that every project looks pretty much exactly the same.&quot;</p>
+<p>The key design principle here is consistency in interface while maintaining flexibility in implementation. As I noted during the presentation, &quot;the project looks the same, but underneath the hood, what methods you use, what plotting packages you like, what algorithms you choose, they don't matter. You do what you need.&quot; This standardization means that when someone else needs to jump in and help with a project, they can do so without wasting time figuring out how things are organized. The familiar structure lets them focus immediately on the substance of the work rather than deciphering a new system.</p>
+<p>Far from constraining creativity, this standardization enables it by removing unnecessary cognitive overhead. Data scientists can concentrate on solving problems instead of reinventing project structures and interfaces for each new initiative.</p>
+<h2>Design first, code second</h2>
+<p>Instead of diving straight into &quot;vibe coding&quot; (coding without clear direction), I started with a design document. I dictated my requirements to the AI assistant:</p>
+<ul>
+<li>The functionality I needed</li>
+<li>The three interfaces I wanted</li>
+<li>The overall architecture</li>
+</ul>
+<p>The AI generated a comprehensive design document that included:</p>
+<ul>
+<li>Project overview</li>
+<li>Functional requirements</li>
+<li>Architecture design</li>
+<li>Key modules (parsers, digestion simulation, mass spec calculation, visualization)</li>
+<li>Usage patterns</li>
+</ul>
+<p>As I reviewed this document, I noted areas where I lacked expertise: &quot;I don't have enough expertise to evaluate this. Got to talk with a biologist or mass spec expert.&quot; This self-awareness is crucial when working with AI tools to ensure that you don't end up building something with a fundamental logical error.</p>
+<h2>Implementing with AI assistance</h2>
+<p>After reviewing the design, I switched to using the AI agent mode to implement the library and command-line interface. The agent created:</p>
+<ul>
+<li>Parsers for protein sequences</li>
+<li>A digestion module with support for various enzymes</li>
+<li>Mass spec calculation functionality</li>
+<li>Visualization capabilities</li>
+<li>A command-line interface</li>
+</ul>
+<p>What would have taken me about three days of work was accomplished in minutes. However, I emphasized that this wasn't the end of the process - I would normally spend at least an hour or two reviewing the code to ensure it was correct and identify knowledge gaps.</p>
+<h2>The final product</h2>
+<p>When I tried to demonstrate the tool's functionality, I ran into some issues - a common occurrence in live demos! In my case, it was a package dependency problem. As I joked to the audience, &quot;It is these moments like these that make me go, alright, I'm going to pull out the cooking show style thing and switch over to the pre-baked, already-working thing that I have prepared for everybody.&quot;</p>
+<p>This &quot;cooking show mode&quot; saved the demo, allowing me to showcase the working version I had prepared beforehand:</p>
+<ul>
+<li>Calculating protein mass</li>
+<li>Performing trypsin digestion</li>
+<li>Outputting mass/charge values</li>
+<li>Generating a visualization of the mass spectrum</li>
+</ul>
+<p>To the audience's applause, I concluded with the lessons learned.</p>
+<h2>Key lessons learned</h2>
+<p>Throughout this exercise, I noted several important principles for effective AI collaboration. <strong>Context is key</strong> - the more contextual information you provide to AI, the better its output. As Michael Smallegen had mentioned in his preceding lightning talk, trying to vibe code from scratch with minimal context would inevitably result in &quot;spaghetti&quot; code that's difficult to maintain.</p>
+<p>Even as data scientists, we need to <strong>apply software development judgment</strong> to the process. Data scientists who can build the operational software around their analytical work minimize handoff delays and dependencies on other teams. AI assistance significantly lowers the energy barrier to making this software work, but without critical oversight and software development principles, AI-generated code can quickly become unmaintainable. Throughout the demo, I found myself constantly evaluating the code against established patterns and identifying areas where I lacked expertise and needed to consult with specialists.</p>
+<p><strong>Interactive communication enhances development</strong>. During the demo, I discovered that dictating my requirements was faster than typing, and AI tools acted like &quot;an intellectual sparring partner&quot; to help clarify what I really needed. Even when my initial instructions weren't perfectly formed, the back-and-forth conversation helped refine my thinking as I worked through the problem.</p>
+<p><strong>Documentation emerged as another crucial advantage with these patterns</strong>. One powerful aspect of this development process was getting comprehensive documentation without having to write it myself - a task that often gets neglected in rapid development cycles.</p>
+<p>My ex-colleague Matt Whitfield, who now works at Dash Bio, has taken this approach further with <strong>requirements-driven development</strong>, where requirements become part of the codebase itself in the form of documentation, serving as context for both humans and AI. This seamless integration of specifications and implementation creates a powerful feedback loop.</p>
+<p>When used thoughtfully, AI tools can dramatically accelerate development while still allowing us to apply our domain expertise and judgment. The key is <strong>maintaining human agency</strong> in the process - using AI as a powerful assistant rather than letting it take over completely.</p>
+<h2>One more thing: the repository</h2>
+<p>I put the repository up here for anyone who wants to explore it: <a href="https://github.com/ericmjl/protein-mass-spec-calculator">https://github.com/ericmjl/protein-mass-spec-calculator</a>.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-good-practices-for-ai-assisted-development-from-a-live-protein-calculator-demo</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Good practices for AI-assisted development from a live protein calculator demo}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{04}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{19}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/4/19/good-practices-for-ai-assisted-development-from-a-live-protein-calculator-demo}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+</body>
