@@ -1,0 +1,817 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Stop guessing at priors: R2D2&#39;s automated approach to Bayesian modeling">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/stop-guessing-at-priors-r2d2s-automated-approach-to-bayesian-modeling' />
+
+
+
+    <!-- Google Analytics -->
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-12498603-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+
+    <style>
+        .blog-card-container {
+            display: flex;
+        }
+
+        .blog-card-left {
+            flex: 1;
+        }
+
+        .blog-card-right {
+            flex: 3;
+        }
+
+        /* Add rounded corners to banner images */
+        .banner-image {
+            border-radius: 8px;
+            max-width: 98%;
+            height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+    </style>
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Stop guessing at priors: R2D2&#39;s automated approach to Bayesian modeling - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Stop guessing at priors: R2D2&#39;s automated approach to Bayesian modeling</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-08-06</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/bayesian/">
+        bayesian
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/variance/">
+        variance
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/r2d2/">
+        r2d2
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/dirichlet/">
+        dirichlet
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/multilevel/">
+        multilevel
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/glm/">
+        glm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/regularization/">
+        regularization
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/priors/">
+        priors
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/inference/">
+        inference
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/pymc/">
+        pymc
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share my journey exploring the R2D2 framework for Bayesian modeling, which lets you intuitively control model fit by placing a prior on R² instead of individual coefficients. I walk through its elegant extensions to generalized linear and multilevel models, showing how it automatically allocates explained variance and prevents overfitting. Curious how this approach can simplify your modeling and highlight the most important factors in your data?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>When I first encountered the R2D2 (R²-induced Dirichlet Decomposition) framework (Zhang et al., 2020), I was struck by its intuitive approach to Bayesian regularization. Instead of placing priors on individual regression coefficients and hoping for the best, R2D2 lets you directly specify your beliefs about how much variance the model should explain. But what really fascinated me was how the framework elegantly extends from simple linear regression to complex multilevel models through a series of principled modifications.</p>
+<p>This post documents my journey understanding the progression from the basic R2D2 shrinkage prior to its sophisticated multilevel variant (R2D2M2), with stops along the way to explore generalized linear models. What emerged was a beautiful mathematical architecture where each extension builds naturally on the previous.</p>
+<h2>The foundation: R2D2 shrinkage prior</h2>
+<p>The journey begins with the elegant insight that motivated the original R2D2 framework: why not place a prior directly on the coefficient of determination (R²) rather than fumbling with individual coefficient priors? The challenge with individual coefficient priors isn't just knowing where to center them, but defining appropriate variance parameters - it's remarkably difficult to know a priori how much variability each coefficient should have.</p>
+<h3>The core mathematical insight</h3>
+<p>For any model, R² represents the proportion of output variance that can be explained:</p>
+<pre><code>R² = explained variance / total variance = W / (W + σ²)
+</code></pre>
+<p>Rearranging this relationship shows us what W actually represents:</p>
+<pre><code>R² = W / (W + σ²)
+R²(W + σ²) = W
+R²W + R²σ² = W
+R²σ² = W - R²W = W(1 - R²)
+W = σ² * (R² / (1 - R²))
+</code></pre>
+<p>Therefore, W represents the <strong>ratio of explained variance to residual variance</strong> - how much variance the model explains relative to unexplained noise. This gives us:</p>
+<ul>
+<li><strong>W = 1</strong>: Signal equals noise (R² = 0.5)</li>
+<li><strong>W = 4</strong>: Signal is 4 times stronger than noise (R² = 0.8)</li>
+<li><strong>W = 0.25</strong>: Noise is 4 times stronger than signal (R² = 0.2)</li>
+</ul>
+<p>The R2D2 framework starts by placing a Beta prior on R²:</p>
+<div class="hll"><pre><span></span><span class="n">r_squared</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Beta</span><span class="p">(</span><span class="s2">&quot;r_squared&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">b</span><span class="p">)</span>
+<span class="n">W</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">r_squared</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r_squared</span><span class="p">))</span>
+</pre></div>
+<p>As Zhang et al. note, &quot;the induced prior density for W = R²/(1-R²) is a Beta Prime distribution ... denoted as BP(a,b),&quot; giving us intuitive control over model fit through the familiar Beta hyperparameters.</p>
+<h3>Allocating explained variance: the Dirichlet decomposition</h3>
+<p>But here's where R2D2 gets clever. Instead of requiring the modeler to manually specify variance parameters for each predictor's prior, it uses a <strong>Dirichlet decomposition</strong> to automatically allocate the total explained variance W across predictors:</p>
+<div class="hll"><pre><span></span><span class="c1"># W is the total explained variance to allocate</span>
+<span class="n">phi</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Dirichlet</span><span class="p">(</span><span class="s2">&quot;phi&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">a_pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;predictors&quot;</span><span class="p">)</span>
+<span class="n">lambda_j</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;lambda_j&quot;</span><span class="p">,</span> <span class="n">phi</span> <span class="o">*</span> <span class="n">W</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;predictors&quot;</span><span class="p">)</span>
+</pre></div>
+<p>This means <code>φⱼ × W = λⱼ</code> answers the question: <em>&quot;What fraction of the total explained variance does predictor j get?&quot;</em></p>
+<p><strong>Example</strong>: If W = 8 (explained variance is 8 times larger than residual variance) and φ = [0.5, 0.3, 0.2], then:</p>
+<ul>
+<li>Predictor 1: λ₁ = 0.5 × 8 = 4 (gets 50% of explained variance)</li>
+<li>Predictor 2: λ₂ = 0.3 × 8 = 2.4 (gets 30% of explained variance)</li>
+<li>Predictor 3: λ₃ = 0.2 × 8 = 1.6 (gets 20% of explained variance)</li>
+</ul>
+<p>As Zhang et al. describe, this creates adaptive behavior where &quot;the heavy tail reduces the bias in estimation of large coefficients, while the high concentration around zero shrinks the irrelevant coefficients heavily to zero, thus reducing the noise&quot; - factors that explain a lot of the output variance get allocated more of the total explained variance (larger λⱼ values), while factors that don't explain much output variance get allocated less explained variance (smaller λⱼ values).</p>
+<h3>The R2D2 model</h3>
+<p>Bringing these pieces together - the R² prior, the Dirichlet variance allocation, and the coefficient distributions - we get the R2D2 model:</p>
+<div class="hll"><pre><span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="c1"># Noise level (data scale)</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfNormal</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="c1"># R² prior (intuitive model fit control)</span>
+    <span class="n">r_squared</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Beta</span><span class="p">(</span><span class="s2">&quot;r_squared&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">b</span><span class="p">)</span>
+
+    <span class="c1"># Global signal-to-noise ratio</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">r_squared</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r_squared</span><span class="p">))</span>
+
+    <span class="c1"># Local variance allocation (competitive)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Dirichlet</span><span class="p">(</span><span class="s2">&quot;phi&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">a_pi</span><span class="p">),</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;predictors&quot;</span><span class="p">)</span>
+    <span class="n">lambda_j</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;lambda_j&quot;</span><span class="p">,</span> <span class="n">phi</span> <span class="o">*</span> <span class="n">W</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;predictors&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Coefficients with allocated variance</span>
+    <span class="n">scale_j</span> <span class="o">=</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">pm</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">lambda_j</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># For Laplace priors</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Laplace</span><span class="p">(</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">scale_j</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;predictors&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Standard linear likelihood</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span>
+    <span class="n">likelihood</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;obs&quot;</span><span class="p">)</span>
+</pre></div>
+<p>The beauty of this approach lies in the competitive nature of the Dirichlet allocation: all predictors compete for the total explained variance W. If one predictor becomes more important (higher φⱼ), others must become less important. This creates natural sparsity and prevents overfitting.</p>
+<h2>First extension: R2D2 for generalized linear models</h2>
+<p>The first major challenge came when extending R2D2 to non-Gaussian outcomes. Yanchenko et al. (2021) tackled this problem by developing clever approximation methods that preserve the intuitive R² interpretation. The beautiful relationship <code>R² = W/(W+σ²)</code> that made everything work cleanly suddenly becomes complex when dealing with Poisson counts, binary outcomes, or other GLM families.</p>
+<h3>The challenge: no more simple σ²</h3>
+<p>In GLMs, the &quot;noise&quot; isn't a simple σ² anymore. Instead, we have:</p>
+<ul>
+<li><strong>Poisson</strong>: Variance equals the mean (<code>σ²(η) = e^η</code>)</li>
+<li><strong>Binomial</strong>: Variance depends on probability (<code>σ²(η) = μ(η)[1-μ(η)]</code>)</li>
+<li><strong>Gaussian</strong>: Still simple (<code>σ²(η) = σ²</code>)</li>
+</ul>
+<p>This breaks our clean R² = W/(W+σ²) relationship because now both the signal and noise are functions of the linear predictor η.</p>
+<h3>The elegant solution: linear approximation</h3>
+<p>The GLM extension uses a brilliant linear approximation approach. As Yanchenko et al. describe, &quot;applying a first-order Taylor series approximation of μ(η) and σ²(η) around β₀&quot; allows them to handle the GLM complexity. We approximate the complex GLM relationship around the intercept β₀:</p>
+<pre><code>R² ≈ W/(W + s²(β₀))
+</code></pre>
+<p>Where <code>s²(β₀) = σ²(β₀)/[μ'(β₀)]²</code> is the &quot;effective noise&quot; for each GLM family:</p>
+<ul>
+<li><strong>Gaussian</strong>: <code>s²(β₀) = σ²</code> (no change needed!)</li>
+<li><strong>Poisson</strong>: <code>s²(β₀) = e^{-β₀}</code> (depends on baseline rate)</li>
+<li><strong>Logistic</strong>: <code>s²(β₀) = μ(β₀)(1-μ(β₀))/[μ'(β₀)]²</code> (depends on baseline probability)</li>
+</ul>
+<h3>What this achieves</h3>
+<p><strong>The genius</strong>: We keep all the interpretability and mathematical structure of the linear R2D2 case, but just compute a smarter &quot;noise&quot; term that respects the GLM family's variance structure.</p>
+<div class="hll"><pre><span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="c1"># Same intuitive R² prior!</span>
+    <span class="n">r_squared</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Beta</span><span class="p">(</span><span class="s2">&quot;r_squared&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">b</span><span class="p">)</span>
+
+    <span class="c1"># GLM-specific &quot;effective noise&quot;</span>
+    <span class="k">if</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;poisson&#39;</span><span class="p">:</span>
+        <span class="n">s_sq</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;s_sq&quot;</span><span class="p">,</span> <span class="n">pt</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">beta0</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">family</span> <span class="o">==</span> <span class="s1">&#39;binomial&#39;</span><span class="p">:</span>
+        <span class="n">exp_beta0</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">beta0</span><span class="p">)</span>
+        <span class="n">mu_beta0</span> <span class="o">=</span> <span class="n">exp_beta0</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">exp_beta0</span><span class="p">)</span>
+        <span class="n">mu_prime_beta0</span> <span class="o">=</span> <span class="n">exp_beta0</span> <span class="o">/</span> <span class="n">pt</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">exp_beta0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">s_sq</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;s_sq&quot;</span><span class="p">,</span> <span class="n">mu_beta0</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">mu_beta0</span><span class="p">)</span> <span class="o">/</span> <span class="n">pt</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">mu_prime_beta0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="c1"># Same competitive allocation structure!</span>
+    <span class="n">W_base</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;W_base&quot;</span><span class="p">,</span> <span class="n">r_squared</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r_squared</span><span class="p">))</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="n">W_base</span> <span class="o">*</span> <span class="n">s_sq</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Dirichlet</span><span class="p">(</span><span class="s2">&quot;phi&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_components</span><span class="p">,</span> <span class="n">xi0</span><span class="p">),</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;components&quot;</span><span class="p">)</span>
+</pre></div>
+<p>The elegance of this approach becomes clear when we step back and see what's happening conceptually. We're essentially asking &quot;what would σ² be if this GLM were actually a linear model?&quot; and using that as our effective noise term. This preserves all the intuitive benefits of R2D2 while handling GLM complexity.</p>
+<h2>The great leap: R2D2M2 for multilevel models</h2>
+<p>The most sophisticated extension addresses the challenge of multilevel models with multiple grouping factors - the kind of complex experimental designs common in laboratory research. Aguilar &amp; Bürkner (2022) developed the R2D2M2 prior to handle this complexity while preserving the intuitive variance decomposition interpretation.</p>
+<h3>The multilevel challenge</h3>
+<p>Consider a laboratory experiment with:</p>
+<ul>
+<li><strong>Predictors</strong>: Gene expression, Age, Treatment dose</li>
+<li><strong>Grouping factors</strong>: Mouse ID, MicroRNA ID, Stress condition</li>
+</ul>
+<p>Traditional approaches assign independent priors to each effect:</p>
+<div class="hll"><pre><span></span><span class="c1"># Traditional (problematic) approach</span>
+<span class="n">beta_gene</span> <span class="o">~</span> <span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">λ_gene</span><span class="err">²</span><span class="p">)</span>
+<span class="n">beta_age</span> <span class="o">~</span> <span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">λ_age</span><span class="err">²</span><span class="p">)</span>
+<span class="n">mouse_effects</span> <span class="o">~</span> <span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">λ_mouse</span><span class="err">²</span><span class="p">)</span>
+<span class="n">microRNA_effects</span> <span class="o">~</span> <span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">λ_microRNA</span><span class="err">²</span><span class="p">)</span>
+<span class="n">stress_effects</span> <span class="o">~</span> <span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">λ_stress</span><span class="err">²</span><span class="p">)</span>
+</pre></div>
+<p><strong>The problem</strong>: As you add more predictors and grouping factors, the implied R² prior becomes increasingly concentrated near 1 (the maximum possible R² value). This happens because each additional effect adds its own independent variance contribution, causing the total expected explained variance to grow without bound, leading to overfitting-prone models that expect near-perfect fit a priori.</p>
+<h3>The R2D2M2 solution: type-level variance allocation</h3>
+<p>The key insight from Aguilar &amp; Bürkner is that R2D2M2 extends the Dirichlet decomposition to handle multiple <strong>types</strong> of effects while preserving hierarchical pooling:</p>
+<div class="hll"><pre><span></span><span class="c1"># Component calculation for laboratory data</span>
+<span class="n">n_components</span> <span class="o">=</span> <span class="n">n_predictors</span> <span class="o">+</span> <span class="n">n_grouping_factors</span>
+<span class="n">n_components</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">=</span> <span class="mi">6</span>  <span class="c1"># gene_expr + age + dose + mouse + microRNA + stress</span>
+
+<span class="n">component_names</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;population_gene_expr&#39;</span><span class="p">,</span>    <span class="c1"># Population-level effects</span>
+    <span class="s1">&#39;population_age&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;population_dose&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;mouse_intercepts&#39;</span><span class="p">,</span>        <span class="c1"># Group-specific intercept types</span>
+    <span class="s1">&#39;microRNA_intercepts&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;stress_intercepts&#39;</span>
+<span class="p">]</span>
+</pre></div>
+<p>The key innovation here is subtle but powerful: instead of allocating variance to individual groups (Mouse 1, Mouse 2, etc.), we allocate variance to <strong>types</strong> of effects. All mice share one variance prior, all microRNAs share another, etc.</p>
+<h3>The complete R2D2M2 framework</h3>
+<p>Let's see how this all comes together in practice. The R2D2M2 model combines the R² prior, the extended Dirichlet allocation, and the hierarchical variance structure:</p>
+<div class="hll"><pre><span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="c1"># Same intuitive R² control</span>
+    <span class="n">r_squared</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Beta</span><span class="p">(</span><span class="s2">&quot;r_squared&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha_r2</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">beta_r2</span><span class="p">)</span>
+    <span class="n">tau_squared</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;tau_squared&quot;</span><span class="p">,</span> <span class="n">r_squared</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r_squared</span><span class="p">))</span>
+
+    <span class="c1"># Extended Dirichlet allocation across ALL effect types</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Dirichlet</span><span class="p">(</span><span class="s2">&quot;phi&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">concentration</span><span class="p">),</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;components&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Population-level effects - each gets its own φ component</span>
+    <span class="n">beta_gene</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;beta_gene&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                         <span class="n">sigma</span><span class="o">=</span><span class="n">pt</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigma_squared</span> <span class="o">*</span> <span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">tau_squared</span><span class="p">))</span>
+    <span class="n">beta_age</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;beta_age&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">sigma</span><span class="o">=</span><span class="n">pt</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigma_squared</span> <span class="o">*</span> <span class="n">phi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">tau_squared</span><span class="p">))</span>
+    <span class="n">beta_dose</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;beta_dose&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                         <span class="n">sigma</span><span class="o">=</span><span class="n">pt</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigma_squared</span> <span class="o">*</span> <span class="n">phi</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">tau_squared</span><span class="p">))</span>
+
+    <span class="c1"># Group-specific intercepts - each type gets its own φ component</span>
+    <span class="n">mouse_intercepts</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;mouse_intercepts&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                <span class="n">sigma</span><span class="o">=</span><span class="n">pt</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigma_squared</span> <span class="o">*</span> <span class="n">phi</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">tau_squared</span><span class="p">),</span>
+                                <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;mice&quot;</span><span class="p">)</span>
+    <span class="n">microRNA_intercepts</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;microRNA_intercepts&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                   <span class="n">sigma</span><span class="o">=</span><span class="n">pt</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigma_squared</span> <span class="o">*</span> <span class="n">phi</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="n">tau_squared</span><span class="p">),</span>
+                                   <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;microRNAs&quot;</span><span class="p">)</span>
+    <span class="n">stress_intercepts</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;stress_intercepts&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                 <span class="n">sigma</span><span class="o">=</span><span class="n">pt</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigma_squared</span> <span class="o">*</span> <span class="n">phi</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">*</span> <span class="n">tau_squared</span><span class="p">),</span>
+                                 <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;stress_conditions&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Linear predictor combining all effects</span>
+    <span class="n">eta</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta_gene</span> <span class="o">*</span> <span class="n">gene_expr</span> <span class="o">+</span> <span class="n">beta_age</span> <span class="o">*</span> <span class="n">age</span> <span class="o">+</span> <span class="n">beta_dose</span> <span class="o">*</span> <span class="n">dose</span> <span class="o">+</span>
+           <span class="n">mouse_intercepts</span><span class="p">[</span><span class="n">mouse_ids</span><span class="p">]</span> <span class="o">+</span>
+           <span class="n">microRNA_intercepts</span><span class="p">[</span><span class="n">microRNA_ids</span><span class="p">]</span> <span class="o">+</span>
+           <span class="n">stress_intercepts</span><span class="p">[</span><span class="n">stress_conditions</span><span class="p">])</span>
+</pre></div>
+<p>Now that we've seen the mathematical structure, let's understand what makes this approach so effective.</p>
+<h3>Why this works so well</h3>
+<p><strong>Hierarchical pooling preserved</strong>: Individual mice still borrow strength from each other because they share the same variance component. Mouse A and Mouse B both use <code>mouse_scale</code>, but have different intercept values.</p>
+<p><strong>Automatic factor importance</strong>: The φ allocation tells you which experimental factors matter most. If φ = [0.15, 0.25, 0.05, 0.35, 0.15, 0.05], then mouse differences account for 35% of total explained variance - more than any single predictor!</p>
+<p><strong>Scalable complexity</strong>: Works with any number of crossed or nested grouping factors without parameter explosion.</p>
+<h2>The unified architecture</h2>
+<p>What strikes me most about this progression is how each extension elegantly handles new complexity:</p>
+<p>All three approaches maintain <strong>consistent R² control</strong>, letting you directly specify beliefs about model fit through the same intuitive Beta prior on R². The competitive variance allocation through the Dirichlet mechanism creates healthy competition between effects across all approaches, preventing any single component from dominating. This leads to highly interpretable results - every approach produces φ components that directly tell you &quot;what percentage of explained variance does each effect contribute?&quot;</p>
+<p>The mathematical elegance is striking: each extension modifies just what needs to change. The GLM extension changes the noise term (σ² → s²(β₀)), while the M2 extension extends the allocation to multiple effect types. Finally, all approaches provide the same practical benefits - automatic shrinkage, sparsity induction, and protection against overfitting while maintaining computational tractability.</p>
+<h2>When to use what</h2>
+<p>Given these unified principles, how do you choose which approach fits your specific modeling scenario? Through this exploration, clear use cases emerged:</p>
+<table>
+<thead>
+<tr>
+  <th>Approach</th>
+  <th>When to Use</th>
+  <th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>R2D2 Shrinkage</strong></td>
+  <td>Simple linear regression with multiple predictors, no grouping</td>
+  <td>Gene expression ~ drug dose + age + weight</td>
+</tr>
+<tr>
+  <td><strong>R2D2 GLM</strong></td>
+  <td>Non-Gaussian outcomes with simple structure</td>
+  <td>Bacterial counts, binary outcomes, rate data</td>
+</tr>
+<tr>
+  <td><strong>R2D2M2</strong></td>
+  <td>Complex laboratory designs with multiple grouping factors (<strong>the laboratory default</strong>)</td>
+  <td>Laboratory experiments with mouse ID + microRNA ID + stress condition</td>
+</tr>
+</tbody>
+</table>
+<h2>Looking forward</h2>
+<p>R2D2 solves a common frustration in Bayesian modeling: how do you set reasonable priors on dozens of coefficients without spending hours tweaking hyperparameters? Instead of guessing at individual coefficient priors, you specify one intuitive parameter - how much of the data variation you expect your model to explain - and R2D2 automatically figures out how to distribute that explanatory power across your predictors.</p>
+<p>For laboratory researchers especially, R2D2M2 delivers actionable scientific insight. When your model tells you that &quot;mouse differences account for 35% of explained variance while stress conditions only account for 5%,&quot; you immediately know where to focus your experimental design efforts.</p>
+<p>This practical approach - starting with an intuitive question about model fit and letting the mathematics handle the details - shows how thoughtful statistical frameworks can make sophisticated modeling more accessible to working scientists. The PyMC library has implemented a modified form of R2D2M2 as the <a href="https://www.pymc.io/projects/extras/en/stable/generated/pymc_extras.distributions.R2D2M2CP.html"><code>R2D2M2CP</code> distribution</a>, making these powerful priors readily available for practical use.</p>
+<h2>References</h2>
+<p><strong>Zhang, Y. D., Naughton, B. P., Bondell, H. D., &amp; Reich, B. J.</strong> (2020). Bayesian Regression Using a Prior on the Model Fit: The R2-D2 Shrinkage Prior. <em>Journal of the American Statistical Association</em>, 117(538), 862-874. <a href="https://www.tandfonline.com/doi/full/10.1080/01621459.2020.1825449">https://www.tandfonline.com/doi/full/10.1080/01621459.2020.1825449</a></p>
+<p><strong>Yanchenko, E., Bondell, H. D., &amp; Reich, B. J.</strong> (2021). The R2D2 Prior for Generalized Linear Mixed Models. <em>arXiv preprint arXiv:2111.10718</em>. <a href="https://arxiv.org/abs/2111.10718">https://arxiv.org/abs/2111.10718</a></p>
+<p><strong>Aguilar, J. &amp; Bürkner, P.</strong> (2022). Intuitive Joint Priors for Bayesian Linear Multilevel Models: The R2D2M2 prior. <em>arXiv preprint arXiv:2208.07132</em>. <a href="https://arxiv.org/abs/2208.07132">https://arxiv.org/abs/2208.07132</a></p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-stop-guessing-at-priors-r2d2s-automated-approach-to-bayesian-modeling</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Stop guessing at priors: R2D2&#39;s automated approach to Bayesian modeling}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{08}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{06}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/8/6/stop-guessing-at-priors-r2d2s-automated-approach-to-bayesian-modeling}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+</body>
