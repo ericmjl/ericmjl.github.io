@@ -1,0 +1,596 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Your first 90 days at work - what should you do?">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/your-first-90-days-at-work-what-should-you-do' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Your first 90 days at work - what should you do? - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Your first 90 days at work - what should you do?</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-02-29</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/career development/">
+        career development
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/productivity tips/">
+        productivity tips
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/time management/">
+        time management
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/brag doc/">
+        brag doc
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/professional development/">
+        professional development
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/first job/">
+        first job
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share advice for those starting a new job, focusing on the first 90 days. I discuss the importance of automating your calendar, recording your accomplishments, building a company committee, and choosing a manageable project with tangible impact. These strategies can help you gain control over your career direction and make a positive impression in your new role. How can you apply these tips to your own career journey?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Congratulations! You're fresh out of school and landed a new job. What <em>should</em> you be doing within those first 90 days?</p>
+<p>Based on conversations I've had with many people, here's a collection of specific actions to help you gain agency over your career direction.</p>
+<h2 id="automate-your-calendar">Automate your calendar</h2><p>You will likely be an individual contributor, not a manager. As an individual contributor, your calendar should follow the "<a href="https://paulgraham.com/makersschedule.html">Maker's schedule</a>". As such, you need to learn to be efficient with your time, blocking off long periods of focus time to get into a flow state and accomplish work. I recommend finding ways to schedule blocks of time on your calendar to do work. If that doesn't happen, someone else will take that open slot for a meeting. And meetings, when stuck in at 10 am or 2 pm, can be incredibly disruptive to achieving a flow state of productivity.</p>
+<p>If you're on the Microsoft Office365 stack, use <a href="https://support.microsoft.com/en-us/topic/focus-plan-for-viva-insights-a079a744-010e-4fee-8552-a2799d0c62ea">Microsoft Viva to schedule focus time blocks automatically</a>. They will then show up on your calendar as "Focus Time" entries. You can edit them later as blocks used for specific activities. Customize Focus Time to your preferences! It can be 1, 2, or 4 hrs, and it can be mainly in the morning or afternoon, depending on your work habits. The most important thing you can do here is to protect time from meetings to execute work and sharpen your technical saw daily.</p>
+<p>Also, save time scheduling ping-pong using Microsoft Bookings or Calendly to schedule meetings with external people. If you've ever found yourself trying to schedule meetings without Bookings or Calendly, you'll invariably find yourself knee deep in the following email pattern:</p>
+<blockquote><p><strong>Me:</strong> Sounds good! Can next week on Friday at 2 pm work!</p>
+<p><strong>You:</strong> Actually, that might not work, can you do Friday at 3 pm?</p>
+<p><strong>Me:</strong> Oh no, that doesn't work either. Can you give me a list of times that work for you?</p>
+<p><strong>You:</strong> I can do the following:...</p>
+</blockquote>
+<p>It's a total waste of two people's time! Given current technology, we should automate this problem away.</p>
+<h2 id="start-recording-your-accomplishments">Start recording your accomplishments</h2><p>You need a brag doc. Steve Huynh, former Amazon Principal Engineer, <a href="https://www.youtube.com/shorts/gbkv8Asadh0">says you need a brag doc</a>. I want to echo that sentiment.</p>
+<p>What is this brag doc?</p>
+<p>This document lives outside your company's systems. In it, you record your accomplishments at work without revealing the company's core intellectual property. You have complete control over how it should look -- your only audience is your future self. Nobody else needs to look at it but you. All you need to do is record the following kinds of statements:</p>
+<blockquote><p>Delivered {{ thing }} to {{ collaborator/stakeholder group }} using tools {{ put your tools here }} that enabled {{ put quantified value statement here }}.</p>
+</blockquote>
+<p>The more of these you have, the better.</p>
+<p>Why do you need a brag doc?</p>
+<p>As it turns out, statistically, you're not likely to work for the same manager at the same company for the rest of your career. I know because I've switched once. There may be job cuts, or you might get bored or frustrated with your environment. In those circumstances, you'll leave the company you work for, and you're going to need to update your resume. As Steve Huynh puts it, populating your brag doc will enable you to start from a position of abundance when you need to update your resume. Ask any of my teammates, and they'll tell you that I give them the same advice: I know they'll graduate from my hands one day, so this is one way for them to be equipped for whatever role they may take on next.</p>
+<p>Can someone else apart from you write your brag doc? Possibly, but it'll never be as good as you. The best managers will try their best to record your accomplishments for you, but even they will miss some things. The person who can record them best is you.</p>
+<p>(As for me, in keeping with my core ways of working, I have a Markdown file within my Obsidian notes that serves as my brag doc, and it's spartan -- nothing fancy, just a bunch of "delivered X with tool Y with value Z" in there.)</p>
+<h2 id="build-your-company-committee">Build your company committee</h2><p>If you did a PhD or Masters thesis, this shouldn't be a foreign concept. You'll want to find people whom you can trust to seek advice from. In effect, you want to build a committee similar to your thesis committee.</p>
+<p>But unlike your thesis committee, where your advisor would be part of it, in this case, I advise that your manager be <em>outside</em> of your company committee. Your manager should be playing the role of a coach and mentor already. But their perspective will be biased. You will want a view that isn't theirs.</p>
+<p>So, consider who can be on your company committee as you do your daily work. Best thing? <em>You don't have to tell them they're on your committee!</em> You only need to schedule one-on-one time with them on some regular cadence. (With my committee, I met with them one-on-one about twice a year, and they never knew!)</p>
+<p>What should be the traits of your committee? They should be the type of person who is a coach at heart. You need to trust them with information you might not be 100% comfortable sharing with your manager. Ideally, you need to get along with them and have some rapport. Also ideal (but not necessary) is having natural opportunities to interact with them outside of your 1:1s, which can help lessen any potential awkwardness you might experience trying to approach them.</p>
+<h2 id="choose-to-work-on-something-of-manageable-and-tangible-impact">Choose to work on something of manageable and tangible impact</h2><p>Within your first 90 days, finish off a manageable assignment that can deliver a tangible impact to someone else. It doesn't have to be a big assignment, just something concrete. Either you can ask your manager to help you find one, or you can go further and find one yourself. President Obama said in an interview, "<a href="https://www.youtube.com/watch?v=YNY4UFaHbP4">Just learn how to get stuff done.</a>" Quoting further (just because the interview is resonating with me so much):</p>
+<blockquote><p>If you project an attitude of whatever it is that's needed, I can handle it and I can do it, whoever is running that organization will notice, I promise.</p>
+</blockquote>
+<p>Naturally, you will want to apply some filtering criteria to what you choose to work on for your first assignment. It should be achievable within those 90 days. It should be of moderate challenge, not something trivial, and deliver at least a modest amount of value for 2 or more people within the organization. It should also line up with your skillsets. Otherwise, you're more than guaranteed to botch the assignment.</p>
+<p>What you want to accomplish with this first assignment is to accumulate <strong>credibility points</strong> that you can then parlay into further lines of high-value, technically challenging, and fun work.</p>
+<p>Additionally, if you work on something that lets you demonstrate tangible value to others, you'll be honing and sharpening your instinct for impact. I can guarantee this. It is critical that, over time, you can articulate the value of your work to others!</p>
+<p>While finishing this assignment, you should be able to leverage it to build your mental map of the organization around you -- people, what do they know and don't know? Who do they know, what do they work on, their broader team's mandate, and more? Having an accurate mental map will yield dividends downstream -- it is a skill to hold a complex organizational map in your head and navigate it efficiently.</p>
+<p>When I first joined Moderna, I didn't build some big fancy model right from the beginning. My contribution within my first 90 days was effectively a software refactoring project (but one that needed a strong intuition of molecular biology). For the skillset that I possessed, this was manageable. But it delivered enough value for my collaborators to avoid hiring a whole army of people to do their work <em>and</em> could free up laboratory scientists' time to do higher-order work. The other thing I did was equip that team with the necessary skills to maintain their software. Doing so gave me enough credibility points in their eyes that we could start pursuing different approaches to the problem altogether.</p>
+<h2 id="what-advice-would-you-give">What advice would you give?</h2><p>If you're experienced in the industry, what advice would you give to others just starting out?</p>
+<h2 id="acknowledgments">Acknowledgments</h2><p>Special thanks to Sara Ali for initiating this conversation in a 1:1 meeting and inspiring me to write the post. Also, thanks to Nan Li for suggesting that I switch from 30 to 90 days and for the final advice about working on an assignment to learn about the organization.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-your-first-90-days-at-work-what-should-you-do</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Your first 90 days at work - what should you do?}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{02}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{29}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/2/29/your-first-90-days-at-work-what-should-you-do}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

@@ -1,0 +1,1464 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="It&#39;s time to try out pixi!">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/its-time-to-try-out-pixi' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>It&#39;s time to try out pixi! - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">It&#39;s time to try out pixi!</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-08-16</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/pixi/">
+        pixi
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/tooling/">
+        tooling
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/software development/">
+        software development
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/environment management/">
+        environment management
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/containerization/">
+        containerization
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/gpu/">
+        gpu
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/packaging/">
+        packaging
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/docker/">
+        docker
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/reproducibility/">
+        reproducibility
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/testing/">
+        testing
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>Post SciPy 2024, I had a chance to try out <code>pixi</code>, a new environment manager from the prefix.dev team. I went cold turkey on my laptop, removing <code>~/anaconda</code>, and haven't looked back. In this (very long) blog post, I detail my experience switching from <code>mamba</code> to <code>pixi</code>, the ways that <code>pixi</code> makes it easier to manage environments, how <code>pixi</code> helps with onboarding onto a project, supports containerization, GPU access, and seamless integration with Docker, and how it facilitates publishing to PyPI and running tests. The switch has streamlined my workflow significantly. Was this enough to get you curious about how <code>pixi</code> can optimize your development process too?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I recently switched LlamaBot and my personal website repository to <code>pixi</code>,
+and having test-driven it for a few weeks now,
+I think the time is right to do so.
+During this test-drive, I went cold turkey:
+I deleted <code>~/anaconda</code> from my home directory,
+leaving me with no choice but to use <code>pixi</code> 100%.
+In this post, I'd like to share what I've learned from my perspective
+as a data scientist and software developer.</p>
+<h2 id="what-is-pixi">What is pixi?</h2><p>In my mind, pixi is a package management multi-tool.
+<code>pixi</code> plays many roles, but here are the big, salient ones:</p>
+<table>
+<thead><tr>
+<th>Role</th>
+<th>Analogy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Package installer</td>
+<td><code>conda</code>, <code>pip</code></td>
+</tr>
+<tr>
+<td>Global tool installer</td>
+<td><code>pipx</code>, <code>apt-get</code> and <code>homebrew</code></td>
+</tr>
+<tr>
+<td>Environment manager</td>
+<td><code>environment.yml</code> + <code>conda</code>, or <code>pyproject.toml</code> + <code>pip</code></td>
+</tr>
+<tr>
+<td>Environment lock</td>
+<td><code>conda-lock</code> or <code>pip-lock</code></td>
+</tr>
+<tr>
+<td>Task runner</td>
+<td><code>Makefile</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="my-needs-under-two-personas">My needs under two personas</h2><p>To motivate the content in this post,
+we first need to understand what I see as needs
+from a data scientist's and software developer's perspective.</p>
+<h3 id="data-scientist">Data scientist</h3><h4 id="reproducible-environments">Reproducible Environments</h4><p>I need to replicate my computational environment from machine to machine.
+Strict versioning will be handy but shouldn't be unwieldy -- especially with lock files.
+Compared to my older ways of working using <code>environment.yml</code> files,
+where I manually pin versions when something broke,
+I now prefer to have my environment management tool automatically produce a lock file
+that locks in package versions defined when solving the environment.</p>
+<h4 id="containerization">Containerization</h4><p>Containerization is also important.
+At work, we ship stuff within Docker containers.
+Whatever environment or package management tool I use
+must work well with Docker containers.
+Additionally, as a bonus, we need it to have GPU access, too!
+Moreover, the built container needs to be as lightweight as possible.</p>
+<h4 id="composable-gpu-enabled-and-cpu-only-environments">Composable GPU-enabled and CPU-only environments</h4><p>With a single <code>environment.yml</code> file,
+I can only define a GPU-enabled or CPU-only environment.
+In most cases, we would default to GPU-enabled environments,
+which induces a huge overhead when the code is run on CPU-only environments.
+Ideally, I'd like to be able to do composable environment specification:
+a default setting for CPU-only environments,
+with the ability to specify GPU-only dependencies
+in a fashion that composes with the CPU-only environment
+within a single, canonical configuration file (e.g. <code>pyproject.toml</code>).</p>
+<h3 id="software-developer">Software developer</h3><h4 id="publishing-to-pypi">Publishing to PyPI</h4><p>As a Python tool developer,
+I create stuff that needs to be distributed to other Pythonistas.
+As such, I need to be able to leverage
+existing Python publishing tooling (e.g., PyPI or conda-forge).</p>
+<h4 id="running-tests">Running tests</h4><p>Whatever tool I use, I also need to be able to run software tests easily.
+Ideally, this would be done with one command, e.g., <code>pytest</code>, with minimal overhead.
+The software testing environment should be the same as my development environment.</p>
+<h3 id="both-personas-needs">Both personas' needs</h3><h4 id="simplified-environment-specification">Simplified environment specification</h4><p>As mentioned above, I currently use <code>environment.yml</code> and <code>pyproject.toml</code>
+to specify runtime and development dependencies.
+Runtime dependencies are declared in <code>pyproject.toml</code>,
+while development dependencies are declared in <code>environment.yml</code>.
+However, this way of separating concerns means that
+we have duplication in our dependencies specification!
+Ideally, we'd like to do this with a single file.</p>
+<h4 id="tooling-for-fast-environment-builds">Tooling for fast environment builds</h4><p>Whether we are in a Docker container or not,
+I'd like to see much faster container and environment build times
+with tooling for caching when compared to what I currently experience.</p>
+<p>(Note to self:
+Product-oriented folks keep talking about "don't solution, tell me the problem",
+but I have to say -- I only really knew how much of a problem this was
+once I touched the solution I'm about to talk about!)</p>
+<h4 id="automatic-updates-of-lock-files">Automatic updates of lock files</h4><p>When I add a dependency to my environment,
+I'd like to see the lock file automatically updated
+so that I don't have to remember to do that in the future.</p>
+<h2 id="how-pixi-operates">How pixi operates</h2><p>With the desiderata outlined above as contextual information,
+let's now see how <code>pixi</code> works.</p>
+<h3 id="installation">Installation</h3><p>What's awesome is that <code>pixi</code> is installed via a simple, one-bash-script install.
+Official instructions are available <a href="https://pixi.sh/latest/#installation">here</a>,
+but as of the time of writing, the only thing we need to run is:</p>
+<div class="hll"><pre><span></span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://pixi.sh/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
+</pre></div>
+<p>This sets up <code>pixi</code> within your home directory
+and adds the <code>pixi</code> path to your <a href="https://ericmjl.github.io/essays-on-data-science/software-skills/environment-variables/">PATH environment variable</a>.</p>
+<p>I also recommend getting set up with autocompletion for your shell.
+Once again, official instructions are <a href="https://pixi.sh/latest/#autocompletion">here</a>,
+and what I used for the <code>zsh</code> (macOS' default shell) was:</p>
+<div class="hll"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;eval &quot;$(pixi completion --shell zsh)&quot;&#39;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.zshrc
+</pre></div>
+<h3 id="starting-a-new-project-with-pixi-enabled">Starting a new project with <code>pixi</code> enabled</h3><p>For those who are used to <code>conda</code> idioms,
+<code>pixi</code> won't create a centralized <code>conda</code> environment
+but instead will create a <code>.pixi</code> sub-directory
+within the directory of your <code>pixi</code> configuration file
+(either <code>pyproject.toml</code> or <code>pixi.toml</code>).
+This is akin to <code>poetry</code> for Pythonistas,
+or <code>npm</code> for those coming from the NodeJS ecosystem
+and <code>cargo</code> for Rustaceans.
+In line with my desire to be able to specify sets of dependencies
+for runtime environments and development environments
+and also minimize the number of configuration files present,
+it makes sense to initialize with a <code>pyproject.toml</code> configuration
+rather than the default <code>pixi.toml</code> configuration file.
+This is done by executing:</p>
+<div class="hll"><pre><span></span>pixi<span class="w"> </span>init<span class="w"> </span>--format<span class="w"> </span>pyproject<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>-v
+</pre></div>
+<p>This gives me the following <code>pyproject.toml</code> file:</p>
+<div class="hll"><pre><span></span><span class="k">[project]</span>
+<span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pixi-cuda-environment&quot;</span><span class="w"> </span><span class="c1"># defaults to my directory name.</span>
+<span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0.1.0&quot;</span>
+<span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Add a short description here&quot;</span>
+<span class="n">authors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[{</span><span class="n">name</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Eric Ma&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">email</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;e************@gmail.com&quot;</span><span class="p">}]</span>
+<span class="n">requires-python</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;= 3.11&quot;</span>
+<span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span>
+
+<span class="k">[build-system]</span>
+<span class="n">requires</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;setuptools&quot;</span><span class="p">]</span>
+<span class="n">build-backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setuptools.build_meta&quot;</span>
+
+<span class="k">[tool.pixi.project]</span>
+<span class="n">channels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;conda-forge&quot;</span><span class="p">]</span>
+<span class="n">platforms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;osx-arm64&quot;</span><span class="p">]</span>
+
+<span class="k">[tool.pixi.pypi-dependencies]</span>
+<span class="n">pixi-cuda-environment</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">editable</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
+
+<span class="k">[tool.pixi.tasks]</span>
+</pre></div>
+<p>What's important to note here is that <code>[project] -&gt; dependencies</code>
+lists the Python project's runtime dependencies,
+which will be respected when <code>pixi</code> creates or updates the environment,
+as it is interpreted as being pulled from PyPI.
+In other words, the following two configurations are equivalent:</p>
+<div class="hll"><pre><span></span><span class="k">[project]</span>
+<span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;docutils&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;BazSpam == 1.1&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="k">[project.optional-dependencies]</span>
+<span class="n">PDF</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;ReportLab&gt;=1.2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;RXP&quot;</span><span class="p">]</span>
+</pre></div>
+<p>and</p>
+<div class="hll"><pre><span></span><span class="k">[tool.pixi.pypi-dependencies]</span>
+<span class="n">docutils</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">BazSpam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;== 1.1&quot;</span>
+
+<span class="k">[tool.pixi.feature.PDF.pypi-dependencies]</span>
+<span class="n">ReportLab</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=1.2&quot;</span>
+<span class="n">RXP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+</pre></div>
+<p>h/t Ruben Arts, one of the core developers of <code>pixi</code>, who educated me on this point.</p>
+<p>The advantage of putting runtime dependencies for distributed Python packages
+inside the <code>project.dependencies</code> section
+is that when you build the package to be distributed on PyPI,
+there's no need to double-specify the dependency chain
+within the <code>tool.pixi.dependencies</code> section,
+since <code>project.dependencies</code> is already respected by <code>pixi</code>.</p>
+<p>Apart from that, other default configuration settings within the configuration file
+should look familiar to those who have experience with <code>pyproject.toml</code> configuration.</p>
+<h3 id="adding-dependencies">Adding dependencies</h3><p>As mentioned above, runtime dependencies,
+which must exist when someone else installs your package to be used in their project,
+are distinct from development dependencies,
+which are usually extra things needed to develop your package properly.
+My goal is that if someone <code>pip install</code>s my package,
+they will automatically have the full runtime dependency set.
+To that end, there is a two-step process that I would use
+to add packages to the project.
+The first step is to set up your development environment using <code>pixi add &lt;package name&gt;</code>,
+which pulls from <code>conda-forge</code>, and develop the data science project.
+Then, once one is ready for distributing the project as a Python package,
+we use the <code>pixi add --pypi &lt;package names here&gt;</code> command (note the <code>--pypi</code> flag!)
+to ensure that they get added into the <code>project --&gt; dependencies</code> section.</p>
+<p>For example, if my code depends on <code>pandas</code> to be used, I would run:</p>
+<div class="hll"><pre><span></span>pixi<span class="w"> </span>add<span class="w"> </span>--pypi<span class="w"> </span>pandas
+</pre></div>
+<p>On the other hand, if my development workflow depends on <code>ruff</code> and <code>pytest</code>, I would run:</p>
+<div class="hll"><pre><span></span>pixi<span class="w"> </span>add<span class="w"> </span>ruff<span class="w"> </span>pytest
+</pre></div>
+<p>Those two commands will give us the following modified <code>pyproject.toml</code> file:</p>
+<div class="hll"><pre><span></span><span class="c1"># FILE: pyproject.toml</span>
+<span class="k">[project]</span>
+<span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pixi-cuda-environment&quot;</span>
+<span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0.1.0&quot;</span>
+<span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Add a short description here&quot;</span>
+<span class="n">authors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[{</span><span class="n">name</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Eric Ma&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">email</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;e************@gmail.com&quot;</span><span class="p">}]</span>
+<span class="n">requires-python</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;= 3.11&quot;</span>
+<span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;pandas&gt;=2.2.2,&lt;2.3&quot;</span><span class="p">]</span><span class="w"> </span><span class="c1"># &lt;-- NOTE: stuff added via `pixi add --pypi` goes here!</span>
+
+<span class="k">[build-system]</span>
+<span class="n">requires</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;setuptools&quot;</span><span class="p">]</span>
+<span class="n">build-backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setuptools.build_meta&quot;</span>
+
+<span class="k">[tool.pixi.project]</span>
+<span class="n">channels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;conda-forge&quot;</span><span class="p">]</span>
+<span class="n">platforms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;osx-arm64&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;linux-64&quot;</span><span class="p">]</span><span class="w"> </span><span class="c1"># &lt;-- NOTE: I modified this manually to include linux-64, and you can add osx-64 if you&#39;re on an Intel Mac!</span>
+
+<span class="k">[tool.pixi.pypi-dependencies]</span>
+<span class="n">pixi-cuda-environment</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">editable</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="c1"># &lt;-- NOTE: this ensures that we never have to run `pip install -e .` ourselves!</span>
+
+<span class="k">[tool.pixi.tasks]</span>
+
+<span class="k">[tool.pixi.dependencies]</span><span class="w"> </span><span class="c1"># &lt;-- NOTE: stuff added via `pixi add` goes here!</span>
+<span class="n">ruff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=0.5.5,&lt;0.6&quot;</span>
+<span class="n">pytest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=8.3.2,&lt;8.4&quot;</span>
+</pre></div>
+<h3 id="activating-an-environment">"Activating" an environment</h3><p>Because there's no centralized conda environment,
+if you need to run commands within the pixi environment
+(which has the same structure as a conda environment),
+you run <code>pixi shell</code> rather than <code>conda activate &lt;env_name&gt;</code>.</p>
+<p>Running <code>pixi shell</code> at my terminal results in something that looks like this:</p>
+<div class="hll"><pre><span></span>❯<span class="w"> </span>which<span class="w"> </span>python
+python<span class="w"> </span>not<span class="w"> </span>found
+
+❯<span class="w"> </span>pixi<span class="w"> </span>shell
+<span class="w"> </span>.<span class="w"> </span><span class="s2">&quot;/var/folders/lb/fzbrctwd2klcrwsg63vzqj0r0000gn/T/pixi_env_37v.sh&quot;</span>
+
+❯<span class="w">  </span>.<span class="w"> </span><span class="s2">&quot;/var/folders/lb/fzbrctwd2klcrwsg63vzqj0r0000gn/T/pixi_env_37v.sh&quot;</span>
+
+<span class="o">(</span>pixi-cuda-environment<span class="o">)</span>
+❯<span class="w"> </span>which<span class="w"> </span>python
+/Users/ericmjl/github/incubator/pixi-cuda-environment/.pixi/envs/default/bin/python
+
+<span class="o">(</span>pixi-cuda-environment<span class="o">)</span>
+❯
+</pre></div>
+<p>Notice how <em>before</em> running <code>pixi shell</code>, I couldn't execute Python natively in my terminal.
+After all, I went cold turkey and deleted my <code>mambaforge</code> installation!
+(There is a twist: you <em>can</em> use <code>pixi</code> to install Python globally!
+I address this below.
+Though for the sake of simplicity for now,
+let's assume that a global Python installation doesn't exist.)
+But <em>after</em> running <code>pixi shell</code>, I can --
+because the <code>/Users/ericmjl/github/incubator/pixi-cuda-environment/.pixi/envs/default/bin/python</code> path
+is now set on my <a href="https://ericmjl.github.io/essays-on-data-science/software-skills/environment-variables/"><code>PATH</code> environment variable</a>.</p>
+<h3 id="adding-cuda-dependencies">Adding CUDA dependencies</h3><p>At this point, NVIDIA hardware is
+the default hardware used by data scientists for GPU-accelerated computation.
+As such, I need to know how to use <code>pixi</code> to install GPU-enabled packages.
+I went to my go-to, JAX and PyTorch,
+to figure out how to install the GPU-enabled versions of these packages.</p>
+<p>To make this happen, we must distinguish between both environments:
+CPU-only, like on my Mac,
+and GPU-enabled, like on my home lab that runs Ubuntu.
+First, we define the common and CUDA-specific dependencies on CUDA-enabled systems.
+To start, my <code>pyproject.toml</code> file changes a bit on the <code>dependencies</code> section:</p>
+<div class="hll"><pre><span></span><span class="c1"># FILE: pyproject.toml</span>
+<span class="k">[tool.pixi.dependencies]</span>
+<span class="n">ruff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=0.5.5,&lt;0.6&quot;</span>
+<span class="n">pytest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=8.3.2,&lt;8.4&quot;</span>
+<span class="n">ipython</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=8.26.0,&lt;9&quot;</span>
+<span class="c1"># NOTE: I need JAX and PyTorch to be installed in both places.</span>
+<span class="n">jax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">pytorch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+
+<span class="k">[tool.pixi.feature.cuda]</span>
+<span class="n">system-requirements</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">cuda</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;12&quot;</span><span class="p">}</span><span class="w"> </span><span class="c1"># this will support CUDA minor/patch versions!</span>
+
+<span class="k">[tool.pixi.feature.cuda.target.linux-64.dependencies]</span>
+<span class="n">jaxlib</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">build</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;cuda12&quot;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="c1"># Environments</span>
+<span class="k">[tool.pixi.environments]</span>
+<span class="n">cuda</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;cuda&quot;</span><span class="p">]</span><span class="w"> </span><span class="c1"># maps my &quot;cuda&quot; environment to the &quot;cuda&quot; feature</span>
+</pre></div>
+<p>For simplicity in explanation, and to show how conda package dependencies are solved,
+I've opted to list <code>jax</code> and <code>pytorch</code> under the <code>tool.pixi.dependencies</code> section
+rather than under <code>project.dependencies</code>.
+I am also using a floating version for simplicity's sake.
+If you're curious what happens,
+I'd encourage you to try listing <code>jax</code> or <code>pytorch</code> under <code>project.dependencies</code> instead
+and see what happens to the resolved environments!</p>
+<p>Here, I used <code>pixi</code>'s <code>feature</code> definitions.
+This concept comes from the Rust world
+if I remember correctly my conversation with the Prefix devs
+about specifying a CUDA-centric specification for my Linux machine.
+With the above modifications to my <code>pyproject.toml</code> file,
+I now have two ways to run <code>pixi shell</code>:</p>
+<ul>
+<li><code>pixi shell -e cuda</code> will start a shell environment with <code>cuda</code> enabled, while</li>
+<li><code>pixi shell</code> will start a shell environment without cuda.</li>
+</ul>
+<p>We can tell which environment we're in through the environment name upon activation.
+Using <code>pixi shell -e cuda</code> on my home lab, we get:</p>
+<div class="hll"><pre><span></span>❯<span class="w"> </span>pixi<span class="w"> </span>shell<span class="w"> </span>-e<span class="w"> </span>cuda
+<span class="w"> </span>.<span class="w"> </span><span class="s2">&quot;/tmp/pixi_env_41w.sh&quot;</span>
+
+❯<span class="w">  </span>.<span class="w"> </span><span class="s2">&quot;/tmp/pixi_env_41w.sh&quot;</span>
+
+<span class="o">(</span>pixi-cuda-environment:cuda<span class="o">)</span>
+❯<span class="w"> </span>ipython
+Python<span class="w"> </span><span class="m">3</span>.12.4<span class="w"> </span><span class="p">|</span><span class="w"> </span>packaged<span class="w"> </span>by<span class="w"> </span>conda-forge<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="o">(</span>main,<span class="w"> </span>Jun<span class="w"> </span><span class="m">17</span><span class="w"> </span><span class="m">2024</span>,<span class="w"> </span><span class="m">10</span>:23:07<span class="o">)</span><span class="w"> </span><span class="o">[</span>GCC<span class="w"> </span><span class="m">12</span>.3.0<span class="o">]</span>
+Type<span class="w"> </span><span class="s1">&#39;copyright&#39;</span>,<span class="w"> </span><span class="s1">&#39;credits&#39;</span><span class="w"> </span>or<span class="w"> </span><span class="s1">&#39;license&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>more<span class="w"> </span>information
+IPython<span class="w"> </span><span class="m">8</span>.26.0<span class="w"> </span>--<span class="w"> </span>An<span class="w"> </span>enhanced<span class="w"> </span>Interactive<span class="w"> </span>Python.<span class="w"> </span>Type<span class="w"> </span><span class="s1">&#39;?&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>help.
+
+In<span class="w"> </span><span class="o">[</span><span class="m">1</span><span class="o">]</span>:<span class="w"> </span>import<span class="w"> </span>jax.numpy<span class="w"> </span>as<span class="w"> </span>np<span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>np.arange<span class="o">(</span><span class="m">3</span><span class="o">)</span>
+
+In<span class="w"> </span><span class="o">[</span><span class="m">2</span><span class="o">]</span>:<span class="w"> </span>a.devices<span class="o">()</span>
+Out<span class="o">[</span><span class="m">2</span><span class="o">]</span>:<span class="w"> </span><span class="o">{</span>cuda<span class="o">(</span><span class="nv">id</span><span class="o">=</span><span class="m">0</span><span class="o">)}</span>
+
+In<span class="w"> </span><span class="o">[</span><span class="m">3</span><span class="o">]</span>:<span class="w"> </span>import<span class="w"> </span>torch
+t
+In<span class="w"> </span><span class="o">[</span><span class="m">4</span><span class="o">]</span>:<span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>torch.tensor<span class="o">([</span><span class="m">1</span>,<span class="w"> </span><span class="m">2</span>,<span class="w"> </span><span class="m">3</span>.0<span class="o">])</span>
+
+In<span class="w"> </span><span class="o">[</span><span class="m">5</span><span class="o">]</span>:<span class="w"> </span>a.cuda<span class="o">()</span>
+Out<span class="o">[</span><span class="m">5</span><span class="o">]</span>:<span class="w"> </span>tensor<span class="o">([</span><span class="m">1</span>.,<span class="w"> </span><span class="m">2</span>.,<span class="w"> </span><span class="m">3</span>.<span class="o">]</span>,<span class="w"> </span><span class="nv">device</span><span class="o">=</span><span class="s1">&#39;cuda:0&#39;</span><span class="o">)</span>
+</pre></div>
+<p>Notice how I've been able to run JAX and PyTorch with CUDA enabled.</p>
+<p>On the other hand, using <code>pixi shell</code> (without <code>-e cuda</code>),
+we have the following behaviour:</p>
+<div class="hll"><pre><span></span>❯<span class="w"> </span>pixi<span class="w"> </span>shell
+
+❯<span class="w">  </span>.<span class="w"> </span><span class="s2">&quot;/tmp/pixi_env_YJX.sh&quot;</span>
+
+<span class="o">(</span>pixi-cuda-environment<span class="o">)</span>
+❯<span class="w"> </span>ipython
+Python<span class="w"> </span><span class="m">3</span>.12.4<span class="w"> </span><span class="p">|</span><span class="w"> </span>packaged<span class="w"> </span>by<span class="w"> </span>conda-forge<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="o">(</span>main,<span class="w"> </span>Jun<span class="w"> </span><span class="m">17</span><span class="w"> </span><span class="m">2024</span>,<span class="w"> </span><span class="m">10</span>:23:07<span class="o">)</span><span class="w"> </span><span class="o">[</span>GCC<span class="w"> </span><span class="m">12</span>.3.0<span class="o">]</span>
+Type<span class="w"> </span><span class="s1">&#39;copyright&#39;</span>,<span class="w"> </span><span class="s1">&#39;credits&#39;</span><span class="w"> </span>or<span class="w"> </span><span class="s1">&#39;license&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>more<span class="w"> </span>information
+IPython<span class="w"> </span><span class="m">8</span>.26.0<span class="w"> </span>--<span class="w"> </span>An<span class="w"> </span>enhanced<span class="w"> </span>Interactive<span class="w"> </span>Python.<span class="w"> </span>Type<span class="w"> </span><span class="s1">&#39;?&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>help.
+
+In<span class="w"> </span><span class="o">[</span><span class="m">1</span><span class="o">]</span>:<span class="w"> </span>import<span class="w"> </span>jax.numpy<span class="w"> </span>as<span class="w"> </span>np<span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>np.arange<span class="o">(</span><span class="m">3</span><span class="o">)</span>
+An<span class="w"> </span>NVIDIA<span class="w"> </span>GPU<span class="w"> </span>may<span class="w"> </span>be<span class="w"> </span>present<span class="w"> </span>on<span class="w"> </span>this<span class="w"> </span>machine,<span class="w"> </span>but<span class="w"> </span>a<span class="w"> </span>CUDA-enabled<span class="w"> </span>jaxlib<span class="w"> </span>is<span class="w"> </span>not<span class="w"> </span>installed.<span class="w"> </span>Falling<span class="w"> </span>back<span class="w"> </span>to<span class="w"> </span>cpu.
+
+In<span class="w"> </span><span class="o">[</span><span class="m">2</span><span class="o">]</span>:<span class="w"> </span>a.devices<span class="o">()</span>
+Out<span class="o">[</span><span class="m">2</span><span class="o">]</span>:<span class="w"> </span><span class="o">{</span>CpuDevice<span class="o">(</span><span class="nv">id</span><span class="o">=</span><span class="m">0</span><span class="o">)}</span>
+
+In<span class="w"> </span><span class="o">[</span><span class="m">3</span><span class="o">]</span>:<span class="w"> </span>import<span class="w"> </span>torch
+
+In<span class="w"> </span><span class="o">[</span><span class="m">4</span><span class="o">]</span>:<span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>torch.tensor<span class="o">([</span><span class="m">1</span>,<span class="w"> </span><span class="m">2</span>,<span class="w"> </span><span class="m">3</span>.0<span class="o">])</span>
+
+In<span class="w"> </span><span class="o">[</span><span class="m">5</span><span class="o">]</span>:<span class="w"> </span>a.cuda<span class="o">()</span>
+---------------------------------------------------------------------------
+AssertionError<span class="w">                            </span>Traceback<span class="w"> </span><span class="o">(</span>most<span class="w"> </span>recent<span class="w"> </span>call<span class="w"> </span>last<span class="o">)</span>
+Cell<span class="w"> </span>In<span class="o">[</span><span class="m">5</span><span class="o">]</span>,<span class="w"> </span>line<span class="w"> </span><span class="m">1</span>
+----&gt;<span class="w"> </span><span class="m">1</span><span class="w"> </span>a.cuda<span class="o">()</span>
+
+File<span class="w"> </span>~/github/incubator/pixi-cuda-environment/.pixi/envs/default/lib/python3.12/site-packages/torch/cuda/__init__.py:284,<span class="w"> </span><span class="k">in</span><span class="w"> </span>_lazy_init<span class="o">()</span>
+<span class="w">    </span><span class="m">279</span><span class="w">     </span>raise<span class="w"> </span>RuntimeError<span class="o">(</span>
+<span class="w">    </span><span class="m">280</span><span class="w">         </span><span class="s2">&quot;Cannot re-initialize CUDA in forked subprocess. To use CUDA with &quot;</span>
+<span class="w">    </span><span class="m">281</span><span class="w">         </span><span class="s2">&quot;multiprocessing, you must use the &#39;spawn&#39; start method&quot;</span>
+<span class="w">    </span><span class="m">282</span><span class="w">     </span><span class="o">)</span>
+<span class="w">    </span><span class="m">283</span><span class="w"> </span><span class="k">if</span><span class="w"> </span>not<span class="w"> </span>hasattr<span class="o">(</span>torch._C,<span class="w"> </span><span class="s2">&quot;_cuda_getDeviceCount&quot;</span><span class="o">)</span>:
+--&gt;<span class="w"> </span><span class="m">284</span><span class="w">     </span>raise<span class="w"> </span>AssertionError<span class="o">(</span><span class="s2">&quot;Torch not compiled with CUDA enabled&quot;</span><span class="o">)</span>
+<span class="w">    </span><span class="m">285</span><span class="w"> </span><span class="k">if</span><span class="w"> </span>_cudart<span class="w"> </span>is<span class="w"> </span>None:
+<span class="w">    </span><span class="m">286</span><span class="w">     </span>raise<span class="w"> </span>AssertionError<span class="o">(</span>
+<span class="w">    </span><span class="m">287</span><span class="w">         </span><span class="s2">&quot;libcudart functions unavailable. It looks like you have a broken build?&quot;</span>
+<span class="w">    </span><span class="m">288</span><span class="w">     </span><span class="o">)</span>
+
+AssertionError:<span class="w"> </span>Torch<span class="w"> </span>not<span class="w"> </span>compiled<span class="w"> </span>with<span class="w"> </span>CUDA<span class="w"> </span>enabled
+
+In<span class="w"> </span><span class="o">[</span><span class="m">6</span><span class="o">]</span>:
+</pre></div>
+<p>As you can tell above, our arrays are instantiated on CPU memory
+rather than GPU memory in the non-CUDA-enabled environment.
+With a relatively elegant syntax,
+we can create two separate environments
+within the same project for different hardware specifications.</p>
+<h3 id="building-docker-containers-with-caching-on-ci/cd">Building docker containers with caching on CI/CD</h3><p>Another need I have at work is the ability to build docker containers
+that contain our source code library and can be shipped into the cloud.
+Additionally, these containers should be as small as possible.
+Finally, when building these containers via CI/CD,
+we need caching enabled to ensure that build times are reasonably short
+when nothing changes in the environment,
+with the environment defined by the <code>pyproject.toml</code> file
+and generated <code>pixi.lock</code> file.
+(More on <code>pixi.lock</code> later.)</p>
+<p>I went about test-driving how to make this happen.
+It turns out not to be too challenging!
+To simplify the build, thereby allowing me to iterate more,
+I removed <code>pytorch</code> from the environment (as specified above)
+for the following environment definitions:</p>
+<div class="hll"><pre><span></span><span class="c1"># FILE: pyproject.toml</span>
+<span class="k">[tool.pixi.dependencies]</span>
+<span class="n">ruff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=0.5.5,&lt;0.6&quot;</span>
+<span class="n">pytest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=8.3.2,&lt;8.4&quot;</span>
+<span class="n">ipython</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=8.26.0,&lt;9&quot;</span>
+<span class="n">jax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+
+<span class="c1"># Feature Definitions</span>
+<span class="k">[tool.pixi.feature.cuda]</span>
+<span class="n">platforms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;linux-64&quot;</span><span class="p">]</span>
+<span class="n">system-requirements</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">cuda</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;12&quot;</span><span class="p">}</span>
+
+<span class="k">[tool.pixi.feature.cuda.dependencies]</span>
+<span class="n">jaxlib</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">build</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;cuda12&quot;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="c1"># Environments</span>
+<span class="k">[tool.pixi.environments]</span>
+<span class="n">cuda</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;cuda&quot;</span><span class="p">]</span>
+</pre></div>
+<p>Then, I made a <code>Dockerfile</code> that looks like the following:</p>
+<div class="hll"><pre><span></span><span class="c"># FILE: Dockerfile</span>
+<span class="k">FROM</span><span class="w"> </span><span class="s">ghcr.io/prefix-dev/pixi:latest</span>
+
+<span class="k">WORKDIR</span><span class="w"> </span><span class="s">/repo</span>
+
+<span class="k">COPY</span><span class="w"> </span>pixi.lock<span class="w"> </span>/repo/pixi.lock
+<span class="k">COPY</span><span class="w"> </span>pyproject.toml<span class="w"> </span>/repo/pyproject.toml
+
+<span class="k">RUN</span><span class="w"> </span>/usr/local/bin/pixi<span class="w"> </span>install<span class="w"> </span>--manifest-path<span class="w"> </span>pyproject.toml<span class="w"> </span>--environment<span class="w"> </span>cuda
+
+<span class="c"># Entrypoint shell script ensures that any commands we run start with `pixi shell`,</span>
+<span class="c"># which in turn ensures that we have the environment activated</span>
+<span class="c"># when running any commands.</span>
+<span class="k">COPY</span><span class="w"> </span>entrypoint.sh<span class="w"> </span>/repo/entrypoint.sh
+<span class="k">RUN</span><span class="w"> </span>chmod<span class="w"> </span><span class="m">700</span><span class="w"> </span>/repo/entrypoint.sh
+<span class="k">ENTRYPOINT</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s2">&quot;/repo/entrypoint.sh&quot;</span><span class="w"> </span><span class="p">]</span>
+</pre></div>
+<p>Notice how there is an official <code>pixi</code> Docker container!
+Most crucially, it <em>does not</em> ship with anything CUDA-related,
+so how do we get CUDA packages into it?
+Well, it is now possible to use non-NVIDIA docker containers to run GPU code
+thanks to the many efforts of <code>conda-forge</code> community members who work for NVIDIA,
+as we can specify whether we need GPU-related packages or not
+entirely within our <code>conda</code>/<code>pixi</code> environments instead.</p>
+<p>To test-drive, I built the docker container locally on my home lab machine:</p>
+<div class="hll"><pre><span></span>docker<span class="w"> </span>build<span class="w"> </span>-f<span class="w"> </span>Dockerfile<span class="w"> </span>.<span class="w"> </span>-t<span class="w"> </span>pixi-cuda
+</pre></div>
+<p>On my home lab machine, Docker build took about 3 minutes to complete.
+The longest build step was the Pixi install command in the Dockerfile;
+the second longest build step was exporting the layers.</p>
+<div class="hll"><pre><span></span><span class="o">[</span>+<span class="o">]</span><span class="w"> </span>Building<span class="w"> </span><span class="m">194</span>.3s<span class="w"> </span><span class="o">(</span><span class="m">12</span>/12<span class="o">)</span><span class="w"> </span>FINISHED<span class="w">                      </span>docker:defaultl
+<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">[</span>internal<span class="o">]</span><span class="w"> </span>load<span class="w"> </span>build<span class="w"> </span>definition<span class="w"> </span>from<span class="w"> </span>Dockerfile<span class="w">                </span><span class="m">0</span>.0s
+<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span>transferring<span class="w"> </span>dockerfile:<span class="w"> </span>533B<span class="w">                                </span><span class="m">0</span>.0sj
+<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">[</span>internal<span class="o">]</span><span class="w"> </span>load<span class="w"> </span>metadata<span class="w"> </span><span class="k">for</span><span class="w"> </span>ghcr.io/prefix-dev/pixi:latest<span class="w">     </span><span class="m">0</span>.4s
+<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">[</span>internal<span class="o">]</span><span class="w"> </span>load<span class="w"> </span>.dockerignore<span class="w">                                   </span><span class="m">0</span>.0so
+<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span>transferring<span class="w"> </span>context:<span class="w"> </span>2B<span class="w">                                     </span><span class="m">0</span>.0s
+<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">[</span><span class="m">1</span>/7<span class="o">]</span><span class="w"> </span>FROM<span class="w"> </span>ghcr.io/prefix-dev/pixi:latest@sha256:45d86bb788aaa<span class="w">  </span><span class="m">0</span>.0s
+<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">[</span>internal<span class="o">]</span><span class="w"> </span>load<span class="w"> </span>build<span class="w"> </span>context<span class="w">                                   </span><span class="m">0</span>.0s
+<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span>transferring<span class="w"> </span>context:<span class="w"> </span><span class="m">118</span>.83kB<span class="w">                               </span><span class="m">0</span>.0s
+<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span>CACHED<span class="w"> </span><span class="o">[</span><span class="m">2</span>/7<span class="o">]</span><span class="w"> </span>WORKDIR<span class="w"> </span>/repo<span class="w">                                      </span><span class="m">0</span>.0s
+<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">[</span><span class="m">3</span>/7<span class="o">]</span><span class="w"> </span>COPY<span class="w"> </span>pixi.lock<span class="w"> </span>/repo/pixi.lock<span class="w">                            </span><span class="m">0</span>.1s
+<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">[</span><span class="m">4</span>/7<span class="o">]</span><span class="w"> </span>COPY<span class="w"> </span>pyproject.toml<span class="w"> </span>/repo/pyproject.toml<span class="w">                  </span><span class="m">0</span>.1s
+<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">[</span><span class="m">5</span>/7<span class="o">]</span><span class="w"> </span>RUN<span class="w"> </span>/usr/local/bin/pixi<span class="w"> </span>install<span class="w"> </span>--manifest-path<span class="w"> </span>pyproj<span class="w">  </span><span class="m">170</span>.9s
+<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">[</span><span class="m">6</span>/7<span class="o">]</span><span class="w"> </span>COPY<span class="w"> </span>entrypoint.sh<span class="w"> </span>/repo/entrypoint.sh<span class="w">                    </span><span class="m">0</span>.1s
+<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">[</span><span class="m">7</span>/7<span class="o">]</span><span class="w"> </span>RUN<span class="w"> </span>chmod<span class="w"> </span><span class="m">700</span><span class="w"> </span>/repo/entrypoint.sh<span class="w">                         </span><span class="m">0</span>.3s
+<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span>exporting<span class="w"> </span>to<span class="w"> </span>image<span class="w">                                             </span><span class="m">22</span>.2s
+<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span>exporting<span class="w"> </span>layers<span class="w">                                            </span><span class="m">22</span>.2s
+<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span>writing<span class="w"> </span>image<span class="w"> </span>sha256:6f13e2a7b362c7b3736d4405f7f5566775320d<span class="w">  </span><span class="m">0</span>.0s
+</pre></div>
+<p>To verify that I could indeed run CUDA-accelerated JAX, I entered into the container:</p>
+<div class="hll"><pre><span></span>❯<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span>--gpus<span class="w"> </span>all<span class="w"> </span>-it<span class="w"> </span>docker.io/library/pixi-cuda<span class="w"> </span>/bin/bash
+<span class="w"> </span>.<span class="w"> </span><span class="s2">&quot;/tmp/pixi_env_5FU.sh&quot;</span>
+
+root@295a84b64679:/repo#<span class="w">  </span>.<span class="w"> </span><span class="s2">&quot;/tmp/pixi_env_5FU.sh&quot;</span>
+
+<span class="o">(</span>pixi-cuda-environment:cuda<span class="o">)</span><span class="w"> </span>root@295a84b64679:/repo#<span class="w"> </span>ipython
+Python<span class="w"> </span><span class="m">3</span>.12.4<span class="w"> </span><span class="p">|</span><span class="w"> </span>packaged<span class="w"> </span>by<span class="w"> </span>conda-forge<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="o">(</span>main,<span class="w"> </span>Jun<span class="w"> </span><span class="m">17</span><span class="w"> </span><span class="m">2024</span>,<span class="w"> </span><span class="m">10</span>:23:07<span class="o">)</span><span class="w"> </span><span class="o">[</span>GCC<span class="w"> </span><span class="m">12</span>.3.0<span class="o">]</span>
+Type<span class="w"> </span><span class="s1">&#39;copyright&#39;</span>,<span class="w"> </span><span class="s1">&#39;credits&#39;</span><span class="w"> </span>or<span class="w"> </span><span class="s1">&#39;license&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>more<span class="w"> </span>information
+IPython<span class="w"> </span><span class="m">8</span>.26.0<span class="w"> </span>--<span class="w"> </span>An<span class="w"> </span>enhanced<span class="w"> </span>Interactive<span class="w"> </span>Python.<span class="w"> </span>Type<span class="w"> </span><span class="s1">&#39;?&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>help.
+
+In<span class="w"> </span><span class="o">[</span><span class="m">1</span><span class="o">]</span>:<span class="w"> </span>import<span class="w"> </span>jax.numpy<span class="w"> </span>as<span class="w"> </span>np<span class="p">;</span><span class="w"> </span><span class="nv">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>np.arange<span class="o">(</span><span class="m">3</span><span class="o">)</span>
+
+In<span class="w"> </span><span class="o">[</span><span class="m">2</span><span class="o">]</span>:<span class="w"> </span>a.devices<span class="o">()</span>
+Out<span class="o">[</span><span class="m">2</span><span class="o">]</span>:<span class="w"> </span><span class="o">{</span>cuda<span class="o">(</span><span class="nv">id</span><span class="o">=</span><span class="m">0</span><span class="o">)}</span>
+
+In<span class="w"> </span><span class="o">[</span><span class="m">3</span><span class="o">]</span>:
+</pre></div>
+<p>I was indeed able to run the container with GPU acceleration!
+I had to wrestle with installing
+the <a href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html">NVIDIA docker container toolkit</a>
+on my home lab,
+which was a one-time installation to work through,
+but that's tangential to exploring <code>pixi</code> + Docker.
+At this point, I'm pretty sure that <code>pixi</code> is a no-brainer to have:
+any sane ML Platform team at a company
+should be baking it into your AMIs (if you're on AWS) or equivalent.</p>
+<p>What about that <code>entrypoint.sh</code> file?
+Well, did you notice this line in my shell output above?</p>
+<div class="hll"><pre><span></span><span class="o">(</span>pixi-cuda-environment:cuda<span class="o">)</span><span class="w"> </span>root@295a84b64679:/repo#<span class="w"> </span>ipython
+</pre></div>
+<p>Yes, that's right:
+we have the <code>cuda</code> environment for my <code>pixi-cuda-environment</code> project enabled,
+rather than just a plain shell.
+That is courtesy of <code>entrypoint.sh</code>.
+Here's what it looks like:</p>
+<div class="hll"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1"># FILE: entrypoint.sh</span>
+<span class="c1"># Modified from: https://stackoverflow.com/a/44079215</span>
+<span class="c1"># This script ensures that within a Docker container</span>
+<span class="c1"># we have the right pixi environment activated</span>
+<span class="c1"># before executing a command</span>
+
+<span class="c1"># If `nvidia-smi` is available, then execute command in the `cuda` environment</span>
+<span class="c1"># as defined in `pyproject.toml`.</span>
+<span class="k">if</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>nvidia-smi<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span>pixi<span class="w"> </span>shell<span class="w"> </span>-e<span class="w"> </span>cuda
+<span class="k">else</span>
+<span class="w">    </span>pixi<span class="w"> </span>shell
+<span class="k">fi</span>
+<span class="nb">exec</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$@</span><span class="s2">&quot;</span>
+</pre></div>
+<p>I'll note that it's become standard to build Docker containers on CI/CD runners,
+This gives us the advantage of triggering a build automatically on every commit,
+as opposed to triggering a build manually like I did on my home lab.
+This will be discussed below!</p>
+<h3 id="running-software-tests">Running software tests</h3><p>Software tests are another integral part of our work workflow,
+so I explored what it would take to run tests with <code>pixi</code> in the loop.
+A few important contextual matters:</p>
+<ol>
+<li>The software environment only exists at the terminal if we run <code>pixi shell</code>.</li>
+<li><code>pixi</code> does allow us to define tasks like in Makefiles and specify the environment in which they run.</li>
+</ol>
+<p>Taking advantage of these two,
+we can continue configuring our <code>pixi</code> environment
+and demonstrate how to make software tests run.</p>
+<p>Firstly, we use <code>pixi</code> to add <code>pytest</code> and <code>pytest-cov</code> to the environment:</p>
+<div class="hll"><pre><span></span>pixi<span class="w"> </span>add<span class="w"> </span>pytest<span class="w"> </span>pytest-cov
+</pre></div>
+<p>This added <code>pytest-cov</code> to <code>pyproject.toml</code>.
+Because I already had <code>pytest</code> defined, it was not overwritten:</p>
+<div class="hll"><pre><span></span><span class="c1"># FILE: pyproject.toml</span>
+<span class="k">[tool.pixi.dependencies]</span>
+<span class="n">ruff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=0.5.5,&lt;0.6&quot;</span>
+<span class="n">pytest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=8.3.2,&lt;8.4&quot;</span>
+<span class="n">ipython</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=8.26.0,&lt;9&quot;</span>
+<span class="n">jax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">pytest-cov</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=5.0.0,&lt;6&quot;</span><span class="w"> </span><span class="c1"># &lt;-- NOTE: This was newly added!</span>
+</pre></div>
+<p>Then, I added a dummy test file, <code>test_arrays.py</code>, into the top-level directory:</p>
+<div class="hll"><pre><span></span><span class="c1"># FILE: test_arrays.py</span>
+<span class="sd">&quot;&quot;&quot;Example test for arrays.&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_array</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test array creation.&quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">devices</span><span class="p">())</span>
+</pre></div>
+<p>Finally, I added a <code>test</code> task under <code>tool.pixi.tasks</code> in <code>pyproject.toml</code>:</p>
+<div class="hll"><pre><span></span><span class="c1"># FILE: pyproject.toml</span>
+<span class="k">[tool.pixi.tasks]</span>
+<span class="n">test</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pytest&quot;</span><span class="w"> </span><span class="c1"># &lt;-- NOTE: This was newly added!</span>
+</pre></div>
+<p>Now, how do we run this test? Turns out it's doable this way:</p>
+<div class="hll"><pre><span></span>pixi<span class="w"> </span>run<span class="w"> </span><span class="nb">test</span>
+</pre></div>
+<p>When run outside of a specified <code>pixi shell</code>,
+it will run inside the <code>default</code> environment,
+giving an output like this:</p>
+<div class="hll"><pre><span></span>❯<span class="w"> </span>pixi<span class="w"> </span>run<span class="w"> </span><span class="nb">test</span>
+✨<span class="w"> </span>Pixi<span class="w"> </span>task<span class="w"> </span><span class="o">(</span><span class="nb">test</span><span class="w"> </span><span class="k">in</span><span class="w"> </span>default<span class="o">)</span>:<span class="w"> </span><span class="nv">pytest</span>
+<span class="o">==================</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span>session<span class="w"> </span><span class="nv">starts</span><span class="w"> </span><span class="o">==================</span>
+platform<span class="w"> </span>linux<span class="w"> </span>--<span class="w"> </span>Python<span class="w"> </span><span class="m">3</span>.12.4,<span class="w"> </span>pytest-8.3.2,<span class="w"> </span>pluggy-1.5.0
+rootdir:<span class="w"> </span>/home/ericmjl/github/incubator/pixi-cuda-environment
+configfile:<span class="w"> </span>pyproject.toml
+plugins:<span class="w"> </span>cov-5.0.0
+collected<span class="w"> </span><span class="m">1</span><span class="w"> </span>item
+
+test_arrays.py<span class="w"> </span>.<span class="w">                                  </span><span class="o">[</span><span class="m">100</span>%<span class="o">]</span>
+
+<span class="o">===================</span><span class="w"> </span><span class="m">1</span><span class="w"> </span>passed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">0</span>.38s<span class="w"> </span><span class="o">===================</span>
+</pre></div>
+<p>But what if I want to run it inside the <code>cuda</code> environment?
+The easiest way to do this is to specify the environment to run it in:</p>
+<div class="hll"><pre><span></span>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>cuda<span class="w"> </span><span class="nb">test</span>
+</pre></div>
+<blockquote><p><strong>NOTE:</strong> Don't get the order wrong!
+<code>-e cuda</code> must be specified before the task name (i.e. <code>test</code>),
+as anything passed in after the task name
+will be passed to the task's executable as an argument!</p>
+</blockquote>
+<p>There are other ways to accomplish the same thing,
+but this is the easiest and most unambiguous.
+In any case, the output of that last command looks like this:</p>
+<div class="hll"><pre><span></span>❯<span class="w"> </span>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>cuda<span class="w"> </span><span class="nb">test</span>
+✨<span class="w"> </span>Pixi<span class="w"> </span>task<span class="w"> </span><span class="o">(</span><span class="nb">test</span><span class="w"> </span><span class="k">in</span><span class="w"> </span>cuda<span class="o">)</span>:<span class="w"> </span>pytest<span class="w">  </span><span class="c1">### NOTE: We are using the `cuda` env now!</span>
+<span class="o">====================</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span>session<span class="w"> </span><span class="nv">starts</span><span class="w"> </span><span class="o">=====================</span>
+platform<span class="w"> </span>linux<span class="w"> </span>--<span class="w"> </span>Python<span class="w"> </span><span class="m">3</span>.12.4,<span class="w"> </span>pytest-8.3.2,<span class="w"> </span>pluggy-1.5.0
+rootdir:<span class="w"> </span>/home/ericmjl/github/incubator/pixi-cuda-environment
+configfile:<span class="w"> </span>pyproject.toml
+plugins:<span class="w"> </span>cov-5.0.0
+collected<span class="w"> </span><span class="m">1</span><span class="w"> </span>item
+
+test_arrays.py<span class="w"> </span>.<span class="w">                                       </span><span class="o">[</span><span class="m">100</span>%<span class="o">]</span>
+
+<span class="o">=====================</span><span class="w"> </span><span class="m">1</span><span class="w"> </span>passed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">0</span>.69s<span class="w"> </span><span class="o">======================</span>
+</pre></div>
+<p>Notice how we are running tests within the <code>cuda</code> environment!</p>
+<h3 id="running-tests-with-pixi-on-github-actions">Running tests with pixi on GitHub Actions</h3><p>Now that we can run tests with <code>pixi</code> locally, and do it in two environments,
+the next thing I think we need to look at is running tests on CI/CD.
+Because I am on GitHub, GitHub Actions is my CI/CD choice.
+Let's see how to run tests with <code>pixi</code> on GitHub Actions.
+To start, we will need the GitHub Action definition,
+which I place at <code>.github/workflows/test.yaml</code>:</p>
+<div class="hll"><pre><span></span><span class="c1"># FILE: .github/workflows/test.yaml</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Run software tests</span>
+
+<span class="nt">on</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">push</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">pull_request</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">branches</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">main</span>
+
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">test</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Run tests</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Checkout repository</span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
+
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">prefix-dev/setup-pixi@v0.8.1</span>
+<span class="w">      </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">pixi-version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v0.25.0</span>
+<span class="w">        </span><span class="nt">cache</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pixi run test</span>
+</pre></div>
+<p>I intentionally omitted the <code>cuda</code> environment
+because GPU runners are unavailable on GitHub actions' native runners.
+However, if we use self-hosted runners,
+it is, in principle, possible to set up the <code>cuda</code> environment that we defined.</p>
+<p>Nonetheless, the biggest and most important piece to know here
+is that the prefix devs have provided us with a <code>setup-pixi</code> action!
+This allows us to set up <code>pixi</code>
+and automatically create the <code>pixi</code> environments associated with it.
+Better yet is the ability to do caching!
+This massively speeds up the time taken to create the <code>pixi</code> env on CI/CD,
+which can cut down the turn-around time to fixing bugs.</p>
+<p>To recap, running <code>pixi install</code> from scratch on my home lab
+takes about 23 seconds for the default environment,
+while <code>pixi install -e cuda</code> takes about 3 minutes or so.
+With caching on GitHub actions,
+loading the <code>default</code> environment from the cache takes only 8 seconds.
+Imagine the speedup that one would have with caching provided by <code>pixi</code>!</p>
+<table>
+<thead><tr>
+<th style="text-align:center">Build Machine</th>
+<th style="text-align:center">Environment</th>
+<th style="text-align:center">Cache</th>
+<th style="text-align:center">Build Time (s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">Home Lab</td>
+<td style="text-align:center">default</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">23</td>
+</tr>
+<tr>
+<td style="text-align:center">Home Lab</td>
+<td style="text-align:center">cuda</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">180</td>
+</tr>
+<tr>
+<td style="text-align:center">GH Actions</td>
+<td style="text-align:center">default</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">33</td>
+</tr>
+<tr>
+<td style="text-align:center">GH Actions</td>
+<td style="text-align:center">default</td>
+<td style="text-align:center">Yes</td>
+<td style="text-align:center">8</td>
+</tr>
+<tr>
+<td style="text-align:center">GH Actions</td>
+<td style="text-align:center">cuda</td>
+<td style="text-align:center">N/A</td>
+<td style="text-align:center">N/A</td>
+</tr>
+</tbody>
+</table>
+<blockquote><p>NOTE: Home lab build times and GH Actions build times without caching are similar!
+The point of the table above was to illustrate the power of caching on CI/CD.</p>
+</blockquote>
+<h3 id="docker-container-build-with-github-actions">Docker container build with GitHub Actions</h3><p>In addition to running tests on GitHub Actions,
+it's also important for me to be able to build Docker containers using Actions.
+This way, we offload the time otherwise needed to babysit a local machine
+to a remote computer that is automatically triggered by a code commit.</p>
+<p>To do this, we need an Actions workflow file:</p>
+<div class="hll"><pre><span></span><span class="c1"># FILE: .github/workflows/build-docker.yaml</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Build docker container</span>
+
+<span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">push</span>
+
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">build-container</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Build container</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Checkout repository</span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v2</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Docker meta</span>
+<span class="w">      </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">meta</span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker/metadata-action@v5</span>
+<span class="w">      </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># list of Docker images to use as base name for tags</span>
+<span class="w">        </span><span class="nt">images</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">ericmjl/pixi-cuda-environment</span>
+<span class="w">        </span><span class="c1"># generate Docker tags based on the following events/attributes</span>
+<span class="w">        </span><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">type=sha</span>
+<span class="w">          </span><span class="no">type=raw,value=latest</span>
+
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Set up QEMU</span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker/setup-qemu-action@v3</span>
+
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Set up Docker Buildx</span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker/setup-buildx-action@v3</span>
+
+<span class="w">    </span><span class="c1"># NOTE: Change this to your own AWS ECR login or other container repo service,</span>
+<span class="w">    </span><span class="c1"># such as GitHub Container Registry, which doesn&#39;t require login tokens.</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Login to Docker Hub</span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker/login-action@v3</span>
+<span class="w">      </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.DOCKERHUB_USERNAME }}</span>
+<span class="w">        </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.DOCKERHUB_TOKEN }}</span>
+
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Build and push</span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker/build-push-action@v6</span>
+<span class="w">      </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">push</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ steps.meta.outputs.tags }}</span>
+<span class="w">        </span><span class="nt">cache-from</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">type=gha</span>
+<span class="w">        </span><span class="nt">cache-to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">type=gha,mode=max</span>
+</pre></div>
+<p>Nothing within this Actions YAML file is <code>pixi</code>-related,
+but because we're building the container from the Dockerfile,
+which is based on the official <code>pixi</code> image,
+we take advantage of building a Docker container using the official GitHub Action --
+with caching involved too!</p>
+<p>When comparing the time it takes to generate the container image without caching,
+it takes about 3 minutes to build the container
+and another 2-ish minutes to push it to Dockerhub.
+(Your internet connection will determine how fast pushes happen.)
+With image layer caching, as long as the <code>pyproject.toml</code> and <code>pixi.lock</code> files
+are unchanged between commits,
+the entire GitHub Actions build time falls to ~30 seconds,
+representing an approximately 10X speed-up between iterations.
+Summarized as a table:</p>
+<table>
+<thead><tr>
+<th style="text-align:center">Cache Present?</th>
+<th style="text-align:center">Build Time (s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">No</td>
+<td style="text-align:center">600</td>
+</tr>
+<tr>
+<td style="text-align:center">Yes</td>
+<td style="text-align:center">30</td>
+</tr>
+</tbody>
+</table>
+<p>If you have anything downstream dependent on a Docker image being built,
+this massive reduction in iteration time is a definite big treat!</p>
+<h3 id="lock-files">Lock files</h3><p>Every <code>pixi</code> command that depends on an environment
+will result in a check that the lock files are kept in sync with the configuration file
+(or manifest, in <code>pixi</code> parlance).
+What <code>pixi</code> commands do this? What I've seen includes:</p>
+<ul>
+<li><code>pixi run &lt;task&gt;</code> or <code>pixi run &lt;shell command&gt;</code>, ± <code>-e &lt;env name&gt;</code></li>
+<li><code>pixi shell</code></li>
+<li><code>pixi install</code></li>
+</ul>
+<p>The full behaviour is documented <a href="https://pixi.sh/v0.26.1/reference/cli/#install">here</a>.
+This is incredibly useful for ensuring
+the lock file syncs with the environment configuration file!</p>
+<h2 id="putting-it-all-together">Putting it all together</h2><p>While writing this post,
+I implemented and test-drove the ideas in a new repo named <a href="https://github.com/ericmjl/pixi-cuda-environment"><code>pixi-cuda-environment</code></a>.
+This serves as a minimal implementation of the ideas above.
+h/t Ben Mares and Adrian Seyboldt, who helped review the repo.</p>
+<p>To apply everything I learned from this exercise,
+I decided to update <a href="https://github.com/ericmjl/pyds-cli"><code>pyds-cli</code></a>,
+<a href="https://github.com/ericmjl/llamabot"><code>llamabot</code></a>,
+and <a href="https://github.com/ericmjl/website">my personal website</a> to depend solely on <code>pixi</code>.
+This turned out to be an incredible thing to do!
+I could move from my MacBook Air to my home lab
+and get up and running easily using <code>pixi install</code>,
+simply by investing some time and thought into the configuration file.
+On another code repository that I wasn't the core developer of,
+thanks to a well-configured <code>pixi.toml</code> file (the alternative to <code>pyproject.toml</code>),
+I could immediately run the web app associated with the repository.</p>
+<p>All taken together, although there are many benefits to adopting <code>pixi</code> --
+reproducibility and task execution, to name two --
+I think its secret sauce for Python-centric adoption lies in the following two points:</p>
+<ul>
+<li>It pulls Python packages from the two canonical sources of packages (<code>conda</code> and <code>pip</code>).</li>
+<li>It can unify Python project configuration into a single file (<code>pyproject.toml</code>).</li>
+</ul>
+<p>The thought and care that went into <code>pixi</code>'s design are quite evident.
+I hope that it continues to get the development attention
+that is commensurate with its impact!</p>
+<h2 id="tips-for-using-pixi">Tips for using <code>pixi</code></h2><p>Any change will feel slightly uncomfortable, and I experienced some of it.
+I needed to adjust to this change,
+having come from a world where <code>~/anaconda</code> and <code>mamba</code> were what I depended on
+and then suddenly going cold turkey.
+Here's some tips that I have for using <code>pixi</code>,
+based on test-driving it at home and at work.</p>
+<h3 id="lock-file-errors-keep-calm-and-pixi-install">Lock file errors? Keep calm and <code>pixi install</code>!</h3><p><strong>Lock files</strong> can represent a big change,
+a departure from an <code>environment.yml</code> file without a <code>conda-lock</code> file.
+Lock files can also look intimidating!
+After all, they're filled with many, many lines of auto-generated text.
+At the same time, they <em>are</em> intended to be checked into source control!
+(That last point broke my mental model of never checking in auto-generated files.)</p>
+<p>At the same time,
+lock files can also go out of sync with your manifest file
+(i.e. <code>pyproject.toml</code> or <code>pixi.toml</code>) if one is not careful.
+<code>pixi</code> tries to manage this complexity by
+(a) auto-updating the <code>pixi.lock</code> file on almost all commands,
+making it more convenient than <code>conda-lock</code>, and
+(b) loudly erroring with a friendly error message.
+If ever you encounter that error, whether locally or on CI,
+saying that the lock files are out of date,
+<strong>a <code>pixi install</code> + <code>git commit</code> and <code>git push</code> will do the trick.</strong></p>
+<h3 id="cuda-specification-syntax">CUDA specification syntax</h3><p>The syntax for specifying CUDA packages from <code>conda-forge</code>,
+is also something we need to commit to memory.
+The patterns to remember look like:</p>
+<div class="hll"><pre><span></span><span class="n">package_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;some version&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">build</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;*cuda*&quot;</span><span class="w"> </span><span class="p">}</span>
+<span class="n">package_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;some version&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">build</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;*cuda12*&quot;</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+<h3 id="default-channels">Default channels</h3><p>The default pixi behaviour is to look for packages from <code>conda-forge</code>.
+If your Python package can't be resolved from there,
+try moving it to the <code>pypi-dependencies</code> section instead.</p>
+<h3 id="global-tool-installation">Global tool installation</h3><p>If you went cold turkey as I did but still need to install Python tooling globally,
+then there's muscle memory that you'll need to un-learn very quickly.
+Whereas previously I could rely on a base environment
+through my <code>mambaforge</code> installation, it no longer exists.
+Rather, I needed to install Python and <code>pipx</code> globally with <code>pixi</code>
+and then use <code>pipx</code> (not <code>pixi</code>!) to install that tool using</p>
+<div class="hll"><pre><span></span>pipx<span class="w"> </span>install<span class="w"> </span>--python<span class="w"> </span><span class="k">$(</span>which<span class="w"> </span>python<span class="k">)</span><span class="w"> </span>&lt;tool<span class="w"> </span>name&gt;
+</pre></div>
+<p>In this way, I could install <code>pyds-cli</code> and <code>llamabot</code> "globally"
+rather than within each environment.</p>
+<h3 id="define-pixi-tasks-thoughtfully">Define <code>pixi</code> tasks thoughtfully</h3><p>Providing a task that allows for a one-command "get something useful accomplished"
+can be incredibly confidence-building for the next person
+who clones your repo locally and tries to run something.
+Examples might be a <code>lab</code> command to run JupyterLab,
+a <code>start</code> command that runs a Python script that demos the output of your work,
+or a <code>test</code> command to help software developers
+gain confidence that they've got the repo installed correctly.
+Be sure to provide that command in the README!</p>
+<h3 id="minimal-analyses">Minimal analyses</h3><p>What if you're not a tool developer
+and just want a quick environment to do some analyses
+without touching other environments?
+For this persona, there is a simplified workflow that I have used
+which may be helpful as a reference.</p>
+<p>Navigate to an empty directory.
+Then:</p>
+<div class="hll"><pre><span></span><span class="c1"># Initialize pixi files</span>
+pixi<span class="w"> </span>init
+<span class="c1"># Add packages that you need</span>
+pixi<span class="w"> </span>add<span class="w"> </span>jupyter<span class="w"> </span>ipython<span class="w"> </span>ipykernel<span class="w"> </span>pixi-kernel<span class="w"> </span>numpy<span class="w"> </span>pandas<span class="w"> </span>matplotlib<span class="w"> </span>seaborn<span class="w"> </span>scikit-learn
+<span class="c1"># Run Jupyter lab</span>
+pixi<span class="w"> </span>run<span class="w"> </span>jupyter<span class="w"> </span>lab
+<span class="c1"># Add more packages as you see fit when it&#39;s needed; pixi will keep things in sync!</span>
+pixi<span class="w"> </span>add<span class="w"> </span>statsmodels
+</pre></div>
+<p>Thanks to <code>pixi-kernel</code>,
+there will be a Jupyter kernel named <code>Pixi - Python 3 (ipykernel)</code>
+which will contain the packages contained in your environment.
+If you commit the notebooks + pixi configuration files to source control,
+someone else can download it and reproduce the environment easily.
+And as long as you don't rely on data living at a hard-coded path,
+that other person should be able to reproduce your work as well!</p>
+<h2 id="acknowledgments">Acknowledgments</h2><p>I'd like to thank Sean Law, Rahul Dave, and Ruben Arts for reviewing this content,
+as well as Juan Orduz for battle-testing the blog post
+in support of his own project's migration.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-its-time-to-try-out-pixi</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{It&#39;s time to try out pixi!}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{08}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{16}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/8/16/its-time-to-try-out-pixi}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>
