@@ -1,0 +1,686 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Llamabot 0.4.0 Released!">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/llamabot-040-released' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Llamabot 0.4.0 Released! - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Llamabot 0.4.0 Released!</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-03-24</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/querybot/">
+        querybot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/refactor/">
+        refactor
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/chromadb/">
+        chromadb
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/lancedb/">
+        lancedb
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/vector database/">
+        vector database
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/hybrid search/">
+        hybrid search
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/chatui/">
+        chatui
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/mixin/">
+        mixin
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/panel/">
+        panel
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/repo chat/">
+        repo chat
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/litellm/">
+        litellm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/contributions/">
+        contributions
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/open source/">
+        open source
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share the latest updates of LlamaBot 0.4.0, highlighting the decoupling of document storage from text generation in QueryBot, the introduction of the ChatUIMixin for easy web UI integration, and the switch to LanceDB for its lightweight, SQLite-like handling of vectors. I also touch on enhancements to repo chat, making it simpler to launch web-based chatbots on repository content. If you're a llamabot user, I'd love to hear from you about how well it works for you!</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>LlamaBot 0.4.0 was released on 23 March 2024! I wanted to share some of the new things that have happened in the repo since I last wrote about it here on my blog.</p>
+<h2 id="querybot">QueryBot</h2><h3 id="decoupling-document-storage-and-retrieval">Decoupling document storage and retrieval</h3><p>The first version of QueryBot had document storage coupled tightly with an LLM -- a pattern I had picked up from LlamaIndex. But this pattern turned out to cause a world of pain when experimenting with local LLMs. It was only when I recognized that <a href="https://ericmjl.github.io/blog/2024/1/15/your-embedding-model-can-be-different-from-your-text-generation-model/">our LLM generator doesn't have to come from the same provider as our text embedder</a> that I could refactor QueryBot into its current form, with separate systems for document storage + retrieval and text generation. Underneath the hood, I did a major refactor of QueryBot (which I only briefly alluded to before) that encoded this information, resulting in the separation of document storage/retrieval systems from text generation. Concretely, we have the following implemented in <code>llamabot.components.docstore</code>:</p>
+<ul>
+<li><code>ChromaDBDocStore</code>: backed by ChromaDB and configured to use the <code>sentence-transformers</code> as the embedding model provider</li>
+<li><code>LanceDBDocStore</code>: backed by LanceDB and configured to use <code>sentence-transformers</code> as the embedding model provider</li>
+<li><code>BM25DocStore</code>: in-memory document store (literally just a list of strings) using the <code>bm25</code> Python package to retrieve documents.</li>
+</ul>
+<p><code>BM25DocStore</code> exists to enable hybrid search manually as ChromaDB doesn't support it (as of 24 March 2024), but in the long run, I think <code>BM25DocStore</code> will go away as more vector DBs implement hybrid retrieval. It's still there as a vestige of my experimentation, though!</p>
+<h3 id="chatuimixin-for-composable-web-uis">ChatUIMixin for composable web UIs</h3><p>Additionally, I created a <code>ChatUIMixin</code> that enables any of LlamaBot's <code>&lt;X&gt;Bot</code>s to be served as a Panel chat app. (You'll see an example below!) I first encountered the Mixin pattern for real when working with fellow PyMC developer <a href="https://www.linkedin.com/in/bill-engels-a5239a119/">Bill Engels</a> on a project and thought it might be relevant for the ability to <em>compose</em> a bot with different pieces together.</p>
+<p>The code looks essentially like this:</p>
+<div class="hll"><pre><span></span><span class="sd">&quot;&quot;&quot;LlamaBot ChatUI that composes with Bots.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">panel</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pn</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ChatUIMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A mixin for a chat user interface.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">initial_message</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">callback_function</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callback_function</span> <span class="o">=</span> <span class="n">callback_function</span>
+        <span class="k">if</span> <span class="n">callback_function</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">callback_function</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">ai_message</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">instance</span><span class="p">:</span> <span class="bp">self</span><span class="p">(</span><span class="n">ai_message</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">chat_interface</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">ChatInterface</span><span class="p">(</span>
+            <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">callback_function</span><span class="p">,</span> <span class="n">callback_exception</span><span class="o">=</span><span class="s2">&quot;verbose&quot;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">initial_message</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chat_interface</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">initial_message</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s2">&quot;System&quot;</span><span class="p">,</span> <span class="n">respond</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">servable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the chat interface as a Panel servable object.</span>
+
+<span class="sd">        :returns: The chat interface as a Panel servable object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">chat_interface</span><span class="o">.</span><span class="n">servable</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">serve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Serve the chat interface.</span>
+
+<span class="sd">        :returns: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chat_interface</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+<p>The key lies in the <code>callback_function</code>, which by default ensures that every message sent by the user will trigger a <code>__call__</code> on the bot that inherits from the <code>ChatUIMixin</code>, and the <code>serve()</code> class method that launches the Panel server and loads a browser. With this, one can create a new Bot and, with a single line change, add in web UI capabilities. Previously, you would have:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyBot</span><span class="p">(</span><span class="n">SimpleBot</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+<p>Now, you would do:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyBot</span><span class="p">(</span><span class="n">SimpleBot</span><span class="p">,</span> <span class="n">ChatUIMixin</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+<h2 id="lancedb">LanceDB</h2><p>LanceDB has been getting rave reviews from DS, ML, and AI practitioners whose opinions I respect a ton, in particular, because it's as lightweight as <a href="https://www.sqlite.org/">SQLite</a>. <a href="https://www.linkedin.com/in/vincentwarmerdam/">Vincent Warmerdam</a> has stated it as much:</p>
+<blockquote><p>I've been toying with <a href="https://www.linkedin.com/company/lancedb/">LanceDB</a> and yeah ... I totally dig it.</p>
+<p>It gives me the SQlite feeling for vectors which is very motivating. Being able to index it to disk and send it off to a service afterwards is <em>exactly</em> what I want for a bunch of hobby projects.</p>
+<ul>
+<li><a href="https://www.linkedin.com/posts/vincentwarmerdam_ive-been-toying-with-lancedb-and-yeah-activity-7170345000931676160-pW_D?utm_source=share&amp;utm_medium=member_desktop">Vincent Warmerdam on LinkedIn</a></li>
+</ul>
+</blockquote>
+<p>I decided to give it a test drive and compare it to <a href="https://github.com/chroma-core/chroma">ChromaDB</a>, which I've already been using as a default vector DB for LlamaBot's QueryBot. My first impressions were so good that I made LanceDB the default vector database storage system in LlamaBot. The most significant selling point that won me over was the availability of a full-text index <em>alongside</em> the vector store. This enabled me to incorporate <a href="https://lancedb.github.io/lancedb/hybrid_search/hybrid_search/#hybrid-search-in-lancedb">hybrid search</a> much more quickly as part of the document retrieval system. (Hybrid search is when we combine keyword search + vector similarity + combined ranking of documents retrieved by the two to get a (potentially) better retrieval of context for LLMs.) As a developer constantly searching for sane defaults, I was excited about this. Now, with LanceDB as the default document storage system for QueryBot, every QueryBot instantiated as of version 0.4.0 will come with hybrid search capabilities for document retrieval <em>by default</em>!</p>
+<h2 id="repo-chat">Repo Chat</h2><p>I also spent some time upgrading llamabot repo chat. In particular, I restored the ability to chat using the Panel app. Now, serving up a web-based chatbot on any repository's content has become much easier!</p>
+<p>As an example, if you want to chat with my website (as a way of accessing historical snapshots of my brain), you can do it with the following <code>llamabot</code> command:</p>
+<div class="hll"><pre><span></span>llamabot<span class="w"> </span>repo<span class="w"> </span>chat<span class="w"> </span>--model-name<span class="w"> </span>gpt-4-0125-preview<span class="w"> </span>--panel<span class="w"> </span>--initial-message<span class="w"> </span><span class="s2">&quot;Hello! I am a bot to help you answer questions about Eric Ma&#39;s blog.&quot;</span><span class="w"> </span>--checkout<span class="w"> </span>main<span class="w"> </span>https://github.com/ericmjl/website
+</pre></div>
+<p>It may take ~1-2 minutes to finish cloning my website and embedding the text using the default local text embedder -- I'm too cheap to configure OpenAI as my default embedder! Once done, <code>llamabot</code> will launch a <a href="https://panel.holoviz.org/">Panel app</a> that you can use to chat. Try asking it some questions about stuff like leadership, career development, or LlamaBot:</p>
+<p><img src="screenshot.webp" alt="Screenshot of Llamabot repo chat using the Panel chat interface"></p>
+<p>Or, if you want to chat with the <code>llamabot</code> repo to get a personalized tutorial on how to use it, you can launch <code>llamabot repo chat</code> with the following command:</p>
+<div class="hll"><pre><span></span>llamabot<span class="w"> </span>repo<span class="w"> </span>chat<span class="w"> </span>--model-name<span class="w"> </span>gpt-4-0125-preview<span class="w"> </span>--panel<span class="w"> </span>--initial-message<span class="w"> </span><span class="s2">&quot;Hello! I am a bot to help you answer questions about the LlamaBot repository!&quot;</span><span class="w"> </span>--checkout<span class="w"> </span>main<span class="w"> </span>https://github.com/ericmjl/llamabot
+</pre></div>
+<p>Repo chat is nothing much more than a lightweight customization around QueryBot. Most of the customization involves automatically cloning a particular repository branch and automatically launching the Panel server.</p>
+<h2 id="other-notes">Other notes</h2><p>Because I rely heavily on Ollama for local LLMs, I reported an upstream issue in LiteLLM to ensure compatibility for JSON mode with OpenAI's API. (See this issue.) LiteLLM v1.32.7 should now have a uniform JSON mode API between Ollama and OpenAI!</p>
+<p>Speaking of LiteLLM, Rena Lu of TigerEye also made her first suite of contributions, ensuring that we now pass in <code>**kwargs</code> in every built-in bot to LiteLLM. Stabilizing this pattern will be beneficial in the long run. She also helped test and check that releasing the upper-bound pin on LiteLLM wouldn't break anything.</p>
+<h2 id="give-it-a-shot">Give it a shot!</h2><p>You can install <code>llamabot</code> using:</p>
+<div class="hll"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span><span class="s2">&quot;llamabot&gt;=0.4.0&quot;</span>
+</pre></div>
+<p>I'd love to hear about your experience using the updated <code>QueryBot</code> classes and <code>llamabot repo chat</code>!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-llamabot-040-released</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Llamabot 0.4.0 Released!}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{03}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{24}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/3/24/llamabot-040-released}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

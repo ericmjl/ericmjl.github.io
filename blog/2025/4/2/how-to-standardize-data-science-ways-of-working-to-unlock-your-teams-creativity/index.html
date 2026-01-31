@@ -1,0 +1,666 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="How to standardize Data Science ways of working to unlock your team&#39;s creativity">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/how-to-standardize-data-science-ways-of-working-to-unlock-your-teams-creativity' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>How to standardize Data Science ways of working to unlock your team&#39;s creativity - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">How to standardize Data Science ways of working to unlock your team&#39;s creativity</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-04-02</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/leadership/">
+        leadership
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workflows/">
+        workflows
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/best practices/">
+        best practices
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/software/">
+        software
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/change management/">
+        change management
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/innovation/">
+        innovation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/open source/">
+        open source
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share insights from my talk at BioIT World about leading one of Moderna's data science teams. I discuss our mission to make science run at the speed of thought and how we standardize workflows across the data scientists to enhance creativity. Key points include designing delivery models, making best practices easy, and balancing standards with innovation. I also touch on AI-assisted coding and our open-source infrastructure. Our approach aims to liberate scientists for their best work. Curious about how we achieve this balance and what it means for the future of data science at Moderna?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>On 2 April 2025, I had the opportunity to speak at BioIT World about my experiences building data science teams and the associated tooling at Moderna. Unlike most speakers, I ditched the slides and went for a more interactive approach – that's just my style. Why subject everyone to 25 minutes of me blabbering when we could have an engaging discussion instead?</p>
+<p>For those who couldn't attend, I wanted to share the key insights from my talk on how we've made our data science team fly at Moderna. These lessons come from my experience as a data science team lead, where I manage a team of six (including myself), serving Moderna's 600-person research organization, and where we share tools with other data science teams totaling 12, serving a wide remit across Moderna’s ~6000-person organization.</p>
+<h2 id="the-mission">The Mission</h2><p>First, a bit about us: my home team's mission is to "make science run at the speed of thought and to quantify the unquantified." I joined Moderna in summer 2021 – too late to profit from the pandemic, so I'm really there for the science, not the money! Part of making science run at the speed of thought is to make sure we data scientists have the tools and practices at hand that enable <em>us</em> to work at the speed of thought. That is where standardization comes in.</p>
+<h2 id="talk-overview">Talk Overview</h2><p>In my talk, I focused on three key aspects of standardizing data science workflows:</p>
+<ol>
+<li>How to design delivery models that serve stakeholder, customer, and/or collaborator needs</li>
+<li>Ways to make best practices the path of least resistance</li>
+<li>Strategies for implementing standards on the path of least resistance</li>
+</ol>
+<p>I shared concrete examples from my experience at Moderna, but also encouraged the audience to discuss these topics with their neighbors so we could learn from the collective wisdom in the room. My goal was for everyone to leave with practical ideas they could implement right away—regardless of their team or org size. I will admit, the room was relatively quiet at first (I think most people came not expecting my talk delivery format), but gradually the room warmed up.</p>
+<h3 id="1-standardized-delivery-models">1. Standardized Delivery Models</h3><p>The first thing to address is the question: what exactly does your data science team deliver? And I don't mean "insights" – that's not a specific enough answer. I'm talking about concrete work products. Something tangible that people can interact with or mull over.</p>
+<p>Before choosing delivery formats, it's essential to understand the "jobs to be done" (from Clayton Christensen's Innovator's Solution) – what are stakeholders actually trying to accomplish with your outputs? Delivery models should be tailored to what your company actually needs, not just what's trendy.</p>
+<p>At Moderna, we deliver two things as a data science team:</p>
+<ul>
+<li><strong>Python packages</strong>: Reusable components that encapsulate data science work that other computational and data scientists can reuse.</li>
+<li><strong>Compute tasks</strong>: CLI tools that serve as a wrapper for computational workflows, which are deployed on the cloud and accessible via web UI, RESTful API, and Python client. These serve both technical and non-technical users.</li>
+</ul>
+<p>We made this decision early on to avoid building things like dashboards, which in my opinion are where data science projects go to die. Dashboards should be built by the people who actually want to see the data. I've also been in the position of promising a UI and suffering the maintenance costs later. It was not a happy time. So we cut out building any kind of user interface from our work products, preferring to leave this to professional front-end engineers.</p>
+<p>Yet at the same time, there is a strong "engineering" component to our work, because we want to reduce the friction that occurs from handover. I've heard stories in finance of data science and quant teams completing their prototype in a notebook within a month, but the ML engineering team needing 8 months to productionize it because the deployment language was different (Java, not Python), the runtime environment was different, and the engineering team was not intimately familiar with the problem domain, and so they were delayed on the appropriate suite of tests to write. So at Moderna, every data scientist must understand that our return on investment is only realized if we package our work as software, and we avoid these problems associated with handoff by ensuring that we have the tools to make deployment easy.</p>
+<p>Moreover, I don't care if you know how to build a fancy Transformer ML model in a Jupyter notebook. If your work cannot be operationalized hands-free without your involvement, you have not delivered a return on investment on your time. Software is how we scale labour!</p>
+<p>The benefits? Consistency, reusability, and very clear paths from exploration to production. Expectations with stakeholders are crystal clear, yet what we deliver is flexible enough to work with a variety of collaborators.</p>
+<h3 id="2-making-best-practices-the-path-of-least-resistance">2. Making Best Practices the Path of Least Resistance</h3><p>Consistent organization and automation reduces cognitive load and frees up mental energy for creative problem-solving. Our philosophy is simple: "Make the right thing the easy thing to do."</p>
+<p>We've implemented several tactical best practices that make a big difference:</p>
+<ul>
+<li><strong>One project, one code repository</strong>: Every project gets its own code repository – you can break this rule when you know the rule, but it's a good starting point.</li>
+<li><strong>Standardized project scaffolding</strong>: We've invested in command-line tools (not unlike <a href="https://ericmjl.github.io/pyds-cli/"><code>pyds-cli</code></a>) that, after a quick questionnaire, generate a full Python project package structure with:<ul>
+<li>Dedicated locations for tests (signaling that testing is expected)</li>
+<li>Documentation templates (encouraging thorough documentation)</li>
+<li>Proper code organization with examples of submodules</li>
+<li>Configuration files</li>
+<li>Pre-configured CI/CD pipelines that run on every commit</li>
+</ul>
+</li>
+<li>We invested early on in <strong>automated workflows</strong> that reduce friction, such as:<ul>
+<li>Automatic installation of pre-commit hooks for code quality</li>
+<li>Automated authentication for internal systems</li>
+<li>Tools that manage cloud workstation usage (e.g., auto-shutdown for workstations)</li>
+</ul>
+</li>
+<li><strong>Documentation</strong>: We invest heavily in documentation, running quarterly "docathons" to ensure our work is adequately documented for future team members. As I like to say, "Software scales labor, documentation scales brains."</li>
+<li><strong>Modern dependency management</strong> with tools like pixi and uv (we've evolved from conda to mamba to reduce build times, and now we're transitioning to pixi/uv)</li>
+</ul>
+<blockquote><p>Software scales labor, documentation scales brains!</p>
+</blockquote>
+<p>These standardized practices reduce cognitive overhead. If I jump into a colleague's project, I immediately know where to look for documentation and tests, which helps me onboard faster than having one-on-one sessions. Shared idioms and patterns make it easier to jump in and help each other, fostering stronger team dynamics.</p>
+<p>I would note that the tech stack is merely one piece of the whole puzzle. The practices we build around the tech stack are another integral portion. The goal is for scientists to spend less time on configuration and more time on science. The investment of my time hopefully yields thirty, sixty, or a hundredfold in terms of what we give back to our teammates.</p>
+<p>The best part? We enable all of this at extremely low software licensing spend — our only vendor spends on our technology stack for data scientists are on AWS, GitHub, and GitHub Copilot.</p>
+<h3 id="3-implementation-strategy">3. Implementation Strategy</h3><p>Change management principles apply to workflow standardization. Successful implementation requires both technical and cultural elements.</p>
+<p>Our standardization journey at Moderna involved several key elements:</p>
+<ul>
+<li><strong>Leadership buy-in was critical</strong>: The support chain included my direct manager Andrew Giessel and Dave Johnson, our Chief Data and AI Officer. When I implemented our standardized project structure, Dave personally reviewed the pull request. His comment – "I love the user-facing emojis" – showed me he had actually read my code and was supportive of this change.</li>
+<li><strong>Evolution through multiple iterations</strong>: We started with a basic template that codified our best practices, each time making things better. Because we have so many repos flying around, we don't worry about upgrading all of them at once, but instead opportunistically update them when we get back to touching them.</li>
+<li><strong>Empowering others to contribute</strong>: If someone finds a pain point, I guide them through the process for improving our command-line interface tools. The benefit is that shared knowledge grows and spreads.</li>
+<li><strong>Documentation of ways-of-working</strong>: We leverage our two-day quarterly docathons to improve documentation for the long haul.</li>
+</ul>
+<p>The command-line tooling we've developed isn't just my project – it's now shared with the ML platform team, and data scientists actively make code changes to it. We "dog food" our own tools, which is incredibly empowering. You've got to give power back to the frontliners so they can make the changes they need to move at the speed they want.</p>
+<p>Sustainable change requires leadership support, frontline champions, visible benefits, and evolution at a pace teams can absorb.</p>
+<h2 id="balancing-standards-with-innovation">Balancing Standards with Innovation</h2><p>The perceived tension between standardization and creativity is often a false dichotomy. Well-designed standards actually create freedom through constraints.</p>
+<p>At Moderna, we've found this balance by being intentional about where we apply standards:</p>
+<ul>
+<li><strong>Areas where we apply standardization</strong>:<ul>
+<li>Project structure and organization</li>
+<li>Deployment pipelines and processes</li>
+<li>Documentation formats and expectations</li>
+<li>Code review and quality check workflows</li>
+</ul>
+</li>
+<li><strong>Areas where we preserve flexibility</strong>:<ul>
+<li>Algorithm selection and implementation</li>
+<li>Analysis approaches and methodologies</li>
+<li>Visualization choices and design</li>
+<li>Local development environment preferences</li>
+</ul>
+</li>
+</ul>
+<p>The key insight is <strong>focusing standardization on interfaces, not implementations</strong>. You're free to use whatever Python packages you need, but by standardizing on the language and the structure, we can make it easier to jump in and help each other.</p>
+<p>In doing so, we help make data science teams fly by:</p>
+<ul>
+<li>Eliminating decision fatigue on routine aspects of projects</li>
+<li>Reducing cognitive load from context-switching between different project structures</li>
+<li>Automating repeatable processes, freeing mental energy for scientific challenges</li>
+<li>Enabling faster onboarding and collaboration, reducing time spent explaining project basics</li>
+<li>Creating predictable workflows where scientists can anticipate next steps rather than inventing them</li>
+</ul>
+<h2 id="ai-assisted-coding">AI-Assisted Coding</h2><p>Though not a focus of my talk, many asked about AI-assisted coding. This is completely ingrained at Moderna – everyone has access to ChatGPT Enterprise (that's public knowledge), and every developer who asks for GitHub Copilot gets it. We're developing extensive documentation on how to productively use AI assistance in daily coding.</p>
+<p>The testimonials are powerful. Just yesterday, I interviewed a DevOps engineer who's doing three to four people's worth of work and coasting because of GitHub Copilot in agent mode. It's the ultimate productivity tool if you know how to wield it properly.</p>
+<h2 id="final-thoughts">Final Thoughts</h2><p>What's particularly powerful about our approach is that it can be implemented with minimal vendor dependencies. At Moderna, our data science and deployment infrastructure is built almost entirely on open-source tools — our only significant software expenses are AWS, GitHub Enterprise, and GitHub Copilot. This deliberate choice to avoid vendor lock-in provides significant cost savings and the flexibility to adapt quickly as the scientific landscape changes.</p>
+<p>The ultimate goal isn't standardization for its own sake — it's creating an environment where data scientists can do their best thinking and most innovative work. When done right, good standards don't constrain scientists; they liberate them.</p>
+<p>It's taken three and a half years of my life at Moderna to build this culture, but it's been worth it. I'm optimistic about our future regardless of the stock price – I'm long on the technology, and concomitantly, I would love to see science run at the speed of thought!</p>
+<p>Thanks for coming to my TED Talk! :)</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-how-to-standardize-data-science-ways-of-working-to-unlock-your-teams-creativity</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{How to standardize Data Science ways of working to unlock your team&#39;s creativity}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{04}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{02}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/4/2/how-to-standardize-data-science-ways-of-working-to-unlock-your-teams-creativity}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>
