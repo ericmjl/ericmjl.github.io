@@ -1,0 +1,1054 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="A Developer-First Guide to LLM APIs (March 2023)">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/a-developer-first-guide-to-llm-apis-march-2023' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>A Developer-First Guide to LLM APIs (March 2023) - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">A Developer-First Guide to LLM APIs (March 2023)</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2023-03-29</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llms/">
+        llms
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/large language models/">
+        large language models
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/gpt/">
+        gpt
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/gpt4/">
+        gpt4
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/openai/">
+        openai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/langchain/">
+        langchain
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llama_index/">
+        llama_index
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>I built one application using three different GPT libraries 📚,
+and figured out that it can give me a 100X ROI! 💰
+In this blog post, I compare their outputs, developer experiences,
+and ⏰ discuss how future application developments may look.
+Curious about the future of GPT and its value proposition? 🚀</p>
+<p>(The summary and title were generated by GPT-4 and edited by me.)</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Large Language Models (LLMs) are having a moment now!
+We can interact with them programmatically in three ways:
+OpenAI's official API,
+LangChain's abstractions,
+and LlamaIndex.
+How do we choose among the three?
+I'd like to use a minimally complex example to showcase how we might make this decision.</p>
+<h2 id="the-problem">The Problem</h2><p>I blog.</p>
+<p>(Ok, well, that's quite the understatement, given that you're reading it right now.)</p>
+<p>As you probably can tell from my blog's design,
+I need to summarize the blog post for the blog landing page.
+Because I usually share the post on LinkedIn,
+I also need to generate a LinkedIn post advertising the blog post.
+I've heard that emojis are great when sharing posts on LinkedIn,
+but I can only sometimes remember the names of appropriate emojis.
+Some automation help would be great here.
+Finally, if I can make a better title than I initially thought of,
+that would also constitute an improvement.</p>
+<p>I've decided that I wanted a tool that can summarize my blog posts,
+generate appropriately emojified LinkedIn posts for me to advertise those posts,
+and provide a catchy and engaging title without being clickbait.
+These are tedious to write!
+Wouldn't it be great to have a tool that can generate both?
+That's the use case for LLMs!</p>
+<h2 id="desiderata">Desiderata</h2><p>Here's the list of requirements I have to build the tool I want.</p>
+<p>Firstly, I should be able to provide the <em>text</em> of a blog post as input and get back:</p>
+<ol>
+<li>A proposed title according to my desired specifications,</li>
+<li>A summary to put onto my website's blog listing page, and</li>
+<li>A LinkedIn post that I can use to share with others.</li>
+</ol>
+<p>Secondly, the tool should minimize token usage.
+Tokens equal money spent on this task,
+so saving on token usage would increase my leverage trading time for money.</p>
+<p>Finally, because I'm still writing some code to implement this tool,
+I'd like to use a package that would provide the most easily maintained code.
+Of course, that means a subjective judgment of how simple the abstractions are.</p>
+<p>To that end, I will show how to implement this writing tool using three APIs currently available:
+the official OpenAI Python API, the LangChain API, and the LlamaIndex API.
+This exercise lets us see which ones are most suitable for this particular use case.
+We will be using GPT-4 everywhere, as its quality is known to be superior to GPT-3.5.
+Finally, I will focus on blog post summary generation and LinkedIn post generation
+when comparing the APIs before choosing one framework to implement the complete program.</p>
+<h2 id="the-test-blog-post">The test blog post</h2><p>The blog post I'll use for implementing this is my most recent one on the Arc browser.
+I will be passing in the Lektor raw source without the title.
+The raw source is available on <a href="https://raw.githubusercontent.com/ericmjl/website/main/content/blog/arc-browser-first-impressions/contents.lr">my website repository</a>.</p>
+<p>According to <a href="https://github.com/openai/tiktoken"><code>tiktoken</code></a>,
+this text uses 1436 tokens to encode:</p>
+<div class="hll"><pre><span></span><span class="n">blog_text</span> <span class="o">=</span> <span class="o">...</span> <span class="c1"># taken from my raw source.</span>
+
+<span class="n">encoder</span> <span class="o">=</span> <span class="n">tiktoken</span><span class="o">.</span><span class="n">get_encoding</span><span class="p">(</span><span class="s2">&quot;cl100k_base&quot;</span><span class="p">)</span>
+<span class="n">tokens</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">blog_text</span><span class="p">)</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+</pre></div>
+<div class="hll"><pre><span></span>1436
+</pre></div>
+<p>This is a constant throughout the post.</p>
+<h2 id="prompts">Prompts</h2><p>The prompts that I will use to generate the desired text are as follows.
+If the three prompts are too long to remember,
+you can focus on the one for summarization as an anchoring example.</p>
+<h3 id="summary">Summary</h3><div class="hll"><pre><span></span><span class="n">summarization_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;You are a blog post summarization bot.</span>
+<span class="s2">Your take a blog post and write a summary of it.</span>
+<span class="s2">The summary is intended to hook a reader into the blog post and entice them to read it.</span>
+<span class="s2">You should add in emojis where appropriate.</span>
+
+<span class="s2">My previous summaries sounded like this:</span>
+
+<span class="s2">1. I finally figured out how to programmatically create Google Docs using Python. Along the way, I figured out service accounts, special HTML tags, and how to set multi-line environment variables. Does that tickle your brain?</span>
+<span class="s2">2. Here is my personal experience creating an app for translating Ark Channel devotionals using OpenAI&#39;s GPT-3. In here, I write about the challenges I faced and the lessons I learned! I hope it is informative for you!</span>
+<span class="s2">3. I discuss two Twitter threads that outline potential business ideas that could be built on top of ChatGPT3, a chatbot-based language model. What&#39;s the tl;dr? As mankind has done over and over, we build machines to solve mundane and repetitive tasks, and ChatGPT3 and other generative models are no exception!</span>
+
+<span class="s2">The summary you generate should match the tone and style of the previously-generated ones.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+</pre></div>
+<h3 id="linkedin-post-prompt">LinkedIn Post Prompt</h3><div class="hll"><pre><span></span><span class="n">linkedin_prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;You are a LinkedIn post generator bot.</span>
+<span class="s2">You take a blog post and write a LinkedIn post.</span>
+<span class="s2">The post is intended to hook a reader into reading the blog post.</span>
+<span class="s2">The LinkedIn post should be written with one line per sentence.</span>
+<span class="s2">Each sentence should begin with an emoji appropriate to that sentence.</span>
+<span class="s2">The post should be written in professional English and in first-person tone.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+</pre></div>
+<h3 id="title-prompt">Title Prompt</h3><div class="hll"><pre><span></span><span class="n">title_prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;You are a blog post title generator.</span>
+<span class="s2">You take a blog post and write a title for it.</span>
+<span class="s2">The title should be short, ideally less than 100 characters.</span>
+<span class="s2">It should be catchy but not click-baity,</span>
+<span class="s2">free from emojis, and should intrigue readers,</span>
+<span class="s2">making them want to read the summary and the post itself.</span>
+<span class="s2">Ensure that the title accurately captures</span>
+<span class="s2">the contents of the post.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+</pre></div>
+<h2 id="setup-api-key">Setup API key</h2><p>Using OpenAI’s API requires we set the OpenAI API key before doing anything;
+this is also true for using LangChain and LlamaIndex.
+As always, to adhere to reasonable security practices when developing locally,
+we should store the API key as an environment variable in a <code>.env</code> file
+listed in the <code>.gitignore</code>of a repository
+and then load the API key in our Jupyter notebooks.
+Here is how we implement it. Firstly, the <code>.env</code> file:</p>
+<div class="hll"><pre><span></span><span class="w"> </span><span class="c1"># .env</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">OPENAI_API_KEY</span><span class="o">=</span><span class="s2">&quot;...&quot;</span>
+</pre></div>
+<p>And then, at the top of our Jupyter notebook or Python script:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">openai</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="n">load_dotenv</span><span class="p">()</span>
+
+<span class="n">openai</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">)</span>
+</pre></div>
+<h2 id="implementation-using-openai-s-api">Implementation using OpenAI's API</h2><h3 id="summarization">Summarization</h3><p>Let’s start off using the OpenAI Python API. To use GPT-4, we need to provide a chat history of messages that looks something like this:</p>
+<div class="hll"><pre><span></span><span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">summarization_prompt</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Here is my blog post source: </span><span class="si">{</span><span class="n">blog_post</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="p">]</span>
+</pre></div>
+<p>Then, we pass the message history into the OpenAI chat completion class</p>
+<div class="hll"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4&quot;</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+</pre></div>
+<p>Once the API call has returned, we can see what gets returned:</p>
+<div class="hll"><pre><span></span><span class="n">summary</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;message&quot;</span><span class="p">][</span><span class="s2">&quot;content&quot;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+</pre></div>
+<div class="hll"><pre><span></span>I recently got my hands on the new [Arc browser](https://arc.net/) and I&#39;m loving it! 🤩 Arc reimagines the browser as a workspace, helping us manage our chaotic tabs and multiple projects. Some cool features include tabs that expire ⏳, spaces for grouping tabs 🗂️, rapid switching between tabbed and full-screen mode 🖥️, side-by-side view for multitasking 📑, and automatic developer mode for locally hosted sites 🔧. Arc&#39;s focus on UI design is a game-changer for productivity and focus! Check out my first impressions and see if Arc could be your new favorite browser! 🚀
+</pre></div>
+<p>The total number of tokens used here is:</p>
+<div class="hll"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">summarization_prompt</span><span class="p">))</span> \
+<span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">human_message</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]))</span> \
+<span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">summary</span><span class="p">))</span>
+</pre></div>
+<div class="hll"><pre><span></span>1870
+</pre></div>
+<h3 id="linkedin-post">LinkedIn Post</h3><p>Now, let's make the LinkedIn post.</p>
+<div class="hll"><pre><span></span><span class="n">linkedin_prompt</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">linkedin_prompt</span><span class="p">}</span>
+<span class="n">messages</span> <span class="o">=</span> <span class="p">[</span><span class="n">linkedin_prompt</span><span class="p">,</span> <span class="n">human_message</span><span class="p">]</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4&quot;</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">linkedin_post</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;message&quot;</span><span class="p">][</span><span class="s2">&quot;content&quot;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">linkedin_post</span><span class="p">)</span>
+</pre></div>
+<div class="hll"><pre><span></span>🚀 Just tried the new [Arc browser](https://arc.net/) for 24 hours!
+
+🧠 It&#39;s designed to fit the modern multitasker&#39;s brain.
+
+⏳ Love the tabs that expire feature - goodbye clutter!
+
+🌐 Spaces for grouping tabs - perfect for juggling multiple projects.
+
+🔍 Rapid switching between tabbed and full-screen mode for better focus.
+
+📏 Side-by-side view for efficient multitasking.
+
+👨‍💻 Automatic developer mode for locally hosted sites - a developer&#39;s dream!
+
+🌟 Overall, Arc is a game-changer for productivity and focus.
+
+📖 Read my full experience in the blog post [here](&lt;blog_post_link&gt;).
+</pre></div>
+<p>The total number of tokens used here is:</p>
+<div class="hll"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">linkedin_prompt</span><span class="p">))</span> \
+<span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">human_message</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]))</span> \
+<span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">linkedin_post</span><span class="p">))</span>
+</pre></div>
+<div class="hll"><pre><span></span>1669
+</pre></div>
+<h3 id="cost-accounting">Cost Accounting</h3><p>Tabulating the total cost of tokens,
+we have 3c per 1,000 tokens for prompts
+and 6c per 1,000 token for generated texts.
+We can do the math easily here:</p>
+<div class="hll"><pre><span></span><span class="c1"># Cost</span>
+<span class="n">prompt_encoding_lengths</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">linkedin_prompt</span><span class="p">))</span> \
+    <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">human_message</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]))</span> \
+    <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">summarization_prompt</span><span class="p">))</span> \
+    <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">human_message</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]))</span>
+<span class="p">)</span>
+
+<span class="n">generated_encoding_lengths</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">linkedin_post</span><span class="p">))</span> <span class="o">+</span> \
+    <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">summary</span><span class="p">))</span>
+<span class="p">)</span>
+
+<span class="n">cost</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="mf">0.03</span> <span class="o">*</span> <span class="n">prompt_encoding_lengths</span> <span class="o">+</span> <span class="mf">0.06</span> <span class="o">*</span> <span class="n">generated_encoding_lengths</span>
+<span class="p">)</span> <span class="o">/</span> <span class="mi">1000</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span>
+</pre></div>
+<div class="hll"><pre><span></span><span class="mf">0.11657999999999999</span>
+</pre></div>
+<p>Or about 12c to perform this operation.</p>
+<p>How much ROI do we get here?
+Excluding benefits, equity, and more, a new Ph.D. grad data scientist
+is paid about <code>$150,000</code> (give or take) per year in the biomedical industry in 2023.
+Assuming about 250 days of work per year at an average of 8 hours per day,
+we're talking about an hourly rate of <code>$75</code>/hr at that salary.
+If it takes that person 10 minutes to cook up a summary and LinkedIn post
+(which is about how long I take -
+excluding figuring out what emojis to put in
+because that's, for me, bloody time-consuming.),
+then we're looking at <code>$12.5</code> worth of time put into crafting that post.
+Looking at just the cold hard numbers,
+<strong>we're looking at a 100X cost improvement by using GPT-4 as a writing aid.</strong></p>
+<h2 id="implementation-using-langchain-s-api">Implementation using LangChain's API</h2><p>Now, let's do the same thing, except with the LangChain API. Here, we'll be using LangChain's Chain API.</p>
+<h3 id="summarization">Summarization</h3><p>First off, summarization:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">langchain.chains</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLMChain</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain.prompts.chat</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ChatPromptTemplate</span><span class="p">,</span>
+    <span class="n">HumanMessagePromptTemplate</span><span class="p">,</span>
+    <span class="n">SystemMessagePromptTemplate</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain.prompts</span><span class="w"> </span><span class="kn">import</span> <span class="n">PromptTemplate</span>
+
+<span class="n">system_message_prompt</span> <span class="o">=</span> <span class="n">SystemMessagePromptTemplate</span><span class="p">(</span>
+    <span class="n">prompt</span><span class="o">=</span><span class="n">PromptTemplate</span><span class="p">(</span>
+        <span class="n">template</span><span class="o">=</span><span class="n">summarization_prompt</span><span class="p">,</span>
+    <span class="n">input_variables</span><span class="o">=</span><span class="p">[],</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain.chat_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatOpenAI</span>
+
+
+<span class="n">chat</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;gpt-4&quot;</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="n">human_message_prompt</span> <span class="o">=</span> <span class="n">HumanMessagePromptTemplate</span><span class="p">(</span>
+    <span class="n">prompt</span><span class="o">=</span><span class="n">PromptTemplate</span><span class="p">(</span>
+        <span class="n">template</span><span class="o">=</span><span class="s2">&quot;Here is my post:</span><span class="se">\n\n</span><span class="s2"> </span><span class="si">{blog_post}</span><span class="s2">?&quot;</span><span class="p">,</span>
+        <span class="n">input_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;blog_post&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">chat_prompt_template</span> <span class="o">=</span> <span class="n">ChatPromptTemplate</span><span class="o">.</span><span class="n">from_messages</span><span class="p">([</span><span class="n">system_message_prompt</span><span class="p">,</span> <span class="n">human_message_prompt</span><span class="p">])</span>
+<span class="n">summary_chain</span> <span class="o">=</span> <span class="n">LLMChain</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="n">chat</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="n">chat_prompt_template</span><span class="p">)</span>
+<span class="n">summary</span> <span class="o">=</span> <span class="n">summary_chain</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">blog_post</span><span class="o">=</span><span class="n">blog_text</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+</pre></div>
+<div class="hll"><pre><span></span>I recently tried out the Arc browser 🌐, which reimagines the browser as a workspace to boost productivity! 🚀 After 24 hours of use, I&#39;m loving its features: tabs that expire ⏳, spaces for organizing tabs 🗂️, rapid switching between tabbed and full-screen mode 🖥️, side-by-side view for multitasking 📑, and automatic developer mode for locally hosted sites 💻. Arc&#39;s focus on UI design helps us stay focused and organized in our digital lives. Curious to know more? Dive into my first impressions! 😃
+</pre></div>
+<p>According to tiktoken:</p>
+<div class="hll"><pre><span></span>len(encoder.encode(summary))
+</pre></div>
+<p>The generated text was 191 tokens.</p>
+<div class="hll"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">system_message_prompt</span><span class="o">.</span><span class="n">format_messages</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">content</span><span class="p">))</span>
+</pre></div>
+<p>The system prompt was 237 tokens.</p>
+<div class="hll"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">human_message_prompt</span><span class="o">.</span><span class="n">format_messages</span><span class="p">(</span><span class="n">blog_post</span><span class="o">=</span><span class="n">blog_text</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">content</span><span class="p">))</span>
+</pre></div>
+<p>The human message prompt was 1442.</p>
+<p>We'll keep those numbers in mind when doing the final cost accounting.</p>
+<h3 id="linkedin-post">LinkedIn Post</h3><p>Now, let's make the LinkedIn post.</p>
+<div class="hll"><pre><span></span><span class="n">linkedin_system_prompt</span> <span class="o">=</span> <span class="n">SystemMessagePromptTemplate</span><span class="p">(</span>
+    <span class="n">prompt</span><span class="o">=</span><span class="n">PromptTemplate</span><span class="p">(</span>
+        <span class="n">template</span><span class="o">=</span><span class="n">linkedin_prompt</span><span class="p">,</span>
+    <span class="n">input_variables</span><span class="o">=</span><span class="p">[],</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">linkedin_blog_prompt</span> <span class="o">=</span> <span class="n">HumanMessagePromptTemplate</span><span class="p">(</span>
+    <span class="n">prompt</span><span class="o">=</span><span class="n">PromptTemplate</span><span class="p">(</span>
+        <span class="n">template</span><span class="o">=</span><span class="s2">&quot;Here is the blog post:</span><span class="se">\n\n</span><span class="si">{blog_post}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">input_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;blog_post&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">linkedin_chat_prompt_template</span> <span class="o">=</span> <span class="n">ChatPromptTemplate</span><span class="o">.</span><span class="n">from_messages</span><span class="p">([</span><span class="n">linkedin_system_prompt</span><span class="p">,</span> <span class="n">linkedin_blog_prompt</span><span class="p">])</span>
+
+<span class="n">linkedin_chain</span> <span class="o">=</span> <span class="n">LLMChain</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="n">chat</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="n">linkedin_chat_prompt_template</span><span class="p">)</span>
+
+<span class="n">linkedin_post</span> <span class="o">=</span> <span class="n">linkedin_chain</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">blog_post</span><span class="o">=</span><span class="n">blog_text</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">linkedin_post</span><span class="p">)</span>
+</pre></div>
+<div class="hll"><pre><span></span>🎉 Just tried the new [Arc browser](https://arc.net/) and I&#39;m loving it! 🧠
+
+🕒 Arc&#39;s unique features like tabs that expire and spaces for different projects help me stay focused and organized. 📌
+
+🚀 Check out my blog post for a detailed review and first impressions of this game-changing browser: [Arc Browser: First Impressions](&lt;blog post link&gt;) 🌐
+
+👨‍💻 Are you ready to revolutionize your browsing experience? #ArcBrowser #Productivity #Tools
+</pre></div>
+<p>Doing an accounting of the tokens once again:</p>
+<div class="hll"><pre><span></span>len(encoder.encode(linkedin_post))
+</pre></div>
+<p>The generated LinkedIn post used 151 generated tokens.</p>
+<div class="hll"><pre><span></span>len(encoder.encode(linkedin_blog_prompt.format_messages(blog_post=blog_text)[0].content))
+</pre></div>
+<p>The blog post prompt itself used 1441 prompt tokens.</p>
+<div class="hll"><pre><span></span>len(encoder.encode(linkedin_system_prompt.format_messages()[0].content))
+</pre></div>
+<p>And the system prompt used 71 tokens.</p>
+<h3 id="cost-accounting">Cost Accounting</h3><p>As usual, let's do the accounting of tokens.</p>
+<div class="hll"><pre><span></span><span class="c1"># Cost Accounting</span>
+<span class="n">generated_encodings_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">linkedin_post</span><span class="p">))</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">summary</span><span class="p">))</span>
+
+<span class="n">prompt_lengths</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">human_message_prompt</span><span class="o">.</span><span class="n">format_messages</span><span class="p">(</span><span class="n">blog_post</span><span class="o">=</span><span class="n">blog_text</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">content</span><span class="p">))</span> \
+    <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">system_message_prompt</span><span class="o">.</span><span class="n">format_messages</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">content</span><span class="p">))</span> \
+    <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">linkedin_blog_prompt</span><span class="o">.</span><span class="n">format_messages</span><span class="p">(</span><span class="n">blog_post</span><span class="o">=</span><span class="n">blog_text</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">content</span><span class="p">))</span> \
+    <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">linkedin_system_prompt</span><span class="o">.</span><span class="n">format_messages</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">content</span><span class="p">))</span>
+<span class="p">)</span>
+
+<span class="n">cost</span> <span class="o">=</span> <span class="mf">0.03</span> <span class="o">*</span> <span class="n">prompt_lengths</span> <span class="o">+</span> <span class="mf">0.06</span> <span class="o">*</span> <span class="n">generated_encodings_length</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cost</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+<div class="hll"><pre><span></span><span class="mf">0.11648999999999998</span>
+</pre></div>
+<p>As we can see, this also costs about 12c for the entire exercise.</p>
+<h2 id="implementation-using-llamaindex">Implementation using LlamaIndex</h2><p>The way LlamaIndex works is different from the previous two frameworks.
+With OpenAI's and LangChain's APIs, we stuffed the entire document into the prompt for each task.
+With LlamaIndex, we can embed and store the text beforehand
+and then query it with a prompt for our LLM. Here is how it looks:</p>
+<h3 id="embed-text">Embed Text</h3><p>To do this, we use the <code>GPTSimpleVectorIndex</code> provided by LlamaIndex:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llama_index</span><span class="w"> </span><span class="kn">import</span> <span class="n">Document</span><span class="p">,</span> <span class="n">GPTSimpleVectorIndex</span><span class="p">,</span> <span class="n">LLMPredictor</span>
+
+<span class="c1"># Index documents using GPT4</span>
+<span class="n">llm_predictor</span> <span class="o">=</span> <span class="n">LLMPredictor</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="n">chat</span><span class="p">)</span>
+<span class="n">documents</span> <span class="o">=</span> <span class="p">[</span><span class="n">Document</span><span class="p">(</span><span class="n">blog_text</span><span class="p">)]</span>
+<span class="n">index</span> <span class="o">=</span> <span class="n">GPTSimpleVectorIndex</span><span class="p">(</span><span class="n">documents</span><span class="o">=</span><span class="n">documents</span><span class="p">,</span> <span class="n">llm_predictor</span><span class="o">=</span><span class="n">llm_predictor</span><span class="p">)</span>
+</pre></div>
+<p>Thanks to the built-in token accounting capabilities of LlamaIndex, we can see that building the index costed us 1637 tokens.</p>
+<div class="hll"><pre><span></span>INFO:llama_index.token_counter.token_counter:&gt; [build_index_from_documents] Total LLM token usage: 0 tokens
+INFO:llama_index.token_counter.token_counter:&gt; [build_index_from_documents] Total embedding token usage: 1637 tokens
+</pre></div>
+<h3 id="summarization">Summarization</h3><p>Let's start by creating a summary of the blog post.</p>
+<div class="hll"><pre><span></span><span class="n">response</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">summarization_prompt</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">response</span><span class="p">)</span>
+</pre></div>
+<div class="hll"><pre><span></span>Discover the Arc browser, a game-changer that reimagines the browser as a workspace 🌐! With features like tabs that expire ⏳, spaces for grouping tabs 📁, rapid switching between modes ⚡, side-by-side view 👀, and automatic developer mode for locally hosted sites 🔧, Arc is designed to boost your productivity and focus 🚀. Dive into my 24-hour experience with this innovative browser and see how it fits my brain 🧠!
+</pre></div>
+<p>Not bad! The response looks pretty good, though I might edit it a bit further.</p>
+<p>The token usage here is:</p>
+<div class="hll"><pre><span></span>INFO:llama_index.token_counter.token_counter:&gt; [query] Total LLM token usage: 2026 tokens
+INFO:llama_index.token_counter.token_counter:&gt; [query] Total embedding token usage: 257 tokens
+</pre></div>
+<h3 id="linkedin-post-generation">LinkedIn Post Generation</h3><p>Now, let's try generating a LinkedIn post the same way.</p>
+<div class="hll"><pre><span></span><span class="n">response</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">linkedin_prompt</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">response</span><span class="p">)</span>
+</pre></div>
+<div class="hll"><pre><span></span>🚀 Just tried the new Arc browser for 24 hours!
+🌟 It reimagines the browser as a workspace, perfect for multitaskers.
+⏰ Love the tabs that expire feature, keeping my workspace clutter-free.
+🌈 Spaces help me group tabs by context, boosting focus and productivity.
+🖥️ Rapid switching between tabbed and full-screen mode is a game-changer.
+👩‍💻 Developer mode for locally hosted sites makes web development a breeze.
+🔗 Check out my detailed review on my blog and see how Arc can transform your browsing experience!
+</pre></div>
+<p>Not bad, it followed my instructions as well.</p>
+<p>Here's the token usage:</p>
+<div class="hll"><pre><span></span>INFO:llama_index.token_counter.token_counter:&gt; [query] Total LLM token usage: 1874 tokens
+INFO:llama_index.token_counter.token_counter:&gt; [query] Total embedding token usage: 78 tokens
+</pre></div>
+<h3 id="cost-accounting">Cost Accounting</h3><p>LlamaIndex did not break down the difference in prompt tokens vs. generated text tokens for me
+but split out embedding tokens.
+In calculating the cost, we will make the following assumptions:</p>
+<ul>
+<li>the cost of embedding tokens to be <a href="https://platform.openai.com/docs/guides/embeddings/what-are-embeddings">$0.0004 per 1000 tokens</a>,</li>
+<li>of the LLM token usage budget, the part used for prompting can be calculated by subtracting the number of tokens used to encode the output from the reported LLM token usage.</li>
+</ul>
+<p>Crunching the numbers, we get:</p>
+<div class="hll"><pre><span></span><span class="n">embedding_tokens</span> <span class="o">=</span> <span class="mi">1637</span> <span class="o">+</span> <span class="mi">257</span> <span class="o">+</span> <span class="mi">78</span>
+
+<span class="n">linkedin_llm_tokens</span> <span class="o">=</span> <span class="mi">1874</span>
+<span class="n">linkedin_generated_tokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">response</span><span class="p">))</span>
+
+<span class="n">summary_llm_tokens</span> <span class="o">=</span> <span class="mi">2026</span>
+<span class="n">summary_generated_tokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">summary_response</span><span class="o">.</span><span class="n">response</span><span class="p">))</span>
+
+<span class="n">llm_tokens_cost</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.06</span> <span class="o">*</span> <span class="p">(</span><span class="n">linkedin_generated_tokens</span> <span class="o">+</span> <span class="n">summary_generated_tokens</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.03</span> <span class="o">*</span> <span class="p">(</span><span class="n">linkedin_llm_tokens</span> <span class="o">-</span> <span class="n">linkedin_generated_tokens</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.03</span> <span class="o">*</span> <span class="p">(</span><span class="n">summary_llm_tokens</span> <span class="o">-</span> <span class="n">summary_generated_tokens</span><span class="p">))</span> <span class="o">/</span> <span class="mi">1000</span>
+
+<span class="n">embedding_tokens_cost</span> <span class="o">=</span> <span class="n">embedding_tokens</span> <span class="o">*</span> <span class="mf">0.0004</span> <span class="o">/</span> <span class="mi">1000</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cost: </span><span class="si">{</span><span class="n">llm_tokens_cost</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">embedding_tokens_cost</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+<div class="hll"><pre><span></span>Cost: 0.1243588
+</pre></div>
+<p>Also about 12c for this exercise.</p>
+<h2 id="generated-text-comparison">Generated Text Comparison</h2><h3 id="summarization">Summarization</h3><p>Here are the generated texts for summarization side-by-side:</p>
+<h4 id="openai-s-summarization">OpenAI's Summarization</h4><div class="hll"><pre><span></span>I recently got my hands on the new [Arc browser](https://arc.net/) and I&#39;m loving it! 🤩 Arc reimagines the browser as a workspace, helping us manage our chaotic tabs and multiple projects. Some cool features include tabs that expire ⏳, spaces for grouping tabs 🗂️, rapid switching between tabbed and full-screen mode 🖥️, side-by-side view for multitasking 📑, and automatic developer mode for locally hosted sites 🔧. Arc&#39;s focus on UI design is a game-changer for productivity and focus! Check out my first impressions and see if Arc could be your new favorite browser! 🚀
+</pre></div>
+<h4 id="langchain-s-summarization">LangChain's Summarization</h4><div class="hll"><pre><span></span>I recently tried out the Arc browser 🌐, which reimagines the browser as a workspace to boost productivity! 🚀 After 24 hours of use, I&#39;m loving its features: tabs that expire ⏳, spaces for organizing tabs 🗂️, rapid switching between tabbed and full-screen mode 🖥️, side-by-side view for multitasking 📑, and automatic developer mode for locally hosted sites 💻. Arc&#39;s focus on UI design helps us stay focused and organized in our digital lives. Curious to know more? Dive into my first impressions! 😃
+</pre></div>
+<h4 id="llamaindex-s-summarization">LlamaIndex's Summarization</h4><div class="hll"><pre><span></span>Discover the Arc browser, a game-changer that reimagines the browser as a workspace 🌐! With features like tabs that expire ⏳, spaces for grouping tabs 📁, rapid switching between modes ⚡, side-by-side view 👀, and automatic developer mode for locally hosted sites 🔧, Arc is designed to boost your productivity and focus 🚀. Dive into my 24-hour experience with this innovative browser and see how it fits my brain 🧠!
+</pre></div>
+<h4 id="style-verdict">Style verdict</h4><p>Of the three, LlamaIndex's style is the furthest from my usual style,
+though, in some instances, I might choose the style generated by LlamaIndex to change things up on my blog.</p>
+<h3 id="linkedin-post-generation">LinkedIn Post Generation</h3><h4 id="openai-s-post">OpenAI's Post</h4><div class="hll"><pre><span></span>🚀 Just tried the new [Arc browser](https://arc.net/) for 24 hours!
+
+🧠 It&#39;s designed to fit the modern multitasker&#39;s brain.
+
+⏳ Love the tabs that expire feature - goodbye clutter!
+
+🌐 Spaces for grouping tabs - perfect for juggling multiple projects.
+
+🔍 Rapid switching between tabbed and full-screen mode for better focus.
+
+📏 Side-by-side view for efficient multitasking.
+
+👨‍💻 Automatic developer mode for locally hosted sites - a developer&#39;s dream!
+
+🌟 Overall, Arc is a game-changer for productivity and focus.
+
+📖 Read my full experience in the blog post [here](&lt;blog_post_link&gt;).
+</pre></div>
+<h4 id="langchain-s-post">LangChain's Post</h4><div class="hll"><pre><span></span>🎉 Just tried the new [Arc browser](https://arc.net/) and I&#39;m loving it! 🧠
+
+🕒 Arc&#39;s unique features like tabs that expire and spaces for different projects help me stay focused and organized. 📌
+
+🚀 Check out my blog post for a detailed review and first impressions of this game-changing browser: [Arc Browser: First Impressions](&lt;blog post link&gt;) 🌐
+
+👨‍💻 Are you ready to revolutionize your browsing experience? #ArcBrowser #Productivity #Tools
+</pre></div>
+<h4 id="llamaindex-s-post">LlamaIndex's Post</h4><div class="hll"><pre><span></span>🚀 Just tried the new Arc browser for 24 hours!
+🌟 It reimagines the browser as a workspace, perfect for multitaskers.
+⏰ Love the tabs that expire feature, keeping my workspace clutter-free.
+🌈 Spaces help me group tabs by context, boosting focus and productivity.
+🖥️ Rapid switching between tabbed and full-screen mode is a game-changer.
+👩‍💻 Developer mode for locally hosted sites makes web development a breeze.
+🔗 Check out my detailed review on my blog and see how Arc can transform your browsing experience!
+</pre></div>
+<h4 id="style-verdict">Style Verdict</h4><p>Of the three, OpenAI's is furthest from how I usually write my LinkedIn posts,
+but in fairness, I didn't instruct the model with examples provided.
+If I were to choose, I would pick LlamaIndex's generated post.</p>
+<h2 id="developer-experience-dx">Developer Experience (DX)</h2><p>For this simple use case, which would I go with? LlamaIndex, OpenAI's official API, or LangChain?</p>
+<p>As a lazy programmer, I would go with LlamaIndex.
+That's because I needed the fewest lines of code to reach my desired endpoints.
+It is easy to remember the API as well - you only need to remember the pattern:</p>
+<ol>
+<li><code>Document</code> to wrap the text that we imported,</li>
+<li><code>GPTSimpleVectorIndex</code> (or more generically <code>&lt;some&gt;Index</code>), and</li>
+<li><code>LLMPredictor</code> to wrap around LangChain's LLMs.</li>
+<li><code>&lt;Index&gt;.query(prompt)</code></li>
+</ol>
+<p>The biggest reason why LlamaIndex is best suited to this use case is that
+querying text is a relatively simple use case.
+We only need to load the document in a query-able fashion.
+Furthermore, as you can see from my code above,
+using LlamaIndex resulted in the least boilerplate code.</p>
+<p>That said, is LlamaIndex the right choice for every application?
+Probably not.
+As of March 2023, LangChain is geared towards much more complex (and autonomous) LLM use cases.
+So the abstractions that the library creators put in the library may be geared
+to design larger LLM applications rather than simple ones like we just did.
+And OpenAI's API is officially supported,
+which means it would likely have an official "blessing" in the long run.</p>
+<p>I have a penchant/bias for more tightly-controlled LLM applications,
+which means forgoing a chat interface in favour of a single-text-in-single-text-out interface.
+Indeed, while I see the usefulness of chat-based interfaces for exploration,
+I don't think it will become the dominant UI when embedding LLMs in applications.
+Rather, I predict that we'll see UI/UX researchers designing, on a per-application basis,
+whether to use a free-flowing chat UI or to use a more tightly controlled ad-lib-style interface,
+or <a href="https://twitter.com/thesephist/status/1587929014848540673">even</a>
+<a href="https://twitter.com/thesephist/status/1592241959489380354">crazier</a>
+<a href="https://twitter.com/thesephist/status/1590545448066252800">interfaces</a>!
+The factor that should matter the most here is the ROI gained in human time.</p>
+<p>Additionally, I predict that we will see data science teams use LLMs
+to bang out dozens of little utility apps much faster than previously possible.
+These utility apps will likely serve niche-specific but often-repeated use cases,
+and may serve as the basis of larger applications that get developed.
+For example, we'll probably see built apps that let users ad-lib a templated prompt.
+We'll see things like LLMs being the role of data engineer
+(e.g. <a href="https://ericmjl.github.io/blog/2023/2/5/building-a-gpt3-based-translation-app/">structuring data from unstructured text</a>)
+and domain-specific idea generators prompted by domain experts or domain needs (as we saw here),</p>
+<p>The short answer is that we'll see more customization to local contexts,
+with highest ROI use cases being prioritized.</p>
+<h2 id="caveats-to-this-analysis">Caveats to this analysis</h2><p>There are some caveats here to what I've done that I'd like to point out.</p>
+<p>Firstly, I've used the most straightforward implementations, stuffing the most text into the prompt.
+Why? It is because I'm still exploring the libraries and their APIs and partly because so much development has happened quickly.
+Others will be able to figure out more efficient ways of implementing what we did here with their favourite framework.</p>
+<p>Secondly, this particular task is quite simple.
+LangChain, on the other hand, can generate much more complex programs, as we can see from its documentation.
+Critiquing LangChain's heavy abstractions would be unfair, as it's very likely designed for more complex autonomous applications.</p>
+<h2 id="conclusion">Conclusion</h2><p>One application built three ways with three different libraries.
+We have seen how the outputs can differ even with the same prompts and how the developer experience can vary between the three.
+That said, I caution that these are early days.
+Libraries evolve.
+Their developers can introduce more overhead or reduce it.
+It's probably too early to "pick a winner";
+as far as I can tell, it's less a competition and more a collaboration between these library developers.
+However, we can keep abreast of the latest developments and keep experimenting with the libraries on the side,
+finding out what works and what doesn't and adapting along the way.</p>
+<p>The near-term value proposition of GPT as a tool lies in its ability to automate low-risk, high-effort writing.
+We saw through cost calculations that LLMs can represent a 100X ROI in time saved.
+For us, as data scientists, that should be heartening!
+Where in your day-to-day work can you find a similar 100X ROI?
+Let me know in the comments!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2023-a-developer-first-guide-to-llm-apis-march-2023</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{A Developer-First Guide to LLM APIs (March 2023)}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2023}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{03}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{29}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2023/3/29/a-developer-first-guide-to-llm-apis-march-2023}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

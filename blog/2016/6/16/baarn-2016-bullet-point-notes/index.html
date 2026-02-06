@@ -1,0 +1,662 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="BAARN 2016 Bullet Point Notes">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/baarn-2016-bullet-point-notes' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>BAARN 2016 Bullet Point Notes - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">BAARN 2016 Bullet Point Notes</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2016-06-16</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/conferences/">
+        conferences
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/meeting notes/">
+        meeting notes
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>I attended the 2016 Boston Area Antibiotic Resistance Network meeting, held at the American Association for the Advancement of Science (AAAS). Here’s my bullet-point notes version of what went on.</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p><strong>Session 1: New antibiotic strategies and therapeutics:</strong></p>
+<p>In this section, scientists and group leaders presented novel ways of thinking about anti-bacterial treatment.</p>
+<ol>
+<li>Small molecules: focus on how to get molecules into the cell. (Anita Miller, Entasis)</li>
+<li>Phage lysins: one component of phages, add externally to a bacteria. (Vincent Fischetti, Rockefeller University)</li>
+<li>Ecobiotics: Consortia of commensal bacteria to restore general diversity, or impact specific pathways. (Matthew Henn, Seres Therapeutics)</li>
+<li>Chemical discovery: Gene clusters can predict biochemical activity of natural products, great for discovering new chemicals. Cool point I took home - a gene cluster that encodes a molecule that destroys function of a common protein may also encode a resistant version of that version. (Emily Balskus, Harvard University)</li>
+</ol>
+<p><strong>Session 2: Creating a sustainable ecosystem for antibiotic production.</strong></p>
+<p>In this section, representatives from finance, manufacturing, regulatory, and public policy discussed how they thought a sustainable ecosystem for producing antibiotics could be fostered.</p>
+<p>Panel members:</p>
+<ul>
+<li>Joseph Larsen, BARDA</li>
+<li>Cara Cassino, Contrafect</li>
+<li>Edward Cox, FDA</li>
+<li>Alan Carr, Needham &amp; Co.</li>
+</ul>
+<p>Are there enough ideas in the pipeline?</p>
+<ul>
+<li>BARDA model: product accelerator; public-private partnerships.</li>
+<li>Missing: a "pull" incentive - if I develop X successfully, I will get paid Y. Need lawmakers’ help.</li>
+</ul>
+<p>Are there enough ideas in the pipeline? </p>
+<ul>
+<li>BARDA model: product accelerator; public-private partnerships.</li>
+<li>Missing: a "pull" incentive - if I develop X successfully, I will get paid Y. Need lawmakers’ help.</li>
+<li>There’s a move towards targeted drug therapies.</li>
+<li>New paradigms come with unknown risks.</li>
+<li>Market around antibiotics: there’s underlying interest, but some skepticism and fear towards biotech.</li>
+<li>There are sub-sections of antibiotics space (e.g. gram positives) that can do well, because of unmet need.</li>
+<li>Regulatory: yet, if there’s an unmet need, then we’re behind. Private vs. societal value are not aligned.</li>
+<li>Antibiotics: a bit like fire department. We don’t pay fire department by the number of times they put out fires, but as an insurance. Payments are de-linked from the amount of usage.</li>
+<li>Private sector model isn’t going to foster investment.</li>
+<li>Incentives need to factor in not just pathogens, but also clinical manifestations of the pathogens.</li>
+</ul>
+<p>Diagnostics?</p>
+<ul>
+<li>Rapid, within 1-2 hours, which can be good enough to form the basis for decision making, is an unmet need.</li>
+<li>Susceptibility testing is also important.</li>
+</ul>
+<p>Why is there not reduced antibiotic usage in agriculture?</p>
+<ul>
+<li>Companies that manufacture these products are told to voluntarily remove indications for non-therapeutic uses.</li>
+<li>By end of year, antibiotics will need to be prescribed by a vet.</li>
+<li>Antibiotics have growth promotion and prophylactic non-therapeutic uses. </li>
+<li>Interestingly: high prices per course discourages lax usage. Interesting…… But what if the economic &amp; regulatory model was changed?</li>
+</ul>
+<p>New antibiotics are a bit like the different types of fire extinguishers (one for petrochemical, one for electrical, etc.). You only buy a new fire extinguisher if it is sufficiently different. New antibiotics have to likewise be sufficiently different.</p>
+<p>What’s the one thing that has to be done?</p>
+<ul>
+<li>From small antibiotic developer’s perspective: prioritization is needed. Favourable reimbursement is needed. Also support the fire department model, but don’t discriminate between large and small developers.</li>
+<li>Push incentives are helping, but we need the "pull" incentives, i.e. the known return on investment.</li>
+<li>Parallels between rare diseases and antibiotics. "Fire department"-style incentives might be a good way forward.</li>
+<li>Rapid, high resolution diagnostics would be really transformative, for example, in their use in clinical trials for rare infections.</li>
+<li>Clinical trial networks, infrastructure to be able to study new, narrow-spectrum agents.</li>
+</ul>
+<p><strong>Session 3: Entrepreneurship</strong></p>
+<p>Things to note:</p>
+<ul>
+<li>Make sure the science is solid. Nature cannot be fooled.<ul>
+<li>Regulatory issues must be thought of right from the beginning. </li>
+</ul>
+</li>
+<li>Technology can come from anywhere. A good company is one that addresses an unmet need.</li>
+<li>Talk with regulatory people early on. They sometimes have productive things to say as well.</li>
+<li>Get a great team together. They should know the market, believe in the mission.</li>
+<li>Focus on proof of concept and differentiation. If these are achieved, good things can happen.</li>
+<li>Talk with people you trust, who are willing to tell you "this idea is a bad idea".</li>
+</ul>
+<p><strong>Session 4: Diagnostics</strong></p>
+<ul>
+<li>From talking with others over lunch, I found that diagnostics have to be technically so simple (i.e. solid phase chemistry).</li>
+<li>Clinical goals:<ul>
+<li>Reduce use of antibiotics</li>
+<li>Rapid diagnosis and treatment</li>
+<li>Data to guide the most appropriate antibiotic</li>
+<li>Clinicians need to know when to withhold and when to deploy antibiotics.</li>
+</ul>
+</li>
+<li>Unmet clinical needs:<ul>
+<li>Rapid, simple, inexpensive to distinguish viral from bacterial infection, or if a person is even infected or not.<ul>
+<li>CLIA-waived - so simple, a non-laboratory person can do it.</li>
+<li>Likely a biomarker test.</li>
+</ul>
+</li>
+<li>Rapid, simple inexpensive test to detect viral pathogens<ul>
+<li>There are simple molecular assays, but none that are inexpensive.</li>
+</ul>
+</li>
+<li>Rapid identification of bacteria<ul>
+<li>Laboratory-based test</li>
+<li>Improvements are being made.</li>
+</ul>
+</li>
+<li>Rapid susceptibility testing<ul>
+<li>Still a challenge.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Rapid: a context-specific term.<ul>
+<li>Bacterial vs. viral: 15-20 minutes.</li>
+<li>Viral detection: 15-20 minutes, on-demand and not batched.</li>
+<li>Bacterial detection: an hour or less, on-demand.</li>
+<li>Susceptibility: \&lt; 6 hours.</li>
+</ul>
+</li>
+<li>Identification of species is better than gram pos/neg.</li>
+<li>T2 Biosystems: an interesting platform, PCR-based detection.</li>
+<li>Resistance testing:<ul>
+<li>Genotypic is helpful for gram-positive strains. Gram-negatives are more challenging.</li>
+<li>Phenotypic testing: Accelerate Diagnostics and Geneweave. Accelerate uses FISH and growth characteristics.</li>
+</ul>
+</li>
+<li>How to change a clinician’s practice?<ul>
+<li>Reliable test.</li>
+<li>Outcomes data - prove to doctor that test makes a difference.</li>
+<li>Reimbursement model that encourages use of test.</li>
+<li>Educate physicians - what and when to order, how to interpret results. (Interpretation is key!)</li>
+</ul>
+</li>
+<li>T2 diagnostics: magnetic resonance-based detection of pathogens.</li>
+<li>What is the best economic model for infectious disease products?</li>
+</ul>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2016-baarn-2016-bullet-point-notes</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{BAARN 2016 Bullet Point Notes}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2016}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{06}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{16}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2016/6/16/baarn-2016-bullet-point-notes}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

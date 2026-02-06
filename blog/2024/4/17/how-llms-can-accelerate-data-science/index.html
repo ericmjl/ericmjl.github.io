@@ -1,0 +1,739 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="How LLMs can accelerate data science">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/how-llms-can-accelerate-data-science' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>How LLMs can accelerate data science - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">How LLMs can accelerate data science</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-04-17</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/bioit world/">
+        bioit world
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/conference/">
+        conference
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llms/">
+        llms
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/software development/">
+        software development
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/productivity tools/">
+        productivity tools
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai training/">
+        ai training
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/code completion/">
+        code completion
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/debugging/">
+        debugging
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/documentation/">
+        documentation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/commit messages/">
+        commit messages
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share insights from my talk at the BioIT World conference in 2024, focusing on how LLMs empower data scientists and the necessity of software development skills in data science. I discuss practical applications of LLMs, such as code completion, documentation, debugging, and learning new domains, highlighting their role in enhancing productivity and efficiency. LLMs not only automate mundane tasks but also facilitate rapid knowledge acquisition, proving to be invaluable tools for data science teams. How could LLMs transform your data science work?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I recently delivered a talk at the BioIT World conference in 2024. The slides can be found <a href="https://ericmjl.github.io/how-llms-can-accelerate-data-science/#/">online here</a>. This post is a written version of that same talk. (As Joyce, the moderator, alluded to afterwards, this talk probably could have been titled "Prompt Engineering for Data Scientist Efficiency".)</p>
+<h2 id="two-threads">Two threads</h2><p>The talk is inspired by two parallel threads running through my professional life.</p>
+<h3 id="llms-are-an-empowerment-tool">LLMs are an empowerment tool</h3><p>The first is that <strong>LLMs are incredibly empowering as a tool</strong>. Moderna, where I work, has fully embraced generative AI as a productivity and efficiency tool, where everyone in the company has access to GPT-4's longest context (128k) model by one means or another. There is an internal academy that everyone in the company is asked to attend that provides training on how artificial intelligence works and a forum for individuals to brainstorm use cases on how to use AI to improve individual productivity. The result has been a flowering of citizen-generated use cases - and some have followed up on it with concrete action! I have seen non-programming scientists chat with LLMs to help them build Python tooling for mass spectrometry analysis, and I have seen colleagues take the contents of documents and translate them into their native language to help with better understanding the jargon inside. At the same time, while we know that LLMs contain super-human knowledge, they are also prone to mistakes through hallucination. As such, we need to be skilled enough to verify LLM outputs.</p>
+<h3 id="data-science-involves-writing-software">Data science involves writing software</h3><p>The second thread is that <strong>data science necessarily involves writing software</strong>. This argument starts with Hadley Wickham's talk, "<a href="https://www.youtube.com/watch?v=cpbtcsGE0OA">You can't do data science in a GUI</a>." The crux of the argument is that GUIs are too restrictive for the complexity of problems that data scientists need to solve. As such, programming skills are necessary to wrangle that level of complexity. The corollary is that if we coded in a programming language without getting organized like a software developer, our codebase would rapidly become chaotic. As such, <a href="https://ericmjl.github.io/blog/2024/4/5/how-to-grow-software-development-skills-in-a-data-science-team/">software development skills are necessary and can be developed</a>. (This skill is trainable, motivating why I created the <a href="https://ericmjl.github.io/data-science-bootstrap-notes/get-bootstrapped-on-your-data-science-projects/">Data Science Bootstrap Notes</a>.)</p>
+<h3 id="recap">Recap</h3><p>So, to recap, there are two threads:</p>
+<ol>
+<li>LLMs are incredibly empowering as a tool, and</li>
+<li>Data science necessarily involves writing software</li>
+</ol>
+<p>What does this mean for data scientists using LLMs?</p>
+<h2 id="llms-enable-data-science-teams-to-build-great-software">LLMs enable data science teams to build great software</h2><p>At a basic level, LLMs can enable a data science team to build software at a higher skill level than they might otherwise by drafting boilerplate code and lowering the energy barrier to adopting good practices.</p>
+<h3 id="code-completion">Code completion</h3><p>Code completion using LLMs is probably the most well-known. We know that if you start typing something along the lines of:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="c1"># Read the file `data.csv` and create a Random Forest</span>
+<span class="c1"># regressor model to predict `output` from the rest</span>
+<span class="c1"># of the columns.</span>
+</pre></div>
+<p>Then, code copilot tools such as GitHub Copilot can use the comment as a prompt to complete the code necessary to accomplish what you're trying to do. Being as specific as possible helps you get closer to completing the code one-shot.</p>
+<h3 id="in-line-documentation">In-line documentation</h3><p>For code blocks that become functions, with the function body filled out, what's left is writing the docstrings. 98-99% of the time, GitHub Copilot (as an example code completer) can accurately deliver what I need in the docstring, enabling me to use it as a fancy tab completer. As an example, documenting the arguments to a function is usually pretty annoying, but I can usually start with <code>:pa</code> and, Copilot will fill out the rest of the line for me.</p>
+<h3 id="test-writing">Test writing</h3><p>Once you have a function body, the following prompt can help you with test writing:</p>
+<div class="hll"><pre><span></span><span class="nd">@prompt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">draft_tests</span><span class="p">(</span><span class="n">function_body</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;I have the following function</span>
+
+<span class="sd">    {{ function_body }}</span>
+
+<span class="sd">    Draft me three unit tests.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+<p>As with the first case, the more specific the instructions, the easier it will be for LLMs to help draft test cases.</p>
+<h2 id="llms-give-your-data-science-teams-superpowers">LLMs give your data science teams superpowers</h2><p>But those three use cases are rather pedestrian -- and typical between data scientists and software engineers. What other kinds of use cases can we have for LLMs to aid data scientists?</p>
+<h3 id="refactor-entire-notebooks">Refactor entire notebooks</h3><p>Data scientists work in notebooks, often churning out entire notebooks full of exploratory code. Some of that code could be organized better. What if we had a bot that could automatically parse the entire notebook and help me propose refactored code? Suppose you have access to an LLM with a very long context window (e.g. GPT4-128k or Claude 3). In that case, you can do just that: either copy and paste the entire JSON of the notebook or export it as a Python script and then use the following prompt to obtain a refactoring of the notebook:</p>
+<div class="hll"><pre><span></span><span class="nd">@prompt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">refactor</span><span class="p">(</span><span class="n">notebook_json</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Given the following Jupyter notebook code:</span>
+
+<span class="sd">    {{ notebook_json }}</span>
+
+<span class="sd">    Help me propose a suite of functions</span>
+<span class="sd">    that can be refactored out from the notebook.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+<h3 id="debug-stack-traces">Debug stack traces</h3><p>If you're an experienced data scientist, there may be errors for which one glance at the stack trace, and you know exactly what the problem is. However, for the relatively junior data scientist, debugging code can be incredibly challenging, but having access to a well-trained LLM can help this persona grow in debugging skills. The key challenge is overcoming the feeling of being overwhelmed when faced with a stack trace 14 levels deep, where the bug in one's code might be buried in the middle. Turns out, this prompt can be of help to debuggers of all skill levels:</p>
+<div class="hll"><pre><span></span><span class="nd">@prompt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">debug</span><span class="p">(</span><span class="n">stack_trace</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Given the following stack trace:</span>
+
+<span class="sd">    {{ stack_trace }}</span>
+
+<span class="sd">    Help me debug what&#39;s going on here</span>
+<span class="sd">    by proposing hypotheses as to why</span>
+<span class="sd">    I am encountering this error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+<p>The LLM response usually quickly zeros in on the key issue at hand, and most of the time, it will prioritize the most probable cause first, allowing one to get to work testing each of those hypotheses. Even better, LLMs are usually trained to be polite and nonjudgmental, making it easier for a less experienced data scientist to pick up the skill of debugging without the fear of being judged by a grumpy senior data scientist.</p>
+<p><em>That said, if the group fears asking questions because of being judged or you have a grumpy senior-level data scientist, I'd argue that you have a culture problem -- that's for another day!</em></p>
+<h3 id="draft-long-form-documentation">Draft long-form documentation</h3><p>We know that documentation benefits everyone but never gets written. But this doesn't have to be the normal state of things! If you're already doing presentations to customers, collaborators, and stakeholders, then <strong>please, please, please record and transcribe them!</strong> This is because the transcript can become a source of material for the <a href="https://diataxis.fr/">Diataxis framework's four types of documentation</a>! And this prompt can help you kickstart that document writing:</p>
+<div class="hll"><pre><span></span><span class="nd">@prompt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">draft_documentation</span><span class="p">(</span>
+    <span class="n">presentation_transcript</span><span class="p">,</span>
+    <span class="n">diataxis_spec</span><span class="p">,</span>
+    <span class="n">documentation_type</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;I have the following meeting transcript:</span>
+
+<span class="sd">    {{ presentation_transcript }}</span>
+
+<span class="sd">    Here is the Diataxis spec for {{ documentation_type }}:</span>
+
+<span class="sd">    {{ diataxis_spec }}</span>
+
+<span class="sd">    Please draft for me the {{ documentation_type }} using</span>
+<span class="sd">    the transcript as source material.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+<h3 id="write-commit-messages">Write commit messages</h3><p>Speaking of documentation, commit messages are also a form of documentation! Well-written commit messages have the characteristic of being precise, descriptive, and containing the intent of a change. But they're a chore to write -- why do I have to duplicate my one-liner of code with a two-liner plain language description? Well, as it turns out, if we do so, it makes debugging changes to our codebase much easier and lets us figure out who made a specific line change way down the road!</p>
+<p>Since I built the LlamaBot git commit message writer hook, I've no longer written commit messages by hand. Even my slides, written entirely in Markdown, were committed in chunks with messages written by my trusty git commit writer. Here's an example of an actual commit:</p>
+<div class="hll"><pre><span></span>commit 5ffff99bae4611bdcea09187d839e5b40b9ef630
+Author: Eric Ma &lt;ericmajinglong@gmail.com&gt;
+Date:   Mon Apr 15 15:55:18 2024 -0400
+
+    feat(index): update professional title
+    and add about sections
+
+    - Update the professional title to
+      &quot;Senior Principal Data Scientist&quot; at Moderna.
+    - Add a humorous &quot;About me&quot; section
+      with claims of GPT-4 prompt engineering experience,
+      telepathy, and time-traveling emails.
+    - Introduce a more serious &quot;About me (take 2)&quot; section
+      detailing roles and expertise.
+    - Highlight involvement in Generative AI at Moderna,
+      emphasizing democratized access to GPT,
+      community building through an internal academy,
+      and the development of citizen-generated use cases.
+</pre></div>
+<p>If you also want to have automatic commit message writing, you can access it with an OpenAI API key and LlamaBot:</p>
+<div class="hll"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>llamabot
+llamabot<span class="w"> </span>git<span class="w"> </span>install-commit-message-hook
+<span class="c1"># Ensure you have an OpenAI API Key</span>
+</pre></div>
+<h3 id="draft-database-queries">Draft database queries</h3><p>I work in the biotech Research space, where we don't often have structured data in databases but piles of Excel spreadsheets and CSV files. As such, my SQL skills aren't as good as those of some data analysts and other data scientists who work with production data warehoused in SQL databases. So, composing and writing SQL (for me at least) is a bit of a chore. I've shortcut picking up SQL by using the following prompt:</p>
+<div class="hll"><pre><span></span><span class="nd">@prompt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">nl2sql</span><span class="p">(</span><span class="n">nl_request</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Given the following database schema:</span>
+
+<span class="sd">    {{ schema }}</span>
+
+<span class="sd">    And the following natural language request:</span>
+
+<span class="sd">    {{ nl_request }}</span>
+
+<span class="sd">    Return for me the SQL necessary to satisfy the</span>
+<span class="sd">    natural language request.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+<h3 id="ask-questions-of-code-repositories">Ask questions of code repositories</h3><p>As data scientists, we use open-source tools, and not all of them may have the best documentation available. Or their codebase (and documentation source files) may be too big to efficiently navigate. No problem: I built using LlamaBot, I built a RAG tool for code repositories that allows me to chat with the repository itself:</p>
+<div class="hll"><pre><span></span>llamabot<span class="w"> </span>repo<span class="w"> </span>chat<span class="w"> </span>https://github.com/webpro/reveal-md.git<span class="w"> </span><span class="se">\</span>
+--checkout<span class="w"> </span>main<span class="w"> </span><span class="se">\</span>
+--model-name<span class="w"> </span>gpt-4-0125-preview<span class="w"> </span><span class="se">\</span>
+--panel
+</pre></div>
+<p>The <code>--panel</code> flag fires up a web chat UI based on the panel UI building framework:</p>
+<p><img src="https://raw.githubusercontent.com/ericmjl/how-llms-can-accelerate-data-science/main/images/llamabot-repo-chat-panel.webp" alt=""></p>
+<p>(That image above was set as a background for an individual slide in my actual presentation!)</p>
+<h3 id="learn-a-new-domain">Learn a new domain</h3><p>Data scientists, to be most effective, need to ramp up very quickly on their domain knowledge. Having access to a non-judgmental, personalized tutor can be incredibly empowering for picking up a new domain that one is not well-versed in. As an example, I'm not very well-versed in analytical chemistry. however, thanks to the use of GPT4, I can pick up analytical chemistry concepts from a non-judgmental robot, instead of a judgmental human. Here's an example of something I didn't really understand. In analytical chemistry, there is this term called %A and %B. these were completely foreign to me as I was trained in microbiology and biochemistry in my undergrad days. So I asked GPT for to explain it to me the way Richard Feynman would:</p>
+<p><img src="https://raw.githubusercontent.com/ericmjl/how-llms-can-accelerate-data-science/main/images/learn-new-topics.webp" alt=""></p>
+<p>More generally, I've used the following prompt to help me pick up, almost anything at an undergraduate level:</p>
+<div class="hll"><pre><span></span><span class="nd">@prompt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">learn</span><span class="p">(</span><span class="n">concept</span><span class="p">,</span> <span class="n">education_level</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;You are an expert in {{ concept }}.</span>
+
+<span class="sd">    I am looking to understand {{ concept }}.</span>
+
+<span class="sd">    Explain it to me the way Richard Feynman would explain it</span>
+<span class="sd">    to a student in {{ education_level }}.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+<h3 id="add-emojis-to-your-talk">Add emojis to your talk</h3><p>Finally, LLMs can be used to add emojis to your talk! Why bother going through the titles one by one and wrangling fists and knuckles over what emoji to put before each slide? Especially for someone like me who has no emoji sense, I just delegate this off to an LLM to do for me!</p>
+<div class="hll"><pre><span></span><span class="nd">@prompt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_emojis</span><span class="p">(</span><span class="n">talk_md</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Given the following Markdown slide deck:</span>
+
+<span class="sd">    {{ talk_md }}</span>
+
+<span class="sd">    Add emojis to all of the title headers</span>
+<span class="sd">    while preserving the original text.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+<h2 id="summary">Summary</h2><p>The hardest part of data science can sometimes be the routine parts. This is where LLMs have the potential for a really great impact. Things like documenting my work, checking the correctness of my work, rapidly ramping up new domain knowledge, and more can be accelerated using LLMs.</p>
+<p>I'd like to argue that we are entering a productive new world! LLMs are great productivity tools if wielded correctly. They can really supercharge a data science team by helping them supercharge their learning and automating away a ton of boring stuff. How do you see LLMs being a useful tool for your data science teammates?</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-how-llms-can-accelerate-data-science</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{How LLMs can accelerate data science}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{04}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{17}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/4/17/how-llms-can-accelerate-data-science}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>
