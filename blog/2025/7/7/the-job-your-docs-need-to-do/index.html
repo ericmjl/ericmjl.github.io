@@ -1,0 +1,657 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="The job your docs need to do">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/the-job-your-docs-need-to-do' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>The job your docs need to do - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">The job your docs need to do</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-07-07</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/documentation/">
+        documentation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/diataxis/">
+        diataxis
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/innovation/">
+        innovation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/tutorials/">
+        tutorials
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/guides/">
+        guides
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/reference/">
+        reference
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/strategy/">
+        strategy
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/product/">
+        product
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/jobs theory/">
+        jobs theory
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I explore how combining the Diataxis documentation framework with Clayton Christensen's jobs-to-be-done theory can transform the way we write docs. By focusing on the specific outcomes readers want to achieve, we can make our documentation more useful and competitive—not just against other docs, but against all the ways people solve their problems. What happens when you treat your documentation as a product designed to help users get real jobs done?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <h1 id="what-is-the-job-that-your-docs-need-to-do">What is the job that your docs need to do?</h1><p>Two threads have been running through my mind recently, and I keep finding connections between them that I can't shake. The first is Diataxis - a structured framework for documentation that divides all docs into four distinct types: tutorials, how-to guides, reference, and explanation. The second is Clayton Christensen's jobs theory, which asks a deceptively simple question: what is the job that your customer needs to get done?</p>
+<p>Side note: I've been heavily inspired by Clayton Christensen's books recently, and have audiobooked my way through Innovator's Dilemma/Solution/DNA, as well as Competing Against Luck. All good books, 100% recommended if you're interested in understanding how innovation actually works.</p>
+<p>Here's the key insight: your documentation isn't competing with other documentation. It's competing with every other way someone could accomplish their job.</p>
+<h2 id="the-competition-you-didn-t-know-you-had">The competition you didn't know you had</h2><p>When someone opens your internal documentation, they're looking for more than information. They're trying to accomplish something specific, and they're evaluating whether your docs are the right tool for that job.</p>
+<p>For internal company documentation—whether it's for internally built software, processes, or systems—the competition is different but equally real. Your how-to guide competes with asking a colleague, digging through Slack history, or reverse-engineering from existing code. Your reference docs compete with reading the source code directly, checking configuration files, or experimenting in a staging environment.</p>
+<table>
+<thead><tr>
+<th><strong>Diataxis Doc Type</strong></th>
+<th><strong>Jobs to be Done (JTBD)</strong></th>
+<th><strong>Alternative Product Categories That Could Be Hired</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>How-to Guides</td>
+<td>"Show me how to achieve a specific outcome."</td>
+<td>Asking a colleague, Slack/Teams search, reverse-engineering from existing code, trial and error in staging</td>
+</tr>
+<tr>
+<td>Reference</td>
+<td>"Give me exact technical information I can look up quickly."</td>
+<td>Reading source code, checking config files, database schemas, API endpoint testing, environment variables</td>
+</tr>
+<tr>
+<td>Explanation</td>
+<td>"Help me understand how/why it works."</td>
+<td>Architecture diagrams, code comments, git history, team knowledge sharing sessions, design documents</td>
+</tr>
+<tr>
+<td>Tutorials</td>
+<td>"Help me learn by doing, in a safe structured way."</td>
+<td>Pair programming, shadowing a colleague, sandbox environments, local development setup walkthroughs</td>
+</tr>
+</tbody>
+</table>
+<p>Once you see this competition, it reframes how you think about documentation structure.</p>
+<h2 id="the-opportunity-hiding-in-plain-sight">The opportunity hiding in plain sight</h2><p>Here's what's fascinating about internal documentation: the competition is actually pretty terrible. Think about it:</p>
+<ul>
+<li>Asking a colleague interrupts their work and creates context switching for both of you</li>
+<li>Digging through Slack history is time-consuming and often incomplete</li>
+<li>Reverse-engineering from existing code is slow and error-prone</li>
+<li>Trial and error in staging environments wastes time and resources</li>
+</ul>
+<p>This means that even moderately good internal documentation has a much lower bar to clear than external documentation. Your internal how-to guide doesn't need to compete with polished YouTube tutorials - it just needs to be better than interrupting Sarah from accounting or spending 30 minutes searching through #engineering-general.</p>
+<p>This is actually a huge opportunity. While external documentation faces fierce competition from Stack Overflow's crowdsourced answers and professionally produced tutorials, internal documentation often competes with... nothing systematic at all.</p>
+<p>The result? Even basic improvements to internal documentation can have outsized impact on team productivity. When your reference docs are faster than reading source code, people will use them. When your how-to guides are clearer than tribal knowledge, they become the default choice.</p>
+<h2 id="understanding-the-competition">Understanding the competition</h2><p>Most documentation is written from the perspective of the product being documented. It's organized around features, capabilities, and technical architecture. But when you flip the perspective to focus on jobs-to-be-done, you can structure information more effectively around what readers actually need to accomplish.</p>
+<h2 id="a-job-focused-approach-in-practice">A job-focused approach in practice</h2><p>Let me show you what this looks like in practice. Say you're writing a how-to guide for deploying your company's internal microservice. The traditional approach focuses on what information to include. The job-focused approach starts with the specific outcome: "Help me get this service deployed so I can test my feature and merge my PR."</p>
+<p>That job-focused lens shifts how you structure the guide:</p>
+<ul>
+<li>You lead with the most common use case and a working example first, then dive into edge cases</li>
+<li>You include troubleshooting steps for the most common failure modes</li>
+<li>You assume they're in a hurry and want to get back to their main project</li>
+</ul>
+<p>Every decision gets filtered through the lens of "does this help the reader accomplish their job better?"</p>
+<p>The result? Documentation that people actually use because it's genuinely better at helping them accomplish their jobs.</p>
+<h2 id="how-to-apply-this-framework">How to apply this framework</h2><p>Start by identifying the specific job your reader is trying to accomplish. Not the general topic area, but the specific outcome they need to achieve. Then ask yourself:</p>
+<ol>
+<li>What alternatives could they hire instead of your documentation?</li>
+<li>What unique value can your documentation provide that those alternatives can't?</li>
+<li>How can you structure the information to make their job easier to accomplish?</li>
+</ol>
+<p>For that third question especially, consider using AI to help you think through different structural approaches. You can prompt an AI with the specific job your reader needs to accomplish and ask it to suggest multiple ways to organize the information, then choose the approach that best serves that job.</p>
+<p>Take reference documentation as an example. The job goes beyond providing comprehensive information about all internal API endpoints or configuration options. The real job is "give me exact technical information I can look up quickly." This means your reference docs need to be faster and more precise than someone could get from reading your source code, checking configuration files, or asking in Slack.</p>
+<p>If someone can figure out what they need faster by just reading the source code or asking a colleague, your reference docs aren't doing their job.</p>
+<h2 id="how-this-applies-to-ai-assisted-documentation">How this applies to AI-assisted documentation</h2><p>Here's where this gets really interesting. When documentation is designed around jobs-to-be-done, it creates a positive feedback loop that extends beyond the direct reader.</p>
+<p>Well-structured, job-focused documentation helps humans and also helps AI systems understand context and provide better assistance to future users. When your how-to guide is crystal clear about the specific outcome it helps achieve, an AI can better understand when to recommend that guide to someone with a similar job.</p>
+<p>The result is that good documentation becomes a force multiplier. Beyond helping the direct reader, it helps AI systems help other readers accomplish similar jobs faster and more accurately.</p>
+<p>This creates a flywheel effect: better documentation helps more people accomplish their jobs, which generates more usage data and feedback, which leads to even better documentation that helps both humans and AI serve users more effectively.</p>
+<h2 id="applying-this-perspective">Applying this perspective</h2><p>The next time you write internal documentation, start with what job your reader is trying to accomplish rather than what you want to explain.</p>
+<p>Ask yourself: if someone could accomplish this job faster or more reliably using a different approach, why would they choose your documentation instead? For internal docs, this question often has a surprising answer: because the alternatives are genuinely worse.</p>
+<p>This is liberating. Your internal documentation doesn't need to be perfect - it just needs to be better than the current chaos of tribal knowledge and ad-hoc problem-solving.</p>
+<p>When you can answer that question clearly, you'll write documentation that people find genuinely useful. And when people use your documentation successfully, they become more successful with your product.</p>
+<p>This matters because documentation is ultimately about scaling our collective knowledge and decision-making capacity. But that scaling only happens when people actually use the documentation. And people only use documentation when it helps them accomplish specific jobs they need to get done.</p>
+<p>For internal documentation, this scaling opportunity is especially significant. Every time someone uses your docs instead of interrupting a colleague, you're not just solving one person's problem - you're preserving focus and momentum across your entire team.</p>
+<p>That's the value of thinking about internal documentation as a product designed around jobs-to-be-done. It creates a better experience for everyone who interacts with your work, and unlike external documentation, you don't need to beat world-class competition to succeed.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-the-job-your-docs-need-to-do</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{The job your docs need to do}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{07}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{07}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/7/7/the-job-your-docs-need-to-do}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

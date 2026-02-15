@@ -1,0 +1,664 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="What does it take to build a statistics agent?">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/what-does-it-take-to-build-a-statistics-agent' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>What does it take to build a statistics agent? - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">What does it take to build a statistics agent?</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-12-02</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/statistics/">
+        statistics
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/biotech/">
+        biotech
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/reproducibility/">
+        reproducibility
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/experiments/">
+        experiments
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/research/">
+        research
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/automation/">
+        automation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data/">
+        data
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/open source/">
+        open source
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/bayesian/">
+        bayesian
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share my journey building a domain-specific statistics agent to help researchers design better experiments, inspired by the challenges of limited access to statisticians in pharma and biotech. I discuss the pitfalls of "folk statistics," the importance of prompt engineering, and the lessons learned through iterative testing and refinement. Curious how an AI agent can elevate experimental design and what it takes to make it truly helpful?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Within research organizations at most pharma and biotech companies, professionally-trained statisticians are often staffed at extremely low ratios relative to the number of lab scientists. By rough Fermi estimation, I'd hazard a guess that ratios anywhere from 1:10 to 1:100 are plausible, meaning most researchers have limited access to statistical expertise when they need it most, during experiment design. This statistician shortage creates a critical bottleneck in experimental design, power calculations, and biostatistical consultation—areas where proper statistical guidance can prevent costly mistakes and improve research reproducibility.</p>
+<p>This creates a costly problem. When statisticians aren't available, researchers fall back to what I call "folk statistics" - the kind you learn by immersion in a lab, or from 1-2 graduate lectures hidden within broader "laboratory methods" or "computational methods" classes. I know this because I practiced folk statistics myself in the life sciences, blindly following rules like "just do n=3" or "just use the t-test with your count data" without understanding the statistical reasoning behind these choices.</p>
+<p>The consequences are documented in stark numbers. Amgen scientists attempted to reproduce 53 landmark preclinical papers and failed in 47 cases (89%)—even after contacting original authors and exchanging reagents. Bayer's internal validation found only 20-25% of studies "completely in line" with original publications. These studies consistently identified poor experimental design and inadequate statistical analysis as major contributors. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4461318/">Freedman et al. (2015)</a> estimated $28 billion annually spent on irreproducible preclinical research in the United States alone.</p>
+<p><img src="https://cdn.ncbi.nlm.nih.gov/pmc/blobs/ccea/4461318/0e3c7aea2b45/pbio.1002165.g002.jpg" alt="Breakdown of causes of preclinical irreproducibility from Freedman et al. (2015). Study design accounts for 27.6% of irreproducibility."></p>
+<p><em>Breakdown of causes of preclinical irreproducibility from Freedman et al. (2015). Study design accounts for 27.6% of irreproducibility.</em></p>
+<p>At the individual experiment level, this translates to teams <strong>throwing out hard-won experimental data</strong> that can cost anywhere from thousands to hundreds of thousands of dollars to collect per round, <strong>wasting up to millions of dollars downstream</strong> by basing decisions on poorly-collected data, and <strong>missing opportunities</strong> to set up machine learners with high quality laboratory data that could shortcut the amount of laboratory experimentation needed.</p>
+<p>I took one semester of graduate-level biostatistics, then a decade of self-study in Bayesian statistics, followed by professional work where accurate estimation was critical—whether estimating half-life of a molecule, binding affinity of an antibody, or other performance properties. Through this journey, I no longer trust folk statistics. Folk statistics relies on faulty assumptions—like "n=3 is all you'll really need," "use the t-test for count data," or "calculate the SEM and don't show the SD"—which influence bad decision-making when people don't know better. Once you see how these assumptions break down and lead to wrong conclusions, you can't unsee it. Quantities like half-life, binding affinity, and other performance properties need to be accurately estimated through proper experimental design and statistically-informed mechanistic modeling.</p>
+<p>Statisticians are expensive, but they're also 100% critical for generating high quality, high fidelity data. Their role at the experiment design phase is usually that of a consultant, asking probing questions to ensure experiments are designed with good controls, confounders are accounted for, and the right statistical models are chosen. The question is: <strong>can we scale this expertise?</strong></p>
+<p>Not to replace statisticians, but to level up the organizational statistical practice <em>before</em> researchers check in with a professionally-trained stats person. If lab scientists can think through their experimental designs more rigorously beforehand - understanding power calculations, considering confounders, planning proper controls - then the conversations they have with statisticians can be elevated. Instead of starting from scratch, they can engage in more sophisticated discussions about design trade-offs, model selection, and advanced statistical considerations. In turn, this amplifies the value of the statistician's time and improves outcomes for everyone.</p>
+<p>I was inspired by Dr. Emi Tanaka's <a href="https://emitanaka.org/slides/AASC2024/#/title-slide">slides on extracting elements of statistical experiment design using LLMs</a>, which showed how we can extract structured information like response variables, treatments, experimental units, design types, replicate structure, and controls. I decided to take a stab at building something that could do more than just extract information—something that could actually consult on experiment design.</p>
+<p>And so <code>stats-agents</code> was born: an AI-powered statistics agent for experiment design consultation. Here's how I designed and evaluated this domain-specific AI agent.</p>
+<p>As a preface, I initially explored the ReAct pattern but <a href="https://ericmjl.github.io/blog/2025/11/16/how-i-replaced-307-lines-of-agent-code-with-4-lines/">switched to PocketFlow</a>, a minimalist graph-based framework that replaced 307 lines of agent orchestration code with just 4 lines. This graph-based approach brought clarity, modularity, and made the execution flow explicit—exactly what I needed for building a robust statistics agent.</p>
+<p>So how did I go about building this agent?</p>
+<p>Deeply influenced by Clayton Christensen's books, I actually started with "what's the job for this agent to be done?" I initially considered building a single agent that could handle both experiment design consultation and statistical analysis of collected data. However, I quickly realized these are fundamentally different phases with different goals, tools, and interaction patterns.</p>
+<p>The <strong>experiment design phase</strong> is consultative and exploratory - it's about asking questions, understanding constraints, identifying potential issues, and helping researchers think through their design <em>before</em> data collection. The <strong>analysis phase</strong> is more technical - it's about taking collected data and building statistical models to estimate quantities of interest.</p>
+<p>I decided to focus the agent on the design phase only. This separation of concerns made the agent cleaner, less confusing, and allowed it to be optimized for its specific purpose: being an inquisitive, consultative partner during experiment design. The analysis phase would be handled separately (or by a different agent) with its own tools and prompting strategies.</p>
+<p>So I defined the agent's job description (JD) as: "an agent that will provide critique on experiment designs, suggest modifications, and help researchers think through their experimental design before data collection". It sounded oddly like a human's job description for a real job, except more specific. Notice, however, that the JD leaves room for a real human, in that no accountability for outcomes is placed on the agent, a human statistician still needs to review the work, just as we wrote above.</p>
+<p>With the job scope defined, I turned to designing the tools the agent would need.</p>
+<p>The first tool I gave was <code>critique_experiment_design</code> - a tool that provides comprehensive critique of experiment designs, identifying potential flaws, biases, weaknesses, and areas for improvement. This tool considers multiple angles including biological, statistical, and practical constraints. The agent can use this to help researchers identify issues in their designs before they collect data.</p>
+<p>The second tool I gave was one I previously wrote about: the ability to execute code (<code>write_and_execute_code</code>). I wanted this available to answer questions like "what should my data table look like?"</p>
+<p>I've noticed that having a sample data table in front of us when discussing experimental designs is incredibly clarifying—it cuts through abstract confusion toward concrete understanding. This tool enables the agent to generate sample data tables, perform power calculations, create plate map visualizations, and other dynamic analyses.</p>
+<p><strong>Important security note</strong>: The ability to execute arbitrary Python code is powerful but also dangerous. An agent that can execute code can delete files, modify system configurations, access sensitive data, make network requests, and more. For any production deployment, this agent must run in a containerized environment with strict isolation, resource limits, and no access to secrets or credentials. This isn't optional - it's a cybersecurity requirement! For my development and testing, I ran it in a controlled environment on my own machine, but production deployment would require proper containerization.</p>
+<p>With the tools defined, the next challenge was evaluation: how do you know if the agent is actually working? This turned out to be more complex than I initially expected.</p>
+<p>The evaluation process had two distinct phases: an exploration-guided MVP phase (vibes-driven) and a post-MVP systematic testing phase.</p>
+<p><strong>Phase 1: MVP Development (Vibes-Driven)</strong></p>
+<p>During the MVP phase, I defined a fixed conversation path and repeatedly tested it manually in a Marimo notebook's chat UI. I tested with a sequence like: asking for design critique, providing an experiment description, requesting power calculations, and asking for sample data tables. As I found errors, I fixed them immediately, contrary to evaluation best practices, but appropriate for this exploratory phase. The tool definitions weren't settled until this phase was complete.</p>
+<p>I also used Cursor (a coding agent) to help diagnose issues, explore multiple solutions, and get different perspectives before committing to fixes. This "multiple AI opinions before committing" pattern follows a similar philosophy to Geoffrey Litt's <a href="https://www.geoffreylitt.com/2025/10/24/code-like-a-surgeon">"Code like a surgeon"</a> approach: spike out an attempt at a big change, review it as a sketch of where to go, and often you won't use the result directly—but it helps you understand the problem space better.</p>
+<p>Rather than accepting the first AI suggestion, I'd ask multiple questions, explore several solution approaches, and understand the trade-offs before making an informed decision. When debugging complex issues like the closure vs. shared state problem, I'd often ask multiple models the same question to see if they'd converge on the same diagnosis—if different LLMs independently arrived at the same answer, that was a good sign the solution was on the right track. This led to better architecture decisions and fewer instances of "I wish I had done it differently."</p>
+<p><strong>Phase 2: Systematic Evaluation</strong></p>
+<p>Once the baseline behavior was satisfactory, I moved to systematic evaluation.</p>
+<p><strong>Benchmark prompt</strong>: I created a "perfect prompt" document (<code>experiment_design_for_power_calc.md</code>) that served as my regression test suite. This complete, detailed experiment design specification should trigger specific agent behaviors, such as asking the right questions, performing power calculations correctly, providing contextual explanations. Every time I modified the system prompt or tools, I'd run this same benchmark and check: did it still work? Without this, I found myself making changes that broke things in subtle ways, or losing track of what "good" behavior even looked like. <em>The benchmark prompt became my north star, a concrete example of the agent working as intended.</em></p>
+<p><strong>Synthetic test generation</strong>: Once I had a reliable benchmark, I expanded to systematic evaluation with variation. Starting with five examples from Tanaka's slide deck, I used the methodology from Shreya Shankar and Hamel Husain (researchers who developed systematic approaches for LLM evaluation) to generate synthetic chat examples by selecting 1-3 axes of variation. I chose experimental domain (biotech vs. agriculture) as the primary axis, while varying the statistical expertise level of the simulated user. This process generated dozens of conversation traces that, while not exhaustive, represented draws from my constrained prior belief about likely conversations.</p>
+<p>Systematic evaluation with these varied conversation traces revealed patterns I never would have noticed through manual testing. Through these traces, I identified three major categories of failure modes that needed to be addressed.</p>
+<h2 id="failure-mode-1-multi-step-execution-breakdown">Failure mode 1: Multi-step execution breakdown</h2><p>The first major issue I encountered was that the agent couldn't chain tool calls effectively. When the agent executed code to perform a power calculation, it would store the result in a variable like <code>mtt_power_analysis_result</code>. But when it tried to analyze that result in a subsequent tool call, it would fail with a <code>NameError</code> - the variable simply wasn't accessible.</p>
+<p>The root cause was subtle: the code execution tool (<code>write_and_execute_code_wrapper</code>) was using a closure variable that captured the notebook's globals at initialization time. However, the agent framework (AgentBot) stores results in a separate shared dictionary (<code>shared["globals_dict"]</code>). These two dictionaries were disconnected; think of them as two separate notebooks that couldn't see each other's variables. So when the agent created a variable in one tool call, it wasn't visible to the next.</p>
+<p>The fix required connecting them: I modified the code execution tool to accept an optional <code>_globals_dict</code> parameter. When provided, it uses the agent's shared dictionary instead of its own isolated one. This allows results from one tool call to be accessible in subsequent calls, enabling true multi-step workflows where the agent can build on previous results.</p>
+<h2 id="failure-mode-2-display-formatting-and-contextual-output">Failure mode 2: Display formatting and contextual output</h2><p>The second category of issues involved both technical display problems and behavioral output quality. When the agent returned Python objects (DataFrames, matplotlib figures, etc.), they weren't displaying properly in the Marimo chat interface. The agent would return a dictionary with these objects, but Marimo's chat UI doesn't automatically render matplotlib <code>Figure</code> objects embedded in dictionaries.</p>
+<p>But there was a deeper behavioral problem: the agent was dumping DataFrames and plots without any explanatory text. I'd ask for a power analysis, and the agent would return a raw DataFrame with numbers -- no context, no interpretation, no explanation of what I was looking at. My sense of taste rebelled. This wasn't just a technical problem, it was an aesthetic one. I wanted a polished, consultant-like experience where explanatory text naturally flows between objects, not a data dump.</p>
+<p><strong>Sometimes the best technical solutions come from caring about how things look and feel.</strong></p>
+<p>I solved both problems through a combination of technical infrastructure and prompt engineering. With AI assistance, I created a formatter system that processes dictionaries containing text and objects, converting strings to markdown and passing objects through for native display. This handled the technical display issue. It's implemented within <code>llamabot/components/formatters.py</code> as <code>create_marimo_formatter</code>.</p>
+<p>But to solve the behavioral problem—getting the agent to actually provide contextual text—I had to update the system prompt. I added explicit guidance requiring that every object be preceded (and ideally followed) by explanatory text that connects back to the researcher's goals. The prompt now instructs the agent to create a dictionary with explanatory text strings interleaved with objects, then return it. The formatter processes this dictionary, creating that polished, consultant-like experience where text naturally flows between objects.</p>
+<h2 id="failure-mode-3-agent-decision-making-and-domain-knowledge">Failure mode 3: Agent decision-making and domain knowledge</h2><p>The third category of failures involved the agent's decision-making process and understanding of domain conventions. Through systematic evaluation, I discovered several patterns.</p>
+<p>Here's a concrete example of how the prompt evolved. Initially, I had a simple instruction: "Ask clarifying questions about experiment goals, constraints, and assumptions." But the agent kept jumping straight to calculations. So I added:</p>
+<p><strong>Before (early version):</strong></p>
+<blockquote><p>Ask clarifying questions about experiment goals, constraints, and assumptions.</p>
+</blockquote>
+<p><strong>After (refined version):</strong></p>
+<blockquote><p><strong>CRITICAL - BE INQUISITIVE FIRST</strong>: Before jumping into calculations, you MUST ask probing questions to understand the full context:</p>
+<ul>
+<li>What effect size are they expecting or hoping to detect? Why?</li>
+<li>What is the expected variability in their measurements? Do they have pilot data?</li>
+<li>What are their practical constraints (budget, time, sample availability)?</li>
+<li>What are they most worried about with this experiment?</li>
+<li>Have they done similar experiments before? What issues did they encounter?</li>
+<li>What would make this experiment a "success" in their view?</li>
+</ul>
+<p><strong>Only after gathering this context</strong> should you use <code>write_and_execute_code_wrapper</code> to perform calculations.</p>
+</blockquote>
+<p><strong>The agent wasn't inquisitive enough.</strong> Despite the system prompt emphasizing the need to ask questions, the agent would often jump straight to calculations without first understanding the researcher's context, constraints, and goals. I had to add multiple "CRITICAL" reminders in the prompt, explicitly stating that questioning should happen BEFORE calculations.</p>
+<p><strong>The agent was trying to pass variable names as strings.</strong> When the agent wanted to analyze a result from a previous tool call, it would try to write a function like <code>def analyze(mtt_power_analysis_result):</code> and pass <code>{"mtt_power_analysis_result": "mtt_power_analysis_result"}</code> - which passes the string literal, not the actual dictionary! I had to explicitly teach the agent to write functions with NO parameters that access variables directly from globals.</p>
+<p><strong>Contradictions in the system prompt.</strong> There were conflicting instructions about when to use <code>respond_to_user</code> vs <code>return_object_to_user</code>. I resolved this by clarifying: use <code>respond_to_user</code> for text-only responses, and <code>return_object_to_user</code> when you have Python objects to display.</p>
+<p><strong>The agent didn't understand domain-specific visualizations.</strong> When the test user (a.k.a. me) asked for a "plate map" or "plate layout visualization," the agent would generate something, but it often wasn't what researchers expected.</p>
+<p>A plate map visualization in experimental biology is a very specific thing: a heatmap-style 8×12 grid (rows A-H, columns 1-12) where each well is color-coded by treatment group with a clear legend. Without explicit guidance, the agent would create generic bar charts or scatter plots that didn't match these domain conventions.</p>
+<p>I solved this by adding detailed specifications in the system prompt that describe exactly what plate map visualizations should look like, including the grid structure (rows labeled A-H, columns 1-12 for 96-well plates), color coding requirements (different colors per treatment, with a legend), complete code patterns showing how to create them with matplotlib, common plate formats (96-well, 384-well, 1536-well), and trigger phrases that should generate plate maps.</p>
+<p>This pattern - providing detailed specifications for domain-specific outputs - became a key strategy. When the agent needs to generate something that follows domain conventions, it needs explicit guidance on what those conventions are.</p>
+<p>Addressing these behavioral issues required multiple rounds of iteration. The system prompt didn't reach its final form in one go - as I discovered each issue, I added more explicit guidance, examples, and "CRITICAL" warnings. The prompt grew substantially through iterative refinement, and the agent's behavior improved dramatically with each iteration.</p>
+<p>The process wasn't linear during the early iteration phases - I'd fix one issue, test it, discover another, fix that, and sometimes realize the first fix needed refinement. Working with the Cursor coding agent helped me identify contradictions, explore multiple solution approaches, and get different perspectives before committing to changes. This iterative refinement process is essential when building domain-specific agents: you can't anticipate all the behavioral issues upfront, so you need to be prepared to evolve the prompt based on what you discover through testing.</p>
+<h2 id="conclusion-key-lessons-for-building-domain-specific-agents">Conclusion: Key lessons for building domain-specific agents</h2><p>Building this AI statistics agent for experiment design revealed several important patterns that apply broadly to building domain-specific AI agents and LLM-powered tools:</p>
+<h3 id="1-the-system-prompt-is-the-primary-control-surface">1. The system prompt is the primary control surface</h3><p>The agent's personality, decision-making process, inquisitiveness, and ability to provide contextual explanations are primarily controlled through prompt design rather than code changes. The prompt is where the domain knowledge lives, where the behavioral patterns are encoded, and where the "personality" of the agent is defined. Code provides the infrastructure, but the prompt provides the intelligence.</p>
+<p>If you want to change the agent's behavior, you're often better off modifying the prompt than changing the code. The prompt became a detailed instruction manual that teaches the agent not just <em>what</em> to do, but <em>how</em> to think, <em>when</em> to ask questions, and <em>why</em> certain patterns matter.</p>
+<h3 id="2-testing-is-essential-but-not-sufficient">2. Testing is essential, but not sufficient</h3><p>Even with extensive testing, you cannot guarantee what will be seen in the real world. Users will ask questions you never thought of, use terminology you didn't anticipate, have edge cases in their data you didn't consider, and interact with the agent in ways that break your assumptions.</p>
+<p>This is why the agent is designed as a <em>consultant</em> rather than an autonomous decision-maker. A human statistician still needs to review the work. The testing process is essential for building confidence, but you must also design the system with the assumption that it will encounter unexpected situations. This means implementing clear error handling, graceful degradation when things go wrong, explicit boundaries on what the agent can and cannot do, and human oversight for critical decisions.</p>
+<h2 id="final-thoughts">Final thoughts</h2><p>The process of building this agent revealed something I didn't expect: you can't anticipate all the behavioral issues upfront. The prompt grew from ~200 to ~600 lines through iterative discovery—each failure mode required explicit guidance I didn't know I'd need. Building domain-specific agents means being prepared to evolve your approach based on what you discover through testing, not just what you plan in advance.</p>
+<h2 id="try-it-yourself">Try it yourself</h2><p>The experiment design agent is available as a Marimo notebook in the <a href="https://github.com/ericmjl/llamabot">LlamaBot repository</a>. You can run it locally with:</p>
+<div class="hll"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:ericmjl/llamabot.git
+<span class="nb">cd</span><span class="w"> </span>llamabot/notebooks
+uvx<span class="w"> </span>marimo<span class="w"> </span>edit<span class="w"> </span>--watch<span class="w"> </span>notebooks/experiment_design_agent.py
+</pre></div>
+<p>The agent is designed to be inquisitive and consultative—it will ask probing questions about your experiment goals, constraints, and assumptions before providing recommendations. This AI statistics agent can help with power calculations, experimental design critique, sample data table generation, plate map visualizations, and biostatistical consultation for researchers in pharma and biotech.</p>
+<p><strong>Limitations</strong>: This agent is a prototype focused on the experiment design phase. It's not a replacement for human statisticians—it's designed to amplify their knowledge and help researchers think through their designs before data collection. The agent requires human oversight and review, especially for high-stakes decisions. I haven't tested it across all experimental design types, and it may struggle with highly specialized domains or unusual constraints.</p>
+<p>If you're interested in building your own domain-specific agent, I hope the lessons and patterns shared here provide a useful starting point. The code is open source, and I welcome contributions and feedback.</p>
+<p>I'm working on a part 2 of this blog post, where I'll build out the statistical analysis agent—the companion to this experiment design agent. That post will cover how to build an agent that takes collected data and performs statistical analysis, model fitting, and interpretation.</p>
+<p>Thank you for reading this far. If you made it here, you've invested real time and attention in understanding not just what I built, but how and why—and that means a lot! Building this agent has been four months in the making, and sharing those discoveries with others who care about the same problems is what makes the work worthwhile. I'm grateful you came along for the ride!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-what-does-it-take-to-build-a-statistics-agent</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{What does it take to build a statistics agent?}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{12}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{02}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/12/2/what-does-it-take-to-build-a-statistics-agent}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

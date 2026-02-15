@@ -1,0 +1,636 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Rethinking LLM interfaces, from chatbots to contextual applications">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/rethinking-llm-interfaces-from-chatbots-to-contextual-applications' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Rethinking LLM interfaces, from chatbots to contextual applications - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Rethinking LLM interfaces, from chatbots to contextual applications</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-06-14</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llm/">
+        llm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workflow/">
+        workflow
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/interfaces/">
+        interfaces
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/automation/">
+        automation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/contextual/">
+        contextual
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ux/">
+        ux
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/apps/">
+        apps
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/business/">
+        business
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/augmentation/">
+        augmentation
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share why I believe the future of LLM applications lies beyond chat interfaces. Drawing on insights from colleagues, thought leaders, and my own experience building DeckBot, I argue that embedding AI into structured workflows—like TurboTax—creates more effective and delightful user experiences. Instead of relying on open-ended chat, we should inject LLMs at key moments within well-defined processes. Curious how this shift could transform the way we build and use AI-powered tools?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Chat interfaces were a great starting point for interacting with large language models, but they're not the endgame. <strong>My thesis is that we should build LLM applications as contextual tools embedded in structured workflows, not as open-ended chat interfaces.</strong> This insight came from three converging threads that fundamentally changed how I think about building LLM-powered applications.</p>
+<p>The first thread came from a conversation with my colleague <a href="https://www.linkedin.com/in/michelle-faits/">Michelle Faits</a>, who articulated that apps powered by generative AI really need to end up looking less like chat interfaces and more like TurboTax -- where there's a well-defined process that needs to happen, and instead of users filling out forms manually, we ask an AI to help with the form-filling process.</p>
+<p>The second thread was a YouTube video titled "<a href="https://youtu.be/mRqBjKFyfLc?si=9sRDPg-hH5iBLiFf">AI UX Design: ChatGPT interfaces are already obsolete</a>" by Alan Pike from Vancouver. In it, he talks about shifting from chatbot to context-native interfaces, a change that's both subtle and dramatic. It's subtle because there's little visible change, but dramatic because the way you interact with the interface changes fundamentally. You're no longer stuck with the drudge work of filling out yet another form, but are instead presented with an AI-powered interface capable of understanding what your next action is likely to be and anticipating it just in time.</p>
+<p>The third thread is Clayton Christensen's "jobs to be done" theory. What I've been noticing is that there are too many ChatGPT copycat clones, and those chat clones don't really help me accomplish the job that I'm trying to do. It takes a different type of interface to make that happen.</p>
+<h2 id="these-threads-converge-on-a-simple-truth">These threads converge on a simple truth</h2><p>What connects TurboTax's structured approach, Pike's context-native interfaces, and jobs-to-be-done theory is this: <strong>the most effective LLM applications will embed AI capabilities directly into well-defined workflows rather than forcing users to articulate their needs through chat.</strong></p>
+<p>This means moving from "tell the AI what you want" to "let the AI assist you as you work through a process you already understand."</p>
+<h2 id="the-turbotax-moment">The TurboTax moment</h2><p>Michelle's insight about TurboTax really stuck with me. TurboTax works because it represents a well-defined business process with pretty routine steps that we need to walk through, but some of the steps do require judgment calls. Do you fill out this section or not? And what do you fill in? You need to determine that from context, so there's a little bit of agency for LLM bots inside there. But for the most part, it's just form filling.</p>
+<p>This is a powerful analogy for LLM apps, one that gets to the heart of any app build. The question becomes: how do you go about building a user interface that works like this? When we build chat interfaces, we put a lot of onus on the LLM to make smart decisions on behalf of us. But what if chat wasn't the primary way of interacting? What if we had well-defined business workflows supported by custom apps that just require us to fill out forms in a delightful way?</p>
+<h2 id="the-obsolescence-of-chat-interfaces">The obsolescence of chat interfaces</h2><p>Alan Pike's perspective really crystallized something I'd been feeling. In his talk, he showed how we're moving from text-based interfaces that are powerful but confounding to 90% of people, toward context-native interfaces that inject AI capabilities right where you need them.</p>
+<p>Think about it: we've already started seeing hints of tools pushing chat to the side. ChatGPT has Canvas mode now, where if you ask it to co-author a document, it sticks the chat up in the corner and lets you focus on the work you're doing. But this is still just the beginning.</p>
+<p>Pike showed examples of right-click contextual actions, natural language search that understands intent rather than requiring exact phrases, and date pickers where you can just say "next Thursday at 11" instead of clicking through calendar grids. These represent a fundamental shift in how we think about human-computer interaction.</p>
+<p>I thought the talk was quite good, and I'm embedding it below to share.</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/mRqBjKFyfLc?si=9sRDPg-hH5iBLiFf" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe><h2 id="jobs-to-be-done-theory-meets-llm-apps">Jobs to be done theory meets LLM apps</h2><p>Clayton Christensen's jobs-to-be-done framework is perfect for thinking about LLM applications. When I look at most LLM interfaces, we've become hooked on chat -- but they don't necessarily always help me accomplish the specific job I'm trying to do. Generic chat interfaces put the burden on me to figure out how to express my needs and on the LLM to figure out what I actually want. What if we could do better?</p>
+<p>I think what we're going to see is an evolution of LLM-powered apps from being text and chat driven to being deeply embedded within applications, making it possible to flow through business processes in a way that's much smoother and more delightful than what was possible before. It's not really about agentic capabilities, which are nice, but the winners will be the interfaces that inject LLMs in just the right places -- in the boring work!</p>
+<h2 id="building-deckbot-demonstrates-this-approach">Building DeckBot demonstrates this approach</h2><p>Let me show you what this looks like in practice. I built a Markdown slide deck generator called DeckBot, deliberately avoiding chat as the primary interface because it was too freeform and unreliable.</p>
+<p>Instead of starting with a UI, I began with the data model: defining a <code>Slide</code> as a Pydantic model with title, content, and type. I tested individual slide generation in a Marimo notebook until each component worked reliably. Then I put them together into a <code>SlideDeck</code> Pydantic model. This allowed me to compose a <code>SlideDeck</code> from individually-generated <code>Slides</code>.</p>
+<p>The next breakthrough came when I realized I could inject LLM capabilities directly into the data objects themselves. Instead of an agent orchestrating external tools, my data models gained natural language-powered methods:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">SlideDeck</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">slides</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Slide</span><span class="p">]</span>
+    <span class="n">talk_title</span><span class="p">:</span> <span class="nb">str</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">edit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">change</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Edit the slide at a given index using natural language.&quot;&quot;&quot;</span>
+        <span class="n">current_slide</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">slides</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+        <span class="n">new_slide</span> <span class="o">=</span> <span class="n">slidemaker</span><span class="p">(</span><span class="n">slidemaker_edit</span><span class="p">(</span><span class="n">current_slide</span><span class="p">,</span> <span class="n">change</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slides</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_slide</span>
+</pre></div>
+<p>This represents a fundamental shift: instead of putting all intelligence in a central agent, I distributed it into the data models themselves. Each Pydantic model knows how to manipulate itself based on natural language instructions.</p>
+<p><strong>DeckBot sits at step 5 of the maturity ladder I'll describe below</strong>; it provides LLM-augmented interfaces that understand context and assist with specific tasks, but within a structured framework.</p>
+<h2 id="the-future-of-llm-applications">The future of LLM applications</h2><p>I believe we're going to see LLM applications become more like TurboTax and less like open-ended chat interfaces. These will be applications built around well-defined business processes that users can flow through smoothly, with AI providing assistance at just the right moments.</p>
+<p>There's still a place for agents, but we need to recognize that adoption follows a ladder of maturity:</p>
+<ol>
+<li>Unstructured work relying on human intuition</li>
+<li>Documented SOPs and manual processes</li>
+<li>Digital UIs guiding humans through structured processes</li>
+<li>Rule-based automation for predictable parts of workflows</li>
+<li>LLM-augmented interfaces providing contextual assistance</li>
+<li>Semi-autonomous LLM components handling defined subtasks</li>
+<li>Full agent orchestration with human oversight</li>
+<li>Truly autonomous agent systems managing entire business processes</li>
+</ol>
+<p>Customer support agents have emerged as one of the first places for LLM agents, and I suspect it's because customer support as a business process has more or less been well-standardized. The fact that we can "agentify" it stems from decades of process refinement. Other business domains need to undergo similar transformation before they're ready for full agent automation.</p>
+<p>At Moderna, we've embraced generative AI heavily, relying on ChatGPT and custom GPTs. But I know this cannot be the only way we interact with LLMs. There are ways to surgically inject LLMs into workflows so users can accomplish what they're trying to do in a structured fashion, but in a delightfully smooth and flowing way.</p>
+<p>The big lesson I learned building DeckBot is understanding where and when to inject LLMs very surgically into custom LLM applications. It's not about replacing human decision-making with AI decision-making; it's about augmenting human workflows with AI capabilities at precisely the right moments.</p>
+<h2 id="key-principles-for-contextual-llm-applications">Key principles for contextual LLM applications</h2><p>Drawing from the TurboTax insight, Pike's context-native approach, and jobs-to-be-done theory, here are the essential principles I've learned:</p>
+<ol>
+<li><strong>Start with the data model, not the interface.</strong> Get clear on what you're actually trying to accomplish and model that as structured data first. Design APIs around those data models that work through clean function calls before adding any LLM capabilities.</li>
+<li><strong>Inject LLMs surgically into workflows.</strong> Identify the specific points where natural language understanding or generation adds value, rather than building everything around chat or agents.</li>
+<li><strong>Test with structured examples first.</strong> Use notebooks to validate that your core functions work properly before thinking about user interfaces.</li>
+<li><strong>Build for the job-to-be-done.</strong> Don't chase the latest agentic capabilities just because they're exciting. Focus on making specific workflows easier and more delightful.</li>
+</ol>
+<h2 id="the-path-forward">The path forward</h2><p>Chat was the beginning of our journey with LLMs, but it is most certainly not the destination. The three threads I described, namely, Michelle's TurboTax-esque structured approach, Pike's context-native interfaces, and Christensen's jobs-to-be-done framework, all point toward the same future: <strong>LLM applications that flow smoothly through business processes, where AI assistance appears exactly when and where it's needed.</strong></p>
+<p>This isn't about replacing human decision-making with AI decision-making. It's about augmenting human workflows with AI capabilities at precisely the right moments, without forcing users to translate their intentions into chat prompts or rely on agents to make all decisions for them.</p>
+<p>We're at the beginning of an incredible generation of software and products, and it's an exciting time to build not just the software but the processes around them too! The question we have now is this: how quickly we can move beyond chat alone to build contextual applications that truly help people accomplish their goals?</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-rethinking-llm-interfaces-from-chatbots-to-contextual-applications</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Rethinking LLM interfaces, from chatbots to contextual applications}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{06}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{14}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/6/14/rethinking-llm-interfaces-from-chatbots-to-contextual-applications}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>
