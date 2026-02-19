@@ -1,0 +1,610 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Canvas Chat: A Visual Interface for Thinking with LLMs">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/canvas-chat-a-visual-interface-for-thinking-with-llms' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Canvas Chat: A Visual Interface for Thinking with LLMs - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Canvas Chat: A Visual Interface for Thinking with LLMs</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-12-31</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llm/">
+        llm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/opencode/">
+        opencode
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/claude/">
+        claude
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/visualization/">
+        visualization
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/tools/">
+        tools
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/productivity/">
+        productivity
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>I built Canvas Chat, a visual interface for nonlinear LLM conversations, over Christmas break using OpenCode and Claude Opus 4.5. The tool solves a specific job: thinking through complex problems where exploration branches in multiple directions. Features include branching conversations, highlight-and-branch, multi-select merge for synthesis, matrix evaluation, and integrated web search. It's open source and runs on Modal.</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I've been mulling over this idea since last year January: A visual, nonlinear interface for LLM conversations—something like an infinite canvas where you could branch, merge, and see the shape of your thinking. It stayed in the "someday" pile because the implementation cost felt too high for a speculative side project; I wasn't skilled in browser technologies or anything UI-related.</p>
+<p>Then came the Christmas break ultralearning exercise I documented in <a href="https://ericmjl.github.io/blog/2025/12/28/you-can-just-make-stuff-with-opencode-and-claude-opus-4-5/">my recent blog post about building with OpenCode and Claude Opus 4.5</a>. Pressure-testing Opus 4.5 made me realize it was finally feasible to spend a day trying to make this work. I pushed Canvas Chat from idea to working prototype in about 24 hours of actual building time, and <a href="https://ericmjl--canvas-chat-fastapi-app.modal.run/">then another 24 hrs to get it up on Modal</a> and add in many, many refinements, each of which may have taken me multiple weeks. The final result is this:</p>
+<p><img src="canvas-chat-overview.webp" alt="Canvas Chat overview showing nodes connected in a directed graph"></p>
+<p>But before I explain what I built, let me explain <em>why</em> I wanted it in the first place.</p>
+<h2 id="the-job-to-be-done">The job to be done</h2><p>Clayton Christensen's <a href="https://hbr.org/2016/09/know-your-customers-jobs-to-be-done">Jobs to Be Done</a> framework asks: what job is the customer hiring this product to do? For Canvas Chat, the job isn't "chat with an LLM"—ChatGPT already does that fine. The job is: <strong>think through a complex problem where the exploration is nonlinear.</strong></p>
+<p>Here's the struggling moment. You're deep in a conversation with Claude or GPT, and you want to try a different framing of your question. But if you do, you'll lose the current thread. Or an LLM gives you a list of ten ideas, one catches your eye, and you want to drill into it—but the conversation keeps scrolling and you lose the overview. Or you've been exploring a problem across three separate chat sessions and now you need to synthesize, but you can't see them together.</p>
+<p>Linear chat actively works against this kind of thinking. It forces linear structure onto nonlinear exploration. You end up managing context in your head, copy-pasting between windows, losing track of which threads went where.</p>
+<p>Canvas Chat exists to solve that. When your thinking branches in multiple directions, it keeps all the threads visible and connected so you don't lose context and can synthesize across them.</p>
+<h2 id="how-it-works">How it works</h2><p>Canvas Chat is an infinite canvas where conversations are nodes in a directed graph. You type a message, it appears as a node. The LLM's response appears as another node, connected by an edge. So far, standard. But then:</p>
+<p><strong>Branch from any node.</strong> Click reply on any message, and your new message connects to that point, not the end of the conversation. The response branches off visually. Try two different prompts from the same starting point and see both branches side by side.</p>
+<p><img src="branch-from-node.webp" alt="Branching from a node to create parallel conversation threads"></p>
+<p><strong>Highlight and branch.</strong> Select text within a node, and a tooltip appears. Type a follow-up question, and Canvas Chat creates a highlight node (showing the excerpt with a blockquote) plus your question, plus the LLM response. The original node stays intact. This works especially well when an LLM gives a list of ideas and you want to drill into one without losing the overview.</p>
+<p><img src="highlight-and-branch-tooltip.webp" alt="Tooltip appearing when text is selected within a node"></p>
+<p><img src="highlight-and-branch-result.webp" alt="Result of highlight and branch showing the blockquote excerpt"></p>
+<p><strong>Multi-select for merge context.</strong> Cmd-click multiple nodes, then type. The new message connects to all selected nodes, and the LLM sees the full ancestry of every selected node. I use this to synthesize: select two branches that went in different directions, ask "What do these approaches have in common?" The context includes everything that led to both.</p>
+<p><img src="multi-select-merge.webp" alt="Multiple nodes selected for merge context synthesis"></p>
+<h2 id="context-flows-through-the-graph">Context flows through the graph</h2><p>When you send a message, Canvas Chat walks the DAG backward from your selected node(s), collecting all ancestors. It sorts them by creation time and sends them to the LLM as conversation history. If you've selected multiple nodes (a merge), the context is the union of all their ancestors, deduplicated.</p>
+<p>The practical effect: the LLM always knows how you arrived at the current question, even if the path is nonlinear. Branch from a discussion about protein folding dynamics, ask a follow-up about computational costs, and the context includes the protein folding discussion. No manual copy-paste.</p>
+<h2 id="matrix-evaluation">Matrix evaluation</h2><p>This feature came out of a specific struggling moment: evaluating many options against many criteria and losing track of which combinations I'd thought through.</p>
+<p>Select one or more nodes as context, type <code>/matrix &lt;and then put additional instructions you're looking to fill out here&gt;</code>. Canvas Chat parses out the list items and shows a confirmation modal where you can remove items or swap rows/columns. Click create, and a matrix node appears.</p>
+<p><img src="matrix-evaluation-modal.webp" alt="Matrix evaluation modal for configuring rows and columns"></p>
+<p>Each cell has a "+" button. Click it and the LLM fills that cell, seeing the matrix context you provided, the row item, the column item, and the full DAG history from the source nodes. "Fill All" processes every empty cell sequentially.</p>
+<p>Click any filled cell to see the full text. "Pin to Canvas" extracts that evaluation into a standalone node, which you can then branch from. Say you're comparing business ideas against criteria, one cell says "strong market fit with enterprise customers," you want to dig into that—pin and branch.</p>
+<p><img src="matrix-evaluation-filled.webp" alt="Matrix evaluation with cells filled by the LLM"></p>
+<h2 id="web-search-and-deep-research">Web search and deep research</h2><p>Canvas Chat integrates Exa's APIs for two slash commands:</p>
+<p><code>/search &lt;query&gt;</code> runs a neural search and creates a Search node with the query, plus Reference nodes for each result. Click "Fetch &amp; Summarize" on any reference to grab the full page content and summarize it.</p>
+<p><img src="web-search-results.webp" alt="Web search results showing reference nodes"></p>
+<p><code>/research &lt;topic&gt;</code> kicks off Exa's Research API, which performs multi-step research with multiple queries. The results stream into a Research node with inline source citations.</p>
+<p><img src="deep-research-node.webp" alt="Deep research node with inline citations"></p>
+<p>If you have nodes selected when you run these commands, Canvas Chat uses an LLM to refine your query using the selected text as context. Highlight "CCNOT gate" and type <code>/search how does this work</code>, and it rewrites the query to "how Toffoli gate CCNOT quantum computing works" before searching.</p>
+<h2 id="local-first-and-multi-provider">Local-first and multi-provider</h2><p><img src="settings-api-keys.webp" alt="Settings panel showing API key configuration"></p>
+<p>All session data lives in IndexedDB. No server-side storage, no accounts. Export sessions as <code>.canvaschat</code> JSON files. API keys live in localStorage and are sent with each request.</p>
+<p>The server is stateless: it proxies LLM calls via LiteLLM and handles the Exa integration, but never stores conversation data. You can deploy it yourself on Modal with a single command.</p>
+<p>Canvas Chat dynamically fetches available models from each provider when you enter an API key. OpenAI, Anthropic, Google (Gemini), Groq, GitHub Models, and local Ollama instances (when running on localhost) all work. Switch models mid-conversation to compare outputs.</p>
+<h2 id="what-building-this-taught-me">What building this taught me</h2><p>This project reinforced something I wrote about in <a href="../../28/you-can-just-make-stuff-with-opencode-and-claude-opus-4-5/">the "I don't code anymore, I build" post</a>: I stayed in product builder brain throughout. I didn't have strong opinions about whether the JavaScript was idiomatic because I don't know what idiomatic JavaScript looks like. I just knew whether the feature worked.</p>
+<p>When something broke, I'd describe the symptoms and let Opus 4.5 debug in as much detail as I can manage. When I wanted a new interaction pattern, I'd describe what it should feel like and watch it materialize. The creative work — deciding what nonlinear chat should <em>be</em> — remained human. The mechanical translation got delegated.</p>
+<p>Canvas Chat is the kind of project I wouldn't have attempted before because the implementation cost exceeded the payoff. Now it didn't.</p>
+<h2 id="try-it">Try it</h2><p>Canvas Chat is open source. Run it locally:</p>
+<div class="hll"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ericmjl/canvas-chat.git
+<span class="nb">cd</span><span class="w"> </span>canvas-chat
+pixi<span class="w"> </span>run<span class="w"> </span>dev
+</pre></div>
+<p>Add your API keys in settings and go. The deployed version runs on <a href="https://ericmjl--canvas-chat-fastapi-app.modal.run/">Modal</a>.</p>
+<p>If you try it, I want to hear what works and what doesn't! You can get in touch with me via <a href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7">Shortmail</a>, or file an issue on the <a href="https://github.com/ericmjl/canvas-chat">Github repo</a>.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-canvas-chat-a-visual-interface-for-thinking-with-llms</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Canvas Chat: A Visual Interface for Thinking with LLMs}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{12}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{31}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/12/31/canvas-chat-a-visual-interface-for-thinking-with-llms}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

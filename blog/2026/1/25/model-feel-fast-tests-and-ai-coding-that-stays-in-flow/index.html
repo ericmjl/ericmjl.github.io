@@ -1,0 +1,641 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Model feel, fast tests, and AI coding that stays in flow">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/model-feel-fast-tests-and-ai-coding-that-stays-in-flow' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Model feel, fast tests, and AI coding that stays in flow - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Model feel, fast tests, and AI coding that stays in flow</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-01-25</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llm/">
+        llm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/autonomy/">
+        autonomy
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/supervision/">
+        supervision
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/personality/">
+        personality
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/verbosity/">
+        verbosity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/harness/">
+        harness
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/refactoring/">
+        refactoring
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workflow/">
+        workflow
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/testing/">
+        testing
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ergonomics/">
+        ergonomics
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share my hands-on experience using AI coding models, focusing less on benchmarks and more on the day-to-day feel—how model style, personality, and the right testing harness impact productivity and flow. I discuss the trade-offs between long-horizon autonomy and short-horizon iteration, and why a constructive, enthusiastic AI assistant matters as much as raw performance. Curious how the right mix of model and harness can transform your coding workflow?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Most of the conversation about AI coding models focuses on performance metrics. Benchmarks, evals, pass rates, latency. Useful stuff, but it misses the part that actually shapes my day-to-day: what it <em>feels</em> like to work with the model.</p>
+<p>Once you start using LLMs as coding agents, the qualitative experience becomes a throughput issue. It affects how often you intervene, how much you trust what is happening, and whether you stay in flow or spend your time cleaning up weird breakage.</p>
+<p>Two axes keep showing up for me.</p>
+<p>First is time horizon and supervision style: long-horizon autonomy versus short-horizon iteration.</p>
+<p>Second is personality and verbosity: how the model behaves when it is wrong, how much it narrates, and whether it stays constructive or spirals into apology loops.</p>
+<p>There is also a third ingredient that ends up mattering as much as the model: the agentic harness. By that I mean the tools and checks that the agent can run to verify it did not break behavior, <em>and</em> whether the harness gives you streaming and visual feedback—a live trace of what the model is doing—or leaves you staring at a spinner until the answer drops. Good harness beats model swapping more often than I expected.</p>
+<h2 id="long-horizon-autonomy-vs-short-horizon-iteration">Long-horizon autonomy vs short-horizon iteration</h2><p>I call it "Opus-feel" when a model has that "ask and it shall be given" vibe with a longer time horizon. You describe what you want, it runs for a while, and it comes back with a plausible scaffold. It is great for momentum.</p>
+<p>I call it "Sonnet-feel" when a model leans toward shorter-horizon iteration. It works better when you are walking through a real codebase step by step, keeping changes small enough that you can validate what happened, correct course, and keep going.</p>
+<p>Another way to put it is that long-horizon autonomy pushes you toward a spec-and-review loop, while short-horizon iteration pushes you toward a steer-and-verify loop. Both can be productive. They just fail differently.</p>
+<p>In a sufficiently large codebase, you cannot rely solely on long-horizon autonomy where you ask for something with a vague description and hope it lands cleanly. You are not always guaranteed something well organized, especially when the job is refactoring rather than greenfield scaffolding.</p>
+<p>A concrete example for me came from Canvas chat. At the time, everything was tied to <code>app.js</code> and <code>app.py</code>. When I wanted to refactor things into plugins, I needed to dogfood a plugin pattern in the codebase itself.</p>
+<p>Long-horizon autonomy struggled here. It could generate a plugin pattern, but it was not great at the careful, incremental work of extracting behavior out of a monolith and into a clean plugin boundary.</p>
+<p>Walking bit by bit with Sonnet or Sonnet-quality models was a very different experience. The big win was that I could study the LLM traces live (the tool calls and file edits it proposes step by step) and see where edits were being made. If I noticed a feature handler getting added to <code>app.js</code> when it clearly belonged in a plugin file, I could intervene immediately and ask, "Why is that thing over there in <code>app.js</code>? Why is it not inside the plugin file instead?" That kind of interactive, traceable work is where the short-horizon models shine.</p>
+<p>Examples from my own testing, with all the usual caveats: Opus-4.5 (Anthropic), GPT-5.2 (OpenAI), and GLM-4.7 (z.ai) have been solid for the long-horizon, get-it-moving-fast mode. Minimax M 2.1 (OpenCode Zen) feels closer to the short-horizon mode for me. Composer-1 (Cursor) also feels closer to that style. I suspect GPT-4o and GPT-5.1 (both OpenAI) might land there too, but I have not really test-driven them.</p>
+<p>The practical takeaway is that I now switch modes on purpose. When I need speed and initial momentum, I reach for long-horizon autonomy. When I need control, I choose a short-horizon model so I can babysit the work, watch the traces, and intercept it when it tries to do something clever in the wrong place.</p>
+<h3 id="the-harness-lesson-cypress-beat-model-hopping">The harness lesson (Cypress beat model hopping)</h3><p>One more lesson from that period: I did a bunch of model hopping, trying to find something that would fix a particular class of behavioral breakage.</p>
+<p>The most frustrating failures were not subtle logic bugs. They were basic syntax errors introduced during tool-call patching, unclosed brackets, unclosed parentheses, that kind of thing. When that happens, you do not get a slightly-wrong feature, you get a page that fails to load. Debugging it manually is fine the first time, and infuriating on the seventh.</p>
+<p>The thing that actually moved the needle was listening to my colleague Anand Murthy and instantiating Cypress tests. A simple automated page reload catches those failures immediately. It shifts the pain earlier, gives the agent a verification loop it can run on demand, and turns "agentic coding" into something I can trust.</p>
+<p>Here is the dumbest possible example, taken straight from the Cypress suite in canvas-chat. It is not fancy, and that is the point. It catches "the page does not load" failures quickly.</p>
+<div class="hll"><pre><span></span><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Help Modal and Auto-Layout&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">beforeEach</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">cy</span><span class="p">.</span><span class="nx">clearLocalStorage</span><span class="p">();</span>
+<span class="w">        </span><span class="nx">cy</span><span class="p">.</span><span class="nx">clearIndexedDB</span><span class="p">();</span>
+<span class="w">        </span><span class="nx">cy</span><span class="p">.</span><span class="nx">visit</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">);</span>
+<span class="w">        </span><span class="nx">cy</span><span class="p">.</span><span class="nx">wait</span><span class="p">(</span><span class="mf">1000</span><span class="p">);</span>
+<span class="w">    </span><span class="p">});</span>
+
+<span class="w">    </span><span class="nx">it</span><span class="p">(</span><span class="s1">&#39;opens and closes help modal&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">cy</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;#help-btn&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">();</span>
+<span class="w">        </span><span class="nx">cy</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;#help-modal&#39;</span><span class="p">).</span><span class="nx">should</span><span class="p">(</span><span class="s1">&#39;be.visible&#39;</span><span class="p">);</span>
+<span class="w">        </span><span class="nx">cy</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;#help-close&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">();</span>
+<span class="w">        </span><span class="nx">cy</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;#help-modal&#39;</span><span class="p">).</span><span class="nx">should</span><span class="p">(</span><span class="s1">&#39;not.be.visible&#39;</span><span class="p">);</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="p">});</span>
+</pre></div>
+<p>Beyond model choice, a great agentic harness matters. If your harness includes tests that a coding agent can run to verify no behavioral breakage, you get to move faster with more confidence, regardless of which model you are using.</p>
+<h2 id="verbosity-attitude-and-the-cost-of-being-wrong">Verbosity, attitude, and the cost of being wrong</h2><p>The other axis that became obvious once I started pressure testing models is verbosity and its associated feel.</p>
+<p>I tried Gemini 2.5, and it was a disaster for me. After experiencing the long-horizon and short-horizon styles, I did not want to use it. It made elementary mistakes, like leaving trailing dangling curly braces where they were not supposed to be. Then it would apologize profusely over and over, like a Canadian on steroids. (I'm a born and bred Canadian, I'm allowed to say that!)</p>
+<p>In contrast, Claude and Opus are consistently upbeat and positive, and the same can be said for Minimax-M.2 and GLM-4.7. That matters more than I expected. When something breaks and you are iterating quickly, a model that stays constructive keeps the whole loop feeling fun.</p>
+<p>On the other end, GPT-5.2 would just go ahead and do things without being overly effusive, then loop back to tell me what it did. That sounds fine on paper, but it left me feeling a bit clueless. I would wonder what it was doing and whether I could intercept it if it went off on the wrong tangent. I often could not, because I needed to wait until the end to learn what it decided to do.</p>
+<p>So yes, I care about correctness. But I also care about how a model behaves while it is getting to correctness. The journey matters because the journey is where you spend your time.</p>
+<h2 id="enthusiasm-is-a-feature">Enthusiasm is a feature</h2><p>This ties nicely to <a href="https://x.com/Grady_Booch/status/2013343499563999589">a tweet</a> I saw from Grady Booch (@Grady_Booch):</p>
+<blockquote><p>"The greatest value such tools have offered me is to reduce my cognitive load and automate various tedious tasks."</p>
+</blockquote>
+<p>Here is the punchline:</p>
+<blockquote><p>"To serve as an enthusiastic and indefatigable, albeit very naive and often unreliable, pair programmer."</p>
+</blockquote>
+<p>That enthusiasm and indefatigability, compared to a grumpy human, keeps the loop moving.</p>
+<p>My frustration pair coding with Gemini was not just the mistakes, it was the <em>emotional texture</em> of the interaction. It would make mistakes and then apologize, repeatedly. After a while, you start optimizing your own behavior around the assistant's vibe, and that is not where you want your attention to go.</p>
+<p>A better pair programmer, human or AI, is relentlessly game for the next challenge. It affirms what you are trying to do, it corrects you when you are wrong, and it does not act like it is giving up. When the assistant stays constructive, the work stays fun.</p>
+<h2 id="streaming-and-the-illusion-of-speed-the-harness-model">Streaming and the illusion of speed (the harness + model)</h2><p>Raw latency is one thing. What you <em>see</em> while the model is working is another, and that is determined by the harness. In Cursor, you get a fast stream of tool calls and edits. You see the so-called thinking process. Something is clearly happening. With GLM-4.7 or Open Code in certain setups, you wait a long time with nothing streamed in—just a spinner or a blank state until the full response lands. Same model capability, same task, different harness, totally different experience. The harness that gives you a live trace makes the wait feel shorter and keeps you in the loop. The one that hides progress makes every request feel like a gamble. If you care about flow, streaming and visual feedback are not polish; they are table stakes, and they live in the harness.</p>
+<h2 id="the-feel-is-also-vendor-lock-in">The "feel" is also vendor lock-in</h2><p>After enough hours with a single model, you start building muscle memory for its quirks. You learn how to phrase prompts so it does the right thing. You learn which mistakes to expect. You even learn its tone. That comfort is sticky.</p>
+<p>The sticky part is the problem. Getting used to a model's ergonomics is a form of vendor lock-in, and it is something I am determined to avoid.</p>
+<p>That is one reason I have been bouncing between models (apart from me hitting limits) to feel out the ragged frontier of model behavior. It is pretty revealing. You quickly learn that "best model" is not a single number. The model you want depends on whether you are scaffolding, refactoring, debugging, or doing the last-mile polish.</p>
+<p>If you want to keep your agency while using these tools, stay fluent across multiple feels. Otherwise you end up optimizing your workflow around one model's quirks and calling it productivity.</p>
+<h2 id="a-more-pragmatic-way-to-think-about-model-choice">A more pragmatic way to think about model choice</h2><p>What I do now is less romantic than "find the best model". I think in terms of work phases and feedback loops.</p>
+<p>If I am scaffolding, I will happily take Opus-feel: longer-horizon autonomy and a big blob of output, because the cost of being wrong is usually low.</p>
+<p>If I am refactoring or debugging, I want Sonnet-feel: short-horizon iteration and tight supervision, because the cost of being wrong is a broken app and a bunch of time lost to verification.</p>
+<p>And if I keep hitting the same dumb failures, I try to fix my harness before I try to fix my model. Add the smallest test that fails fast, make it runnable by the agent, and suddenly the whole system behaves better. Cypress reloading the page and clicking one button did more for my sanity than another week of model hopping.</p>
+<p>At a systems level, I want a workflow where models are swappable components. In practice that means traces you can read, tests you can run, and a loop that tells you quickly when the agent broke something.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-model-feel-fast-tests-and-ai-coding-that-stays-in-flow</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Model feel, fast tests, and AI coding that stays in flow}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{01}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{25}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/1/25/model-feel-fast-tests-and-ai-coding-that-stays-in-flow}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

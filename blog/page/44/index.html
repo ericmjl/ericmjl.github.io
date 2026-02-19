@@ -1,0 +1,1231 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+    
+
+    
+    
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Blog - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+<div>
+
+<div class="btn-group" role="group" aria-label="pagination">
+  
+  <a href="/blog" class="btn btn-ghost">&laquo;</a>
+  
+
+  
+  <a href="/blog/page/42/" class="btn btn-ghost">42</a>
+  
+
+  
+  <a href="../43/" class="btn btn-ghost">43</a>
+  
+
+  <span class="btn btn-primary disabled">44</span>
+
+  
+  <a href="../45/" class="btn btn-ghost">45</a>
+  
+
+  
+
+  
+  <a href="/blog/page/46/" class="btn btn-ghost">&raquo;</a>
+  
+</div>
+
+<br>
+</div>
+<div class="terminal-timeline">
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2016/3/18/flask-jinja2-bootstrapcss-and-thoughts-on-being-a-maker/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Flask, Jinja2, bootstrap.css - and thoughts on being a maker</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2016-03-18</span>
+
+    
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <div>
+          <p class="card-text"><p>I recently built a <a href="http://github.com/ericmjl/flu-gibson-webui/">front-end GUI</a> for one of my projects, which is a <a href="http://github.com/ericmjl/flu-gibson/">primer calculator</a> for doing Gibson assembly with influenza...
+            <a href="../../2016/3/18/flask-jinja2-bootstrapcss-and-thoughts-on-being-a-maker/">(read more)</a>
+          </p>
+          <small>
+            
+
+
+
+
+
+
+
+(420 words, approximately 3 minutes reading time)
+
+          </small>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2016/3/17/science-and-applied-science-the-philosophies/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Science and Applied Science - The Philosophies</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2016-03-17</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/philosophy/">
+        philosophy
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/science/">
+        science
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <div>
+          <p class="card-text"><p>Random thought came to my mind today.</p>
+<p>The process of science is the careful observation, measurement, and falsification of hypotheses of the world. It is immensely useful. IMO, a worldview that gives rise to genuine curiosity,...
+            <a href="../../2016/3/17/science-and-applied-science-the-philosophies/">(read more)</a>
+          </p>
+          <small>
+            
+
+
+
+
+
+
+
+(208 words, approximately 2 minutes reading time)
+
+          </small>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2016/3/15/tests-enabled-science/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Tests-Enabled Science</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2016-03-15</span>
+
+    
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <div>
+          <p class="card-text"><p>In the software development world, I learned about the importance of writing tests for one’s software. Since then, I have incorporated this habit in my own work, where as part of my more recent work, I write tests for the software I write to...
+            <a href="../../2016/3/15/tests-enabled-science/">(read more)</a>
+          </p>
+          <small>
+            
+
+
+
+
+
+
+
+(390 words, approximately 2 minutes reading time)
+
+          </small>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2016/3/13/r-for-statistics-python-for-data-processing/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">R for Statistics, Python for Data Processing?</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2016-03-13</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/statistics/">
+        statistics
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/r/">
+        R
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <div>
+          <p class="card-text"><p>I’ve heard this refrain many times. However, the distinction never really made sense to me.</p>
+<p>R and Python are merely programming languages. You don’t have to do stats in R and data processing in Python. You can do data processing in R, and...
+            <a href="../../2016/3/13/r-for-statistics-python-for-data-processing/">(read more)</a>
+          </p>
+          <small>
+            
+
+
+
+
+
+
+
+(655 words, approximately 4 minutes reading time)
+
+          </small>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2016/2/13/chalk-talk/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Chalk Talk</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2016-02-13</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/chalk talk/">
+        chalk talk
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/public speaking/">
+        public speaking
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/research presentation/">
+        research presentation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/influenza research/">
+        influenza research
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/broad institute/">
+        broad institute
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/seminar series/">
+        seminar series
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/audience interaction/">
+        audience interaction
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/talk preparation/">
+        talk preparation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/slide decks/">
+        slide decks
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/whiteboard talk/">
+        whiteboard talk
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/presentation skills/">
+        presentation skills
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/feedback/">
+        feedback
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/science communication/">
+        science communication
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/infectious disease/">
+        infectious disease
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/evolution/">
+        evolution
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">Yesterday, I shook things up at the Broad Institute&#39;s Infectious Disease Program seminar series
+by doing a chalk talk instead of a slide deck presentation.
+It was less stressful to prepare for,
+the audience was engaged,
+and I got some valuable feedback. 🎤🔬👥
+
+I&#39;ve learned a lot from this experience
+and I think chalk talks should become the norm again for research presentations. 📝💡</p>
+        </span>
+        <small>
+          <a href="../../2016/2/13/chalk-talk/">Read on...</a>
+          
+
+
+
+
+
+
+
+(475 words, approximately 3 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2016/2/9/scikit-learn-tutorial/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">scikit-learn tutorial</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2016-02-09</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/software carpentry/">
+        software carpentry
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data carpentry/">
+        data carpentry
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <div>
+          <p class="card-text"><p>This past Monday, I led a hands-on session at the <a href="https://broadinstitute.org">Broad Institute</a>, showing how to use the <a href="https://scikit-learn.org">scikit-learn</a> API, as well as common coding patterns for running machine...
+            <a href="../../2016/2/9/scikit-learn-tutorial/">(read more)</a>
+          </p>
+          <small>
+            
+
+
+
+
+
+
+
+(526 words, approximately 3 minutes reading time)
+
+          </small>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2015/12/3/reticulate-evolution-and-microbial-ecology/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Reticulate Evolution and Microbial Ecology</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2015-12-03</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/influenza/">
+        influenza
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/graduate school/">
+        graduate school
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/peer review/">
+        peer review
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/thesis/">
+        thesis
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <div>
+          <p class="card-text"><p>I am happy to announce that, with my advisor's (Jon Runstadler, MIT) approval, I've uploaded my first 1st-author paper to <a href="http://biorxiv.org/content/early/2015/12/02/033514">BioRXiv</a>. This may sound surprising, to document and write...
+            <a href="../../2015/12/3/reticulate-evolution-and-microbial-ecology/">(read more)</a>
+          </p>
+          <small>
+            
+
+
+
+
+
+
+
+(1516 words, approximately 8 minutes reading time)
+
+          </small>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2015/11/28/profiling-pypy-vs-python-for-agent-based-simulation/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Profiling PyPy vs. Python for Agent-Based Simulation</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2015-11-28</span>
+
+    
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <div>
+          <p class="card-text"><h2 id="outline">Outline</h2><ol>
+<li>Introduction:<ol>
+<li>Motivation</li>
+<li>Model description</li>
+<li>Link to code</li>
+</ol>
+</li>
+<li>Environment Setup</li>
+<li>Performance<ol>
+<li>Python vs. PyPy on one parameter set.</li>
+<li>Vary number of...
+            <a href="../../2015/11/28/profiling-pypy-vs-python-for-agent-based-simulation/">(read more)</a>
+          </p>
+          <small>
+            
+
+
+
+
+
+
+
+(1713 words, approximately 9 minutes reading time)
+
+          </small>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2015/9/28/predicting-hiv-drug-resistance-phenotype-from-genotype/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Predicting HIV Drug Resistance Phenotype from Genotype</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2015-09-28</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/drug resistance/">
+        drug resistance
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/academia/">
+        academia
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/grad school/">
+        grad school
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">A blog post detailing how I built a model to predict drug resistance from HIV protease sequence.</p>
+        </span>
+        <small>
+          <a href="../../2015/9/28/predicting-hiv-drug-resistance-phenotype-from-genotype/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1533 words, approximately 8 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2015/9/3/in-which-i-trained-a-neural-network/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">In Which I Trained A Neural Network :)</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2015-09-03</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/deep learning/">
+        deep learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/neural networks/">
+        neural networks
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">I have decided to link to my &lt;a href=&#34;https://github.com/ericmjl/nnet-HA/blob/master/Prototype%20Neural%20Network%20for%20predicting%20HA%20host%20tropism.ipynb&#34;&gt;Jupyter notebook&lt;/a&gt; &amp;amp; &lt;a href=&#34;https://github.com/ericmjl/nnet-HA/tree/master&#34;&gt;github repository&lt;/a&gt; instead of re-writing the whole post here. I hope you enjoy it! :)</p>
+        </span>
+        <small>
+          <a href="../../2015/9/3/in-which-i-trained-a-neural-network/">Read on...</a>
+          
+
+
+
+
+
+
+
+
+
+(56 words, approximately 1 minute reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+<div class="btn-group" role="group" aria-label="pagination">
+  
+  <a href="/blog" class="btn btn-ghost">&laquo;</a>
+  
+
+  
+  <a href="/blog/page/42/" class="btn btn-ghost">42</a>
+  
+
+  
+  <a href="../43/" class="btn btn-ghost">43</a>
+  
+
+  <span class="btn btn-primary disabled">44</span>
+
+  
+  <a href="../45/" class="btn btn-ghost">45</a>
+  
+
+  
+
+  
+  <a href="/blog/page/46/" class="btn btn-ghost">&raquo;</a>
+  
+</div>
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

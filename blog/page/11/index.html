@@ -1,0 +1,1521 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+    
+
+    
+    
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Blog - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+<div>
+
+<div class="btn-group" role="group" aria-label="pagination">
+  
+  <a href="/blog" class="btn btn-ghost">&laquo;</a>
+  
+
+  
+  <a href="/blog/page/9/" class="btn btn-ghost">9</a>
+  
+
+  
+  <a href="../10/" class="btn btn-ghost">10</a>
+  
+
+  <span class="btn btn-primary disabled">11</span>
+
+  
+  <a href="../12/" class="btn btn-ghost">12</a>
+  
+
+  
+  <a href="/blog/page/13/" class="btn btn-ghost">13</a>
+  
+
+  
+  <a href="/blog/page/46/" class="btn btn-ghost">&raquo;</a>
+  
+</div>
+
+<br>
+</div>
+<div class="terminal-timeline">
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2024/4/7/pyds-cli-version-040-released/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">pyds-cli version 0.4.0 released!</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-04-07</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/pyds-cli/">
+        pyds-cli
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/standards/">
+        standards
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/cookiecutter/">
+        cookiecutter
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/templates/">
+        templates
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/github actions/">
+        github actions
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2024/4/7/pyds-cli-version-040-released/" style="text-decoration: none;">
+        <img src="../../2024/4/7/pyds-cli-version-040-released/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I share the latest updates to `pyds-cli`, including the use of `cookiecutter` templates for easy repo scaffolding and a new talks initializer for creating talk presentations using `reveal-md`. These updates simplify the CLI and offer a streamlined approach to project and talk setup, reflecting my commitment to promoting best practices among data scientists. With these tools, I aim to make it easier for data scientists to adopt standardized project structures. Curious about how these updates can enhance your workflow?</p>
+        </span>
+        <small>
+          <a href="../../2024/4/7/pyds-cli-version-040-released/">Read on...</a>
+          
+
+
+
+
+
+
+
+(887 words, approximately 5 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2024/4/5/how-to-grow-software-development-skills-in-a-data-science-team/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">How to grow software development skills in a data science team</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-04-05</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science team/">
+        data science team
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/software development/">
+        software development
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/upskilling/">
+        upskilling
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/tooling/">
+        tooling
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/environment/">
+        environment
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/productivity/">
+        productivity
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2024/4/5/how-to-grow-software-development-skills-in-a-data-science-team/" style="text-decoration: none;">
+        <img src="../../2024/4/5/how-to-grow-software-development-skills-in-a-data-science-team/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I share insights from my 7 years in the industry on how to enhance a data science team&#39;s software development skills, focusing on the necessity of tooling and practices that make it easy and normal to do the right thing: moving from notebook explorations to production-ready code. I also discuss the importance of community practices in fostering a culture of quality software development within data science teams. How can these strategies streamline your team&#39;s workflow and elevate their software development capabilities?</p>
+        </span>
+        <small>
+          <a href="../../2024/4/5/how-to-grow-software-development-skills-in-a-data-science-team/">Read on...</a>
+          
+
+
+
+
+
+
+
+(2402 words, approximately 13 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2024/3/24/llamabot-040-released/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Llamabot 0.4.0 Released!</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-03-24</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/querybot/">
+        querybot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/refactor/">
+        refactor
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/chromadb/">
+        chromadb
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/lancedb/">
+        lancedb
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/vector database/">
+        vector database
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/hybrid search/">
+        hybrid search
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/chatui/">
+        chatui
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/mixin/">
+        mixin
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/panel/">
+        panel
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/repo chat/">
+        repo chat
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/litellm/">
+        litellm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/contributions/">
+        contributions
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/open source/">
+        open source
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2024/3/24/llamabot-040-released/" style="text-decoration: none;">
+        <img src="../../2024/3/24/llamabot-040-released/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I share the latest updates of LlamaBot 0.4.0, highlighting the decoupling of document storage from text generation in QueryBot, the introduction of the ChatUIMixin for easy web UI integration, and the switch to LanceDB for its lightweight, SQLite-like handling of vectors. I also touch on enhancements to repo chat, making it simpler to launch web-based chatbots on repository content. If you&#39;re a llamabot user, I&#39;d love to hear from you about how well it works for you!</p>
+        </span>
+        <small>
+          <a href="../../2024/3/24/llamabot-040-released/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1258 words, approximately 7 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2024/3/23/how-to-organize-and-motivate-a-biotech-data-science-team/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">How to organize and motivate a biotech data science team</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-03-23</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/organization/">
+        organization
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/motivation/">
+        motivation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/research/">
+        research
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/biotech/">
+        biotech
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/team activities/">
+        team activities
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/product-oriented/">
+        product-oriented
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/service-oriented/">
+        service-oriented
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/career development/">
+        career development
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2024/3/23/how-to-organize-and-motivate-a-biotech-data-science-team/" style="text-decoration: none;">
+        <img src="../../2024/3/23/how-to-organize-and-motivate-a-biotech-data-science-team/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I discuss about organizing and motivating a data science team within a biotech research setting, focusing on structuring team activities around key research entities and methodologies. I highlight the importance of aligning team members with projects that match their interests and professional goals, and suggest ways to foster leadership skills without formal management roles. How do we balance the technical and career aspirations of data scientists to maintain productivity and motivation?</p>
+        </span>
+        <small>
+          <a href="../../2024/3/23/how-to-organize-and-motivate-a-biotech-data-science-team/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1296 words, approximately 7 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2024/3/10/mixtral-8x7b-instruct-works-on-an-old-gtx1080/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Mixtral-8x7b-Instruct works on an old GTX1080!</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-03-10</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/mixtral 8x7b-instruct/">
+        mixtral 8x7b-instruct
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/old gpu/">
+        old gpu
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/linux tower/">
+        linux tower
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/4-bit quantized/">
+        4-bit quantized
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/llama bot/">
+        llama bot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/keyword generator/">
+        keyword generator
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/protein engineering/">
+        protein engineering
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/machine learning/">
+        machine learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/older commodity hardware/">
+        older commodity hardware
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2024/3/10/mixtral-8x7b-instruct-works-on-an-old-gtx1080/" style="text-decoration: none;">
+        <img src="../../2024/3/10/mixtral-8x7b-instruct-works-on-an-old-gtx1080/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I share my experience running the Mixtral 8x7b-Instruct model on my old Linux GPU tower. I used the 4-bit quantized model and was pleasantly surprised that it worked. I generated keywords for a paper on protein engineering and machine learning using the model, and the results were comparable to GPT-4. Although the model was slower than running mistral-7b, it was still functional on older hardware. Have you tried running large language models on older hardware? Read on to find out more about my experience.</p>
+        </span>
+        <small>
+          <a href="../../2024/3/10/mixtral-8x7b-instruct-works-on-an-old-gtx1080/">Read on...</a>
+          
+
+
+
+
+
+
+
+(342 words, approximately 2 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2024/3/9/industry-career-panel-for-phd-students-and-post-docs-at-mit/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">From Academia to Industry: Career Advice from MIT Industry Careers Panel</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-03-09</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/career panel/">
+        career panel
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/professional development/">
+        professional development
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/phd advice/">
+        phd advice
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/networking/">
+        networking
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/job search/">
+        job search
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/public profile/">
+        public profile
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/portfolio management/">
+        portfolio management
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/work life balance/">
+        work life balance
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2024/3/9/industry-career-panel-for-phd-students-and-post-docs-at-mit/" style="text-decoration: none;">
+        <img src="../../2024/3/9/industry-career-panel-for-phd-students-and-post-docs-at-mit/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I share insights from a career panel at MIT where we discussed advice for Ph.D. students about to graduate. We covered the importance of studying job postings, networking effectively, maintaining a public profile, and understanding business needs when applying for jobs. We also touched on the value of a publicly viewable portfolio and the challenge of balancing work and home life. What other advice have you heard?</p>
+        </span>
+        <small>
+          <a href="../../2024/3/9/industry-career-panel-for-phd-students-and-post-docs-at-mit/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1223 words, approximately 7 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2024/2/29/your-first-90-days-at-work-what-should-you-do/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Your first 90 days at work - what should you do?</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-02-29</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/career development/">
+        career development
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/productivity tips/">
+        productivity tips
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/time management/">
+        time management
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/brag doc/">
+        brag doc
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/professional development/">
+        professional development
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/first job/">
+        first job
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2024/2/29/your-first-90-days-at-work-what-should-you-do/" style="text-decoration: none;">
+        <img src="../../2024/2/29/your-first-90-days-at-work-what-should-you-do/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I share advice for those starting a new job, focusing on the first 90 days. I discuss the importance of automating your calendar, recording your accomplishments, building a company committee, and choosing a manageable project with tangible impact. These strategies can help you gain control over your career direction and make a positive impression in your new role. How can you apply these tips to your own career journey?</p>
+        </span>
+        <small>
+          <a href="../../2024/2/29/your-first-90-days-at-work-what-should-you-do/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1525 words, approximately 8 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2024/2/25/how-to-keep-sharp-with-technical-skills-as-a-data-science-team-lead/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">How to keep sharp with technical skills as a data science team lead</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-02-25</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/leadership/">
+        leadership
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/coaching/">
+        coaching
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/mentorship/">
+        mentorship
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/continuous learning/">
+        continuous learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/technical skills/">
+        technical skills
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/machine learning/">
+        machine learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/pair coding/">
+        pair coding
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/code review/">
+        code review
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2024/2/25/how-to-keep-sharp-with-technical-skills-as-a-data-science-team-lead/" style="text-decoration: none;">
+        <img src="../../2024/2/25/how-to-keep-sharp-with-technical-skills-as-a-data-science-team-lead/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I share my strategies for maintaining technical skills as a data science team lead.
+Balancing management duties with technical tasks,
+I use strategies like performing lower-level tasks, pair coding, code reviews, asking questions, and prototyping.
+These methods help me stay sharp and credible with my team, while also fostering personal growth.
+How do you keep your technical skills up-to-date?</p>
+        </span>
+        <small>
+          <a href="../../2024/2/25/how-to-keep-sharp-with-technical-skills-as-a-data-science-team-lead/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1069 words, approximately 6 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2024/2/21/llamabot-with-ollama-on-my-home-virtual-private-network/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">LlamaBot with Ollama on my home virtual private network</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-02-21</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/gpu/">
+        gpu
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/deep learning/">
+        deep learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/ollama/">
+        ollama
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/llm/">
+        llm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/tailscale/">
+        tailscale
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/linux/">
+        linux
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/ubuntu/">
+        ubuntu
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/gpu/">
+        gpu
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2024/2/21/llamabot-with-ollama-on-my-home-virtual-private-network/" style="text-decoration: none;">
+        <img src="../../2024/2/21/llamabot-with-ollama-on-my-home-virtual-private-network/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I share how I breathed new life into my idle GPU tower by running an Ollama server on my home&#39;s private network. I connected all my devices via a Tailscale virtual private network and installed Ollama on my GPU server. I then used LlamaBot to build bots that utilized the Ollama server. This turned out to be an effective way to extend the usable life of my GPU box. Curious about how you can do the same with your idle GPU? Read on!</p>
+        </span>
+        <small>
+          <a href="../../2024/2/21/llamabot-with-ollama-on-my-home-virtual-private-network/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1329 words, approximately 7 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2024/2/18/dashboard-ready-data-is-often-machine-learning-ready-data/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Dashboard-ready data is often machine learning-ready data</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-02-18</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/machine learning/">
+        machine learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data engineering/">
+        data engineering
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/python packages/">
+        python packages
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/chemical screening/">
+        chemical screening
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/predictive models/">
+        predictive models
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data curation/">
+        data curation
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2024/2/18/dashboard-ready-data-is-often-machine-learning-ready-data/" style="text-decoration: none;">
+        <img src="../../2024/2/18/dashboard-ready-data-is-often-machine-learning-ready-data/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I discuss the overlap between dashboard-ready and machine-learning-ready data. I share an example from a chemical screening campaign, where the same data used for a dashboard can also be used for machine learning models. I explore the reasons behind this from both a statistical and business perspective. How can you gain leverage in your data for both purposes?</p>
+        </span>
+        <small>
+          <a href="../../2024/2/18/dashboard-ready-data-is-often-machine-learning-ready-data/">Read on...</a>
+          
+
+
+
+
+
+
+
+(430 words, approximately 3 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+<div class="btn-group" role="group" aria-label="pagination">
+  
+  <a href="/blog" class="btn btn-ghost">&laquo;</a>
+  
+
+  
+  <a href="/blog/page/9/" class="btn btn-ghost">9</a>
+  
+
+  
+  <a href="../10/" class="btn btn-ghost">10</a>
+  
+
+  <span class="btn btn-primary disabled">11</span>
+
+  
+  <a href="../12/" class="btn btn-ghost">12</a>
+  
+
+  
+  <a href="/blog/page/13/" class="btn btn-ghost">13</a>
+  
+
+  
+  <a href="/blog/page/46/" class="btn btn-ghost">&raquo;</a>
+  
+</div>
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

@@ -1,0 +1,632 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Elevating Team Performance: Feedback Strategies for Data Science Leaders">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/elevating-team-performance-feedback-strategies-for-data-science-leaders' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Elevating Team Performance: Feedback Strategies for Data Science Leaders - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Elevating Team Performance: Feedback Strategies for Data Science Leaders</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2023-12-11</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/team management/">
+        team management
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/culture/">
+        culture
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/feedback/">
+        feedback
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/coaching/">
+        coaching
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/code review/">
+        code review
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/asynchronous feedback/">
+        asynchronous feedback
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/technical feedback/">
+        technical feedback
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/team/">
+        team
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/morale/">
+        morale
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/continuous improvement/">
+        continuous improvement
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share my experiences and insights on providing effective feedback in a data science team. I discuss the importance of positivity, specificity, self-reflection, effusiveness, in situ technical feedback, connecting accomplishments to broader impacts, and uplifting when mistakes occur. These strategies foster a supportive environment, promote continuous improvement, and align team members with the broader mission. How can these feedback strategies improve your team's dynamics and performance? I hope my experiences shared here can give you inspiration!</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <h2 id="introduction">Introduction</h2><p>In data science (and most) teams, how team leads give feedback can significantly influence team members' growth and development. Being close to the end of the year, I reflected on 2.5 years of providing feedback and coaching to my teammates. I decided to document the nuances of delivering constructive feedback with concrete (but anonymized) examples from my work. These essentially are things that I've learned over the years.  ￼</p>
+<h2 id="stay-positive-and-specific">Stay Positive and Specific</h2><p>When giving feedback, you want to stay positive. Doing so is essential for fostering a supportive and motivating environment. Additionally, you want to be specific. Doing so is necessary for coaching an individual contributor toward improvement.</p>
+<p>For example, I remember one of our teammates delivered an excellent presentation on behalf of a project team. At the same time, I noticed that this public speaking session revealed some pointers where he could have improved. I could have just said, "Great job! I loved it!" and moved on, but instead, I said something along the lines of:</p>
+<blockquote><p>That was an excellent presentation - based on feedback from others in the audience, they could follow along the main concepts. Your delivery was smooth and confident - no noticeable hiccups, even if there were any.
+In the spirit of continual improvement, I noticed that your eyes made more contact with the speaker's monitor than the audience. If you switched your attention to the audience, that would double the effectiveness of your presentation instantly. Consider that for the future!</p>
+</blockquote>
+<p>Some key pointers I strived to accomplish include:
+Opening off with the positives in concrete ways.
+Pivoting to improvements (and not to critiques).
+Providing actionable suggestions that my teammates could put into action in the future.</p>
+<p>This kind of feedback acknowledges the strengths while offering specific areas for improvement, making it constructive and encouraging. By contrast, without specific feedback, your teammates would be left wondering what they did well and what they needed to improve upon. In a worst-case scenario, change something they did well (which they should preserve) while continuing to do something that wasn't effective (which should be changed).</p>
+<h2 id="encourage-self-reflection">Encourage Self-Reflection</h2><p>In providing feedback, I avoid injecting my opinions first. Instead, I encourage self-reflection first. My opening lines in a feedback session often are:</p>
+<blockquote><p>What did you think went well, and what would you like to improve?</p>
+</blockquote>
+<p>Even though I ask that my teammates begin first, I still take notes and have an opinion on where they can improve. The key idea I'm going for here is to encourage self-reflection. From personal experience, I am more receptive to feedback once I've had the chance to rewind and play back my performance tape in my head first. Following the Golden Rule, I want to afford my teammates the same opportunity.</p>
+<p>From that point onwards, there is a discussion rather than a top-down lecture. If I've done the hiring part right, my teammates will be self-conscious and technically adept. As a result, we will agree with most of what we discuss and only have to focus our energies on places where I, or they, may have missed something.</p>
+<h2 id="be-effusive-in-asynchronous-feedback">Be Effusive in Asynchronous Feedback</h2><p>As with general feedback, code review feedback must be specific and positive. Unlike general feedback, however, <em>asynchronous</em> code review needs additional care.</p>
+<p>In asynchronous code review, being biased towards being effusive is essential. If we were to metaphorically measure the bandwidth available for carrying <em>intent</em>, text is limited compared to in-person reviews or reviews done over video calls. Being effusive is a way to help communicate assumed positive intent. Doing so can help foster a psychologically safe environment within the team.</p>
+<p>Suppose you are the reviewer of an algorithm that requires refactoring. A poor way to leave a review comment might look like this:</p>
+<blockquote><p>This code needs refactoring.</p>
+</blockquote>
+<p>A better way to communicate here would be:</p>
+<blockquote><p>Thanks for implementing the algorithm -- this is a non-trivial and technically challenging piece of code. How could we refactor this further to make the implementation match our understanding of the problem better? And how could we test it so that we can gain a guarantee of the mathematical correctness of the overall algorithm?</p>
+</blockquote>
+<p>In that response, I followed the abovementioned principles - being positive, encouraging specificity, and encouraging self-reflection. Also, I avoid using the term "you" to convey that this code is co-created by us as a team, even though my teammate is the reviewer. (Using "you" can also come across as being accusatory, even if that's not the intent.)</p>
+<p>There will be times when I find a nitpicky error that requires a nitpicky response. In those cases, I will prefix my review comment with a clarification that my comment is nitpicky. To illustrate, here is a nitpicky comment without that clarification:</p>
+<blockquote><p>A blank line between the function description and argument docs is needed.</p>
+</blockquote>
+<p>Imagine being a newcomer to the team and receiving that review comment - you have little established trust with the rest of the team. You may wonder, "Why is my team lead being so nitpicky with me?" You may even second-guess your decision to join the group!</p>
+<p>By contrast, here is a better version of the comment.</p>
+<blockquote><p>Minor nitpick: typical documentation style includes a blank line between the description of the function and its argument documentation. Can you fix this throughout, please?</p>
+</blockquote>
+<p>Being effusive means defusing tension, reducing uncertainty, and increasing clarity. Doing so enhances psychological safety, which in turn leads to high-performing teams. Please don't take it from me: <a href="https://www.linkedin.com/pulse/five-keys-successful-google-team-laszlo-bock/">Googlers have done this research!</a></p>
+<h2 id="make-feedback-in-situ">Make Feedback <code>in situ</code></h2><p>Technical feedback is often most effective <a href="https://en.wikipedia.org/wiki/In_situ"><em>in situ</em></a>:</p>
+<blockquote><p>In situ (/ɪn ˈsɪtjuː, - ˈsaɪtjuː, - ˈsiː-/; often not italicized in English) is a Latin phrase that translates literally to "on site" or "in position."</p>
+<p>(<a href="https://en.wikipedia.org/wiki/In_situ">Wikipedia entry on <em>in situ</em>, accessed on Monday, 11 December 2023</a>)</p>
+</blockquote>
+<p>Doing so stems from one property that I have uncovered about deeply technical work. Until it is implemented in code or drawn out as a diagram, there are often (1) too many abstractions to wrap one's head around and (2) too much contextual knowledge needed for specific feedback to be effective. More often than not, technical feedback needs to be shown rather than told. As such, rather than providing technical feedback in the absence of code, documentation, or diagrams, it is much more effective to provide technical feedback <em>in situ</em>, i.e. within the context of actual work being done and just-in-time.</p>
+<p>Here is a real example from work. One of my teammates performed a calculation and called it a probability measure. When we discussed the matter, my feedback was vague as I did not see the mathematical implementation in the code. Only when I saw the code could I pinpoint that the calculation did not constitute a probability measure as the sum of so-called probabilities did not equal 1.0, which is a definition of probabilities. Giving the feedback <em>in situ</em> meant that they had a concrete memory of their own professional experience to rely on when remembering this point.</p>
+<h2 id="point-to-impact">Point to Impact</h2><p>When giving feedback, particularly positive feedback, it helps to contextualize the accomplishment by connecting it to the team's broader mission (or company goals). Doing so is a suggestion written by Ron Carucci in the Harvard Business Review Article, <a href="https://hbr.org/2018/07/what-not-to-do-when-youre-trying-to-motivate-your-team">"What Not To Do When You're Trying To Motivate Your Team"</a>. With few exceptions, at work, we all want to know why what we've done matters -- why else would we dedicate just under 1/4 of our adult lives to it?</p>
+<p>Pointing to impact implies that I am personally on the hook for knowing <em>why</em> a project matters. I am responsible for understanding this for all of my teammates' work. I need to articulate the importance of everyone's work and their connections to a broader vision of what discovery science can be -- accelerated and quantified. I also need to know how every part of our practice relates to our broader mission and its impact <em>beyond our company</em>.</p>
+<h2 id="be-uplifting-when-mistakes-happen">Be uplifting when mistakes happen</h2><p>Providing uplifting feedback, especially when a teammate realizes they've made a mistake, is crucial in maintaining team morale and encouraging a growth mindset. In such situations, it's essential to approach the feedback with empathy and understanding.</p>
+<p>I remember a case where one of my teammates invested months of work in building new tricks to improve our internal deep learning library but overlooked a minor but critical technical detail that led to data leakage within our data loaders. Doing so caused no shortage of a confidence crisis in that teammate, as they felt it was way too silly of an error! At the same time, it was the kind of mistake I could relate to because <em>I made the same category of error during grad school</em>. I shared my personal experience and noted how that teammate's effort had yielded, as a side product, other foundational improvements to our code library, which were going to be high leverage and ROI.</p>
+<p>Begin by acknowledging the good intentions and efforts behind their actions, emphasizing that mistakes are a natural part of the learning process and an opportunity for growth. You might say, "This mistake is uncommon, but in your case, it happened when trying something challenging. I can understand how the excitement can lead to looking over some details; don't bang yourself up over it. The code error is fixable, and you did it straight away, and it was timely too, as nobody was impacted over the time that the bug was present." I addressed the error and reinforced the broader value of that teammate's work to the team. My goal is to foster a supportive environment where team members feel safe to experiment, learn, and improve.</p>
+<h2 id="summary">Summary</h2><p>Effective feedback in a data science team is as much an art as a science. It involves staying positive and specific, encouraging self-reflection, being effusive (especially in asynchronous scenarios), giving technical feedback <em>in situ</em>, connecting accomplishments to broader impacts, and uplifting when mistakes occur. These approaches ensure that feedback is not just a formality but also a powerful tool for growth and team cohesion. Focusing on these aspects fosters an environment where team members feel valued, motivated, and aligned with the team's broader mission.</p>
+<p>My goal is to create a culture of continuous improvement, where feedback forms a stepping stone to professional excellence and a deeper understanding of the intricacies and wonders of data science. What resonated with you? And what did I miss out that you'd like to share?</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2023-elevating-team-performance-feedback-strategies-for-data-science-leaders</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Elevating Team Performance: Feedback Strategies for Data Science Leaders}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2023}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{12}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{11}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2023/12/11/elevating-team-performance-feedback-strategies-for-data-science-leaders}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

@@ -1,0 +1,726 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="How to use xarray for unified laboratory data storage">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/how-to-use-xarray-for-unified-laboratory-data-storage' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>How to use xarray for unified laboratory data storage - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">How to use xarray for unified laboratory data storage</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-07-15</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/xarray/">
+        xarray
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/bioinformatics/">
+        bioinformatics
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/reproducibility/">
+        reproducibility
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/cloud/">
+        cloud
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workflow/">
+        workflow
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/alignment/">
+        alignment
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/features/">
+        features
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/laboratory/">
+        laboratory
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/datasets/">
+        datasets
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/scaling/">
+        scaling
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share how using xarray can transform laboratory and machine learning data management by unifying everything—measurements, features, model outputs, and splits—into a single, coordinate-aligned dataset. This approach eliminates the hassle of index-matching across multiple files, reduces errors, and makes your workflow more reproducible and cloud-ready. Curious how this unified structure can simplify your experimental data analysis and save you time? Read on to find out!</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>What if your laboratory and machine learning related data could be managed within a single data structure? From raw experimental measurements to computed features to model outputs, everything coordinate-aligned and ready for analysis.</p>
+<p>I've been thinking about this problem across different experimental contexts. We generate measurement data, then computed features, then model outputs, then train/test splits. Each piece typically lives in its own file, its own format, with its own indexing scheme. The cognitive overhead of keeping track of which sample corresponds to which row in which CSV is exhausting.</p>
+<p>Let me illustrate this with a microRNA expression study as a concrete example.</p>
+<p>Here's an approach that could solve this: <strong>store everything in a unified xarray Dataset where sample identifiers are the shared coordinate system</strong>. Your experimental measurements, computed features, statistical estimates, and data splits all aligned by the same IDs. No more integer indices. No more file juggling. Just clean, coordinated data that scales to the cloud.</p>
+<h2 id="what-s-wrong-with-traditional-laboratory-data-management">What's wrong with traditional laboratory data management?</h2><p>Picture this: you're three months into a microRNA expression study. You've got the following files:</p>
+<ul>
+<li>expression measurements in <code>expression_data.csv</code>,</li>
+<li>ML features in <code>sequence_features.parquet</code>,</li>
+<li>model outputs in <code>model_results.h5</code>, and</li>
+<li>train/test splits scattered across <code>train_indices.npy</code> and <code>test_indices.npy</code>.</li>
+</ul>
+<p>Each file has its own indexing scheme - some use row numbers, others use identifiers, and you're constantly writing index-matching code just to keep everything aligned.</p>
+<p>The cognitive overhead is brutal. Which microRNA corresponds to row 47 in the features file? Did you remember to filter out the same samples from both your training data and your metadata? When you subset your data for analysis, do all your indices still match?</p>
+<p>I've lost count of how many times I've seen analysis pipelines break because someone forgot to apply the same filtering to all their data files. It's not just inefficient - it's error-prone and exhausting.</p>
+<h2 id="how-does-xarray-solve-this">How does xarray solve this?</h2><p>Xarray changes the game by making <strong>coordinates the foundation of your data structure</strong>. Instead of managing separate files with separate indexing schemes, you create one unified dataset where <em>every piece of data knows exactly which microRNA it belongs to</em>.</p>
+<p>The beauty lies in the coordinate system. Each data point is labeled with meaningful coordinates: not just row numbers, but actual experimental factors like microRNA ID, treatment condition, time point, and replicate. When you slice your data, everything stays aligned automatically.</p>
+<p>This is transformative! When everything shares the same coordinate system, you can slice across any dimension and everything stays connected. Want features for specific microRNAs? The model results for those same microRNAs come along automatically.</p>
+<h2 id="what-does-unified-data-storage-look-like">What does unified data storage look like?</h2><p>Let me walk you through how this works in practice. We start with a coordinate system that captures the experimental design:</p>
+<pre><code>Coordinates:
+* mirna           (150 microRNAs: hsa-miR-1, hsa-miR-2, ...)
+* treatment       (3 conditions: control, hypoxia, inflammation)
+* time_point      (5 timepoints: 2h, 6h, 12h, 24h, 48h)
+* replicate       (3 replicates: rep_1, rep_2, rep_3)
+* cell_line       (10 cell lines: cell_line_01, cell_line_02, ...)
+* experiment_date (4 dates: experiment dates)
+</code></pre>
+<p>Then we progressively add data that aligns with these coordinates:</p>
+<div class="hll"><pre><span></span><span class="c1"># Stage 1: Expression measurements</span>
+<span class="n">unified_dataset</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">({</span>
+    <span class="s1">&#39;expression_level&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;mirna&#39;</span><span class="p">,</span> <span class="s1">&#39;treatment&#39;</span><span class="p">,</span> <span class="s1">&#39;time_point&#39;</span><span class="p">,</span> <span class="s1">&#39;replicate&#39;</span><span class="p">,</span> <span class="s1">&#39;cell_line&#39;</span><span class="p">],</span> <span class="n">expression_data</span><span class="p">)</span>
+<span class="p">})</span>
+
+<span class="c1"># Stage 2: Bayesian estimation results</span>
+<span class="n">unified_dataset</span> <span class="o">=</span> <span class="n">unified_dataset</span><span class="o">.</span><span class="n">assign</span><span class="p">({</span>
+    <span class="s1">&#39;mirna_effects&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;mirna&#39;</span><span class="p">],</span> <span class="n">mirna_coefficients</span><span class="p">),</span>
+    <span class="s1">&#39;mirna_effects_std&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;mirna&#39;</span><span class="p">],</span> <span class="n">mirna_coefficient_errors</span><span class="p">),</span>
+    <span class="s1">&#39;treatment_effects&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;treatment&#39;</span><span class="p">],</span> <span class="n">treatment_coefficients</span><span class="p">),</span>
+    <span class="s1">&#39;treatment_effects_std&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;treatment&#39;</span><span class="p">],</span> <span class="n">treatment_coefficient_errors</span><span class="p">),</span>
+    <span class="s1">&#39;time_effects&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;time_point&#39;</span><span class="p">],</span> <span class="n">time_coefficients</span><span class="p">),</span>
+    <span class="s1">&#39;time_effects_std&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;time_point&#39;</span><span class="p">],</span> <span class="n">time_coefficient_errors</span><span class="p">),</span>
+    <span class="s1">&#39;replicate_effects&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;replicate&#39;</span><span class="p">],</span> <span class="n">replicate_coefficients</span><span class="p">),</span>
+    <span class="s1">&#39;replicate_effects_std&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;replicate&#39;</span><span class="p">],</span> <span class="n">replicate_coefficient_errors</span><span class="p">),</span>
+    <span class="s1">&#39;cell_line_effects&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;cell_line&#39;</span><span class="p">],</span> <span class="n">cell_line_coefficients</span><span class="p">),</span>
+    <span class="s1">&#39;cell_line_effects_std&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;cell_line&#39;</span><span class="p">],</span> <span class="n">cell_line_coefficient_errors</span><span class="p">)</span>
+<span class="p">})</span>
+
+<span class="c1"># Stage 3: ML features</span>
+<span class="n">unified_dataset</span> <span class="o">=</span> <span class="n">unified_dataset</span><span class="o">.</span><span class="n">assign</span><span class="p">({</span>
+    <span class="s1">&#39;ml_features&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;mirna&#39;</span><span class="p">,</span> <span class="s1">&#39;feature&#39;</span><span class="p">],</span> <span class="n">feature_matrix</span><span class="p">)</span>
+<span class="p">})</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">feature</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;nt_A&#39;</span><span class="p">,</span> <span class="s1">&#39;nt_T&#39;</span><span class="p">,</span> <span class="s1">&#39;nt_G&#39;</span><span class="p">,</span> <span class="s1">&#39;nt_C&#39;</span><span class="p">,</span> <span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="s1">&#39;gc_content&#39;</span><span class="p">])</span>
+
+<span class="c1"># Stage 4: Train/test splits</span>
+<span class="n">unified_dataset</span> <span class="o">=</span> <span class="n">unified_dataset</span><span class="o">.</span><span class="n">assign</span><span class="p">({</span>
+    <span class="s1">&#39;train_mask&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;mirna&#39;</span><span class="p">,</span> <span class="s1">&#39;split_type&#39;</span><span class="p">],</span> <span class="n">train_masks</span><span class="p">),</span>
+    <span class="s1">&#39;test_mask&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;mirna&#39;</span><span class="p">,</span> <span class="s1">&#39;split_type&#39;</span><span class="p">],</span> <span class="n">test_masks</span><span class="p">)</span>
+<span class="p">})</span>
+</pre></div>
+<p>The magic happens when you realize that <strong>every piece of data is automatically aligned by the shared coordinate system</strong>. Need to analyze expression patterns for microRNAs in your training set? It's just coordinate selection:</p>
+<div class="hll"><pre><span></span><span class="c1"># Get training mask for random 80/20 split</span>
+<span class="n">train_mask</span> <span class="o">=</span> <span class="n">unified_dataset</span><span class="o">.</span><span class="n">train_mask</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">split_type</span><span class="o">=</span><span class="s1">&#39;random_80_20&#39;</span><span class="p">)</span>
+
+<span class="c1"># Get ML features for training microRNAs</span>
+<span class="n">train_features</span> <span class="o">=</span> <span class="n">unified_dataset</span><span class="o">.</span><span class="n">ml_features</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">train_mask</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Get expression data for the same microRNAs</span>
+<span class="n">train_expression</span> <span class="o">=</span> <span class="n">unified_dataset</span><span class="o">.</span><span class="n">expression_level</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">train_mask</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+<p>Everything stays connected automatically. No manual bookkeeping required.</p>
+<h2 id="how-do-we-build-this-step-by-step">How do we build this step by step?</h2><p>The approach is straightforward - <strong>progressive data accumulation</strong>. You don't need to have everything figured out upfront. Start with your core experimental data, then add layers as your analysis develops.</p>
+<h3 id="stage-1-laboratory-measurements">Stage 1: Laboratory measurements</h3><p>Your foundation is the experimental data with meaningful coordinates:</p>
+<div class="hll"><pre><span></span><span class="c1"># Expression data automatically aligned by coordinates</span>
+<span class="n">expression_data</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+    <span class="n">measurements</span><span class="p">,</span>
+    <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+        <span class="s1">&#39;mirna&#39;</span><span class="p">:</span> <span class="n">mirna_ids</span><span class="p">,</span>
+        <span class="s1">&#39;treatment&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;control&#39;</span><span class="p">,</span> <span class="s1">&#39;hypoxia&#39;</span><span class="p">,</span> <span class="s1">&#39;inflammation&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;replicate&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;rep_1&#39;</span><span class="p">,</span> <span class="s1">&#39;rep_2&#39;</span><span class="p">,</span> <span class="s1">&#39;rep_3&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;time_point&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;2h&#39;</span><span class="p">,</span> <span class="s1">&#39;6h&#39;</span><span class="p">,</span> <span class="s1">&#39;12h&#39;</span><span class="p">,</span> <span class="s1">&#39;24h&#39;</span><span class="p">,</span> <span class="s1">&#39;48h&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;cell_line&#39;</span><span class="p">:</span> <span class="n">cell_lines</span>
+    <span class="p">},</span>
+    <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;mirna&#39;</span><span class="p">,</span> <span class="s1">&#39;treatment&#39;</span><span class="p">,</span> <span class="s1">&#39;replicate&#39;</span><span class="p">,</span> <span class="s1">&#39;time_point&#39;</span><span class="p">,</span> <span class="s1">&#39;cell_line&#39;</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+<p>You should note here how the coordinates basically mirror the experimental design.</p>
+<h3 id="stage-2-bayesian-estimation">Stage 2: Bayesian estimation</h3><p>Add effect estimates that align with your experimental coordinates:</p>
+<div class="hll"><pre><span></span><span class="c1"># Bayesian effects model results</span>
+<span class="n">unified_dataset</span> <span class="o">=</span> <span class="n">unified_dataset</span><span class="o">.</span><span class="n">assign</span><span class="p">({</span>
+    <span class="s1">&#39;mirna_effects&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;mirna&#39;</span><span class="p">],</span> <span class="n">mirna_coefficients</span><span class="p">),</span>
+    <span class="s1">&#39;mirna_effects_std&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;mirna&#39;</span><span class="p">],</span> <span class="n">mirna_coefficient_errors</span><span class="p">),</span>
+    <span class="s1">&#39;treatment_effects&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;treatment&#39;</span><span class="p">],</span> <span class="n">treatment_coefficients</span><span class="p">),</span>
+    <span class="s1">&#39;treatment_effects_std&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;treatment&#39;</span><span class="p">],</span> <span class="n">treatment_coefficient_errors</span><span class="p">),</span>
+    <span class="s1">&#39;time_effects&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;time_point&#39;</span><span class="p">],</span> <span class="n">time_coefficients</span><span class="p">),</span>
+    <span class="s1">&#39;time_effects_std&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;time_point&#39;</span><span class="p">],</span> <span class="n">time_coefficient_errors</span><span class="p">),</span>
+    <span class="s1">&#39;replicate_effects&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;replicate&#39;</span><span class="p">],</span> <span class="n">replicate_coefficients</span><span class="p">),</span>
+    <span class="s1">&#39;replicate_effects_std&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;replicate&#39;</span><span class="p">],</span> <span class="n">replicate_coefficient_errors</span><span class="p">),</span>
+    <span class="s1">&#39;cell_line_effects&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;cell_line&#39;</span><span class="p">],</span> <span class="n">cell_line_coefficients</span><span class="p">),</span>
+    <span class="s1">&#39;cell_line_effects_std&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;cell_line&#39;</span><span class="p">],</span> <span class="n">cell_line_coefficient_errors</span><span class="p">)</span>
+<span class="p">})</span>
+</pre></div>
+<p>The beauty is that your Bayesian effects model estimates align perfectly with your experimental design coordinates. Each experimental factor gets its own effect estimate with uncertainty, organized by the same coordinate system as your raw data.</p>
+<h3 id="stage-3-ml-features">Stage 3: ML features</h3><p>Features slot right into the same coordinate system:</p>
+<div class="hll"><pre><span></span><span class="c1"># ML features aligned by microRNA ID</span>
+<span class="n">unified_dataset</span> <span class="o">=</span> <span class="n">unified_dataset</span><span class="o">.</span><span class="n">assign</span><span class="p">({</span>
+    <span class="s1">&#39;ml_features&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;mirna&#39;</span><span class="p">,</span> <span class="s1">&#39;feature&#39;</span><span class="p">],</span> <span class="n">feature_matrix</span><span class="p">)</span>
+<span class="p">})</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">feature</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;nt_A&#39;</span><span class="p">,</span> <span class="s1">&#39;nt_T&#39;</span><span class="p">,</span> <span class="s1">&#39;nt_G&#39;</span><span class="p">,</span> <span class="s1">&#39;nt_C&#39;</span><span class="p">,</span> <span class="s1">&#39;length&#39;</span><span class="p">,</span> <span class="s1">&#39;gc_content&#39;</span><span class="p">])</span>
+</pre></div>
+<h3 id="stage-4-train/test-splits">Stage 4: Train/test splits</h3><p>Even data splits become part of the unified structure:</p>
+<div class="hll"><pre><span></span><span class="c1"># Boolean masks aligned by microRNA coordinate</span>
+<span class="n">unified_dataset</span> <span class="o">=</span> <span class="n">unified_dataset</span><span class="o">.</span><span class="n">assign</span><span class="p">({</span>
+    <span class="s1">&#39;train_mask&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;mirna&#39;</span><span class="p">,</span> <span class="s1">&#39;split_type&#39;</span><span class="p">],</span> <span class="n">train_masks</span><span class="p">),</span>
+    <span class="s1">&#39;test_mask&#39;</span><span class="p">:</span> <span class="p">([</span><span class="s1">&#39;mirna&#39;</span><span class="p">,</span> <span class="s1">&#39;split_type&#39;</span><span class="p">],</span> <span class="n">test_masks</span><span class="p">)</span>
+<span class="p">})</span>
+</pre></div>
+<blockquote><p><strong>Progressive build = reduced cognitive load</strong></p>
+<p>The beauty of this approach is that you can build it incrementally. Start with your core experimental data, then add statistical results, then ML features, then splits. Each stage builds on the previous coordinate system, so everything stays aligned automatically.</p>
+</blockquote>
+<h2 id="what-are-the-practical-benefits">What are the practical benefits?</h2><h3 id="no-more-index-juggling">No more index juggling</h3><p>Remember the nightmare of keeping track of which microRNA corresponds to which row in which file? That's gone. Every piece of data knows its own coordinates.</p>
+<div class="hll"><pre><span></span><span class="c1"># Before: manual index matching across files</span>
+<span class="n">expression_subset</span> <span class="o">=</span> <span class="n">expression_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
+<span class="n">features_subset</span> <span class="o">=</span> <span class="n">features_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mirna_ids</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]]</span>
+<span class="n">model_results_subset</span> <span class="o">=</span> <span class="n">model_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">]</span>
+
+<span class="c1"># After: coordinate-based selection</span>
+<span class="n">train_data</span> <span class="o">=</span> <span class="n">unified_dataset</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+    <span class="n">unified_dataset</span><span class="o">.</span><span class="n">train_mask</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">split_type</span><span class="o">=</span><span class="s1">&#39;random_80_20&#39;</span><span class="p">),</span>
+    <span class="n">drop</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</pre></div>
+<h3 id="bulletproof-data-consistency">Bulletproof data consistency</h3><p>When you slice your data, everything stays aligned automatically. No more worrying about applying the same filtering to all your files.</p>
+<h3 id="cloud-native-scaling">Cloud-native scaling</h3><p>Store everything in Zarr format and your unified dataset becomes cloud-native. Load it from S3, query specific slices, and everything scales seamlessly. (Note: Zarr has some limitations with certain data types like U8, but xarray supports multiple storage formats to work around these issues.)</p>
+<div class="hll"><pre><span></span><span class="c1"># Save entire workflow to cloud</span>
+<span class="n">unified_dataset</span><span class="o">.</span><span class="n">to_zarr</span><span class="p">(</span><span class="s1">&#39;s3://biodata/mirna_screen_2024.zarr&#39;</span><span class="p">)</span>
+
+<span class="c1"># Load and analyze anywhere</span>
+<span class="n">experiment</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_zarr</span><span class="p">(</span><span class="s1">&#39;s3://biodata/mirna_screen_2024.zarr&#39;</span><span class="p">)</span>
+</pre></div>
+<h3 id="reproducible-analysis-pipelines">Reproducible analysis pipelines</h3><p>Your analysis becomes more reproducible because the data structure itself enforces consistency. Share the dataset and the analysis code just works.</p>
+<h2 id="what-tools-make-this-possible">What tools make this possible?</h2><p>The tooling ecosystem has evolved dramatically in recent years. A few years ago, I would have told you to use parquet files with very unnatural tabular setups to get everything into tidy format. But <strong>xarray is changing the game</strong>.</p>
+<p><strong>Xarray</strong> provides the coordinate system and multidimensional data structures that make this unified approach possible. It's like pandas for higher-dimensional data, but with meaningful coordinates instead of just integer indices.</p>
+<p><strong>Zarr</strong> gives you cloud-native storage that preserves all your coordinate information and metadata. It supports chunking, compression, and parallel access - perfect for scaling your unified datasets.</p>
+<p><strong>Note:</strong> The tools we've got are just getting better and better. I wouldn't have imagined that we'd be able to use xarray for this kind of unified laboratory data storage just a few years ago. The ecosystem is maturing rapidly, and these approaches are becoming more accessible every year.</p>
+<h2 id="what-s-next">What's next?</h2><p>If you're working with multidimensional experimental data, I'd strongly encourage you to try this unified approach. Start small - take your next experiment and see if you can structure it as a single xarray Dataset instead of multiple files.</p>
+<p>The cognitive overhead reduction is immediate. No more wondering if your indices are aligned. No more writing index-matching code. Just clean, coordinated data that scales to the cloud.</p>
+<p>Time will distill the best practices in your context, but I've found this unified approach eliminates so much friction from the experimental data lifecycle. Give it a try and see how it feels in your workflow.</p>
+<p>I cooked up this synthetic example while attending Ian Hunt-Isaak's talk <a href="https://cfp.scipy.org/scipy2025/talk/AARA39/">"Xarray across biology. Where are we and where are we going?"</a> at SciPy 2025. His presentation on using xarray for biological data really crystallized how powerful this coordinate-based approach could be for the typical experimental workflow.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-how-to-use-xarray-for-unified-laboratory-data-storage</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{How to use xarray for unified laboratory data storage}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{07}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{15}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/7/15/how-to-use-xarray-for-unified-laboratory-data-storage}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

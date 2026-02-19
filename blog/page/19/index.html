@@ -1,0 +1,1268 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+    
+
+    
+    
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Blog - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+<div>
+
+<div class="btn-group" role="group" aria-label="pagination">
+  
+  <a href="/blog" class="btn btn-ghost">&laquo;</a>
+  
+
+  
+  <a href="/blog/page/17/" class="btn btn-ghost">17</a>
+  
+
+  
+  <a href="../18/" class="btn btn-ghost">18</a>
+  
+
+  <span class="btn btn-primary disabled">19</span>
+
+  
+  <a href="../20/" class="btn btn-ghost">20</a>
+  
+
+  
+  <a href="/blog/page/21/" class="btn btn-ghost">21</a>
+  
+
+  
+  <a href="/blog/page/46/" class="btn btn-ghost">&raquo;</a>
+  
+</div>
+
+<br>
+</div>
+<div class="terminal-timeline">
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2021/12/30/better-conda-environments-on-github-actions/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Better conda environments on GitHub actions</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2021-12-30</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/continuous integration/">
+        continuous integration
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/github actions/">
+        github actions
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/til/">
+        til
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">I recently figured out two tips to make GitHub actions play nicely with conda installations. Here they are.</p>
+        </span>
+        <small>
+          <a href="../../2021/12/30/better-conda-environments-on-github-actions/">Read on...</a>
+          
+
+
+
+
+
+
+
+(772 words, approximately 4 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2021/11/28/what-candidates-can-and-cannot-control-in-their-job-hunt/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">What candidates can and cannot control in their job hunt</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2021-11-28</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/job hunt/">
+        job hunt
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/career/">
+        career
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/careers/">
+        careers
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">I&#39;ve been involved in quite a few rounds of hiring.
+I&#39;ve also seen a lot of LinkedIn posts by junior data scientists
+complaining about the state of the job market.
+In this post, I&#39;d like to provide personal reflections
+on the hiring process that I&#39;ve experienced
+written from the perspective of someone participating in the hiring team.</p>
+        </span>
+        <small>
+          <a href="../../2021/11/28/what-candidates-can-and-cannot-control-in-their-job-hunt/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1507 words, approximately 8 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2021/9/30/career-faq/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Career FAQ</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2021-09-30</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/career/">
+        career
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/faq/">
+        faq
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">I&#39;ve been asked some questions about my career trajectory, and thanks to a call with Zarrar Shezad, I finally decided to pen down my answers to career trajectory questions.</p>
+        </span>
+        <small>
+          <a href="../../2021/9/30/career-faq/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1628 words, approximately 9 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2021/9/12/machine-directed-evolution/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Machine-Directed Evolution</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2021-09-12</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/science/">
+        science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/paper/">
+        paper
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/catalysis/">
+        catalysis
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/enzyme engineering/">
+        enzyme engineering
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/machine learning/">
+        machine learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">This is a blog post I&#39;ve been wanting to put out for a while.
+It&#39;s about [a really cool paper][acscatalysis] that I had the privilege of working on
+with colleagues at the Novartis Institutes for BioMedical Research (NIBR).
+If you have institutional access, you can read the paper [online][acscatalysis].
+Here is my layman&#39;s summary of the paper.
+
+[acscatalysis]: https://pubs.acs.org/doi/10.1021/acscatal.1c02786
+</p>
+        </span>
+        <small>
+          <a href="../../2021/9/12/machine-directed-evolution/">Read on...</a>
+          
+
+
+
+
+
+
+
+(2333 words, approximately 12 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2021/8/26/hiring-data-scientists-at-moderna-2021/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Hiring data scientists at Moderna! (2021)</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2021-08-26</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/hiring/">
+        hiring
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/moderna/">
+        moderna
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">Moderna&#39;s DSAI team, the team I&#39;m on, is hiring! Read on to get links to the postings and get a glimpse into the inner workings of my head as I look through resumes.</p>
+        </span>
+        <small>
+          <a href="../../2021/8/26/hiring-data-scientists-at-moderna-2021/">Read on...</a>
+          
+
+
+
+
+
+
+
+(2278 words, approximately 12 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2021/8/23/my-experience-switching-to-github-codespaces/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">My experience switching to GitHub codespaces</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2021-08-23</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/programming/">
+        programming
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/ide/">
+        ide
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/tooling/">
+        tooling
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/coding/">
+        coding
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">I recently started experimenting with GitHub codespaces
+and I wanted to share a bit about my experience.</p>
+        </span>
+        <small>
+          <a href="../../2021/8/23/my-experience-switching-to-github-codespaces/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1248 words, approximately 7 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2021/8/16/beautiful-graph-visualization-with-nxviz/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Beautiful Graph Visualization with `nxviz`</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2021-08-16</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/open source/">
+        open source
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/network science/">
+        network science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/graph theory/">
+        graph theory
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/nxviz/">
+        nxviz
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/network analysis/">
+        network analysis
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/graph/">
+        graph
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/network/">
+        network
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this post, I formally introduce the `nxviz` package,
+a _rational_ network visualization package with beautiful defaults made for Pythonistas.
+I created it alongside many contributors, to whom I&#39;m supremely thankful and indebted.
+Come learn more about `nxviz`!</p>
+        </span>
+        <small>
+          <a href="../../2021/8/16/beautiful-graph-visualization-with-nxviz/">Read on...</a>
+          
+
+
+
+
+
+
+
+(910 words, approximately 5 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2021/8/15/ancestors-and-descendants-apply-to-undirected-and-directed-graphs/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Ancestors and descendants apply to undirected and directed graphs</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2021-08-15</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/til/">
+        til
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/network science/">
+        network science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/graph theory/">
+        graph theory
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">Does finding ancestors and descendants of a node apply to undirected graphs, or do they apply to directed graphs only? The answer is less intuitive than we might think.</p>
+        </span>
+        <small>
+          <a href="../../2021/8/15/ancestors-and-descendants-apply-to-undirected-and-directed-graphs/">Read on...</a>
+          
+
+
+
+
+
+
+
+(260 words, approximately 2 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2021/7/12/one-killer-way-to-burst-to-the-cloud-from-your-laptop/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">One killer way to burst to the cloud from your laptop</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2021-07-12</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/dask/">
+        dask
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/coiled computing/">
+        coiled computing
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/computation/">
+        computation
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">I test-drove Coiled Computing&#39;s product, and it&#39;s magical. Let me tell you why!</p>
+        </span>
+        <small>
+          <a href="../../2021/7/12/one-killer-way-to-burst-to-the-cloud-from-your-laptop/">Read on...</a>
+          
+
+
+
+
+
+
+
+(820 words, approximately 5 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2021/7/10/how-to-enable-custom-source-package-installation-in-binder/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">How to enable custom source package installation in Binder</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2021-07-10</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/binder/">
+        binder
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/tutorial/">
+        tutorial
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/jupyter/">
+        jupyter
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/til/">
+        til
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">I figured out how to make my custom source code libraries installable in a Binder container - and do it in a way that preserves flexibility while still being easy to use.</p>
+        </span>
+        <small>
+          <a href="../../2021/7/10/how-to-enable-custom-source-package-installation-in-binder/">Read on...</a>
+          
+
+
+
+
+
+
+
+(493 words, approximately 3 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+<div class="btn-group" role="group" aria-label="pagination">
+  
+  <a href="/blog" class="btn btn-ghost">&laquo;</a>
+  
+
+  
+  <a href="/blog/page/17/" class="btn btn-ghost">17</a>
+  
+
+  
+  <a href="../18/" class="btn btn-ghost">18</a>
+  
+
+  <span class="btn btn-primary disabled">19</span>
+
+  
+  <a href="../20/" class="btn btn-ghost">20</a>
+  
+
+  
+  <a href="/blog/page/21/" class="btn btn-ghost">21</a>
+  
+
+  
+  <a href="/blog/page/46/" class="btn btn-ghost">&raquo;</a>
+  
+</div>
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

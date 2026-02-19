@@ -1,0 +1,730 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="How to manage CUDA libraries within Conda environments">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/how-to-manage-cuda-libraries-within-conda-environments' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>How to manage CUDA libraries within Conda environments - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">How to manage CUDA libraries within Conda environments</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-06-01</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/cuda/">
+        cuda
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/jax/">
+        jax
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/conda/">
+        conda
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/environment variables/">
+        environment variables
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/cudnn/">
+        cudnn
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/gpu/">
+        gpu
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/dynamic libraries/">
+        dynamic libraries
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/nvidia/">
+        nvidia
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/software installation/">
+        software installation
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share how to resolve CUDA backend initialization issues when installing JAX with CUDA, specifically addressing outdated cuDNN versions. I detail a method using Conda environments to manage CUDA installations and set environment variables correctly, offering two solutions: configuring LD_LIBRARY_PATH through Conda's activate.d and deactivate.d scripts, or directly within a Python session using a .env file. Both approaches aim to ensure that JAX utilizes the correct CUDA libraries, but each has its tradeoffs regarding portability. Curious about which method might work best for your setup?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <blockquote><p><strong>UPDATE 9 June 2024:</strong> With thanks to the kind efforts of <a href="https://github.com/vyasr">Vyas Ramasubramani</a>,
+there is actually no need to set <code>LD_LIBRARY_PATH</code> at all,
+as long as one's <code>conda</code> environment is set up correctly!
+I detail what works right at the end of the blog post.</p>
+</blockquote>
+<p>If you're like me, you've tried to install JAX pre-compiled against CUDA, and have probably also wrestled with issues that look like this:</p>
+<div class="hll"><pre><span></span>CUDA backend failed to initialize: Unable to use CUDA because of the following issues with CUDA components:
+Outdated cuDNN installation found.
+Version JAX was built against: 8907
+Minimum supported: 8900
+Installed version: 8600
+The local installation version must be no lower than 8900..(Set TF_CPP_MIN_LOG_LEVEL=0 and rerun for more info.)
+</pre></div>
+<p>And then you may have sat there scratching your head wondering, "but wait, I swear that I have the latest CUDA drivers, CUDA libraries, and cuDNN! Why is CUDA so hard?!"</p>
+<p>Well, now, there's a way out! As it turns out, <em>independent of your system-level CUDA installation</em>, if you're using Conda environments, you actually can manage your own environment-level CUDA installation! And as it turns out, this is mostly a matter of setting <a href="https://ericmjl.github.io/essays-on-data-science/software-skills/environment-variables/">environment variables</a> correctly.</p>
+<h2 id="step-1-ensure-that-the-cuda-metapackage-is-available-in-your-environment-yml-file">Step 1: Ensure that the CUDA metapackage is available in your <code>environment.yml</code> file</h2><p>Your <code>environment.yml</code> file should look like this:</p>
+<div class="hll"><pre><span></span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-env</span>
+<span class="nt">channels</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nvidia</span><span class="w"> </span><span class="c1"># order matters</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda-forge</span>
+<span class="nt">dependencies</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cuda-libraries</span><span class="w"> </span><span class="c1"># this is the cuda metapackage</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cudatoolkit</span><span class="w"> </span><span class="c1"># explicitly needed so conda/mamba installs the cuda-compiled jaxlib</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cudnn</span><span class="w"> </span><span class="c1"># this is specifically for cudnn</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cuda-nvcc</span><span class="w"> </span><span class="c1"># ensures that a compatible nvidia C compiler is available!</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jaxlib</span><span class="w"> </span><span class="c1"># ensure that this is installed by conda/mamba, not by pip!</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jax</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+</pre></div>
+<p>Now, run <code>mamba env update -f environment.yml</code> to install the packages.</p>
+<p>What will happen is the following:</p>
+<ul>
+<li>The CUDA libraries will be installed into your <code>$CONDA_PREFIX/lib</code> directory.</li>
+<li><code>jax</code> and <code>jaxlib</code> will be installed as Python packages as well, within the environment specified by the <code>$CONDA_PREFIX</code> environment variable.</li>
+</ul>
+<p>You may be tempted to run your JAX code at this point, but you'll still run into the aforementioned error.</p>
+<h2 id="step-2-ensure-that-your-ld-library-path-includes-conda-prefix/lib">Step 2: Ensure that your <code>LD_LIBRARY_PATH</code>includes <code>$CONDA_PREFIX/lib</code></h2><p>Now, we need to set environment variables, specifically the <code>LD_LIBRARY_PATH</code> environment variable. The <code>LD_LIBRARY_PATH</code> is used to specify a list of directories to look for "dynamic libraries" before searching the standard UNIX library paths. At this point, options multiply: we may need to make judgment calls or tradeoffs. As I see it, there are two sane places where we can configure <code>LD_LIBRARY_PATH</code> to be correct.</p>
+<h3 id="option-1-use-conda-s-activate-d-and-deactivate.d`">Option 1: Use conda's <code>activate.d</code> and <code>deactivate.d</code></h3><p><code>activate.d</code> and <code>deactivate.d</code> are folders housing shell scripts that are automatically run whenever we do <code>conda activate</code> and <code>conda deactivate</code>, respectively. Jaerock Kwon wrote a constructive <a href="https://jrkwon.com/2022/11/22/cuda-and-cudnn-inside-a-conda-env/">blog post</a> on ensuring that these environment variables are set correctly. Essentially, it is the shell script below, which should be run after activating an environment:</p>
+<div class="hll"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="nv">$CONDA_PREFIX</span>/etc/conda/activate.d
+<span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;export OLD_LD_LIBRARY_PATH=${LD_LIBRARY_PATH}&#39;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nv">$CONDA_PREFIX</span>/etc/conda/activate.d/env_vars.sh
+<span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$OLD_LD_LIBRARY_PATH&#39;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nv">$CONDA_PREFIX</span>/etc/conda/activate.d/env_vars.sh
+
+mkdir<span class="w"> </span>-p<span class="w"> </span><span class="nv">$CONDA_PREFIX</span>/etc/conda/deactivate.d
+<span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;export LD_LIBRARY_PATH=${OLD_LD_LIBRARY_PATH}&#39;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nv">$CONDA_PREFIX</span>/etc/conda/deactivate.d/env_vars.sh
+<span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;unset OLD_LD_LIBRARY_PATH&#39;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nv">$CONDA_PREFIX</span>/etc/conda/deactivate.d/env_vars.sh
+</pre></div>
+<p>The tradeoff here is that this is not portable from machine to machine. We'd have to run that chunk of code every single time we create a new environment that uses CUDA libraries or try to recreate the environment in a new machine or a Docker container. Ideally, we would <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#setting-environment-variables">specify this information within environment.yml</a> (link found via <a href="https://stackoverflow.com/a/64625207/1274908">StackOverflow</a>).</p>
+<h3 id="option-2-explicitly-define-this-in-env-and-load-it-into-your-python-session">Option 2: Explicitly define this in <code>.env</code> and load it into your Python session</h3><p>As it turns out, there is another way! Before importing JAX and executing JAX code, we can directly set the <code>LD_LIBRARY_PATH</code> environment variable within our Python session through environment variables that we load at runtime. To start, we need to create a <code>.env</code> file in our repository:</p>
+<div class="hll"><pre><span></span><span class="c1"># These are the contents of /path/to/repo/.env</span>
+<span class="nv">XLA_FLAGS</span><span class="o">=</span><span class="s2">&quot;--xla_gpu_cuda_data_dir=</span><span class="si">${</span><span class="nv">CONDA_PREFIX</span><span class="si">}</span><span class="s2">/lib&quot;</span>
+<span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">CONDA_PREFIX</span><span class="si">}</span><span class="s2">/lib:</span><span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+<p>Then, within a Jupyter notebook (or a Python session more generally), we use <code>python-dotenv</code> to inject those environment variables into the currently running Python session:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+
+<span class="n">load_dotenv</span><span class="p">()</span>
+</pre></div>
+<p>We should be able to verify that <code>LD_LIBRARY_PATH</code> is set correctly by running:</p>
+<div class="hll"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;LD_LIBRARY_PATH&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;XLA_FLAGS&quot;</span><span class="p">))</span>
+</pre></div>
+<p>What gets printed should follow the pattern set in the <code>.env</code> file.</p>
+<p>Now, you can create NumPy arrays and shouldn't observe any issues with outdated cuDNN:</p>
+<div class="hll"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+<p>To verify that you're also using GPU, at the terminal, run the following:</p>
+<div class="hll"><pre><span></span>nvidia-smi
+</pre></div>
+<p>And you should see something like the following:</p>
+<div class="hll"><pre><span></span>❯<span class="w"> </span>nvidia-smi
+Fri<span class="w"> </span>May<span class="w"> </span><span class="m">31</span><span class="w"> </span><span class="m">12</span>:31:08<span class="w"> </span><span class="m">2024</span>
++-----------------------------------------------------------------------------+
+<span class="p">|</span><span class="w"> </span>NVIDIA-SMI<span class="w"> </span><span class="m">525</span>.85.12<span class="w">    </span>Driver<span class="w"> </span>Version:<span class="w"> </span><span class="m">525</span>.85.12<span class="w">    </span>CUDA<span class="w"> </span>Version:<span class="w"> </span><span class="m">12</span>.0<span class="w">     </span><span class="p">|</span>
+<span class="p">|</span>-------------------------------+----------------------+----------------------+
+<span class="p">|</span><span class="w"> </span>GPU<span class="w">  </span>Name<span class="w">        </span>Persistence-M<span class="p">|</span><span class="w"> </span>Bus-Id<span class="w">        </span>Disp.A<span class="w"> </span><span class="p">|</span><span class="w"> </span>Volatile<span class="w"> </span>Uncorr.<span class="w"> </span>ECC<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>Fan<span class="w">  </span>Temp<span class="w">  </span>Perf<span class="w">  </span>Pwr:Usage/Cap<span class="p">|</span><span class="w">         </span>Memory-Usage<span class="w"> </span><span class="p">|</span><span class="w"> </span>GPU-Util<span class="w">  </span>Compute<span class="w"> </span>M.<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w">                               </span><span class="p">|</span><span class="w">                      </span><span class="p">|</span><span class="w">               </span>MIG<span class="w"> </span>M.<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="o">===============================</span>+<span class="o">======================</span>+<span class="o">======================</span><span class="p">|</span>
+<span class="p">|</span><span class="w">   </span><span class="m">0</span><span class="w">  </span>NVIDIA<span class="w"> </span>A10G<span class="w">         </span>On<span class="w">   </span><span class="p">|</span><span class="w"> </span><span class="m">00000000</span>:00:1E.0<span class="w"> </span>Off<span class="w"> </span><span class="p">|</span><span class="w">                    </span><span class="m">0</span><span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w">  </span><span class="m">0</span>%<span class="w">   </span>28C<span class="w">    </span>P0<span class="w">    </span>59W<span class="w"> </span>/<span class="w"> </span>300W<span class="w"> </span><span class="p">|</span><span class="w">  </span>17434MiB<span class="w"> </span>/<span class="w"> </span>23028MiB<span class="w"> </span><span class="p">|</span><span class="w">      </span><span class="m">0</span>%<span class="w">      </span>Default<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w">                               </span><span class="p">|</span><span class="w">                      </span><span class="p">|</span><span class="w">                  </span>N/A<span class="w"> </span><span class="p">|</span>
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+<span class="p">|</span><span class="w"> </span>Processes:<span class="w">                                                                  </span><span class="p">|</span>
+<span class="p">|</span><span class="w">  </span>GPU<span class="w">   </span>GI<span class="w">   </span>CI<span class="w">        </span>PID<span class="w">   </span>Type<span class="w">   </span>Process<span class="w"> </span>name<span class="w">                  </span>GPU<span class="w"> </span>Memory<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w">        </span>ID<span class="w">   </span>ID<span class="w">                                                   </span>Usage<span class="w">      </span><span class="p">|</span>
+<span class="p">|</span><span class="o">=============================================================================</span><span class="p">|</span>
+<span class="p">|</span><span class="w">    </span><span class="m">0</span><span class="w">   </span>N/A<span class="w">  </span>N/A<span class="w">   </span><span class="m">1947397</span><span class="w">      </span>C<span class="w">   </span>...vironment-name/bin/python<span class="w">    </span>17432MiB<span class="w"> </span><span class="p">|</span>
++-----------------------------------------------------------------------------+
+</pre></div>
+<h2 id="which-way-should-i-use">Which way should I use?</h2><p>Both are good, and both come with a common tradeoff that we need to remember:
+the environment configuration isn't portable from machine to machine.</p>
+<p>In the case of the <code>env_var.sh</code> scripts housed under <code>activate.d</code> and <code>deactivate.d</code>,
+they need to be recreated any time the conda environment is recreated.
+This means that if one deletes the environment and recreates it,
+or simply moves to a different machine and recreates it,
+one will need to re-run the shell commands listed above
+to recreate the environment variables.</p>
+<p>In the case of <code>.env</code> configuration, this is much more lightweight,
+but as a matter of common idioms, <code>.env</code> files are <em>not</em> committed to source control,
+which makes distributing them a hassle.</p>
+<p>My preference is to use <code>.env</code> files,
+as they are more easily accessible to us as we work within a project repository.
+My solution to the problem of portability
+is to ensure that the specific configuration of individual <code>.env</code> files
+is at least initialized as part of a standard project structure
+(akin to what I do with <a href="https://github.com/ericmjl/pyds-cli"><code>pyds-cli</code></a>
+or what <a href="https://cookiecutter-data-science.drivendata.org/"><code>cookie-cutter-data-science</code></a> does),
+so that newly created repositories come with these environment variables.
+And in the <em>absolute</em> worst case,
+one can simply copy/paste those two lines between two repos' <code>.env</code> files.</p>
+<p><strong>UPDATE (9 June 2024):</strong> Thanks to Vyas Ramasubramani from NVIDIA,
+<a href="https://github.com/conda-forge/jaxlib-feedstock/issues/255">who did a deep dive after reading my blog post</a>,
+it turns out it is unnecessary to set environment variables
+as long as the correct CUDA packages are installed.
+<code>cudatoolkit</code> was necessary with CUDA11, but is no longer necessary with CUDA12.
+An example <code>environment.yml</code> file that I verified as working on my system are:</p>
+<div class="hll"><pre><span></span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-env</span>
+<span class="nt">channels</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda-forge</span>
+<span class="nt">dependencies</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python=3.10</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cuda-libraries</span><span class="w"> </span><span class="c1"># this is the cuda metapackage</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cudnn</span><span class="w"> </span><span class="c1"># this is specifically for cudnn</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cuda-nvcc</span><span class="w"> </span><span class="c1"># ensures that a compatible nvidia C compiler is available!</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jaxlib</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cuda-version</span><span class="w"> </span><span class="c1"># necessary for pulling in packages that are CUDA12-compatible!</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jax</span>
+</pre></div>
+<p>As I learned <a href="https://github.com/conda-forge/jaxlib-feedstock/issues/255">through the discussion thread that Vyas created</a>,
+<code>cudatoolkit</code> is needed for CUDA11, while <code>cuda-version</code> is usable for any version of CUDA running back to version 9.2.
+This turns out to be the result of
+hard work by open source community members who also work at NVIDIA
+(see <a href="https://github.com/conda-forge/cuda-version-feedstock/issues/1">this thread</a> for an example).
+Back in graduate school, NVIDIA's stack used to be confusing to me,
+but I'm thankful that many people are hard at work making it easier to use!
+(This is also why I love the internet:
+If I have a misconception and write about it,
+there <em>will</em> be wonderful people like Vyas to correct me!)</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-how-to-manage-cuda-libraries-within-conda-environments</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{How to manage CUDA libraries within Conda environments}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{06}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{01}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/6/1/how-to-manage-cuda-libraries-within-conda-environments}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

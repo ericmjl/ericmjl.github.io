@@ -1,0 +1,563 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="The problem of too many splits?">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/the-problem-of-too-many-splits' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>The problem of too many splits? - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">The problem of too many splits?</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2016-08-16</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+
+    <span id="post_body" name="post_body">
+      <p>I recently followed an interesting Twitter conversation, in which one tweet struck me as surprising:</p>
+<p><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr"><a href="https://twitter.com/jakevdp">@jakevdp</a> <a href="https://twitter.com/data_hope">@data_hope</a> It&#39;s not too late to use and improve common tools.<br><br>Too many splits: Py2/Py3, pip/conda, CPython/pypy/jython/pyston</p>&mdash; Gael Varoquaux (@GaelVaroquaux) <a href="https://twitter.com/GaelVaroquaux/status/765420719782109184">August 16, 2016</a></blockquote></p>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script><p>(I'd recommend following the full Twitter conversation in order to get a full view of Gael Varoquaux's opinions; don't vilify or exalt a person on the basis of one tweet.)</p>
+<p>If I understand Gael's opinion correctly (and I'm open to being corrected here), he must be of the opinion that having a multitude of splits is confusing for the community, new users, and the likes. He must also be of the opinion that tools really should be consolidated such that there is, according to the Zen of Python, "one and preferably only one way of doing things".</p>
+<p>If those are his sentiments, I agree with the former, but not necessarily the latter. I'll outline why, but before I go on, let's quickly review what are all the options available to Pythonistas.</p>
+<p><em>Language + Interpreter</em></p>
+<p>CPython is the de-facto Python implementation that everybody loves (e.g. the implementation is ported to all major platforms) and hates (the GIL!). But PyPy exists, with its JIT compilation experiment, and then Jython, IronPython, and a multitude of smaller experimental Python implementations. And then there's Cython, which isn't really Python and isn't really C but a mish-mash of the two, to complicate things further! So the base interpreter and language (I've mixed the two here) seem to be suffering from confusing splits. Which do we use?</p>
+<p><em>Packaging</em></p>
+<p>Then there's <code>pip</code> and <code>conda</code>. <code>pip</code> installs stuff from PyPI, which is currently an open publishing platform for Python packages, while <code>conda</code> installs stuff from Anaconda cloud; conda-forge, which hosts many PyPI packages that are also built into <code>conda</code> packages, is currently a curated set, and is currently used more as a package redistributor to the three major platforms.</p>
+<p><code>pip</code> only installs Python stuff; <code>conda</code> installs any binary, and is language- and platform-agnostic, and is very widely used by the PyData sub-community of Pythonistas. <code>pip</code> used to have problems with packages like <code>scipy</code> and <code>numpy</code>; now it's less of an issue with the Wheel packaging system.</p>
+<p><code>conda</code> admittedly <em>can</em> get confusing sometimes; I worked on <code>bokeh</code> for a bit at the PyCon 2016 sprints, and <code>conda</code> installed <code>npm</code>, Javascript's package manager. So I have, right now, a JS package manager inside the <code>conda</code> package manager which plays nicely with the Python-only package manager...</p>
+<p>Not to mention, if you're on Ubuntu, there's <code>apt-get</code> for package installation that is linux-specific, but cross-language. If you're on a Mac, then it's <code>homebrew</code> that is the equivalent platform-specific, language-agnostic tool.</p>
+<p><em>Data Visualization</em></p>
+<p>Ah, another confusing. There's the venerable <code>matplotlib</code>. And then there's <code>bokeh</code>, <code>altair</code>, <code>holoviews</code>, <code>seaborn</code>, <code>plotly</code>... Oh my! Which do we go with?!</p>
+<p><em>Web Development</em></p>
+<p>Let's not get started on this one. Flask and Django; we have a running joke at Boston Python that Flask and Django developers shouldn't sit together at Project Nights!</p>
+<p><em>Py2/3</em></p>
+<p>And then, of course, there's Python 2 and Python 3, one split that really created a big split in the community; there are some Python folks who see no need to go to Python 3 unless absolutely forced to (Armin Ronacher, I think, is one), and then there are those who fully advocate for moving on (Jake Vanderplas, for example, and myself).</p>
+<p>So, how do we go forward? Conda + Py3 + CPython? <code>pip</code> + Py2 + PyPy? Permit C-extensions?</p>
+<p>I won't claim to know what's the best, though I will state my preference for <code>conda</code> + Py3 + PyPy (oh, if only it could be this way!). Put more generally, "whatever works, but while also being setup to evolve with a community". As an example, I'm tooled up for working with the PyData crowd (<code>conda</code> + Py3 + CPython), and I trust that the general direction of the PyData crowd will more or less be concordant with the broader Python community, so I don't worry so much about incompatibilities with the broader Python community. Moreover, I often use some web development tools for toy projects, and so I end up using <code>pip</code> anyways, and <code>conda</code> is engineered to play nicely with <code>pip</code>, so I'm happy there too.</p>
+<p>But why do I disagree with Gael that the state of things <em>ought</em> to be consolidated?</p>
+<p>I disagree because I see the splits as being indicative of different groups of people trying to actively solve a diverse multitude of problems. In other words, I see this diversification of tools as a suite of hypotheses that are being tested.</p>
+<p>Sure, <code>pip</code> works well, and is being actively developed, but PyData folks sometimes need to use tools from other languages because none <em>currently</em> exist in Python, and so <code>conda</code> is testing the hypothesis that Python can be used to make a better cross-language <em>and</em> cross-platform package manager.</p>
+<p>Sure, CPython is the most stable and performant interpreter, but PyPy (and other JIT interpreters) are testing the hypothesis that we can make a stable, language-compliant interpreter without all of the type checking overhead of the CPython implementation. In fact, I think I remember hearing (admittedly 2nd hand) the claim that the Python BDFL said that PyPy is probably the way forward.</p>
+<p>Python 3, as a language design specification, is the ongoing hypothesis test that there will be new language features that the Python community will love. I'm guessing that some are backwards-incompatible, so that necessitates a new version number and hence a split.</p>
+<p>So what I think is this - let the hypotheses be tested! If people like it, the hypothesis is validated. If people don't, it's falsified, and we move on.</p>
+<p>Also, vibrancy in the language and tooling brings this diversification. The pragmatist in me is actually glad that there's this many splits, because it means that people's specific problems are being solved, and that in the long-run, <em>as long as there's constant community communication</em>, some of these specific problems may eventually be recognized as common problems that get spread, while others remain as actively maintained niche tools. It's a totally okay situation for the Python community to be in!</p>
+<p>Finally, and this is more pedantic... in the Zen of Python, it's "preferably" but not "mandatory".</p>
+<p>So how do we solve the "confusion" problem? I think this is less a technical thing, and more a community thing. It's time to start writing guidebooks! "Your guidebook to the Python community." Have some opinionated authors come together and put together a series of roadmaps for getting up-and-running with Python, based on how they've set up their own Python computing environments. Newcomers can rely on these "guidebooks" to get up and running, and over time, they'll pick up what they need to know to get their jobs done. What's more important, in my mind, is that there's constant community communication to ensure that confusion doesn't become a big issue; confusion will always be there, but communication can help mitigate it.</p>
+<p>In summary, I'd advocate for pragmatic solutions over ideological stances (used in the good sense); the ideological stance that there should be preferably only one way of doing things is good, because it's an expressed desire for universality and simplicity, which have their inherent goodness as well, but it just may not be pragmatic <em>right now</em>. That's totally cool! Let's take the time as a community to figure out if we can get there, and if so, how, and if not, then what we have is already pretty darn good. :-)</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2016-the-problem-of-too-many-splits</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{The problem of too many splits?}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2016}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{08}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{16}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2016/8/16/the-problem-of-too-many-splits}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

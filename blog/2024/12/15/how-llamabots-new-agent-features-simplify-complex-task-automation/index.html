@@ -1,0 +1,759 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="How LlamaBot&#39;s new agent features simplify complex task automation">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/how-llamabots-new-agent-features-simplify-complex-task-automation' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>How LlamaBot&#39;s new agent features simplify complex task automation - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">How LlamaBot&#39;s new agent features simplify complex task automation</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-12-15</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/agents/">
+        agents
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/automation/">
+        automation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/interface/">
+        interface
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/analysis/">
+        analysis
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workflow/">
+        workflow
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I explore the innovative features of LlamaBot's new AgentBot, designed to simplify complex task automation. These agents operate with goal-oriented non-determinism, decision-making flow control, and natural language interfaces, making them powerful yet user-friendly. I also provide real-world examples, including a detailed walkthrough of a stock market analysis. Curious about how these agents can streamline your workflows and enhance the flexibility of your LLM applications?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <h2 id="a-pythonic-way-to-build-agents">A Pythonic way to build agents</h2><p>The concept of "agents" has been swirling in the AI space for a while now,
+sometimes polarizing opinion.
+Some see agents as the next logical step in automating complex tasks,
+while others dismiss them as over-hyped,
+glorified "just programming."
+I believe the truth lies somewhere in between—agents are neither magical nor trivial.
+Instead,
+they're tools that,
+when well-designed,
+bring immense utility to the table.</p>
+<p>With LlamaBot's new agent capabilities,
+I aimed to create an approachable yet powerful implementation for building agents.
+This post dives into the core ideas that underpin these new features,
+how they simplify agent construction,
+and why I think they strike a balance between complexity and usability.</p>
+<h2 id="what-makes-an-agent">What makes an agent?</h2><p>Let's start with the fundamentals.
+What exactly is an agent?
+My working definition is as follows:</p>
+<p>An <strong>LLM agent</strong> is a system that demonstrates the <em>appearance</em> of making goal-directed decisions autonomously.
+It operates within a scoped set of tasks it can perform,
+without requiring pre-specification of the order in which these tasks are executed.
+Three attributes set it apart:</p>
+<ol>
+<li><strong>Goal-oriented non-determinism</strong>: The agent makes decisions dynamically rather than following a pre-defined sequence of actions.</li>
+<li><strong>Decision-making flow control</strong>: Decisions adapt based on context, resembling a "thinking" process.</li>
+<li><strong>Natural language interfaces</strong>: Inputs and outputs are in plain language, making interactions feel intuitive.</li>
+</ol>
+<p>These attributes combine to give agents their apparent autonomy.
+With these principles in mind,
+I designed LlamaBot's <code>AgentBot</code> to make creating and deploying agents simple,
+flexible,
+and powerful.</p>
+<h2 id="the-heart-of-llamabot-s-new-agentbot">The heart of LlamaBot's new AgentBot</h2><h3 id="decision-making-with-tools">Decision-making with tools</h3><p>At its core,
+the <code>AgentBot</code> orchestrates tools—Python functions annotated with the <code>@tool</code> decorator.
+Given a user prompt,
+the bot selects which tools to use and in what order,
+allowing for dynamic workflows.
+This decision-making process is powered by an LLM
+and is wrapped in a structured system prompt
+that guides the agent toward making the right choices.
+For example, consider the simple task of splitting a restaurant bill:</p>
+<div class="hll"><pre><span></span><span class="nd">@lmb</span><span class="o">.</span><span class="n">tool</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_total_with_tip</span><span class="p">(</span><span class="n">bill_amount</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">tip_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">bill_amount</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">tip_rate</span><span class="p">)</span>
+
+<span class="nd">@lmb</span><span class="o">.</span><span class="n">tool</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">split_bill</span><span class="p">(</span><span class="n">total_amount</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">num_people</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">total_amount</span> <span class="o">/</span> <span class="n">num_people</span>
+
+<span class="n">bot</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">AgentBot</span><span class="p">(</span>
+    <span class="n">system_prompt</span><span class="o">=</span><span class="n">lmb</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;You are my assistant with respect to restaurant bills.&quot;</span><span class="p">),</span>
+    <span class="n">functions</span><span class="o">=</span><span class="p">[</span><span class="n">calculate_total_with_tip</span><span class="p">,</span> <span class="n">split_bill</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+<p>Here, the bot dynamically decides which tool to use based on the input.
+For a prompt like <em>"My dinner was 2300 without tips. Calculate my total with an 18% tip and split the bill between 4 people,"</em> the bot intelligently selects both <code>calculate_total_with_tip</code> and <code>split_bill</code>,
+chaining them together to provide a complete answer:</p>
+<blockquote><p>The total bill with an 18% tip is 2714.00,
+and when split between 4 people,
+each person should pay 678.50.</p>
+</blockquote>
+<h2 id="real-world-example-stock-market-analysis">Real-world example: Stock market analysis</h2><p>LlamaBot's new <code>AgentBot</code> makes it easy to perform multi-step tasks like stock market analysis.
+Here's an example where I created an agent to:</p>
+<ol>
+<li>Scrape stock prices,</li>
+<li>Calculate percentiles,</li>
+<li>Detect outliers, and</li>
+<li>Summarize statistical insights.</li>
+</ol>
+<p>With this setup,
+you can prompt the bot with natural language,
+like: <em>"Analyze the last 100 days of MRNA stock prices"</em>,
+and receive detailed,
+actionable insights in plain English.</p>
+<h3 id="code-implementation">Code implementation</h3><p>Here's how the <code>AgentBot</code> was constructed for this task:</p>
+<div class="hll"><pre><span></span><span class="c1"># Import necessary tools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">llamabot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">lmb</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+<span class="nd">@lmb</span><span class="o">.</span><span class="n">tool</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">scrape_stock_prices</span><span class="p">(</span><span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scrape historical stock prices from Yahoo Finance API.&quot;&quot;&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://query1.finance.yahoo.com/v8/finance/chart/</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;range&quot;</span><span class="p">:</span> <span class="s2">&quot;100d&quot;</span><span class="p">,</span> <span class="s2">&quot;interval&quot;</span><span class="p">:</span> <span class="s2">&quot;1d&quot;</span><span class="p">}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="n">prices</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;chart&quot;</span><span class="p">][</span><span class="s2">&quot;result&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;indicators&quot;</span><span class="p">][</span><span class="s2">&quot;quote&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;close&quot;</span><span class="p">]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">price</span><span class="p">)</span> <span class="k">for</span> <span class="n">price</span> <span class="ow">in</span> <span class="n">prices</span> <span class="k">if</span> <span class="n">price</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="k">except</span> <span class="p">(</span><span class="n">httpx</span><span class="o">.</span><span class="n">HTTPError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error fetching stock data: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to fetch data for </span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nd">@lmb</span><span class="o">.</span><span class="n">tool</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_percentile</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">percentile</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the percentile value from a list of numbers.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">percentile</span><span class="p">))</span>
+
+<span class="nd">@lmb</span><span class="o">.</span><span class="n">tool</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">detect_outliers</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Detect outliers in data using the IQR method.&quot;&quot;&quot;</span>
+    <span class="n">q1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+    <span class="n">q3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">75</span><span class="p">)</span>
+    <span class="n">iqr</span> <span class="o">=</span> <span class="n">q3</span> <span class="o">-</span> <span class="n">q1</span>
+    <span class="n">lower_bound</span> <span class="o">=</span> <span class="n">q1</span> <span class="o">-</span> <span class="n">threshold</span> <span class="o">*</span> <span class="n">iqr</span>
+    <span class="n">upper_bound</span> <span class="o">=</span> <span class="n">q3</span> <span class="o">+</span> <span class="n">threshold</span> <span class="o">*</span> <span class="n">iqr</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">lower_bound</span> <span class="ow">or</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">upper_bound</span><span class="p">]</span>
+
+<span class="nd">@lmb</span><span class="o">.</span><span class="n">tool</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">summarize_statistics</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate basic statistical measures for a dataset.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;mean&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span>
+        <span class="s2">&quot;median&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span>
+        <span class="s2">&quot;std&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span>
+        <span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span>
+        <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span>
+    <span class="p">}</span>
+
+<span class="c1"># Create the stock analysis agent</span>
+<span class="n">stats_bot</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">AgentBot</span><span class="p">(</span>
+    <span class="n">system_prompt</span><span class="o">=</span><span class="n">lmb</span><span class="o">.</span><span class="n">system</span><span class="p">(</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;You are a stock market analysis assistant. Help analyze stock price data</span>
+<span class="sd">        by providing insights about their distribution, outliers, and basic statistics.&quot;&quot;&quot;</span>
+    <span class="p">),</span>
+    <span class="n">functions</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">scrape_stock_prices</span><span class="p">,</span>
+        <span class="n">calculate_percentile</span><span class="p">,</span>
+        <span class="n">detect_outliers</span><span class="p">,</span>
+        <span class="n">summarize_statistics</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+
+<span class="c1"># Using the agent for stock analysis</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">stats_bot</span><span class="p">(</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Please analyze the last 100 days of MRNA stock prices:</span>
+<span class="sd">    1. Scrape the price data</span>
+<span class="sd">    2. Calculate the 90th percentile price</span>
+<span class="sd">    3. Detect any price outliers</span>
+<span class="sd">    4. Provide basic statistical summary&quot;&quot;&quot;</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</pre></div>
+<p>For the prompt <em>"Analyze the last 100 days of MRNA stock prices"</em>, the bot responds:</p>
+<div class="hll"><pre><span></span>The analysis of the last 100 days of MRNA stock prices is complete. Here&#39;s a summary of the findings:
+
+1. **90th Percentile Price**: The 90th percentile price is approximately $90.38. This means that 90% of the closing prices over the last 100 days were below this value, indicating that prices above this are relatively rare.
+2. **Outliers**: No outliers were detected in the data. This suggests that the price movements have been relatively stable without any extreme highs or lows that deviate significantly from the overall trend.
+3. **Basic Statistical Summary**:
+    - **Mean (Average) Price**: The average closing price was about $67.71.
+    - **Median Price**: The median price, which is the middle value when all prices are sorted, was $63.93. This is slightly lower than the mean, indicating a few higher prices might be pulling the average up.
+    - **Standard Deviation**: The standard deviation was $22.36, which measures the amount of variation or dispersion in the prices. A higher standard deviation indicates more variability in the stock price.
+    - **Minimum Price**: The lowest closing price was $36.85.
+    - **Maximum Price**: The highest closing price was $122.50.
+
+Overall, the MRNA stock has shown some variability in its prices over the last 100 days, with a significant range between the minimum and maximum prices. However, the absence of outliers suggests that these price changes have been consistent with the general trend, without any unexpected spikes or drops.
+</pre></div>
+<h2 id="key-features-of-the-new-agentbot">Key features of the new AgentBot</h2><p>(a) <strong>Caching intermediate results</strong>:The agent caches results like numerical arrays,
+reducing redundant computation and saving time and cost.
+Results are stored in a memory dictionary indexed by their SHA-256 hash keys,
+ensuring efficient reuse of previously computed outcomes
+and cost savings on output token usage.</p>
+<p>(b) <strong>Error handling as a first-class citizen</strong>:
+Errors are handled gracefully,
+guiding users without derailing workflows.
+The <code>return_error</code> tool,
+which is built-in to the agent,
+allows the agent to identify issues explicitly,
+providing developers with actionable feedback.</p>
+<p>(c) <strong>Dynamic tool selection</strong>:
+The agent adapts its actions based on context and task complexity.
+It leverages a decision-making model
+that determines the most relevant tools to call
+and uses cached results dynamically where appropriate.</p>
+<p>(d) <strong>High-level APIs for streamlined usage</strong>:
+The API design ensures readability and ease of use.
+By combining Pydantic models for structured inputs and outputs
+with well-annotated Python functions,
+developers can build powerful agents with minimal boilerplate.</p>
+<h2 id="conclusion-why-agents-matter">Conclusion: Why agents matter</h2><p>LlamaBot's new agent capabilities offer developers
+a practical toolset for managing complex workflows with ease.
+Rather than reinventing the wheel,
+<code>AgentBot</code> focuses on integrating thoughtful design and simplicity,
+helping users harness the strengths of existing frameworks
+while tailoring solutions to specific needs.</p>
+<p>To explore these features further,
+check out the <a href="https://ericmjl.github.io/llamabot/tutorials/agentbot/">LlamaBot documentation</a>.
+Let's build something amazing together!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-how-llamabots-new-agent-features-simplify-complex-task-automation</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{How LlamaBot&#39;s new agent features simplify complex task automation}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{12}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{15}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/12/15/how-llamabots-new-agent-features-simplify-complex-task-automation}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

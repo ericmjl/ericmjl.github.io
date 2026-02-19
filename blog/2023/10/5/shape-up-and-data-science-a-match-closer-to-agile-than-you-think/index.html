@@ -1,0 +1,811 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Shape Up and Data Science: A Match Closer to Agile Than You Think">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/shape-up-and-data-science-a-match-closer-to-agile-than-you-think' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Shape Up and Data Science: A Match Closer to Agile Than You Think - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Shape Up and Data Science: A Match Closer to Agile Than You Think</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2023-10-05</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/agile/">
+        agile
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/scrum/">
+        scrum
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/shape up/">
+        shape up
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/software methodologies/">
+        software methodologies
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/product development/">
+        product development
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/deep work/">
+        deep work
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/team autonomy/">
+        team autonomy
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/adaptability/">
+        adaptability
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I explore the limitations of Scrum for data science.
+I introduce Shape Up as a potential alternative.
+I discussed how Shape Up's ways of working
+align better with the unique needs of data science,
+such as deep domain specialization and varied feedback durations.
+I also highlighted how Shape Up embodies Agile's core values
+while suggesting modifications to suit data science projects better.
+Ultimately, I emphasized the importance of adaptability and delivering value,
+staying true to Agile's core principles.</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>As I've delved deeper into the realms of data science and software methodologies,
+I've often reflected on Agile principles.
+Agile's core ethos – adaptability, swift iterations, and collaborative engagement –
+have always resonated with me.
+Yet, over the years, I've observed a myriad of interpretations,
+with Scrum emerging as a dominant favourite.
+But here's a question I've grappled with:
+Does Scrum genuinely cater to every discipline's unique needs?
+Recently, I stumbled upon Shape Up, Basecamp's brainchild.
+In this piece, I want to dissect
+whether Shape Up aligns more seamlessly with data science.
+Let's see if, in some unexpected ways,
+it might even echo the spirit of Agile
+more closely than current Scrum interpretations do.</p>
+<h2 id="understanding-agile-principles">Understanding Agile Principles</h2><p>Before we go on, we must establish what Agile really is about.
+At its core, Agile values:</p>
+<ol>
+<li>Individuals and interactions over processes and tools.</li>
+<li>Working solutions over comprehensive documentation.</li>
+<li>Customer collaboration over contract negotiation.</li>
+<li>Responding to change over following a plan.</li>
+</ol>
+<p>Agile isn't about specific rituals;
+it's about mindsets and principles emphasizing adaptability and delivering value.
+(That Agile isn't about particular rituals makes the structured approach of Scrum,
+with all of its, ahem, <em>ceremonies</em>, particularly jarring and ironic.)</p>
+<h2 id="scrum-s-assumptions-about-engineers-vs-the-reality-of-data-scientists">Scrum's Assumptions About Engineers vs. The Reality of Data Scientists</h2><p>At its core, Scrum was developed with software engineering projects in mind.
+This lineage inherently carries certain assumptions about the team members involved:</p>
+<p><strong>Interchangeability of Engineers:</strong>
+One of the implicit assumptions in Scrum
+is that engineers are somewhat interchangeable.
+In a Scrum environment,
+tasks are often broken down from user stories into smaller tickets.
+In theory, any developer on the team should be able to pick up most tickets.
+This "generalist" approach assumes a relatively uniform skill set among team members.
+While specialization does exist in software engineering,
+Scrum teams often aim for a degree of cross-functionality
+where members can interchange roles to some extent.
+This is why we hear statements in Scrum teams like, "Can anyone take this ticket?"</p>
+<p><strong>Short Feedback Loops:</strong>
+Scrum thrives on rapid iterations and quick feedback.
+It assumes that engineers can produce a piece of functionality,
+however small, that can be reviewed, tested,
+and potentially shipped within a short sprint duration.
+As such, Scrum assumes that the nature of the work allows for such quick turnarounds.</p>
+<p><strong>Homogenized Progress Tracking:</strong>
+Using tools like burndown charts
+and the concept of velocity assume that tasks (or story points)
+can be somewhat uniformly estimated and tracked across sprints.
+This presupposes a certain consistency in the type and complexity of tasks across sprints.</p>
+<p>Contrast this with the world of data science:</p>
+<p><strong>Deep Domain Specialization:</strong>
+Data scientists often possess deep domain specialization.
+One might be an expert in natural language processing.
+At the same time, another might specialize in deep learning for computer vision.
+Yet another may be a recovering wet lab biologist
+with over a decade of molecular biology domain expertise.
+Their expertise isn't just about knowledge;
+it's often about years of experience and intuition built over time.
+This makes it challenging to have interchangeable roles,
+as we might find in Scrum-based software teams.</p>
+<p><strong>Complex Tooling Expertise:</strong>
+Beyond domain knowledge,
+data scientists need expertise in specific computational toolsets.
+Building a neural network in TensorFlow differs from setting up
+a distributed data processing pipeline in Spark.
+This isn't about merely knowing a programming language
+but mastering a very complex and deep stack of computational tools.</p>
+<p><strong>Varied Feedback Durations:</strong> Unlike software tasks that can often be demoed quickly
+(I am thinking of those that involve
+building user interfaces or standing up a new database),
+a data science task, such as training a machine learning model,
+might require days or even weeks before its efficacy can be evaluated;
+additionally, data scientists often need to use their deep domain expertise
+in working with collaborators to really dig at the heart of a problem.
+The feedback loop can be long and is not always predictable.</p>
+<p><strong>Non-uniform Task Complexity:</strong>
+In data science, two tasks that sound similar in scope
+can vary wildly in complexity due to the nuances of data
+or the intricacies of algorithms.
+This makes standardized estimation techniques,
+like story points, challenging to apply consistently.</p>
+<p>In essence, while Scrum's assumptions about engineers foster a fluid,
+iterative environment for software development,
+data science requires a more nuanced approach.
+The deep specialization and intricate tooling knowledge needed in data science
+demand methodologies that acknowledge and cater to these unique challenges,
+something methodologies like Shape Up aim to address.</p>
+<h2 id="why-shape-up-aligns-well-with-data-science">Why Shape Up Aligns Well with Data Science</h2><p>Let's first understand what <a href="https://basecamp.com/shapeup">Shape Up</a> is all about.
+Shape Up is a product development methodology introduced by 37Signals,
+the creators of Basecamp, emphasizing focused work cycles,
+clear boundaries between planning and execution, and flexibility in project scope.
+Instead of traditional sprints,
+teams work in uninterrupted 6-week cycles to produce tangible outcomes.
+This is followed by a 2-week cool-down period for reflection and preparation.
+The methodology prioritizes high-impact tasks ("bets"),
+uses "fat marker sketches" for broad-stroke planning,
+and champions team autonomy,
+allowing for adaptive solutions
+without getting bogged down in exhaustive task details or constant back-and-forth.</p>
+<p>Shape Up, with its unique structure, offers solutions:</p>
+<p><strong>Deep Work Periods</strong>:
+Complex analyses and model developments require deep focus,
+which the longer uninterrupted cycles in Shape Up support.</p>
+<p><strong>Betting on Value</strong>:
+Shape Up emphasizes betting on high-impact tasks,
+ensuring efforts align with potential outcomes.
+This aligns well with the way the best data scientists are trained --
+this person would have a research background, from which follows the:
+Instinct for impact rather than just methodological complexity.
+The ability to clarify and navigate through imprecisely defined problems
+and pick the one with the highest potential value.
+The creativity to develop more than one plausible solution to a problem
+and the technical skill to prototype all of them.</p>
+<p><strong>Fat Marker Sketches:</strong>
+One of the defining characteristics of Shape Up's approach
+is using "fat marker sketches" during the shaping phase.
+These sketches provide a broad overview or blueprint
+without getting bogged down in the minute details.
+This mirrors data science operations very closely.
+Often, a general direction or the core essence of a solution
+is enough to commence with the implementation,
+as the problems data scientists face have a level of complexity
+that doesn't lend itself to concrete wire-framing or detailed lists of specifications.
+Data scientists don't always need an exhaustive list of requirements;
+a sketch that captures the crux of the problem can suffice,
+allowing for flexibility and on-the-fly adjustments.</p>
+<p><strong>Cool-Down Periods</strong>:
+After intense cycles, these periods provide room for reflection,
+further learning, and iteration –
+vital for any data scientist to have a better sense
+of whether we have the right solution built.
+After the intensity of prototyping,
+reworking prototypes, checking with collaborators, and more,
+a cool-down period on a project enables us to
+reflect on the abstraction and generalization of our tooling to other problems,
+identify where we need to fix up our code
+to integrate better across the ecosystem of tools we've built
+and ensure that we're truly addressing
+the underlying business or research questions at hand.
+During this pause, we often find clarity,
+spot overlooked nuances,
+and garner insights that can make our solutions functional and genuinely exceptional.
+The cool-down is less about disengagement and more about taking a holistic view,
+ensuring that our work aligns with broader objectives
+and stands the test of real-world application.</p>
+<h2 id="how-shape-up-embodies-agile-principles">How Shape Up Embodies Agile Principles</h2><p>Interestingly, Shape Up mirrors Agile's core values:</p>
+<p><strong>Responding to Change</strong>:
+Agile prioritizes adaptability.
+Shape Up's flexible scope within fixed cycles embodies this
+by accommodating unforeseen challenges or discoveries.</p>
+<p><strong>Continuous Delivery</strong>:
+Shape Up emphasizes tangible outcomes at the end of each cycle,
+aligning with Agile's emphasis on regular value delivery.</p>
+<p><strong>Collaboration &amp; Trust</strong>:
+The shaping process in Shape Up fosters trust,
+giving teams the autonomy to drive projects,
+reflecting Agile's spirit of collaboration and trust.</p>
+<h2 id="where-shape-up-needs-modification">Where Shape-Up Needs Modification</h2><p>It's important to know that Shape Up isn't a perfect fit for data science projects,
+particularly those requiring research skills
+to investigate and explore before embarking on a build.
+Here are some ways that Shape Up
+may need to be adapted and modified to suit a data science project:</p>
+<p><strong>Allowing for Flexible Cycle Times</strong>:
+The fixed 6-week cycle in Shape Up might not cater to
+the unpredictable nature of specific data science tasks,
+especially those grounded in deep research.
+The solution is to give data scientists the flexibility to define cycle times
+based on the nature of the problem, its complexity, the expected challenges,
+and most importantly, their appetite for the problem.
+It makes sense to give back autonomy to the data scientists in the DS team
+to define a date they've got the appetite to commit to
+rather than impose a fixed schedule.
+This is because some investigations require shorter bursts of work
+while others may need extended periods of deep research.
+The person doing the actual work is most likely the one who will have
+the best sense of how long things will take.</p>
+<p><strong>More Iterative Approaches Within Cycles</strong>:
+Data science projects often involve continuous iterations, refinements, and validations,
+especially when tuning models or algorithms.
+Instead of waiting for the end of a cycle for a shippable result,
+teams should flexibly integrate iteration checkpoints within cycles
+where interim findings, model versions, or hypothesis validations
+are reviewed and refined,
+thereby allowing for pivots to more valuable areas of exploration
+and detours for sanity checking,</p>
+<p><strong>Diverse Feedback Mechanisms</strong>:
+Unlike software products,
+data science outputs might need feedback from diverse stakeholders –
+domain experts, data engineers, business analysts, etc.
+Teams should incorporate just-in-time feedback loops within the Shape Up process,
+ensuring that the data solution aligns with business goals,
+domain knowledge, and technical feasibility.</p>
+<p><strong>Detailed In-Cycle Exploration</strong>:
+While valuable,
+the shaping phase in Shape Up might not be exhaustive enough
+for complex data science challenges that require thorough preliminary exploration.
+Instead, teams should embrace exploration while building,
+alternatively known as "learning while prototyping".
+Doing so allows for pivoting to new hypothesized solutions
+or even reframing the entire problem
+if feedback from collaborators on early prototypes suggests the need to do so.</p>
+<p><strong>Handling External Dependencies</strong>:
+Data scientists often rely on external data sources, APIs, or third-party tools.
+Delays or issues in these can impact the progress of the project.
+To solve this problem, time frames should be designed with buffer periods
+or contingency plans to handle such external dependencies,
+ensuring that projects don't get stalled due to factors outside the team's control.</p>
+<p>While Shape Up offers a structured approach to product development,
+adapting its principles to the nuanced
+and often unpredictable world of data science is necessary.
+By recognizing and addressing its potential limitations in the context of data science,
+teams can derive the best of both worlds,
+ensuring efficient, impactful, and high-quality data-driven solutions.</p>
+<h2 id="conclusion">Conclusion</h2><p>Staying true to Agile's core principles
+means recognizing when alternative methodologies,
+like Shape Up, offer a better alignment,
+especially in unique domains like data science.
+It's a call to understand, adapt, and evolve,
+ensuring we don't get bogged down by ritualistic practices
+but focus on the core essence of delivering value.</p>
+<blockquote><p><strong>Note: This blog post was written with GPT-4 as a writing aid.
+However, I have edited the post to accurately reflect
+what I know and think about Scrum, Shape-Up, and Agile.
+As such, I am willing to defend every character in this post
+as if I were the one writing it.</strong></p>
+</blockquote>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2023-shape-up-and-data-science-a-match-closer-to-agile-than-you-think</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Shape Up and Data Science: A Match Closer to Agile Than You Think}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2023}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{10}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{05}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2023/10/5/shape-up-and-data-science-a-match-closer-to-agile-than-you-think}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

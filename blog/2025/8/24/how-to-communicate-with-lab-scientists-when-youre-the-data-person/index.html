@@ -1,0 +1,860 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="How to communicate with lab scientists (when you&#39;re the data person)">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/how-to-communicate-with-lab-scientists-when-youre-the-data-person' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>How to communicate with lab scientists (when you&#39;re the data person) - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">How to communicate with lab scientists (when you&#39;re the data person)</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-08-24</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/biotech/">
+        biotech
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/communication/">
+        communication
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/decisions/">
+        decisions
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/statistics/">
+        statistics
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/translation/">
+        translation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/collaboration/">
+        collaboration
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/trust/">
+        trust
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/meetings/">
+        meetings
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/probability/">
+        probability
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/stakeholders/">
+        stakeholders
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share practical strategies for data scientists and statisticians to communicate more effectively with lab scientists in biotech. Instead of overwhelming collaborators with methods, I explain how to focus on decision-making, translate complex analyses into actionable probabilities, and build trust through clarity. I also offer tips for structuring meetings and anticipating common questions. Want to know how to make your insights drive real decisions in the lab?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Imagine this scenario: A data scientist explains a hierarchical Bayesian model for 45 minutes. Beautiful math. Elegant handling of batch effects. The lab scientists are polite but glazed over. Finally, someone interrupts: "Sorry, but should we move this compound forward or not?"</p>
+<p>The data scientist hadn't even calculated that probability.</p>
+<p>Sound familiar?</p>
+<p>If you're a statistician or data scientist in biotech, you've probably been there. You've spent hours on sophisticated analyses, crafted beautiful slides about your methods, and watched your audience's eyes glaze over while you explained mixed-effects models.</p>
+<p>Meanwhile, they just needed to know if they should spend $200K on the next experiment.</p>
+<p>Here's the thing: Lab scientists aren't struggling to understand your statistics because they're not smart enough. They're brilliant experts who've spent years mastering protein folding, cell signaling, or synthetic chemistry. They're just juggling their own complex problems and need you to translate your analysis into something they can act on.</p>
+<p>Today, I'm going to show you exactly how to do that.</p>
+<h2 id="here-s-what-we-re-covering">Here's what we're covering:</h2><ol>
+<li>Your communication budget is finite — spend it wisely</li>
+<li>Know what mode they're in before you open your laptop</li>
+<li>Use the three-layer translation model</li>
+<li>Decode what they're really asking</li>
+<li>Build trust through clarity, not complexity</li>
+<li>Master the decision-first meeting structure</li>
+<li>Ask yourself what they'll ask you</li>
+</ol>
+<h2 id="1-your-communication-budget-is-finite-spend-it-wisely">1. Your communication budget is finite — spend it wisely</h2><p>Every interaction has a finite "communication budget" — limited attention, time, and cognitive load. Most data scientists spend this budget like tourists with foreign currency, not realizing the exchange rate.</p>
+<p>Think about your last presentation. Where did you spend your time?</p>
+<p>🚫 <strong>The typical (failed) allocation:</strong></p>
+<ul>
+<li>60% on methodology and statistical details</li>
+<li>30% on results (tables, coefficients, credible intervals)</li>
+<li>10% on "what this means" (usually rushed at the end)</li>
+<li>0% on "what you should do next"</li>
+</ul>
+<p>I get it. We're trained to show our work. We think rigor equals value. We assume that if we explain our methods thoroughly enough, scientists will understand what to do.</p>
+<p>But here's what actually works:</p>
+<p>✅ <strong>The allocation that drives decisions:</strong></p>
+<ul>
+<li>10% on methods (just enough for credibility)</li>
+<li>20% on results (simplified, visual, contextual)</li>
+<li>40% on implications for their specific decisions</li>
+<li>30% on uncertainty and what it means for their next steps</li>
+</ul>
+<p>But context matters. A curious scientist with time might genuinely want 30% methods—they're building mental models for future decisions. Someone facing a go/no-go decision tomorrow? They need 70% decision implications, minimal methods.</p>
+<p>The key is adopting <a href="https://en.wikipedia.org/wiki/BLUF_(communication">BLUF (Bottom-Line Up-Front)</a>). Structure your presentation by working backwards from the decision to be made.</p>
+<p><strong>Try this:</strong> Start with the decision and recommendation, then work backwards to the evidence that supports it. Lead with "Based on our analysis, I recommend we proceed with Compound A because there's an 87% probability it meets our potency threshold."</p>
+<p>This tells them immediately what they need to know, then you can spend the remaining time explaining why.</p>
+<p>Here's what happens when you don't use BLUF: A data scientist spent an entire program review meeting walking through their elegant approach to handling missing data. Really sophisticated stuff. Multiple imputation with careful consideration of the missing-at-random assumption.</p>
+<p>Twenty minutes in, the program lead interrupted: "This is interesting, but we need to decide today whether to advance this molecule. Does it meet our potency threshold or not?"</p>
+<p>They hadn't even calculated that probability. They'd spent their entire communication budget on something that wasn't even the program lead's concern that day.</p>
+<p><strong>With BLUF, they would have started:</strong> "Based on our analysis, I recommend we advance this molecule. There's an 82% probability it meets our potency threshold, even accounting for the missing data. Here's how I handled the missing data to arrive at this conclusion..."</p>
+<h2 id="2-know-what-mode-they-re-in-before-you-open-your-laptop">2. Know what mode they're in before you open your laptop</h2><p>Lab scientists operate in three distinct modes, and each requires a completely different communication approach.</p>
+<h3 id="decision-mode-most-of-the-time">Decision Mode (Most of the time)</h3><p>They're under time pressure for go/no-go decisions. Maybe it's a pipeline review tomorrow. Maybe they need to order materials today. Maybe the synthesis team is literally waiting for their answer.</p>
+<p>Signs you'll hear:</p>
+<ul>
+<li>"What's the bottom line?"</li>
+<li>"Should we proceed?"</li>
+<li>"Just tell me if it worked"</li>
+</ul>
+<p>What they need: Probability of success and a clear recommendation. That's it.</p>
+<h3 id="learning-mode-when-they-have-bandwidth">Learning Mode (When they have bandwidth)</h3><p>They're genuinely curious about your methods. Maybe they're trying to understand why this analysis differs from last time. Maybe they're building intuition for future experiments.</p>
+<p>Signs you'll hear:</p>
+<ul>
+<li>"How does that work?"</li>
+<li>"Why did you choose that approach?"</li>
+<li>"Can you explain the intuition behind this?"</li>
+</ul>
+<p>What they need: Mental models and intuition, not mathematical formulas.</p>
+<h3 id="validation-mode-testing-if-they-can-trust-you">Validation Mode (Testing if they can trust you)</h3><p>They're not really interested in learning—they're assessing whether they can rely on your judgment for million-dollar decisions.</p>
+<p>Signs you'll hear:</p>
+<ul>
+<li>"What assumptions did you make?"</li>
+<li>"How does this handle batch effects?"</li>
+<li>"What if the data is wrong?"</li>
+</ul>
+<p>What they need: Confidence that you've been rigorous without the full mathematical proof.</p>
+<p>Here's the mistake most of us make:</p>
+<p>🚫 <strong>Wrong approach:</strong> Launch into methods explanation regardless of mode</p>
+<p>✅ <strong>Right approach:</strong> Start with the decision and recommendation, then adapt the explanation depth based on their mode</p>
+<p>Most data scientists default to teaching mode when scientists are in decision mode. That's like giving someone a recipe when they just asked if dinner's ready.</p>
+<p>Consider this scenario: A scientist approaches a data scientist with dose-response data. The data scientist starts explaining their Bayesian approach to EC50 estimation. Five minutes in, the scientist stops them: "I just need to know if this is more potent than our current lead."</p>
+<p>She was in Decision Mode. The data scientist was in Teaching Mode. Complete mismatch.</p>
+<p>The better approach is to be deliberate rather than reactive. Before any meeting, clarify the goals upfront. Ask what they're trying to decide. Talk to stakeholders beforehand to understand the context. Do the pre-work rather than trying to read body language in real-time.</p>
+<h2 id="3-use-the-three-layer-translation-model">3. Use the three-layer translation model</h2><p>You think in distributions. They think in decisions. This gap is why brilliant analyses often fail to drive action.</p>
+<p>Here's the framework that works for bridging that gap:</p>
+<p><strong>Layer 1: Statistical Reality (Keep this in your head)</strong></p>
+<ul>
+<li>Full posterior distributions</li>
+<li>Model assumptions</li>
+<li>Fancy math</li>
+<li>All the technical details you love</li>
+</ul>
+<p>This layer is for you. It ensures your analysis is rigorous. But it stays in your head or the appendix.</p>
+<p><strong>Layer 2: Scientific Meaning (The bridge)</strong></p>
+<ul>
+<li>What the analysis means for their biological hypothesis</li>
+<li>How the statistics relate to their experimental design</li>
+<li>The full richness of uncertainty</li>
+</ul>
+<p>Here's the key: Keep the full distribution at this layer. Don't collapse to point estimates yet. You're translating statistics to science, but you're not making decisions yet.</p>
+<p><strong>Layer 3: Decision Layer (What they actually need)</strong></p>
+<ul>
+<li>NOW integrate over posteriors for specific probabilities</li>
+<li>"There's an 87% chance this compound beats your TPP threshold"</li>
+<li>"With 90% probability, this is your best compound"</li>
+<li>"You need 12 more samples to reach 95% confidence"</li>
+</ul>
+<p>The magic is waiting until the last possible moment to collapse distributions into decision probabilities. Why? Because different decisions need different integrations of the same posterior.</p>
+<p>Let me show you what I mean:</p>
+<p>🚫 <strong>Wrong (Layer 1 bleeding into communication):</strong>
+"The posterior distribution for the treatment effect has a 95% credible interval of [0.15, 0.31] with a mean of 0.23."</p>
+<p>What does a lab scientist do with this? Nothing. It's statistical reality without translation.</p>
+<p>✅ <strong>Right (Layer 3, decision-focused):</strong>
+"There's a 92% probability your treatment exceeds the TPP threshold. If you need 95% confidence for the program milestone, run 20 more samples. If 90% is acceptable for an early read, you can proceed now."</p>
+<p>See the difference? One is statistical reporting. The other enables a decision.</p>
+<p>The same posterior distribution might need to answer multiple questions:</p>
+<ul>
+<li>"What's the probability this exceeds our TPP?" (integrate above threshold)</li>
+<li>"What's the probability this is our best compound?" (compare posteriors)</li>
+<li>"How many samples until 95% confidence?" (project forward)</li>
+</ul>
+<p>By keeping the full distribution until Layer 3, you can answer whatever decision question they actually have, not the one you assumed they had.</p>
+<h2 id="4-decode-what-they-re-really-asking">4. Decode what they're really asking</h2><p>Scientists may ask statistics questions when they mean decision questions. Learning to translate is a superpower.</p>
+<p>Here's your decoder ring:</p>
+<p><strong>"Is this significant?"</strong> They're not asking about p-values. They're asking: "Should I continue this line of research?"</p>
+<p><strong>"What's the confidence?"</strong> They don't want credible intervals. They're asking: "How wrong could this decision be?"</p>
+<p><strong>"Did it work?"</strong> They don't care about effect sizes. They're asking: "Is the effect large enough to matter for my application?"</p>
+<p><strong>"Can you check the stats?"</strong> They don't want a methods seminar. They're asking: "I need ammunition for my go/no-go meeting tomorrow."</p>
+<p><strong>"How robust is this?"</strong> They're not necessarily interested in sensitivity analyses. They're asking: "Can I trust this decision?"</p>
+<p>Every lab scientist in biotech faces the same five decisions over and over:</p>
+<ol>
+<li><strong>Resource allocation:</strong> Should I invest more time/money/FTEs in this direction?</li>
+<li><strong>Pipeline progression:</strong> Is this ready for the next stage?</li>
+<li><strong>Experimental design:</strong> Should I modify my approach or repeat?</li>
+<li><strong>Program decisions:</strong> Continue, pivot, or kill?</li>
+<li><strong>Platform decisions:</strong> Is this assay/method worth scaling up?</li>
+</ol>
+<p>Your job isn't to answer their literal question. It's to figure out which of these five decisions they're really trying to make.</p>
+<p>🚫 <strong>Wrong:</strong> Answer the literal statistics question they asked</p>
+<p>✅ <strong>Right:</strong> Answer the decision they're trying to make</p>
+<p><strong>Try this:</strong> When first asked to partner on an analysis, ask: "What decision are you trying to make with this data?"</p>
+<p>Then frame everything around that decision.</p>
+<p>Here's a common scenario: A scientist asks the data team to "check if the groups are different." The data scientist could run their standard analysis and report "statistically significant difference detected." Technically correct. Completely useless.</p>
+<p>Instead, imagine asking: "What decision does this inform?"</p>
+<p>Turns out, they need to know if the new formulation is at least 20% better than the current one — otherwise, it wasn't worth the reformulation costs. The groups were statistically different, but only by 8%. The real answer was: "Don't reformulate."</p>
+<p>That's the difference between answering questions and enabling decisions.</p>
+<h2 id="5-build-trust-through-clarity-not-complexity">5. Build trust through clarity, not complexity</h2><p>Here's the paradox: Most data scientists think trust comes from showing their work.</p>
+<p>This is more nuanced than you might think.</p>
+<p>Over-explaining methods actually reduces trust because:</p>
+<ul>
+<li>It signals insecurity about your results</li>
+<li>It wastes precious communication budget</li>
+<li>It feels like gatekeeping with jargon</li>
+<li>It suggests you don't understand what they need</li>
+</ul>
+<p>What actually builds trust:</p>
+<ul>
+<li>Leading with clear probabilities for their go/no-go decisions</li>
+<li>Showing how probability changes with more data</li>
+<li>Being precise about uncertainty without hedging</li>
+<li>Speaking their language, not yours</li>
+</ul>
+<p>🚫 <strong>Trust-killing:</strong> "Well, it depends on your assumptions about the prior, and if we consider the hierarchical structure of the random effects, controlling for batch-to-batch variation, we can say that under certain conditions..."</p>
+<p>This sounds like you're not confident in your answer.</p>
+<p>✅ <strong>Trust-building:</strong> "There's an 89% chance this works. If you need 95% confidence before scaling up, test 3 more concentrations. Here's why I'm confident in that number: I've accounted for batch effects, and even in the worst-case scenario, you're still above 82%."</p>
+<p>Clear. Actionable. Confident.</p>
+<p>The beauty of probabilistic thinking here: "We're 78% confident" is infinitely clearer than "statistically significant." You can directly answer: "What's the probability we're making the wrong decision?"</p>
+<p>That's a question every scientist understands.</p>
+<p><strong>The methods appendix approach:</strong></p>
+<p>When you do need to establish technical credibility, try this structure:</p>
+<ul>
+<li>One slide of method basics (just enough to show rigor)</li>
+<li>Key assumptions in plain English (Pro tip: AI tools can help translate technical assumptions into audience-appropriate language)</li>
+<li>Details available but not forced</li>
+<li>For the genuinely curious: "Happy to dive into the model after we nail down your decision"</li>
+</ul>
+<p>Smart data scientists keep a technical appendix for every analysis. It has all the details they're proud of—the clever missing data handling, the hierarchical structure, the prior specifications.</p>
+<p>But they only show it when asked. And here's what happens: People trust them more because they respect everyone's time enough not to force it on them.</p>
+<h2 id="6-master-the-decision-first-meeting-structure">6. Master the decision-first meeting structure</h2><p>Stop opening with methods. Stop it right now.</p>
+<p>Start with their decision.</p>
+<p><strong>The structure that works:</strong></p>
+<ol>
+<li><strong>State the decision context upfront</strong>: "We're here to discuss [specific decision]. Here's what the data tells us."</li>
+<li><strong>Give the probability and recommendation immediately</strong>: "There's an 89% probability of success. I recommend proceeding."</li>
+<li><strong>Show how probability changes with more data</strong>: "With 10 more samples, we'd get to 95% confidence."</li>
+<li><strong>Discuss what could change your assessment</strong>: "This assumes your batch effects stay consistent."</li>
+<li><strong>Offer details only if requested</strong>: "Want me to walk through how I got there?"</li>
+</ol>
+<p>Let me show you the difference:</p>
+<p>🚫 <strong>Wrong meeting flow:</strong>
+"Thanks for coming. So I started by examining the data structure, and I noticed some heteroscedasticity in the residuals, which suggested we might need a more complex variance structure. I tried several approaches, including a Box-Cox transformation, but ultimately settled on a hierarchical model because... [20 minutes later]... so in conclusion, it might work."</p>
+<p>By the time you get to the conclusion, they've stopped listening.</p>
+<p>✅ <strong>Right meeting flow:</strong>
+"We're here to discuss whether to advance Compound X to synthesis. Based on your assay data, there's an 89% probability this compound exceeds your 10nM potency requirement. I recommend proceeding to synthesis scale-up. If you need 95% confidence instead of 89%, I'd recommend testing 3 more concentrations first. Want me to walk through how I got there?"</p>
+<p>Notice how the second version:</p>
+<ul>
+<li>Answers their question immediately</li>
+<li>Gives them options based on risk tolerance</li>
+<li>Respects their time</li>
+<li>Offers details rather than forcing them</li>
+</ul>
+<p><strong>The email version:</strong></p>
+<div class="hll"><pre><span></span>Subject: Compound X: 89% probability of meeting TPP
+
+Hi Sarah,
+
+**Decision:** Compound X has an 89% probability of meeting your 10nM potency requirement. Recommend proceeding to synthesis.
+
+**Key evidence:**
+- Consistent effect across all three batches
+- Dose-response curve shows clear relationship
+- Even worst-case scenario keeps you above 15nM
+
+**Next steps:** If you need &gt;95% confidence, test 3 additional concentrations. Otherwise, proceed with synthesis.
+
+Technical details in attached appendix if interested.
+
+Best,
+[Your name]
+</pre></div>
+<p>That's it. Decision first. Evidence second. Details optional.</p>
+<h2 id="7-speak-their-language-literally">7. Speak their language (literally)</h2><p>Here's what most data scientists miss: You need to understand their domain as deeply as they do.</p>
+<p><strong>The measurement method matters more than your statistical method.</strong></p>
+<p>A scientist tells you they're using ELISA to measure protein levels. You nod and proceed with your analysis. But did you ask:</p>
+<ul>
+<li>What's the detection limit?</li>
+<li>How does the antibody specificity affect your readout?</li>
+<li>Are there known cross-reactivities that could confound your results?</li>
+<li>What's the coefficient of variation across replicates?</li>
+</ul>
+<p>These aren't <em>merely</em> statistical questions — they're also biological questions that determine whether your analysis is even valid.</p>
+<p><strong>Be deeply curious about their methods.</strong> Ask about:</p>
+<ul>
+<li>The specific assay they're using and its limitations</li>
+<li>How they handle sample preparation and storage</li>
+<li>What controls they're running and why</li>
+<li>The historical performance of this measurement in their hands</li>
+<li>What could go wrong and how they'd know</li>
+</ul>
+<p><strong>Learn their terminology.</strong> Don't just understand what they're measuring, but understand how they think about it. When they say "potency," do they mean EC50, IC50, or something else? When they talk about "efficacy," are they referring to maximal response, potency, or both?</p>
+<p><strong>Quick domain mastery checklist:</strong></p>
+<ul>
+<li>What are the three most common failure modes for this assay?</li>
+<li>What does "good" look like in their world?</li>
+<li>What would make them suspicious of the data?</li>
+<li>How do they typically handle outliers or unexpected results?</li>
+<li>What's the gold standard measurement they're comparing against?</li>
+</ul>
+<p>Example: A data scientist was analyzing dose-response data from a cell-based assay. The scientist mentioned they were using a "luminescence readout." The data scientist asked about the detection range, learned it was $10^3$ to $10^6$ RLU, and immediately spotted that their highest concentration was saturating the detector. The analysis would have been meaningless without understanding that technical limitation.</p>
+<p><strong>The payoff:</strong> When you speak their language, you don't just communicate better, you also analyze better. You spot confounders they might miss. You suggest controls they haven't thought of. You become a true collaborator, not just a service provider.</p>
+<h2 id="8-ask-yourself-what-they-ll-ask-you">8. Ask yourself what they'll ask you</h2><p>Every scientist has patterns. Learn them.</p>
+<p>Your PI always asks about sample size? Pre-calculate the probability of detecting meaningful effects.
+Your biomarker lead obsesses over false positives? Lead with the posterior probability of true effects.
+The chemistry team cares about synthesis feasibility? Include yield probabilities from your Bayesian model.</p>
+<p>This isn't mind-reading. It's paying attention.</p>
+<p>🚫 <strong>Reactive approach:</strong>
+Wait for their questions, scramble for answers, promise to "get back to you on that"</p>
+<p>✅ <strong>Proactive approach:</strong>
+"I know you usually want to know about batch effects, so I checked—they're negligible. Here's how I verified..."</p>
+<p><strong>Pattern matching checklist:</strong></p>
+<ul>
+<li>What did they ask in the last three meetings?</li>
+<li>What decisions do they usually struggle with?</li>
+<li>What makes them nervous about moving forward?</li>
+<li>What would convince them this is real?</li>
+<li>What got them in trouble before?</li>
+</ul>
+<p>Example: One program lead always asks: "What if we're wrong?" Every. Single. Time.</p>
+<p>The smartest data scientists now anticipate this and always include: "If we're wrong about this, here's what we'd see in the next experiment. Here's our bail-out plan. Here's the cost of being wrong versus the cost of being slow."</p>
+<p>She doesn't ask anymore. She trusts that they've thought it through.</p>
+<p>Another scientist always wants to know if we have enough evidence. So the prepared data scientist leads with: "There's an 85% probability that the treatment effect exceeds your minimum meaningful difference."</p>
+<p>Pre-answering questions isn't just efficient—it builds massive trust. It shows you understand their concerns and you're thinking ahead. Trust me, <strong>this is a career hack!</strong></p>
+<h2 id="the-bottom-line">The bottom line</h2><p>Most data scientists in biotech spend 80% of their communication budget on methods that their collaborators—brilliant scientists juggling their own complex problems—don't have bandwidth to process.</p>
+<p>You're doing the equivalent of giving someone a recipe when they just asked if dinner's ready.</p>
+<p>The shift is simple but not easy: Stop defaulting to education mode. Start asking "What decision are you trying to make?" Then translate your sophisticated analysis into the probability they need to make that decision.</p>
+<p>This isn't about dumbing down your work. It's about translating between two expert domains—like a diplomat translating between heads of state. The lab scientists you work with have spent years mastering complex biological systems. They need translation, not education.</p>
+<p><strong>Your action items:</strong></p>
+<ol>
+<li><strong>When first asked for analysis:</strong> Start with "What decision are you trying to make with this data?" Don't begin any analysis until you know.</li>
+<li><strong>Review your last presentation:</strong> Did you lead with the decision (BLUF) or bury it in methods? If methods came first, restructure.</li>
+<li><strong>Practice probability statements:</strong> Instead of showing credible intervals, say "There's an X% probability that..." It's clearer and more actionable.</li>
+<li><strong>Learn their measurement methods:</strong> Ask about detection limits, controls, and failure modes before analyzing their data.</li>
+<li><strong>Build a pattern map:</strong> Write down what each of your regular collaborators usually asks. Answer it proactively next time.</li>
+<li><strong>Create a technical appendix:</strong> Put all your beautiful methods somewhere. Just don't force people to sit through it.</li>
+</ol>
+<p>The best data scientists are the ones whose collaborators make the best decisions.</p>
+<p>And that starts with spending your communication budget on what actually matters to the people you're trying to help.</p>
+<p><em>What patterns have you noticed in your collaborations? What questions do your scientists always ask? Let me know; I'd love to hear what's working (or not working) for you!</em></p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-how-to-communicate-with-lab-scientists-when-youre-the-data-person</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{How to communicate with lab scientists (when you&#39;re the data person)}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{08}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{24}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/8/24/how-to-communicate-with-lab-scientists-when-youre-the-data-person}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

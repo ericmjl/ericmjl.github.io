@@ -1,0 +1,1065 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="What I learned blogging every week for one year">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/what-i-learned-blogging-every-week-for-one-year' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>What I learned blogging every week for one year - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">What I learned blogging every week for one year</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-12-31</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/blogging/">
+        blogging
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/consistency/">
+        consistency
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/content/">
+        content
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llms/">
+        llms
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data/">
+        data
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/biotech/">
+        biotech
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/career/">
+        career
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/writing/">
+        writing
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/discovery/">
+        discovery
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I reflect on my year-long challenge of writing a blog post every week, surpassing my goal with 53 posts. This journey taught me the power of consistency, improved my ability to communicate complex ideas, and helped me develop AI-assisted tools to streamline my workflow. I also explored the intersection of life sciences and computation, aiming to accelerate scientific discovery. How did these experiences shape my approach to integrating AI into creative processes and what insights can you gain from my journey?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>A challenge I set for myself this year
+was to write a blog post on average once every week for the year,
+regardless of what's going on.
+This meant writing 52 blog posts in total.
+As of December 19, I've hit 53, meaning that I've accomplished my goals!</p>
+<h2 id="what-i-learned">What I learned</h2><p>Here's what I've learned so far.</p>
+<h3 id="consistency-is-king">Consistency is king!</h3><p>One of the biggest lessons I learned from this year-long blogging journey
+is that consistency truly is king.
+By committing to writing weekly,
+I noticed my sense of what to write about
+became increasingly refined and sharpened over time.
+The regular practice helped me:</p>
+<ul>
+<li>Develop a better radar for interesting technical topics worth sharing</li>
+<li>Improve my ability to explain complex concepts clearly</li>
+<li>Build a more systematic approach to documenting my learning journey</li>
+<li>Create a sustainable writing habit that feels natural rather than forced</li>
+</ul>
+<h3 id="build-ai-assistance-tools-and-use-them">Build AI-assistance tools and use them</h3><p>Throughout this journey,
+I found myself building quite a bit of tooling
+to support my blogging workflow,
+most of it done with AI assistance.
+Some notable examples include:</p>
+<p><strong>Blog Banner Generation</strong>:
+I developed a system that uses DALL-E
+to automatically generate watercolor-style banner images for each post,
+maintaining a consistent visual identity
+while saving time on design.</p>
+<p><strong>Social Media Integration</strong>:
+I built tools that use LLMs to help craft:</p>
+<ul>
+<li>Twitter posts that effectively summarize and promote new blog entries</li>
+<li>Substack newsletters that engage my subscriber base</li>
+<li>LinkedIn updates that resonate with my professional network</li>
+</ul>
+<p><strong>Content Enhancement</strong>:
+I created automated systems for:</p>
+<ul>
+<li>Generating relevant tags for better post categorization</li>
+<li>Creating compelling summaries that capture the essence of each post</li>
+<li>Suggesting related content links to improve site navigation</li>
+</ul>
+<p>This tooling journey has been particularly valuable as it helped me:</p>
+<ul>
+<li>Further hone my prompting practices with LLMs</li>
+<li>Develop better intuition for designing programs
+that incorporate LLMs as integral components</li>
+<li>Create a more efficient and consistent blogging workflow</li>
+<li>Experiment with different approaches to human-AI collaboration</li>
+</ul>
+<p>The experience of building these tools
+has not only made my blogging more efficient
+but has also sharpened my intuition for
+how to effectively integrate AI into creative workflows
+while maintaining human oversight and editorial control.</p>
+<h2 id="wordcloud">Wordcloud</h2><p>And here is the obligatory wordcloud of the blog posts:</p>
+<p><img src="wordcloud.webp" alt="Wordcloud of blog posts"></p>
+<h2 id="reflections">Reflections</h2><p>One year of blogging once a week,
+with regular posts on LinkedIn, Twitter, Substack, and Bluesky,
+have left my colleagues jokingly calling me a content creator.
+Jokes aside, this year has seen a significant focus on LLMs in my writing,
+as evidenced by the numerous posts in the LLMs &amp; Data Science Tooling section.
+This reflects the broader excitement and rapid developments in the LLM space.
+At the same time,
+my core interests continue to lie at the intersection of life sciences and computation -
+you can see this in the many posts about protein language models,
+biological applications of deep learning,
+and data science in biotech organizations.
+My professional goal is to make discovery science run at the speed of thought
+and quantify the unquantified.
+This means leveraging advances in AI and computation
+to accelerate scientific discovery,
+while developing tools that help scientists
+measure and understand previously intangible aspects of biology.
+After all, the most transformative breakthroughs happen
+when we remove the friction from scientific exploration
+and shine light on unexplored territory.</p>
+<h2 id="blog-posts-by-theme">Blog Posts by Theme</h2><p>To help you navigate through these posts more easily,
+I've organized them by major themes below.
+You'll notice some posts appear under multiple themes -
+that's because many topics naturally overlap,
+reflecting the interconnected nature of modern data science work.
+Whether you're interested in LLMs, leadership, tooling, or biology,
+you'll find relevant content in these curated lists.</p>
+<h3 id="biology-chemistry">Biology &amp; Chemistry</h3><ul>
+<li><a href="https://ericmjl.github.io/blog/2024/2/7/success-factors-for-data-science-teams-in-biotech/">Success Factors for Data Science Teams in Biotech (2024-02-07)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/2/18/dashboard-ready-data-is-often-machine-learning-ready-data/">Dashboard-ready data is often machine learning-ready data (2024-02-18)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/3/10/mixtral-8x7b-instruct-works-on-an-old-gtx1080/">Mixtral-8x7b-Instruct works on an old GTX1080! (2024-03-10)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/5/5/data-science-in-the-biotech-research-organization/">Data Science in the Biotech Research Organization (2024-05-05)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/5/12/paper-review-design-of-highly-functional-genome-editors-by-modeling-the-universe-of-crispr-cas-sequences/">Paper Review: Design of highly functional genome editors by modeling the universe of CRISPR-Cas sequences (2024-05-12)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/5/16/how-to-control-pymol-from-jupyter-notebooks/">How to control PyMOL from Jupyter notebooks (2024-05-16)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/5/27/multi-modality-deep-learning/">Multi-modality Deep Learning (2024-05-27)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/6/8/the-neural-von-mises-mixture-model/">The Neural Von Mises Mixture Model (2024-06-08)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/7/26/a-survey-of-how-to-use-protein-language-models-for-protein-design-part-1/">A survey of how to use protein language models for protein design: Part 1 (2024-07-26)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/8/2/a-survey-of-how-to-use-protein-language-models-for-protein-design-part-2/">A survey of how to use protein language models for protein design: Part 2 (2024-08-02)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/8/9/a-survey-of-how-to-use-protein-language-models-for-protein-design-part-3/">A survey of how to use protein language models for protein design: Part 3 (2024-08-09)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/11/22/a-modest-proposal-for-data-catalogues-at-biotechs/">A modest proposal for data catalogues at biotechs (2024-11-22)</a></li>
+</ul>
+<h3 id="career-advice">Career Advice</h3><ul>
+<li><a href="https://ericmjl.github.io/blog/2024/1/11/github-actions-secrets-need-to-be-explicitly-declared/">GitHub Actions secrets need to be explicitly declared (2024-01-11)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/2/25/how-to-keep-sharp-with-technical-skills-as-a-data-science-team-lead/">How to keep sharp with technical skills as a data science team lead (2024-02-25)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/2/29/your-first-90-days-at-work-what-should-you-do/">Your first 90 days at work - what should you do? (2024-02-29)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/3/9/industry-career-panel-for-phd-students-and-post-docs-at-mit/">From Academia to Industry: Career Advice from MIT Industry Careers Panel (2024-03-09)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/3/23/how-to-organize-and-motivate-a-biotech-data-science-team/">How to organize and motivate a biotech data science team (2024-03-23)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/6/26/hire-for-communication-skills-not-conversational-skills/">Hire for communication skills, not conversational skills (2024-06-26)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/7/14/conference-report-scipy-2024/">Conference report: SciPy 2024 (2024-07-14)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/10/9/what-brings-you-joy-at-work/">What brings you joy at work? (2024-10-09)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/12/17/how-to-thrive-and-not-just-survive-during-organizational-change/">How to thrive, and not just survive, during organizational change (2024-12-17)</a></li>
+</ul>
+<h3 id="data-science-practice-leadership">Data Science Practice &amp; Leadership</h3><ul>
+<li><a href="https://ericmjl.github.io/blog/2024/1/28/exploratory-data-analysis-isnt-open-ended/">Exploratory data analysis isn’t open-ended (2024-01-28)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/2/7/success-factors-for-data-science-teams-in-biotech/">Success Factors for Data Science Teams in Biotech (2024-02-07)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/2/18/dashboard-ready-data-is-often-machine-learning-ready-data/">Dashboard-ready data is often machine learning-ready data (2024-02-18)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/2/25/how-to-keep-sharp-with-technical-skills-as-a-data-science-team-lead/">How to keep sharp with technical skills as a data science team lead (2024-02-25)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/3/23/how-to-organize-and-motivate-a-biotech-data-science-team/">How to organize and motivate a biotech data science team (2024-03-23)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/4/5/how-to-grow-software-development-skills-in-a-data-science-team/">How to grow software development skills in a data science team (2024-04-05)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/4/7/pyds-cli-version-040-released/">pyds-cli version 0.4.0 released! (2024-04-07)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/4/17/how-llms-can-accelerate-data-science/">How LLMs can accelerate data science (2024-04-17)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/5/5/data-science-in-the-biotech-research-organization/">Data Science in the Biotech Research Organization (2024-05-05)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/6/18/headache-free-portable-and-reproducible-handling-of-data-access-and-versioning/">Headache-free, portable, and reproducible handling of data access and versioning (2024-06-18)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/6/26/hire-for-communication-skills-not-conversational-skills/">Hire for communication skills, not conversational skills (2024-06-26)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/6/30/two-years-of-docathons-insights-and-lessons-learned/">Two years of docathons: Insights and lessons learned (2024-06-30)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/7/2/use-native-formats-when-storing-data/">Use native formats when storing data (2024-07-02)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/7/14/conference-report-scipy-2024/">Conference report: SciPy 2024 (2024-07-14)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/10/6/building-pigeon-secure-notes-in-under-15-minutes-of-coding/">Building Pigeon Secure Notes in under 15 minutes of coding (2024-10-06)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/10/9/what-brings-you-joy-at-work/">What brings you joy at work? (2024-10-09)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/10/18/keys-to-effective-collaborative-data-science/">Keys to effective collaborative data science (2024-10-18)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/10/25/the-human-dimension-to-clean-distributable-and-documented-data-science-code/">The Human Dimension to Clean, Distributable, and Documented Data Science Code (2024-10-25)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/11/22/a-modest-proposal-for-data-catalogues-at-biotechs/">A modest proposal for data catalogues at biotechs (2024-11-22)</a></li>
+</ul>
+<h3 id="data-science-tooling">Data Science Tooling</h3><ul>
+<li><a href="https://ericmjl.github.io/blog/2024/1/10/evolving-llamabot/">Evolving LlamaBot (2024-01-10)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/1/11/github-actions-secrets-need-to-be-explicitly-declared/">GitHub Actions secrets need to be explicitly declared (2024-01-11)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/1/15/your-embedding-model-can-be-different-from-your-text-generation-model/">Your embedding model can be different from your text generation model (2024-01-15)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/1/28/exploratory-data-analysis-isnt-open-ended/">Exploratory data analysis isn’t open-ended (2024-01-28)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/2/1/an-incomplete-and-opinionated-survey-of-llm-tooling/">An (incomplete and opinionated) survey of LLM tooling (2024-02-01)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/2/7/success-factors-for-data-science-teams-in-biotech/">Success Factors for Data Science Teams in Biotech (2024-02-07)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/2/18/dashboard-ready-data-is-often-machine-learning-ready-data/">Dashboard-ready data is often machine learning-ready data (2024-02-18)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/2/21/llamabot-with-ollama-on-my-home-virtual-private-network/">LlamaBot with Ollama on my home virtual private network (2024-02-21)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/3/10/mixtral-8x7b-instruct-works-on-an-old-gtx1080/">Mixtral-8x7b-Instruct works on an old GTX1080! (2024-03-10)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/3/24/llamabot-040-released/">Llamabot 0.4.0 Released! (2024-03-24)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/4/5/how-to-grow-software-development-skills-in-a-data-science-team/">How to grow software development skills in a data science team (2024-04-05)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/4/7/pyds-cli-version-040-released/">pyds-cli version 0.4.0 released! (2024-04-07)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/4/9/how-to-make-distributable-pre-commit-hooks/">How to make distributable pre-commit hooks (2024-04-09)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/4/17/how-llms-can-accelerate-data-science/">How LLMs can accelerate data science (2024-04-17)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/5/16/how-to-control-pymol-from-jupyter-notebooks/">How to control PyMOL from Jupyter notebooks (2024-05-16)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/5/27/multi-modality-deep-learning/">Multi-modality Deep Learning (2024-05-27)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/6/1/how-to-manage-cuda-libraries-within-conda-environments/">How to manage CUDA libraries within Conda environments (2024-06-01)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/6/8/the-neural-von-mises-mixture-model/">The Neural Von Mises Mixture Model (2024-06-08)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/6/18/headache-free-portable-and-reproducible-handling-of-data-access-and-versioning/">Headache-free, portable, and reproducible handling of data access and versioning (2024-06-18)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/6/30/two-years-of-docathons-insights-and-lessons-learned/">Two years of docathons: Insights and lessons learned (2024-06-30)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/7/2/use-native-formats-when-storing-data/">Use native formats when storing data (2024-07-02)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/7/14/conference-report-scipy-2024/">Conference report: SciPy 2024 (2024-07-14)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/8/16/its-time-to-try-out-pixi/">It's time to try out pixi! (2024-08-16)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/8/25/dissecting-the-esm3-model-architecture/">Dissecting the ESM3 Model Architecture (2024-08-25)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/8/31/llamabot-now-has-structuredbot/">LlamaBot now has StructuredBot! (2024-08-31)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/9/6/on-writing-llm-evals-in-pytest/">On writing LLM evals in pytest (2024-09-06)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/9/14/cursor-is-a-jetpack-for-coders/">Cursor is a jetpack for coders (2024-09-14)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/9/15/sync-github-secrets-with-your-env-and-gh-cli/">Sync GitHub secrets with your .env and gh CLI (2024-09-15)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/9/19/how-to-set-up-pixi-with-codeartifacts/">How to set up Pixi with CodeArtifacts (2024-09-19)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/9/23/recreating-shortwhale-with-ai-assisted-coding/">Recreating Shortwhale with AI-Assisted Coding (2024-09-23)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/9/27/explain-your-jupyter-notebooks-using-llamabot/">Explain your Jupyter notebooks using LlamaBot (2024-09-27)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/10/6/building-pigeon-secure-notes-in-under-15-minutes-of-coding/">Building Pigeon Secure Notes in under 15 minutes of coding (2024-10-06)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/10/9/what-brings-you-joy-at-work/">What brings you joy at work? (2024-10-09)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/10/18/keys-to-effective-collaborative-data-science/">Keys to effective collaborative data science (2024-10-18)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/10/20/cursor-did-a-one-shot-rewrite-of-a-panel-app-i-built/">Cursor did a one-shot rewrite of a Panel app I built (2024-10-20)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/10/25/the-human-dimension-to-clean-distributable-and-documented-data-science-code/">The Human Dimension to Clean, Distributable, and Documented Data Science Code (2024-10-25)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/11/2/introducing-new-local-llamabot-logging-features/">Introducing new (local) LlamaBot logging features (2024-11-02)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/11/8/disposable-environments-for-ad-hoc-analyses/">Disposable environments for ad-hoc analyses (2024-11-08)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/11/14/deploying-ollama-on-modal/">Deploying Ollama on Modal (2024-11-14)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/11/22/a-modest-proposal-for-data-catalogues-at-biotechs/">A modest proposal for data catalogues at biotechs (2024-11-22)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/12/15/how-llamabots-new-agent-features-simplify-complex-task-automation/">How LlamaBot's new agent features simplify complex task automation (2024-12-15)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/12/16/5-retrieval-strategies-to-boost-your-rag-systems-performance/">5 retrieval strategies to boost your RAG system's performance (2024-12-16)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/12/20/accurately-extract-text-from-research-literature-pdfs-with-nougat-ocr-and-docling/">Accurately extract text from research literature PDFs with Nougat-OCR and Docling (2024-12-20)</a></li>
+</ul>
+<h3 id="llms">LLMs</h3><ul>
+<li><a href="https://ericmjl.github.io/blog/2024/1/10/evolving-llamabot/">Evolving LlamaBot (2024-01-10)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/1/15/your-embedding-model-can-be-different-from-your-text-generation-model/">Your embedding model can be different from your text generation model (2024-01-15)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/2/1/an-incomplete-and-opinionated-survey-of-llm-tooling/">An (incomplete and opinionated) survey of LLM tooling (2024-02-01)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/2/21/llamabot-with-ollama-on-my-home-virtual-private-network/">LlamaBot with Ollama on my home virtual private network (2024-02-21)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/3/10/mixtral-8x7b-instruct-works-on-an-old-gtx1080/">Mixtral-8x7b-Instruct works on an old GTX1080! (2024-03-10)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/3/24/llamabot-040-released/">Llamabot 0.4.0 Released! (2024-03-24)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/4/17/how-llms-can-accelerate-data-science/">How LLMs can accelerate data science (2024-04-17)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/5/12/paper-review-design-of-highly-functional-genome-editors-by-modeling-the-universe-of-crispr-cas-sequences/">Paper Review: Design of highly functional genome editors by modeling the universe of CRISPR-Cas sequences (2024-05-12)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/5/16/how-to-control-pymol-from-jupyter-notebooks/">How to control PyMOL from Jupyter notebooks (2024-05-16)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/5/27/multi-modality-deep-learning/">Multi-modality Deep Learning (2024-05-27)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/6/8/the-neural-von-mises-mixture-model/">The Neural Von Mises Mixture Model (2024-06-08)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/7/26/a-survey-of-how-to-use-protein-language-models-for-protein-design-part-1/">A survey of how to use protein language models for protein design: Part 1 (2024-07-26)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/8/2/a-survey-of-how-to-use-protein-language-models-for-protein-design-part-2/">A survey of how to use protein language models for protein design: Part 2 (2024-08-02)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/8/9/a-survey-of-how-to-use-protein-language-models-for-protein-design-part-3/">A survey of how to use protein language models for protein design: Part 3 (2024-08-09)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/8/25/dissecting-the-esm3-model-architecture/">Dissecting the ESM3 Model Architecture (2024-08-25)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/8/31/llamabot-now-has-structuredbot/">LlamaBot now has StructuredBot! (2024-08-31)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/9/6/on-writing-llm-evals-in-pytest/">On writing LLM evals in pytest (2024-09-06)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/9/14/cursor-is-a-jetpack-for-coders/">Cursor is a jetpack for coders (2024-09-14)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/9/23/recreating-shortwhale-with-ai-assisted-coding/">Recreating Shortwhale with AI-Assisted Coding (2024-09-23)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/9/27/explain-your-jupyter-notebooks-using-llamabot/">Explain your Jupyter notebooks using LlamaBot (2024-09-27)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/10/20/cursor-did-a-one-shot-rewrite-of-a-panel-app-i-built/">Cursor did a one-shot rewrite of a Panel app I built (2024-10-20)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/11/2/introducing-new-local-llamabot-logging-features/">Introducing new (local) LlamaBot logging features (2024-11-02)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/11/14/deploying-ollama-on-modal/">Deploying Ollama on Modal (2024-11-14)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/12/15/how-llamabots-new-agent-features-simplify-complex-task-automation/">How LlamaBot's new agent features simplify complex task automation (2024-12-15)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/12/16/5-retrieval-strategies-to-boost-your-rag-systems-performance/">5 retrieval strategies to boost your RAG system's performance (2024-12-16)</a></li>
+<li><a href="https://ericmjl.github.io/blog/2024/12/20/accurately-extract-text-from-research-literature-pdfs-with-nougat-ocr-and-docling/">Accurately extract text from research literature PDFs with Nougat-OCR and Docling (2024-12-20)</a></li>
+</ul>
+<h2 id="blog-posts">Blog Posts</h2><p>And for completeness, here's a list of all the blog posts I've written up till 29 December 2024.</p>
+<table>
+<thead><tr>
+<th>Date</th>
+<th>Title</th>
+<th>Categories</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2024-01-10</td>
+<td><a href="https://ericmjl.github.io/blog/2024/1/10/evolving-llamabot/">Evolving LlamaBot</a></td>
+<td>LLMs, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-01-11</td>
+<td><a href="https://ericmjl.github.io/blog/2024/1/11/github-actions-secrets-need-to-be-explicitly-declared/">GitHub Actions secrets need to be explicitly declared</a></td>
+<td>Data Science Tooling, Career Advice</td>
+</tr>
+<tr>
+<td>2024-01-15</td>
+<td><a href="https://ericmjl.github.io/blog/2024/1/15/your-embedding-model-can-be-different-from-your-text-generation-model/">Your embedding model can be different from your text generation model</a></td>
+<td>LLMs, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-01-28</td>
+<td><a href="https://ericmjl.github.io/blog/2024/1/28/exploratory-data-analysis-isnt-open-ended/">Exploratory data analysis isn’t open-ended</a></td>
+<td>Data Science Practice &amp; Leadership, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-02-01</td>
+<td><a href="https://ericmjl.github.io/blog/2024/2/1/an-incomplete-and-opinionated-survey-of-llm-tooling/">An (incomplete and opinionated) survey of LLM tooling</a></td>
+<td>LLMs, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-02-07</td>
+<td><a href="https://ericmjl.github.io/blog/2024/2/7/success-factors-for-data-science-teams-in-biotech/">Success Factors for Data Science Teams in Biotech</a></td>
+<td>Data Science Practice &amp; Leadership, Data Science Tooling, Biology &amp; Chemistry</td>
+</tr>
+<tr>
+<td>2024-02-18</td>
+<td><a href="https://ericmjl.github.io/blog/2024/2/18/dashboard-ready-data-is-often-machine-learning-ready-data/">Dashboard-ready data is often machine learning-ready data</a></td>
+<td>Data Science Practice &amp; Leadership, Data Science Tooling, Biology &amp; Chemistry</td>
+</tr>
+<tr>
+<td>2024-02-21</td>
+<td><a href="https://ericmjl.github.io/blog/2024/2/21/llamabot-with-ollama-on-my-home-virtual-private-network/">LlamaBot with Ollama on my home virtual private network</a></td>
+<td>LLMs, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-02-25</td>
+<td><a href="https://ericmjl.github.io/blog/2024/2/25/how-to-keep-sharp-with-technical-skills-as-a-data-science-team-lead/">How to keep sharp with technical skills as a data science team lead</a></td>
+<td>Data Science Practice &amp; Leadership, Career Advice</td>
+</tr>
+<tr>
+<td>2024-02-29</td>
+<td><a href="https://ericmjl.github.io/blog/2024/2/29/your-first-90-days-at-work-what-should-you-do/">Your first 90 days at work - what should you do?</a></td>
+<td>Career Advice</td>
+</tr>
+<tr>
+<td>2024-03-09</td>
+<td><a href="https://ericmjl.github.io/blog/2024/3/9/industry-career-panel-for-phd-students-and-post-docs-at-mit/">From Academia to Industry: Career Advice from MIT Industry Careers Panel</a></td>
+<td>Career Advice</td>
+</tr>
+<tr>
+<td>2024-03-10</td>
+<td><a href="https://ericmjl.github.io/blog/2024/3/10/mixtral-8x7b-instruct-works-on-an-old-gtx1080/">Mixtral-8x7b-Instruct works on an old GTX1080!</a></td>
+<td>LLMs, Data Science Tooling, Biology &amp; Chemistry</td>
+</tr>
+<tr>
+<td>2024-03-23</td>
+<td><a href="https://ericmjl.github.io/blog/2024/3/23/how-to-organize-and-motivate-a-biotech-data-science-team/">How to organize and motivate a biotech data science team</a></td>
+<td>Data Science Practice &amp; Leadership, Career Advice</td>
+</tr>
+<tr>
+<td>2024-03-24</td>
+<td><a href="https://ericmjl.github.io/blog/2024/3/24/llamabot-040-released/">Llamabot 0.4.0 Released!</a></td>
+<td>LLMs, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-04-05</td>
+<td><a href="https://ericmjl.github.io/blog/2024/4/5/how-to-grow-software-development-skills-in-a-data-science-team/">How to grow software development skills in a data science team</a></td>
+<td>Data Science Practice &amp; Leadership, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-04-07</td>
+<td><a href="https://ericmjl.github.io/blog/2024/4/7/pyds-cli-version-040-released/">pyds-cli version 0.4.0 released!</a></td>
+<td>Data Science Practice &amp; Leadership, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-04-09</td>
+<td><a href="https://ericmjl.github.io/blog/2024/4/9/how-to-make-distributable-pre-commit-hooks/">How to make distributable pre-commit hooks</a></td>
+<td>Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-04-17</td>
+<td><a href="https://ericmjl.github.io/blog/2024/4/17/how-llms-can-accelerate-data-science/">How LLMs can accelerate data science</a></td>
+<td>LLMs, Data Science Practice &amp; Leadership, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-05-05</td>
+<td><a href="https://ericmjl.github.io/blog/2024/5/5/data-science-in-the-biotech-research-organization/">Data Science in the Biotech Research Organization</a></td>
+<td>Data Science Practice &amp; Leadership, Biology &amp; Chemistry</td>
+</tr>
+<tr>
+<td>2024-05-12</td>
+<td><a href="https://ericmjl.github.io/blog/2024/5/12/paper-review-design-of-highly-functional-genome-editors-by-modeling-the-universe-of-crispr-cas-sequences/">Paper Review: Design of highly functional genome editors by modeling the universe of CRISPR-Cas sequences</a></td>
+<td>LLMs, Biology &amp; Chemistry</td>
+</tr>
+<tr>
+<td>2024-05-16</td>
+<td><a href="https://ericmjl.github.io/blog/2024/5/16/how-to-control-pymol-from-jupyter-notebooks/">How to control PyMOL from Jupyter notebooks</a></td>
+<td>LLMs, Data Science Tooling, Biology &amp; Chemistry</td>
+</tr>
+<tr>
+<td>2024-05-27</td>
+<td><a href="https://ericmjl.github.io/blog/2024/5/27/multi-modality-deep-learning/">Multi-modality Deep Learning</a></td>
+<td>LLMs, Data Science Tooling, Biology &amp; Chemistry</td>
+</tr>
+<tr>
+<td>2024-06-01</td>
+<td><a href="https://ericmjl.github.io/blog/2024/6/1/how-to-manage-cuda-libraries-within-conda-environments/">How to manage CUDA libraries within Conda environments</a></td>
+<td>Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-06-08</td>
+<td><a href="https://ericmjl.github.io/blog/2024/6/8/the-neural-von-mises-mixture-model/">The Neural Von Mises Mixture Model</a></td>
+<td>LLMs, Data Science Tooling, Biology &amp; Chemistry</td>
+</tr>
+<tr>
+<td>2024-06-18</td>
+<td><a href="https://ericmjl.github.io/blog/2024/6/18/headache-free-portable-and-reproducible-handling-of-data-access-and-versioning/">Headache-free, portable, and reproducible handling of data access and versioning</a></td>
+<td>Data Science Practice &amp; Leadership, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-06-26</td>
+<td><a href="https://ericmjl.github.io/blog/2024/6/26/hire-for-communication-skills-not-conversational-skills/">Hire for communication skills, not conversational skills</a></td>
+<td>Data Science Practice &amp; Leadership, Career Advice</td>
+</tr>
+<tr>
+<td>2024-06-30</td>
+<td><a href="https://ericmjl.github.io/blog/2024/6/30/two-years-of-docathons-insights-and-lessons-learned/">Two years of docathons: Insights and lessons learned</a></td>
+<td>Data Science Practice &amp; Leadership, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-07-02</td>
+<td><a href="https://ericmjl.github.io/blog/2024/7/2/use-native-formats-when-storing-data/">Use native formats when storing data</a></td>
+<td>Data Science Practice &amp; Leadership, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-07-14</td>
+<td><a href="https://ericmjl.github.io/blog/2024/7/14/conference-report-scipy-2024/">Conference report: SciPy 2024</a></td>
+<td>Data Science Practice &amp; Leadership, Data Science Tooling, Career Advice</td>
+</tr>
+<tr>
+<td>2024-07-26</td>
+<td><a href="https://ericmjl.github.io/blog/2024/7/26/a-survey-of-how-to-use-protein-language-models-for-protein-design-part-1/">A survey of how to use protein language models for protein design: Part 1</a></td>
+<td>LLMs, Biology &amp; Chemistry</td>
+</tr>
+<tr>
+<td>2024-08-02</td>
+<td><a href="https://ericmjl.github.io/blog/2024/8/2/a-survey-of-how-to-use-protein-language-models-for-protein-design-part-2/">A survey of how to use protein language models for protein design: Part 2</a></td>
+<td>LLMs, Biology &amp; Chemistry</td>
+</tr>
+<tr>
+<td>2024-08-09</td>
+<td><a href="https://ericmjl.github.io/blog/2024/8/9/a-survey-of-how-to-use-protein-language-models-for-protein-design-part-3/">A survey of how to use protein language models for protein design: Part 3</a></td>
+<td>LLMs, Biology &amp; Chemistry</td>
+</tr>
+<tr>
+<td>2024-08-16</td>
+<td><a href="https://ericmjl.github.io/blog/2024/8/16/its-time-to-try-out-pixi/">It's time to try out pixi!</a></td>
+<td>Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-08-25</td>
+<td><a href="https://ericmjl.github.io/blog/2024/8/25/dissecting-the-esm3-model-architecture/">Dissecting the ESM3 Model Architecture</a></td>
+<td>LLMs, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-08-31</td>
+<td><a href="https://ericmjl.github.io/blog/2024/8/31/llamabot-now-has-structuredbot/">LlamaBot now has StructuredBot!</a></td>
+<td>LLMs, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-09-06</td>
+<td><a href="https://ericmjl.github.io/blog/2024/9/6/on-writing-llm-evals-in-pytest/">On writing LLM evals in pytest</a></td>
+<td>LLMs, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-09-14</td>
+<td><a href="https://ericmjl.github.io/blog/2024/9/14/cursor-is-a-jetpack-for-coders/">Cursor is a jetpack for coders</a></td>
+<td>LLMs, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-09-15</td>
+<td><a href="https://ericmjl.github.io/blog/2024/9/15/sync-github-secrets-with-your-env-and-gh-cli/">Sync GitHub secrets with your .env and gh CLI</a></td>
+<td>Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-09-19</td>
+<td><a href="https://ericmjl.github.io/blog/2024/9/19/how-to-set-up-pixi-with-codeartifacts/">How to set up Pixi with CodeArtifacts</a></td>
+<td>Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-09-23</td>
+<td><a href="https://ericmjl.github.io/blog/2024/9/23/recreating-shortwhale-with-ai-assisted-coding/">Recreating Shortwhale with AI-Assisted Coding</a></td>
+<td>LLMs, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-09-27</td>
+<td><a href="https://ericmjl.github.io/blog/2024/9/27/explain-your-jupyter-notebooks-using-llamabot/">Explain your Jupyter notebooks using LlamaBot</a></td>
+<td>LLMs, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-10-06</td>
+<td><a href="https://ericmjl.github.io/blog/2024/10/6/building-pigeon-secure-notes-in-under-15-minutes-of-coding/">Building Pigeon Secure Notes in under 15 minutes of coding</a></td>
+<td>Data Science Practice &amp; Leadership, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-10-09</td>
+<td><a href="https://ericmjl.github.io/blog/2024/10/9/what-brings-you-joy-at-work/">What brings you joy at work?</a></td>
+<td>Data Science Practice &amp; Leadership, Data Science Tooling, Career Advice</td>
+</tr>
+<tr>
+<td>2024-10-18</td>
+<td><a href="https://ericmjl.github.io/blog/2024/10/18/keys-to-effective-collaborative-data-science/">Keys to effective collaborative data science</a></td>
+<td>Data Science Practice &amp; Leadership, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-10-20</td>
+<td><a href="https://ericmjl.github.io/blog/2024/10/20/cursor-did-a-one-shot-rewrite-of-a-panel-app-i-built/">Cursor did a one-shot rewrite of a Panel app I built</a></td>
+<td>LLMs, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-10-25</td>
+<td><a href="https://ericmjl.github.io/blog/2024/10/25/the-human-dimension-to-clean-distributable-and-documented-data-science-code/">The Human Dimension to Clean, Distributable, and Documented Data Science Code</a></td>
+<td>Data Science Practice &amp; Leadership, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-11-02</td>
+<td><a href="https://ericmjl.github.io/blog/2024/11/2/introducing-new-local-llamabot-logging-features/">Introducing new (local) LlamaBot logging features</a></td>
+<td>LLMs, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-11-08</td>
+<td><a href="https://ericmjl.github.io/blog/2024/11/8/disposable-environments-for-ad-hoc-analyses/">Disposable environments for ad-hoc analyses</a></td>
+<td>Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-11-14</td>
+<td><a href="https://ericmjl.github.io/blog/2024/11/14/deploying-ollama-on-modal/">Deploying Ollama on Modal</a></td>
+<td>LLMs, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-11-22</td>
+<td><a href="https://ericmjl.github.io/blog/2024/11/22/a-modest-proposal-for-data-catalogues-at-biotechs/">A modest proposal for data catalogues at biotechs</a></td>
+<td>Data Science Practice &amp; Leadership, Data Science Tooling, Biology &amp; Chemistry</td>
+</tr>
+<tr>
+<td>2024-12-15</td>
+<td><a href="https://ericmjl.github.io/blog/2024/12/15/how-llamabots-new-agent-features-simplify-complex-task-automation/">How LlamaBot's new agent features simplify complex task automation</a></td>
+<td>LLMs, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-12-16</td>
+<td><a href="https://ericmjl.github.io/blog/2024/12/16/5-retrieval-strategies-to-boost-your-rag-systems-performance/">5 retrieval strategies to boost your RAG system's performance</a></td>
+<td>LLMs, Data Science Tooling</td>
+</tr>
+<tr>
+<td>2024-12-17</td>
+<td><a href="https://ericmjl.github.io/blog/2024/12/17/how-to-thrive-and-not-just-survive-during-organizational-change/">How to thrive, and not just survive, during organizational change</a></td>
+<td>Career Advice</td>
+</tr>
+<tr>
+<td>2024-12-20</td>
+<td><a href="https://ericmjl.github.io/blog/2024/12/20/accurately-extract-text-from-research-literature-pdfs-with-nougat-ocr-and-docling/">Accurately extract text from research literature PDFs with Nougat-OCR and Docling</a></td>
+<td>LLMs, Data Science Tooling</td>
+</tr>
+</tbody>
+</table>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-what-i-learned-blogging-every-week-for-one-year</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{What I learned blogging every week for one year}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{12}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{31}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/12/31/what-i-learned-blogging-every-week-for-one-year}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

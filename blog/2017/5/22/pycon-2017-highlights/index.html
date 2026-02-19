@@ -1,0 +1,563 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="PyCon 2017 Highlights">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/pycon-2017-highlights' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>PyCon 2017 Highlights - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">PyCon 2017 Highlights</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2017-05-22</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/pycon/">
+        pycon
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/conferences/">
+        conferences
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>A selection of my favourite talks and tutorials from PyCon 2017!</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Last post was about thoughts on past PyCons, having attended PyCon 2017. This post is on PyCon 2017's highlights for me.</p>
+<p><strong>(1) Serving as part of the organizing committee.</strong> I had the privilege of serving on the FinAid committee this year, and spent a large fraction of time in the staff room preparing to disburse FinAid cheques. I have very vivid memories of how slow the line was when I was receiving my cheques back in the day, and so I wanted to make sure FinAid recipients could receive their reimbursements as fast as possible, without wasting time in line (when they could instead be listening on talks).</p>
+<p><strong>(2) Teaching two tutorials.</strong> This year, I submitted two tutorial proposals, and both were accepted. In the three years that I've been teaching it, <a href="https://www.youtube.com/watch?v=E4VKzFmByhE">Network Analysis Made Simple</a> has always been popular, and I think it's because it gives participants a different way of thinking about data, thus making it an intellectually stimulating topic. I also developed a new material on <a href="https://www.youtube.com/watch?v=yACtdj1_IxE">Best Testing Practices for Data Science</a>. This one, in retrospect, was much fresher, and thus in need of more battle-testing and polish compared to Network Analysis. I have some ideas, including modifications to the workshop format, narrowing the target audience and more, to make it more useful for future iterations.</p>
+<p><strong>(3) First talk at PyCon!</strong> I also gave a talk at PyCon on doing <a href="https://www.youtube.com/watch?v=p1IB4zWq9C8">Bayesian Statistical Analysis with PyMC3</a>! This was my first PyCon talk ever. It was so nice to have a tweet-commendation by PyMC3's creator Chris Fonnesbeck too:</p>
+<p><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">. <a href="https://twitter.com/ericmjl">@ericmjl</a> is giving the <a href="https://twitter.com/hashtag/PyMC3?src=hash">#PyMC3</a> talk you really want to hear if you want to learn how to put it to practical use. Room 251. <a href="https://twitter.com/hashtag/PyCon2017?src=hash">#PyCon2017</a></p>&mdash; Chris Fonnesbeck (@fonnesbeck) <a href="https://twitter.com/fonnesbeck/status/866404594951139328">May 21, 2017</a></blockquote></p>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script><p>It was also nice to have Thomas Wiecki's tweet-commendation too:</p>
+<p><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Excellent <a href="https://twitter.com/hashtag/PyMC3?src=hash">#PyMC3</a> talks at <a href="https://twitter.com/hashtag/PyCon2017?src=hash">#PyCon2017</a> by <a href="https://twitter.com/fonnesbeck">@fonnesbeck</a>: <a href="https://t.co/iFbxjSz9C1">https://t.co/iFbxjSz9C1</a> <a href="https://t.co/VhAJLpVQBR">https://t.co/VhAJLpVQBR</a> and <a href="https://twitter.com/ericmjl">@ericmjl</a>: <a href="https://t.co/MnkyWRivXs">https://t.co/MnkyWRivXs</a></p>&mdash; Thomas Wiecki (@twiecki) <a href="https://twitter.com/twiecki/status/866639588995063808">May 22, 2017</a></blockquote></p>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script><p>Beyond that, the attendees seemed to like the talk too on the Twitterverse!</p>
+<p><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Great introduction to Bayesian data analysis with PyMC3 by <a href="https://twitter.com/ericmjl">@ericmjl</a> at <a href="https://twitter.com/hashtag/PyCon2017?src=hash">#PyCon2017</a> <a href="https://t.co/BjbR0tZ6AO">https://t.co/BjbR0tZ6AO</a></p>&mdash; Matteo Visconti dOC (@MatteoVdOC) <a href="https://twitter.com/MatteoVdOC/status/866413241907400704">May 21, 2017</a></blockquote></p>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script><p><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Awesome talk on Bayesian analysis by <a href="https://twitter.com/ericmjl">@ericmjl</a>! Check out the material here: <a href="https://t.co/HAPVYjKUhM">https://t.co/HAPVYjKUhM</a></p>&mdash; Sarah Guido (@sarah_guido) <a href="https://twitter.com/sarah_guido/status/866413261037555713">May 21, 2017</a></blockquote></p>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script><p><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">An excellent concrete introduction to Bayesian stats. I&#39;m really looking forward to working through the notebooks as well. <a href="https://twitter.com/hashtag/PyCon2017?src=hash">#PyCon2017</a> <a href="https://t.co/ec230Ui3iC">https://t.co/ec230Ui3iC</a></p>&mdash; Leland McInnes (@leland_mcinnes) <a href="https://twitter.com/leland_mcinnes/status/866437998253981696">May 21, 2017</a></blockquote></p>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script><p><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Problems, code and explanation - nice! <a href="https://t.co/ulJEXfMAo0">https://t.co/ulJEXfMAo0</a></p>&mdash; AV Speech Processing (@AV_SP) <a href="https://twitter.com/AV_SP/status/866422943361794049">May 21, 2017</a></blockquote></p>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script><p><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Great summary slide <a href="https://twitter.com/ericmjl">@ericmjl</a>! <a href="https://t.co/JbFV4qrzCl">pic.twitter.com/JbFV4qrzCl</a></p>&mdash; William Farmer (@willzfarmer) <a href="https://twitter.com/willzfarmer/status/866415332264562688">May 21, 2017</a></blockquote></p>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script><p><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Last technical talk of <a href="https://twitter.com/hashtag/PyCon2017?src=hash">#PyCon2017</a> and my brain is full. Excellent introduction to <a href="https://twitter.com/hashtag/PyMc3?src=hash">#PyMc3</a> and Bayesian variable inference by <a href="https://twitter.com/ericmjl">@ericmjl</a></p>&mdash; Justin Gosses (@JustinGosses) <a href="https://twitter.com/JustinGosses/status/866413619315056641">May 21, 2017</a></blockquote></p>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script><p><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Great talk from <a href="https://twitter.com/ericmjl">@ericmjl</a> on PyMC3 making everything clear with concrete examples. <a href="https://twitter.com/hashtag/pycon2017?src=hash">#pycon2017</a></p>&mdash; Leland McInnes (@leland_mcinnes) <a href="https://twitter.com/leland_mcinnes/status/866413119676891137">May 21, 2017</a></blockquote></p>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script><p><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">.<a href="https://twitter.com/ericmjl">@ericmjl</a> giving <a href="https://twitter.com/hashtag/bayesian?src=hash">#bayesian</a> intuition at <a href="https://twitter.com/hashtag/PyCon2017?src=hash">#PyCon2017</a> ; as always, a great, inspiring speaker <a href="https://t.co/4qz9QeTArc">https://t.co/4qz9QeTArc</a></p>&mdash; Hugo Bowne-Anderson (@hugobowne) <a href="https://twitter.com/hugobowne/status/866407227518734337">May 21, 2017</a></blockquote></p>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script><p><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Foregoing formula, <a href="https://twitter.com/ericmjl">@ericmjl</a> wants you to walk away w/intuition about Bayesian stats: &quot;update beliefs having seen the evidence&quot; <a href="https://twitter.com/hashtag/pycon2017?src=hash">#pycon2017</a></p>&mdash; Melissa @ #pycon2017 (@iff_or) <a href="https://twitter.com/iff_or/status/866407192110350336">May 21, 2017</a></blockquote></p>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script><p>It's very heartening to see how many people want to move into Bayes-land! The talk also happened to be the last in the session and last of the day, so I think many people were tired by that point and wanted to go to the final keynote. Thus, the only question came from my friend Hugo, with whom I also worked on a course at DataCamp, who asked about "how we might communicate these ideas to, say, a manager." My thoughts on that were to report not a single number (e.g. the mean), but also the range, and communicate how the lower and upper bound of the range would affect bottomline decisions, or open up new opportunities (though I probably could have expressed this sentiment better).</p>
+<p><strong>(4) Feeding Guido van Rossum.</strong> Python's BDFL, <a href="https://en.wikipedia.org/wiki/Guido_van_Rossum">Guido van Rossum</a>, wandered into the staff office asking to see whether the speaker ready room was open, because he was hungry and was looking for some snacks. We initially suggested the main conference hall, but later I ran out and called him back, because we had some English biscuits in the staff room, and we engaged in a short chat. That's when I had my star-awed moment! Was tempted to get a photo, but I figured he'd probably be fed up with people asking for photo ops, so I decided against it, hoping to be considerate for him. When he finished the biscuit, he said goodbye, and left the staff office. Amazing how everybody else just went about their own business while he was in the room; speaks to the lack of ego that PyCon celebrities have, and that sets a great example for the rest of the community!</p>
+<p>Once I'm back in Boston, I'm definitely going to catch up on the rest of PyCon. I heard that there were a lot of good talks that I missed while staffing the conference as FinAid co-chair, will have to make sure that YouTube playlist is set up!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2017-pycon-2017-highlights</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{PyCon 2017 Highlights}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2017}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{05}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{22}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2017/5/22/pycon-2017-highlights}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

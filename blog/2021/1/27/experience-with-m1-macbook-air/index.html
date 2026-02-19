@@ -1,0 +1,606 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Experience with M1 MacBook Air">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/experience-with-m1-macbook-air' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Experience with M1 MacBook Air - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Experience with M1 MacBook Air</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2021-01-27</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/macbook/">
+        macbook
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/macos/">
+        macos
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/arm/">
+        arm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/m1/">
+        m1
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>Some of my early impressions using the M1 MacBook Air for data science purposes.</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Though I've been a Mac user for close to 15 years now, it's the first time that I've had to experience an architecture change. Having upgraded from an old 12" MacBook to a new 13" MacBook Air, I wanted to quickly document some of my early experiences with the M1 MacBook Air.</p>
+<h2 id="initial-ordering">Initial Ordering</h2><p>The online shopping experience is something that I have to mention and give full credit to Apple. They've enabled customers to order a MacBook Air at noon and get it by 2:30 pm, at least in the Boston area. I think this was possible because the model I ordered, a 16GB RAM + 1TB SSD MacBook Air, was available and in-stock in their South Shore store. Good move, Apple; I was pleasantly delighted at being able to make this purchase. (Hopefully, I get a good four years of use out of it, as I did for my little MacBook!)</p>
+<h2 id="installing-tooling">Installing tooling</h2><p>My tools primarily involve the following:</p>
+<ol>
+<li>Homebrew for system-wide packages.</li>
+<li>Anaconda for the Python data science stack.</li>
+<li>VSCode for software development.</li>
+<li>Jupyter for notebook experimentation.</li>
+</ol>
+<p>I started by installing as much as I could of my stack under native (ARM) mode rather than emulated (x86) mode. Here's my report on what worked and what didn't.</p>
+<h3 id="homebrew">Homebrew</h3><p>As of 26 Jan 2021, Homebrew has partial support for the M1 ARM processors. Installing Homebrew was not difficult. Open up the <em>native</em> Terminal, type in the official Homebrew installation commands, and see it go to work. No problems encountered.</p>
+<p>As an experiment, I removed the ARM-compatible Homebrew installation and re-installed it in emulation mode. To do this, I opened up the Hyper terminal, which was not ported over to M1 yet, and ran the official Homebrew installation commands. Likewise, I encountered no problems. As I have been a bit lazy, I did not revert to ARM Homebrew.</p>
+<p>ARM Homebrew and x86 Homebrew get installed into two different directories. The ARM <code>brew</code> goes into <code>/opt/homebrew/bin</code>, while the x86 version goes into the usual <code>/usr/local/bin</code>. Just keep this point in mind; you might find it handy in the future.</p>
+<h3 id="anaconda">Anaconda</h3><p>Following the <a href="https://ericmjl.github.io/data-science-bootstrap-notes/install-anaconda-on-your-machine/">best practices I outline in my knowledge base</a>, I install Miniconda on my machine. After reading some blog posts online, I discovered that there's <a href="https://github.com/conda-forge/miniforge">miniforge</a>, a Miniconda distribution that comes with native ARM compatibility. As such, I started by installing that first.</p>
+<p>Soon, however, I found that there were some environments that I couldn't build. These included <a href="https://github.com/ericmjl/website/blob/master/environment.yml">the one for this website</a>, and anything involving JAX. Initially, I considered living with the situation and using a remote development machine, but I soon felt that nagging feeling that I was leaving a lot of awesome compute on the table by doing that. As such, I uninstalled Miniforge and installed Miniconda in emulation mode. As with Homebrew, I got Miniconda going by running the installer inside Hyper. After the installation was complete, I could build all of my conda environments with ease.</p>
+<p>Having installed Miniconda, I went to work benchmarking a test suite for <a href="https://elarkk.github.io/jax-unirep/"><code>jax-unirep</code></a>, an RNN model that my intern Arkadij and I accelerated together. One of my projects uses JAX, which I could not install in native ARM mode. The exciting thing for me is that I saw the test suite run with no issues! Also, I noticed that the slow tests ran at approximately twice as fast on my computer than on GitHub Actions. This anecdotal benchmark is enough for me to gain confidence in using JAX on this laptop. If you want numbers, though:</p>
+<ul>
+<li>GitHub Actions for jax-unirep tests:<ul>
+<li>45 seconds for fast test</li>
+<li>3m 35 seconds for slow tests</li>
+</ul>
+</li>
+<li>M1 MacBook air (while running on battery power in emulation mode)<ul>
+<li>43 seconds for fast test</li>
+<li>1m 25 seconds for slow tests</li>
+</ul>
+</li>
+</ul>
+<h3 id="docker">Docker</h3><p>Docker has a technical preview for the M1 Mac, and it has only crashed once thus far. (I didn't have enough time to dig deep and figure out why.) Other than that, I was able to install the tech preview with no hassle and even use it to build a development container in VSCode for <code>pyjanitor</code>, in which I made a few pull requests into the library.</p>
+<h3 id="vscode">VSCode</h3><p>To get VSCode, I had to install and use the <a href="https://code.visualstudio.com/insiders/">Insiders build for ARM64</a>. No big hiccups here, everything installed without issues. As I mentioned above, building development containers involved zero hiccups.</p>
+<h3 id="jupyter">Jupyter</h3><p>The Jupyter notebook server ran in x86 emulation mode with no issues as well. I installed the latest jupyter lab 3.0.5, which ran with no hiccups, was snappy in the browser, everything behaving in line with what I was accustomed to.</p>
+<h3 id="julia-language">Julia Language</h3><p>I also went ahead and installed Julia both from conda-forge (it is a bit dated, at v1.1.1) and from the official Julia language website. Installation went smooth; running had no hiccups.</p>
+<h2 id="overall-two-day-impressions">Overall two-day impressions</h2><p>As someone who's used a Mac exclusively since 2006, <em>nothing substantial</em> has changed on the surface. That's something worth mentioning: Apple does it again, making a technically complicated technological transition without letting an end-user know as much. Doing this is insanely remarkable! I've done calls, written emails, this blog post, done software development and ML model fitting with gradient descent, all on a lightweight but powerful machine that sips very little power. I'm wholly impressed here.</p>
+<p>The conda-forge community of volunteers has done just as much too. I'm wholly impressed by the speed at which the team could get their bots to town, cross-compiling the ecosystem's packages.</p>
+<p>I know I'm leaving some performance on the table by sticking with x86 emulation at the moment. Nonetheless, I still can't help but remark that the performance is insanely great! I was quite pleasantly surprised at how smoothly everything runs. Compared to the Intel m5 processor in my old 12" MacBook, the M1 chip runs fast, <em>even in emulation mode</em>.</p>
+<h2 id="tips-for-data-science-usage">Tips for data science usage</h2><p>These tips are valid as of 26 Jan 2021. Here are some things that I suggest you might want to do if you want stuff to "just work":</p>
+<ol>
+<li>Don't bother with emulation mode for the Python DS/software/web development stack. Install Miniconda in emulation mode and be done with it.</li>
+<li>Same goes for Homebrew.</li>
+<li>Install VSCode Insiders for ARM64; you'll enjoy the speed at which everything runs.</li>
+<li>Install Docker's technical preview for M1 if you need to use Docker.</li>
+</ol>
+<p>If you do the above, keep your eyes peeled for community movement on ARM64 compatibility, and don't hesitate to re-install things.</p>
+<h2 id="limitations-encountered">Limitations encountered</h2><p>From my perspective, these are the current limitations I see:</p>
+<ol>
+<li>JAX, being built on top of XLA, is not yet natively compatible with the M1 Mac's GPU. Some movement is probably necessary from the XLA team to make it happen. <a href="https://github.com/google/jax/issues/5501">There is an issue tracker I filed with the JAX team</a>, in which Metal bindings are necessary. Targeting compilation to the Neural Engine will be difficult because there are no public APIs for that, as far as I can tell.</li>
+</ol>
+<h2 id="references">References</h2><p>I used the following references in getting set up:</p>
+<ol>
+<li><a href="https://github.com/pymc-devs/pymc3/issues/4442#issuecomment-767286954">A comment by Chris Fonnesbeck on PyMC3's issue tracker</a>.</li>
+<li><a href="https://stackoverflow.com/questions/65534042/anaconda-and-upgrading-to-new-m1-mac">A question on Stack Overflow</a>.</li>
+<li><a href="https://towardsdatascience.com/how-to-run-jupyter-notebooks-on-an-apple-m1-mac-ac3a8bf39c6c">A slightly dated Medium post on How to run Jupyter notebooks on your Mac</a>.</li>
+</ol>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2021-experience-with-m1-macbook-air</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Experience with M1 MacBook Air}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2021}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{01}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{27}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2021/1/27/experience-with-m1-macbook-air}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

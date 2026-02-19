@@ -1,0 +1,770 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Keys to effective collaborative data science">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/keys-to-effective-collaborative-data-science' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Keys to effective collaborative data science - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Keys to effective collaborative data science</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-10-18</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/science/">
+        science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/collaboration/">
+        collaboration
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/standardization/">
+        standardization
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/empathy/">
+        empathy
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/automation/">
+        automation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/reproducibility/">
+        reproducibility
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/reviews/">
+        reviews
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/coding/">
+        coding
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/research/">
+        research
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I discuss enhancing collaboration between data scientists and non-computational colleagues to ensure impactful work. I emphasize the importance of standardizing code initialization, involving non-coders in code reviews, empathetic communication across roles, and ensuring work is runnable on any computer. These practices aim to bridge gaps, reduce cognitive load, and foster mutual appreciation of challenges faced in data science projects. How can these strategies be implemented in your team?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p><em>Note: This is a blog post version of a guest lecture that I gave at Duke University on 16 October 2024 to a class taught by Brian Lerner.</em></p>
+<p>I've been working as a data scientist in the life sciences space for ~7 years now;
+~10 years if you count my graduate school days.
+Over the years, I've observed how the absence of standardized practices
+can cause our work to fade away once we leave a company.
+I've also witnessed the friction that can arise
+between laboratory teams—the data producers—
+and computational teams—the data consumers—
+often stemming from a lack of empathy for each other's challenges.</p>
+<p>Today, I want to share some thoughts
+on how we can improve our collaborative efforts
+between data scientists and non-computational colleagues
+and ensure our work has a lasting impact.
+My exhortations for today are simple:</p>
+<ol>
+<li>Bring structure to how you work individually.</li>
+<li>Bring empathy to how you work collaboratively.</li>
+<li>Bring clarity to how you work!</li>
+</ol>
+<p>Towards this end, I have four ideas to share:</p>
+<ol>
+<li>For quantitative-types, standardize how you initialize your code repositories.</li>
+<li>Introduce code reviews, especially involving non-coders where possible.</li>
+<li>Communicate across roles with empathy.</li>
+<li>Ensure your work is runnable on any computer.</li>
+</ol>
+<p>Let's dive in to each of these ideas, and how they relate to the three exhortations.</p>
+<h2 id="standardize-how-you-initialize-your-code-repositories">Standardize how you initialize your code repositories</h2><p>Standardizing the way you initialize code repositories for new projects
+is more important than you might think.
+It reduces the cognitive load required to find what you need,
+making it easier for someone else to onboard onto the project in the future.
+It also helps you regain contextual knowledge
+when you return to a project after some time.
+Moreover, adding automation for standardized needs
+can streamline your workflow significantly.</p>
+<p><strong>How can you do this?</strong>
+Start by using template repositories,
+such as those that your instructor Brian might have provided you.
+And if you're not already using one,
+feel free to design one collaboratively with your teammates!</p>
+<p>To put these ideas into action,
+I've built tools like <code>pyds-cli</code>
+that help you get started with a standardized yet flexible project structure.
+For instance, in <code>pyds-cli</code>,
+all projects are structured with a view towards becoming
+a Python package that can be distributed,
+and include things like a source directory,
+tests, a pyproject.toml configuration file,
+a notebooks directory, and a docs directory.
+But you don't have to start using all of these directories right from the get-go!
+Rather, you can start within the <code>notebooks/</code> directory
+and leverage other tooling later.</p>
+<p>At where I work, we also add additional automation,
+such as installing the computational environment
+using standardized tools like Pixi or Conda/Mamba.
+We also install automatic code checkers,
+which reduce the cognitive load during setup
+and help put lightweight guardrails in place.
+Every place where we can add automation
+and reduce cognitive load during setup
+is another way to increase the odds that
+someone else can pick up your project and run with it.</p>
+<h2 id="introduce-code-reviews-between-coders-and-non-coders">Introduce code reviews between coders and non-coders</h2><p>Introducing code reviews is a practical way
+to foster knowledge sharing between coders and non-coders.
+The dialogue that ensues during a code review
+increases the odds that implicit knowledge is made explicit.
+Including non-coders in the code review process
+elevates appreciation for the behind-the-scenes complexity that coders deal with.
+Non-coders, please reciprocate!
+Where possible, involve coders early in the manual data collection process
+to foster mutual appreciation for the challenges each of us faces.</p>
+<p><strong>How should you approach code reviews?</strong>
+For the very experienced, asynchronous reviews may suffice.
+For newcomers, doing this in person can be a great socializing experience.
+Leave comments and questions about anything that's unclear.
+Non-coders should feel empowered to ask questions that might seem obvious;
+this is crucial for drawing out implicit knowledge.</p>
+<p><strong>Examples of questions to ask during code reviews:</strong></p>
+<ul>
+<li>Are there lines of code that might be incorrectly implementing what's intended?</li>
+<li>Are there lines where it's unclear why they exist or what they're used for?</li>
+<li>Are there hard-coded file paths that prevent the code from being executable on someone else's system?</li>
+<li>Is there unnecessary code duplication?</li>
+<li>Are convenience functions used appropriately?</li>
+<li>Is the code organized so that newcomers can easily find what they're looking for?</li>
+<li>Are the names of files, variables, functions, and classes descriptive without being overly verbose?</li>
+<li>Is the code following sane patterns?</li>
+<li>What is the code intended to do, and is it documented?
+(Even this question can help draw out implicit knowledge!)</li>
+</ul>
+<h2 id="communicate-across-roles-with-empathy">Communicate across roles with empathy</h2><p>From what I've gathered, some of you are quantitatively inclined —
+doing data analysis and acting as data consumers—
+while others are more qualitative,
+being involved in unstructured data collection process as data producers.
+Hopefully, both types are working together to design the data collection effort.</p>
+<p>This mirrors how we collaborate with laboratory scientists at work.
+Let me use this as an example to illustrate my point.</p>
+<p><strong>How do you successfully communicate between the two?</strong>
+The key is to have empathy!</p>
+<p><strong>For computational scientists:</strong>
+Understand the practical challenges laboratory scientists face.
+For example, back at Novartis,
+I helped design an experiment.
+In it, I requested fully randomized positions of controls in a 96-well plate,
+done across stacks of plates that are robotically processed.
+This might be statistically ideal but turned out to be logistically challenging!
+The logistical challenge comes from the difference between
+stamp plating controls in standardized positions across plates vs.
+randomly placing them within the plate.
+Requesting fully randomized positions can place an undue burden on laboratory scientists,
+making it difficult to stamp controls from plate to plate.
+If I didn't have empathy for this,
+I might have been perceived as being out of touch with the realities of the lab,
+and my working relationship with the lab would have suffered.
+A compromise we reached was to randomize the positions once
+to achieve sufficient spatial coverage
+while easing the logistical burden.</p>
+<p><strong>For laboratory scientists:</strong>
+Recognize that moving slowly upfront can enable faster progress later.
+In exploratory data analysis,
+computational folks might rush through an analysis with hacked-together code
+without considering future reuse.
+Early discussions about future data collection and analysis plans are important;
+they can help shape how code is written upfront to make it more reusable.
+Providing computational team members with additional time
+to isolate reusable code into functions and document their work
+helps when new data comes in, making automation clearer.</p>
+<p><strong>Set up clear hand-offs and deliverables between roles.</strong>
+For example, between data consumers and producers,
+data should conform to programmatically checkable criteria,
+such as standardized column names in a table.
+With computational (consumer) and laboratory (producer) scientists,
+new experiments are designed collaboratively,
+ensuring both parties understand and agree on the process.
+When a data scientist understands the data generating process,
+they can iterate faster on the analysis.
+And when a laboratory scientist understands the computational process,
+they will know the importance of keeping data formatted appropriately.</p>
+<h2 id="ensure-your-work-is-runnable-on-any-computer">Ensure your work is runnable on any computer</h2><p>Your work should be runnable not just in Google Colab
+or on your HPC
+but ideally on any laptop.
+In a pinch, someone should be able to reproduce the gist of your work on any computer.
+In the best-case scenario, someone else should be able to run a single command
+and reproduce your work on any computer they choose.
+It's your puzzle to figure out how!</p>
+<p><strong>Why is this important?</strong>
+This allows you to collaborate more easily,
+without bottlenecks waiting for someone else to run code
+that you could have run on your own.
+It also ensures that if you need to pause work and pick it up later,
+you can do so easily and with confidence.
+This is also a prerequisite for reproducibility.</p>
+<p><strong>How do you ensure your work is runnable on any computer?</strong></p>
+<p>Here are some tips:</p>
+<ul>
+<li><strong>Avoid hard-coding paths</strong> to files that exist only on your computer.
+Instead, pull directly from a source of truth like a SQL database or a cloud storage system.</li>
+<li><strong>Define sources of truth</strong> with others and document what they are.</li>
+<li><strong>Use environment lock-file generating tools</strong> like <code>conda-lock</code> or <code>pixi</code>.
+These keep track of the exact versions of packages installed, ensuring that other environments have the same setup.</li>
+<li><strong>Leverage automation tools</strong> like Makefile or <code>pixi</code> tasks to create reproducible workflows that can be executed with a single command, such as <code>pixi run test</code> or <code>make build</code>.</li>
+<li><strong>Document everything clearly</strong> to bring clarity to others and reduce the cognitive burden of onboarding.</li>
+</ul>
+<h2 id="my-exhortations-for-today">My exhortations for today</h2><p>Thanks for listening in!
+I hope these pointers help you to:</p>
+<ol>
+<li>Bring structure to how you work individually.</li>
+<li>Bring empathy to how you work collaboratively.</li>
+<li>Bring clarity to how you work!</li>
+</ol>
+<h2 id="q-a">Q&amp;A</h2><p><strong>Jupyter notebooks vs. scripts in industry?</strong></p>
+<p>We use both.
+Notebooks are great for exploration
+or to help produce narrative-style documentation interwoven with code.
+Scripts are useful for one-off tasks.</p>
+<p><strong>How to review notebooks?</strong></p>
+<p>For documentation-style notebooks,
+it's best to do this live — whether over a call or in person.
+Narratives are complex, and being able to hash out unclear points
+and draw out implicit knowledge is extremely helpful.</p>
+<p><strong>What are ways that the qualitative folks can help the quantitative folks?</strong></p>
+<ul>
+<li>Be involved in the definition of ontologies.
+Usually these turn into categorical variables in a downstream analysis.</li>
+<li>Keep your data collection protocols standardized as much as possible,
+but anticipate the evolution of these protocols (especially in early days of a project).
+Communicate these changes to the computational team
+so that they can update the data processing code and design it for flexibility!</li>
+</ul>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-keys-to-effective-collaborative-data-science</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Keys to effective collaborative data science}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{10}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{18}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/10/18/keys-to-effective-collaborative-data-science}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

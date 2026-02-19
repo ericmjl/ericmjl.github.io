@@ -1,0 +1,939 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Building a Translation App with GPT-3: The Story Behind My Creation">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/building-a-gpt3-based-translation-app' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Building a Translation App with GPT-3: The Story Behind My Creation - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Building a Translation App with GPT-3: The Story Behind My Creation</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2023-02-05</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/gpt3/">
+        gpt3
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/openai/">
+        openai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/blogging/">
+        blogging
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/natural language processing/">
+        natural language processing
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/machine learning/">
+        machine learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/artificial intelligence/">
+        artificial intelligence
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/programming/">
+        programming
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/api/">
+        api
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/dokku/">
+        dokku
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/digitalocean/">
+        digitalocean
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/deployment/">
+        deployment
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/web app/">
+        web app
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/large language models/">
+        large language models
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/translation/">
+        translation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/faith/">
+        faith
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/christianity/">
+        christianity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/bible/">
+        bible
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>I built a translator using GPT3 for Ark Channel,
+a daily devotional written in Chinese.
+The translator parses the text into structured data,
+translates the devotional and additional texts,
+and generates cover images.</p>
+<p>I also built a UI using Panel
+and deployed it on a Dokku server on DigitalOcean.
+The result?
+My translation time went from 10-15 minutes to just 2! 🚀</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Since 2011, I have been doing Chinese-to-English translation
+for <a href="http://www.arkchannel.org/en/">Ark Channel</a>.
+For as long as I can remember,
+I have used Google Translate to assist me in translation
+because Chinese is my 2nd language
+(though in Singapore, I learned it as a 1st language subject).
+So, with GPT3's capabilities at doing translation,
+I wanted to test drive its abilities to do machine translation.
+I have not been disappointed!</p>
+<h2 id="what-s-ark-channel">What's Ark Channel?</h2><p>Ark Channel is written in Hong Kong by one person, Sam Kong.
+He started broadcasting short messages of Biblical encouragement
+in response to seeing suicide rates skyrocket in Hong Kong.
+Sam is not a computer person,
+but he writes each edition of Ark Channel in a relatively structured way.
+From Monday through Saturday, Ark Channel's edition looks something like this:</p>
+<div class="hll"><pre><span></span>熱就退了！- 方舟台 14/01/2023 週六 太8上
+
+耶穌說：我去醫治他 (v.7)
+
+* 在主沒有「能」或「不能」，只有「肯」或「不肯」
+
+今日聖經: 太8上
+
+* 為何我認為聖經可信? Why is the Bible reliable? | Tim Keller at Columbia University
+</pre></div>
+<p>And on Sunday, it looks like this:</p>
+<div class="hll"><pre><span></span>存感恩心，走永生路！- 15/01/2023 Sunday Hope 太8下
+
+眾人希奇，說：這是怎樣的人 ? 連風和海也聽從他了（v.27)
+
+* 恩主從不責備任何人用禱告來打擾祂的安寧，但卻責備人因膽怯而自亂陣腳。
+
+今日聖經: 太8下
+
+* 經典的詩歌，現代的心靈，如同中水的聲音 -
+&quot;Holy, Holy, Holy&quot; — Singing at Together for the Gospel
+</pre></div>
+<h2 id="can-gpt3-alone-do-the-translation">Can GPT3 alone do the translation?</h2><p>At first, I thought I would get GPT3 to do translation by using the following prompt,
+written inside a Python function:</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">translate</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="n">f</span> <span class="s2">&quot;Translate the following text into English: &#39;</span><span class="si">{text}</span><span class="s2">&#39;.&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">Completion</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;text-davinci-003&quot;</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="o">=</span><span class="n">prompt</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.1</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;choices&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+<p>However, this yielded unsatisfactory results.
+Here is one example translation for the January 14 entry:</p>
+<div class="hll"><pre><span></span>The heat is gone! - Ark Platform 14/01/2023 Saturday 8am
+
+Jesus said: I go to heal him (v.7)
+
+* With the Lord there is no &quot;can&quot; or &quot;cannot&quot;, only &quot;will&quot; or &quot;will not&quot;
+
+Today&#39;s Bible: Matthew 8
+
+* Why do I think the Bible is reliable? Why is the Bible reliable? | Tim Keller at Columbia University
+</pre></div>
+<p>At first glance, the translation is okay!
+The devotional text on the 3rd line is reasonably accurate.
+The additional text at the end is also translated well.
+There are other issues, though, that we could further tackle.
+Here they are.</p>
+<ol>
+<li>Per our usual practice, <code>方舟台</code> should be translated into <code>Ark Channel</code>.</li>
+<li><code>太8</code> is mistranslated as <code>8am</code>. It should be <code>Matthew 8b</code> or <code>Matthew 8c</code>. Both are acceptable without contextual information; sometimes, we split a chapter into 3 (<code>abc</code>) rather than 2 (<code>ab</code>).</li>
+<li>Additionally, the quoted verse on the 2nd line might need to be corrected and verified.</li>
+<li>Translating the entire text uses up a lot of tokens.</li>
+</ol>
+<p>To solve point 3, Ark Channel historically uses the NKJV version.
+However, I have sometimes used the NIV version to translate
+(primarily out of habit).
+If we can extract the Bible book, chapter, and verse number from the free text,
+we might be able to hit an API to automatically get an authoritative translation
+rather than use GPT3 to do an approximately correct translation.</p>
+<p>To solve point 4,
+if we could translate just the devotional text and additional text fields
+while using dictionary lookups for the rest,
+we could save a lot of OpenAI API calls.</p>
+<h2 id="structuring-the-translation-task-into-sub-tasks">Structuring the translation task into sub-tasks</h2><p>So I decided to split the task into two pieces:</p>
+<ol>
+<li>The first is to extract the information based on a template I provide and return it as a JSON object that I would read into Python as a dictionary.</li>
+<li>The second would take just the parsed devotional and additional texts and do a GPT3-based translation for me.</li>
+</ol>
+<h3 id="extract-information-into-a-json-object">Extract information into a JSON object</h3><p>To make point 1 happen, I needed to provide a template inside a prompt.
+Templating out the Ark Channel devotionals, they look like this:</p>
+<div class="hll"><pre><span></span>&lt;header&gt; - &#39;Ark Channel&#39; &lt;date in DDMMYY or DD/MM/YYYY format&gt; &lt;day of the week or &#39;Sunday Hope&#39;&gt; &lt;book&gt;&lt;chapter number&gt;&lt;optional modifier&gt;
+&lt;quoted verse&gt; (v.&lt;verse_number&gt;)
+
+&lt;devotional_text followed by &quot;今日聖經&quot;&gt;
+
+&lt;additional_text after devotional_text, beginning with &quot;*&quot; character&gt;
+</pre></div>
+<p>It is relatively structured but definitely not easily machine parseable with Python code.
+Furthermore, if I had to code up a parser,
+I would have to write lots of code for many edge cases, which would be undesirable.
+Here are some examples of the issues I encountered,
+each of which would introduce code path forking:</p>
+<ol>
+<li>The date may sometimes be written as <code>DDMMYY</code> or <code>DD/MM/YYYY</code>.</li>
+<li>Only on Sundays will the 'day of week' field be written as "Sunday Hope"; on other days, it is in Chinese.</li>
+<li>There is sometimes an alphanumeric letter at the end of the chapter number to signify that week's edition covers part of a chapter rather than the entire chapter.</li>
+<li>The devotional text sometimes includes multiple line breaks with bullet points or numbered lists, and at other times is one single line.</li>
+<li>The additional text is sometimes multiple lines long and sometimes a single line.</li>
+</ol>
+<p>So, I experimented a bit with the API and made a prompt that returns
+a structured dictionary with fields correctly populated:</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">structure</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;The following text has structure:</span>
+
+<span class="s2">&#39;&lt;header&gt; - &#39;Ark Channel&#39; &lt;date in DDMMYY or DD/MM/YYYY format&gt; &lt;day of the week or &#39;Sunday Hope&#39;&gt; &lt;book&gt;&lt;chapter number&gt;&lt;optional modifier&gt;</span>
+<span class="s2">&lt;quoted verse&gt; (v.&lt;verse_number&gt;)</span>
+
+<span class="s2">&lt;devotional_text followed by &quot;今日聖經&quot;&gt;</span>
+
+<span class="s2">&lt;additional_text after devotional_text, beginning with &quot;*&quot; character&gt;&#39;</span>
+
+<span class="s2">Parse the text: &#39;</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">&#39; as JSON using snake_case for the keys.</span>
+<span class="s2">Ensure the keys&#39; verse_number&#39;, &#39;day_of_week_or_sunday_hope&#39;, &#39;header&#39;, &#39;date&#39;,</span>
+<span class="s2">&#39;book&#39;, &#39;chapter_number&#39;, &#39;optional_modifier&#39;, &#39;quoted_verse&#39;, and &#39;devotional_text&#39; are all present.</span>
+<span class="s2">The &#39;optional_modifier&#39; is usually &#39;下&#39; or &#39;上&#39;, sometimes &#39;中&#39;, and is not always present.</span>
+<span class="s2">Ensure the quoted_verse does not include the verse number.</span>
+<span class="s2">Ensure no double quotes.</span>
+<span class="s2">In values, replace all double quotes with single quotes.</span>
+<span class="s2">Ensure &#39;今日聖經&#39; does not show up in &#39;devotional_text&#39;.</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">Completion</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;text-davinci-003&quot;</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="o">=</span><span class="n">prompt</span><span class="p">,</span>
+        <span class="n">max_tokens</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.1</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s1">&#39;choices&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
+</pre></div>
+<p>As mentioned above, this prompt performs relatively consistently
+against the test cases I designed.
+However, if there is a mild change in formatting,
+I will need to adjust the prompt.</p>
+<p>Additionally, the part that needed the most experimentation was the <code>Ensure</code> statements.
+Before including the <code>Ensure</code> statements,
+GPT3 would return a JSON string that missed out on keys that needed to be present.
+However, GPT3 began reliably covering all of the necessary keys in the dictionary
+after including the' Ensure' statements.</p>
+<p>Finally, there were places in Ark Channel
+where quotation mark usage needed to be more consistent.
+Sometimes, quotation marks were curly;
+at other times, they were straight.
+The parentheses were also sometimes the fixed-width Chinese version;
+at different times, they were the English font version instead.
+With the prompt above, I was able to control the usage of
+quotation marks and parentheses in the translated texts.</p>
+<p>As I'll discuss later, GPT3 became (for me) a great Natural Language API.
+That was pretty incredible.</p>
+<p>With this function, the original text above is parsed as:</p>
+<div class="hll"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;header&#39;</span><span class="p">:</span> <span class="s1">&#39;存感恩心，走永生路！&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="s1">&#39;150123&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;day_of_week_or_sunday_hope&#39;</span><span class="p">:</span> <span class="s1">&#39;Sunday Hope&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;book&#39;</span><span class="p">:</span> <span class="s1">&#39;太&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;chapter_number&#39;</span><span class="p">:</span> <span class="s1">&#39;8&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;optional_modifier&#39;</span><span class="p">:</span> <span class="s1">&#39;下&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;quoted_verse&#39;</span><span class="p">:</span> <span class="s1">&#39;眾人希奇，說：這是怎樣的人 ? 連風和海也聽從他了&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;verse_number&#39;</span><span class="p">:</span> <span class="s1">&#39;27&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;devotional_text&#39;</span><span class="p">:</span> <span class="s1">&#39;恩主從不責備任何人用禱告來打擾祂的安寧，但卻責備人因膽怯而自亂陣腳。&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;additional_text&#39;</span><span class="p">:</span> <span class="s1">&#39;* 經典的詩歌，現代的心靈，如同中水的聲音 - &quot;Holy, Holy, Holy&quot; — Singing at Together for the Gospel&#39;</span>
+<span class="p">}</span>
+</pre></div>
+<p>This is a great start!
+With it in hand,
+I could see a path forward to composing the English translation
+through mapping-based translation for the shorter fields
+and AI-based translation for the natural language fields.
+The latter is what the next point is about.</p>
+<h3 id="translate-the-structured-information-using-gpt-3">Translate the structured information using GPT-3</h3><p>To make this happen,
+I would just need to instruct GPT3 to translate
+the <code>devotional_text</code> and <code>additional_text</code>,
+which are the ones that need the most human thought.
+That is relatively simple,
+as I can reuse the original <code>translate()</code> function defined above.</p>
+<h3 id="generate-images-using-dall-e2-for-fun-and-non-profit">Generate images using DALL-E2 for fun (and non-profit)</h3><p>For fun,
+I also made two cover images for each Ark Channel edition
+using the OpenAI DALL-E2 API.
+This one was easy:
+using the structured text,
+I passed in the <code>header</code> value into the following function:</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">generate_image</span><span class="p">(</span><span class="n">translation</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    OpenAI image generation API (DALL-E 2) given prompt return image URL</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Claude Monet painting of &#39;</span><span class="si">{</span><span class="n">translation</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">openai</span><span class="o">.</span><span class="n">Image</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+      <span class="n">prompt</span><span class="o">=</span><span class="n">prompt</span><span class="p">,</span>
+      <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+      <span class="n">size</span><span class="o">=</span><span class="s2">&quot;256x256&quot;</span>
+    <span class="p">)</span>
+    <span class="n">image_url</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">image_url</span>
+</pre></div>
+<p>As you can see, I ask for a Claude Monet-style painting as the image.
+Once we have the image URL, we can display it.</p>
+<h3 id="building-a-ui-for-the-translation-app">Building a UI for the translation app</h3><p>Without a UI, my code is not usable by my 'yokefellows', as Sam Kong would call us.
+While I'm a techie, they are not.
+I can run code in a notebook,
+but it would be a huge lift to enable them to use the code in its raw form.
+Therefore, I decided to build and deploy a Panel app
+that makes this accessible to them.
+I chose Panel because I was inspired by
+Sophia Yang's use of Panel + the OpenAI API
+(see <a href="https://towardsdatascience.com/chatgpt-and-dall-e-2-in-a-panel-app-1c921d7d9021">her recent blog post about it</a>)
+and because it includes a very flexible layout engine.
+Its reactive idioms are also Pythonic and, therefore, easy to follow.</p>
+<h3 id="deploying-the-app-on-my-server">Deploying the app on my server</h3><p>Regarding deployment, I opted to set up a $12/mo Dokku server on DigitalOcean.
+It has been a while since I last did that, so I felt rusty.
+In the interest of brevity, I will only delve into a bit of detail here.
+The tl;dr is that I installed Dokku,
+figured out how to set up SSL (for HTTPS),
+and deployed the app from within a  Docker container.
+(I referenced <a href="https://ericmjl.github.io/essays-on-data-science/miscellaneous/static-sites-on-dokku/">my old essay on deploying static sites and Python apps</a>;
+writing about stuff one builds is an excellent way of recording knowledge!)</p>
+<p>The final result is an app that looks like this:</p>
+<p><img src="screenshot.webp" alt="Ark Channel translator app deployed on DigitalOcean"></p>
+<h2 id="what-s-the-insight">What's the insight?</h2><p>From this exercise, I've realized that <strong>we can use GPT3 as a natural language API</strong>.
+As an interface, it is less defined than a programming language
+but is much more flexible and human-like.
+The amount of experimentation we need to achieve the same results
+might be similar or even less compared to programming with a Python-based API,
+especially when it comes to more straightforward tasks,
+like structuring a JSON from texts with solid patterns.</p>
+<p><strong>How about testing the app?</strong>
+Testing and validating natural language APIs
+is more challenging than with a programming language API,
+but it is still necessary.
+With our usual programming languages, such as Python, Julia, or Rust,
+we can mostly reason through the logic of a program
+and figure out how to write a general test case.
+However, with GPT3 prompts as a pseudo-programming language,
+it takes more work to build a program that generates real-looking data
+and takes more work to test it logically.
+As such, it becomes more important to rely on example-based tests,
+especially those previously known to fail.</p>
+<p><strong>What about data validation at runtime?</strong>
+GPT3 can blabber anything, so we still need guardrails.
+I also needed to write data validators that checked that
+all required keys were present in the dictionary.
+If that failed, I would display the error message in the UI
+within a <code>Status</code> Markdown pane so that I could surface information to myself
+(the Panel app's primary user and debugger)
+and strategize a way to fix the issue.</p>
+<p><strong>What about my bilingual skills?</strong>
+Did using GPT3 obviate the need for my skills?
+Not at all.
+Instead of using my bilingual skills to <em>create</em> translations,
+I ended up using my bilingual skills to <em>verify</em>
+the machine translations for correctness.
+But, of course, I would still edit the translations
+if they were off, slightly or egregiously.</p>
+<p>Finally, there's the lesson on compositionality.
+This is the same lesson outlined on <a href="https://twitter.com/jungofthewon/status/1621216780176986112">Twitter</a>
+by Jungwon (from Ought, the builders of Elicit,
+a research tool that I wish I had during my doctoral training days).</p>
+<p><blockquote class="twitter-tweet"><p lang="en" dir="ltr">How <a href="https://twitter.com/elicitorg?ref_src=twsrc%5Etfw">@elicitorg</a> applies language models compositionally to make it easier to check models&#39; work:<br><br>1 When language models extract info from or answer questions about papers in Elicit, users can quickly see the source - the part of the paper the model got its answer from. <a href="https://t.co/vHECbNMIVr">pic.twitter.com/vHECbNMIVr</a></p>&mdash; Jungwon (@jungofthewon) <a href="https://twitter.com/jungofthewon/status/1621216780176986112?ref_src=twsrc%5Etfw">February 2, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+<p>Instead of feeding the full text of the devotional
+and asking GPT3 to do a translation of the full text alone,
+breaking up the text into sub-components made it easier to translate
+while preserving the desired formatting that we wanted.
+Instead of designing a prompt to satisfy both goals,
+I could create simpler sub-tasks for the model and combine them again.
+Doing so saved me GPT3 API call tokens (which equals money!)
+and the headache of designing complicated prompts.</p>
+<h2 id="impact">Impact</h2><p>So I spent quite a bit of time building this tool for myself.
+What's the impact here?</p>
+<p>Previously, I would spend about 10-15 minutes
+translating each Ark Channel daily devotional entry.
+With my home-built GPT3-based translation tool,
+I can finish translations in 2 minutes.
+That's anywhere from 5-7 times faster than before.
+Furthermore, with it deployed to my DigitalOcean Dokku server,
+I can make it available to my fellow Ark Channel translators worldwide.</p>
+<p>But there are more benefits here.
+Translation takes mental energy,
+and there's an activation energy barrier to getting it done.
+On days with lower energy levels than usual,
+I would delay translation,
+sometimes causing a downstream chain reaction
+by slowing other Ark Channel translators.
+(All devotionals are sent in strict order.)
+Having a machine do a high-quality translation that I can edit
+massively reduces the barrier to getting it done.</p>
+<h2 id="conclusion">Conclusion</h2><p>This exercise in building an app that used GPT3
+was incredibly informative for me.
+Designing prompts is not easy and takes experimentation,
+but it wasn't the hardest part to get right.
+Within the broader picture of the translator, GPT3 was merely one component.
+As written by Davis Treybig,
+<a href="https://medium.com/innovationendeavors/the-biggest-bottleneck-for-large-language-model-startups-is-ux-ef4500e4e786">UX was the thing I needed to pay the most attention to here</a>.
+When GPT3 failed, and it will, having a way to inspect internal data structures
+made a night-and-day difference in
+my ability to debug what was going wrong live.
+With GPT3 and its successor models,
+I'm confident we can unlock new capabilities in many places!</p>
+<p>P.S. In case you were wondering where the app is located...
+I don't plan to share the URL publicly.
+That's because my credit card is on the line
+and I have no authentication walls to prevent bad actors
+from abusing the app!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2023-building-a-gpt3-based-translation-app</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Building a Translation App with GPT-3: The Story Behind My Creation}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2023}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{02}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{05}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2023/2/5/building-a-gpt3-based-translation-app}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

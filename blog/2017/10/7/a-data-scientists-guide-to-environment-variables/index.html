@@ -1,0 +1,772 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="A Data Scientist&#39;s Guide to Environment Variables">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/a-data-scientists-guide-to-environment-variables' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>A Data Scientist&#39;s Guide to Environment Variables - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">A Data Scientist&#39;s Guide to Environment Variables</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2017-10-07</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/bash/">
+        bash
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/environment variables/">
+        environment variables
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/programming/">
+        programming
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>Environment variables might seem mysterious, but hopefully, after reading this blog post, you'll no longer feel that way!</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>You might have encountered a piece of software asking you for permission to modify your <code>PATH</code> variable,
+or another program's installation instructions cryptically telling you
+that you have to "set your <code>LD_LIBRARY_PATH</code> variable correctly".</p>
+<p>As a data scientist, you might encounter other environment variable issues
+when interacting with your compute stack
+(particularly if you don't have full control over it, like I do).
+This post is meant to demystify what an environment variable is,
+and how it gets used in a data science context.</p>
+<h2 id="what-is-an-environment-variable">What Is An Environment Variable?</h2><p>First off, let me explain what an environment variable is,
+by going in-depth into the <code>PATH</code> environment variable.
+I'd encourage you to execute the commands here inside your bash terminal
+(with appropriate modifications -- read the text to figure out what I'm doing!).</p>
+<p>When you log into your computer system, say,
+your local computer’s terminal or your remote server via SSH,
+your bash interpreter needs to know where to look for particular programs,
+such as <code>nano</code> (the text editor), or <code>git</code> (your version control software),
+or your Python executable. This is controlled by your PATH variable.
+It specifies the paths to folders where your executable programs are found.</p>
+<p>By historical convention, command line programs,
+such as <code>nano</code>, <code>which</code>, and <code>top</code>,
+are found in the directory <code>/usr/bin</code>.
+By historical convention, the <code>/bin</code> folder is for software binaries,
+which is why they are named <code>/bin</code>.
+These are the ones that are bundled with your operating system,
+and as such, need special permissions to upgrade.</p>
+<p>Try it out in your terminal:</p>
+<div class="hll"><pre><span></span>$<span class="w"> </span>which<span class="w"> </span>which
+/usr/bin/which
+$<span class="w"> </span>which<span class="w"> </span>top
+/usr/bin/top
+</pre></div>
+<p>Other programs are installed (for whatever reason) into <code>/bin</code> instead. <code>ls</code> is one example:</p>
+<div class="hll"><pre><span></span>$<span class="w"> </span>which<span class="w"> </span>ls
+/bin/ls
+</pre></div>
+<p>Yet other programs might be installed in other special directories:</p>
+<div class="hll"><pre><span></span>$<span class="w"> </span>which<span class="w"> </span>nano
+/usr/local/bin/nano
+</pre></div>
+<p>How does your Bash terminal figure out where to go to look for stuff?
+It uses the <code>PATH</code> environment variable.
+It looks something like this:</p>
+<div class="hll"><pre><span></span>$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$PATH</span>
+/usr/bin:/bin:/usr/local/bin
+</pre></div>
+<p>The most important thing to remember about the <code>PATH</code> variable is that it is "colon-delimited".
+That is, each directory path is separated by the next using a "colon" (<code>:</code>) character.
+The order in which your bash terminal is looking for programs goes from left to right:</p>
+<ul>
+<li><code>/usr/bin</code></li>
+<li><code>/bin</code></li>
+<li><code>/usr/local/bin</code></li>
+</ul>
+<p>On my particular computer, when I type in <code>ls</code>,
+my bash interpreter will look inside the <code>/usr/bin</code> directory first.
+It'll find that <code>ls</code> doesn't exist in <code>/usr/bin</code>,
+and so it'll move to the next directory, <code>/bin</code>.
+Since my <code>ls</code> exists under <code>/bin</code>,
+it'll execute the <code>ls</code> program from there.</p>
+<p>You can see, then, that this is simultaneously super flexible for customizing your compute environment,
+yet also potentially super frustrating if a program modified your <code>PATH</code> variable without you knowing.</p>
+<p>Wait, you can actually modify your <code>PATH</code> variable? Yep, and there's a few ways to do this.</p>
+<h2 id="how-to-modify-the-path-variable">How To Modify the <code>PATH</code> variable</h2><h3 id="using-a-bash-session">Using a Bash Session</h3><p>The first way is transient, or temporary, and only occurs for your particular bash session.
+You can make a folder have higher priority than the existing paths by "pre-pending" it to the <code>PATH</code> variable:</p>
+<div class="hll"><pre><span></span>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span>/path/to/my/folder:<span class="nv">$PATH</span>
+$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$PATH</span>
+/path/to/my/folder:/usr/bin:/bin:/usr/local/bin
+</pre></div>
+<p>Or I can make it have a lower priority than existing paths by "appending" it to the <code>PATH</code> variable:</p>
+<div class="hll"><pre><span></span>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/path/to/my/folder
+$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$PATH</span>
+/usr/bin:/bin:/usr/local/bin:/path/to/my/folder
+</pre></div>
+<p>The reason this is temporary is because I only export it during my current bash session.</p>
+<h3 id="bashrc-or-bash-profile-file"><code>bashrc</code> or <code>.bash_profile</code> File</h3><p>If I wanted to make my changes somewhat more permanent,
+then I would include inside my <code>.bashrc</code> or <code>.bash_profile</code> file.
+(I recommend using the <code>.bashrc</code> file.)
+The <code>.bashrc</code>/<code>.bash_profile</code> file lives inside your home directory
+(your <code>$HOME</code> environment variable specifies this),
+and is a file that your bash interpreter will execute first load.
+It will execute all of the commands inside there.
+This means, you can change your PATH variable by simply putting inside your <code>.bashrc</code>:</p>
+<div class="hll"><pre><span></span>...other<span class="w"> </span>stuff<span class="w"> </span>above...
+<span class="c1"># Make /path/to/folder have higher priority</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span>/path/to/folder:<span class="nv">$PATH</span>
+
+<span class="c1"># Make /path/to/other/folder have lower priority</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/path/to/folder
+...other<span class="w"> </span>stuff<span class="w"> </span>below...
+</pre></div>
+<h2 id="data-science-and-the-path-environment-variable">Data Science and the <code>PATH</code> environment variable</h2><p>Now, <strong>how is this relevant to data scientists?</strong>
+Well, if you're a data scientist, chances are that you use Python,
+and that your Python interpreter comes from the Anaconda Python distribution
+(a seriously awesome thing, go get it!).
+What the Anaconda Python installer does is prioritize
+the <code>/path/to/anaconda/bin</code> folder in the <code>PATH</code> environment variable.
+You might have other Python interpreters installed on your system
+(that is, Apple ships its own).
+However, this <code>PATH</code> modification ensures that
+each time you type <code>python</code> into your Bash terminal,
+ou execute the Python interpreter shipped with the Anaconda Python distribution.
+In my case, after installing the Anaconda Python distribution, my <code>PATH</code> looks like:</p>
+<div class="hll"><pre><span></span>$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$PATH</span>
+/Users/ericmjl/anaconda/bin:/usr/bin:/bin:/usr/local/bin
+</pre></div>
+<p>Even better, what conda environments do is
+prepend the path to the conda environment binaries folder
+while the environment is activated.
+For example, with my blog, I keep it in an environment named <code>lektor</code>.
+Thus...</p>
+<div class="hll"><pre><span></span>$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$PATH</span>
+/Users/ericmjl/anaconda/bin:/usr/bin:/bin:/usr/local/bin
+$<span class="w"> </span>which<span class="w"> </span>python
+/Users/ericmjl/anaconda/bin/python
+$<span class="w"> </span><span class="nb">source</span><span class="w"> </span>activate<span class="w"> </span>lektor
+$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$PATH</span>
+/Users/ericmjl/anaconda/envs/lektor/bin:/Users/ericmjl/anaconda/bin:/usr/bin:/bin:/usr/local/bin
+$<span class="w"> </span>which<span class="w"> </span>python
+/Users/ericmjl/anaconda/envs/lektor/bin/python
+</pre></div>
+<p>Notice how the bash terminal now preferentially picks the Python inside the higher-priority <code>lektor</code> environment.</p>
+<p>If you've gotten to this point, then you'll hopefully realize there's a few important concepts listed here. Let's recap them:</p>
+<ul>
+<li><code>PATH</code> is an environment variable stored as a plain text string used by the bash interpreter to figure out where to find executable programs.</li>
+<li><code>PATH</code> is colon-delimited; higher priority directories are to the left of the string, while lower priority directories are to the right of the string.</li>
+<li><code>PATH</code> can be modified by prepending or appending directories to the environment variable. It can be done transiently inside a bash session by running the <code>export</code> command at the command prompt, or it can be done permanently across bash sessions by adding an <code>export</code> line inside your <code>.bashrc</code> or <code>.bash_profile</code>.</li>
+</ul>
+<h2 id="other-environment-variables-of-interest">Other Environment Variables of Interest</h2><p>Now, what other environment variables might a data scientist encounter? These are a sampling of them that you might see, and might have to fix, especially in contexts where your system administrators are off on vacation (or taking too long to respond).</p>
+<p><strong>For general use</strong>, you'll definitely want to know where your <code>HOME</code> folder is -- on Linux systems, it's often <code>/home/username</code>, while on macOS systems, it's often <code>/Users/username</code>.  You can figure out what <code>HOME</code> is by doing:</p>
+<div class="hll"><pre><span></span>$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$HOME</span>
+/Users/ericmjl
+</pre></div>
+<p><strong>If you're a Python user</strong>,
+then the <code>PYTHONPATH</code> is one variable that might be useful.
+It is used by the Python interpreter,
+and specifies where to find Python modules/packages.</p>
+<p><strong>If you have to deal with C++ libraries</strong>,
+then knowing your <code>LD_LIBRARY_PATH</code> environment variable is going to be very important.
+I'm not well-versed enough in this to espouse on it intelligently,
+so I would defer to <a href="http://xahlee.info/UnixResource_dir/_/ldpath.html">this website</a>
+for more information on best practices for using the <code>LD_LIBRARY_PATH</code> variable.</p>
+<p><strong>If you're working with Spark</strong>,
+then the <code>PYSPARK_PYTHON</code> environment variable would be of interest.
+This essentially tells Spark which Python to use for both its driver and its workers;
+you can also set the <code>PYSPARK_DRIVER_PYTHON</code>
+to be separate from the <code>PYSPARK_PYTHON</code> environment variable, if needed.</p>
+<p><strong>If you're developing data science apps</strong>,
+then according to the <a href="https://12factor.net">12 factor app development principles</a>,
+your credentials to databases and other sensitive information
+are securely stored and dynamically loaded into the environment at runtime.
+How then do you mimic this in a "local" environment (i.e. your computer)
+without hard-coding sensitive information in your source <code>.py</code> files?</p>
+<p>One way to handle this situation is as follows:
+Firstly, create a <code>.env</code> file in your home directory.
+In there, store your credentials:</p>
+<div class="hll"><pre><span></span><span class="nv">SOME_PASSWORD</span><span class="o">=</span><span class="s2">&quot;put_your_pw_here&quot;</span>
+<span class="nv">SOME_USERNAME</span><span class="o">=</span><span class="s2">&quot;put_your_username_here&quot;</span>
+</pre></div>
+<p>Next, add it to your <code>.gitignore</code>, so you never add it to your version control system.</p>
+<div class="hll"><pre><span></span><span class="c1"># other things</span>
+.env
+</pre></div>
+<p>Finally, in your source <code>.py</code> files, use <code>python-dotenv</code> to load the environment variables at runtime.</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="n">load_dotenv</span><span class="p">()</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="n">username</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;SOME_USERNAME&quot;</span><span class="p">)</span>
+<span class="n">password</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;SOME_PASSWORD&quot;</span><span class="p">)</span>
+</pre></div>
+<h3 id="hack-your-environment-variables">Hack Your Environment Variables</h3><p>This is where the most fun happens!
+Follow along for some stuff you might be able to do
+by hacking your environment variables.</p>
+<p><strong>Hack #1: Enable access to PyPy.</strong>
+I occasionally keep up with the development of PyPy,
+but because PyPy is not yet the default Python interpreter,
+and is not yet <code>conda install</code>-able,
+I have to put it in its own <code>$HOME/pypy/bin</code> directory.
+To enable access to the PyPy interpreter,
+I have to make sure that my <code>/path/to/pypy</code> is present
+in the <code>PATH</code> environment variable,
+but at a lower priority than my regular CPython interpreter.</p>
+<p><strong>Hack #2: Enable access to other language interpreters/compilers.</strong>
+This is analogous to PyPy.
+I once was trying out Lua's JIT interpreter to use Torch for deep learning,
+and needed to add a path to there in my <code>.bashrc</code>.</p>
+<p><strong>Hack #3: Install Python packages to your home directory.</strong>
+On shared Linux compute systems that use the <code>modules</code> system
+rather than <code>conda</code> environments,
+a <code>modulefile</code> that you load might be configured
+with a virtual environment that <em>you don't have permissions to modify</em>.
+If you need to install a Python package,
+you might want to <code>pip install --user my_pkg_name</code>.
+This will install it to <code>$HOME/.local/lib/python-[version]/site-packages/</code>.
+Ensuring that your <code>PYTHONPATH</code>
+includes <code>$HOME/.local/lib/python-[version]/site-packages</code>
+at a high enough priority is going to be important in this case.</p>
+<p><strong>Hack 4: Debugging when things go wrong.</strong>
+In case something throws an error,
+or you have unexpected behaviour --
+something I encountered before was my Python interpreter
+not being found correctly after loading all of my Linux modules --
+then a way to debug is to temporarily set your PATH environment variable
+to some sensible "defaults" and sourcing that,
+effectively "resetting" your PATH variable,
+so that you can manually prepend/append while debugging.</p>
+<p>To do this, place the following line inside a file named <code>.path_default</code>,
+inside your home directory:</p>
+<div class="hll"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="w">  </span><span class="c1"># resets PATH to an empty string.</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span>/usr/bin:/bin:/usr/local/bin:<span class="nv">$PATH</span><span class="w">  </span><span class="c1"># this is a sensible default; customize as needed.</span>
+</pre></div>
+<p>After something goes wrong,
+you can reset your PATH environment variable by using the "source" command:</p>
+<div class="hll"><pre><span></span>$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$PATH</span>
+/some/complicated/path:/more/complicated/paths:/really/complicated/paths
+$<span class="w"> </span><span class="nb">source</span><span class="w"> </span>~/.path_default
+$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="nv">$PATH</span>
+/usr/bin:/bin:/usr/local/bin
+</pre></div>
+<p>Note - you can also execute the exact same commands inside your bash session;
+the interactivity may also be helpful.</p>
+<h3 id="conclusion">Conclusion</h3><p>I hope you enjoyed this article, and that it'll give you a, ahem,
+path forward whenever you encounter these environment variables!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2017-a-data-scientists-guide-to-environment-variables</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{A Data Scientist&#39;s Guide to Environment Variables}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2017}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{10}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{07}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2017/10/7/a-data-scientists-guide-to-environment-variables}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

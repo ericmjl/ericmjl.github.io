@@ -1,0 +1,1543 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+    
+
+    
+    
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Blog - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+<div>
+
+<div class="btn-group" role="group" aria-label="pagination">
+  
+  <a href="/blog" class="btn btn-ghost">&laquo;</a>
+  
+
+  
+  <a href="/blog/page/4/" class="btn btn-ghost">4</a>
+  
+
+  
+  <a href="../5/" class="btn btn-ghost">5</a>
+  
+
+  <span class="btn btn-primary disabled">6</span>
+
+  
+  <a href="../7/" class="btn btn-ghost">7</a>
+  
+
+  
+  <a href="/blog/page/8/" class="btn btn-ghost">8</a>
+  
+
+  
+  <a href="/blog/page/46/" class="btn btn-ghost">&raquo;</a>
+  
+</div>
+
+<br>
+</div>
+<div class="terminal-timeline">
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2025/3/16/the-art-of-finesse-as-a-data-scientist/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">The art of finesse as a data scientist</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-03-16</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/finesse/">
+        finesse
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/productivity/">
+        productivity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/career/">
+        career
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/communication/">
+        communication
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/leadership/">
+        leadership
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/strategy/">
+        strategy
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/problem solving/">
+        problem solving
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/technical skill/">
+        technical skill
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/professional development/">
+        professional development
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/stakeholder management/">
+        stakeholder management
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/project management/">
+        project management
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/collaboration/">
+        collaboration
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/adaptability/">
+        adaptability
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/work effectiveness/">
+        work effectiveness
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2025/3/16/the-art-of-finesse-as-a-data-scientist/" style="text-decoration: none;">
+        <img src="../../2025/3/16/the-art-of-finesse-as-a-data-scientist/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">Finesse in data science is the subtle skill that distinguishes exceptional practitioners from the merely competent. It involves recognizing when you&#39;re stuck in technical rabbit holes, creating tangible progress markers for stakeholders, working backwards from meaningful milestones, adapting with purpose when approaches aren&#39;t working, creatively overcoming technical roadblocks, and cultivating a network for timely assistance. These skills help data scientists navigate complex challenges while consistently delivering value, balancing persistence with adaptability, technical depth with clear communication, and planning with flexibility. How might developing your finesse transform your effectiveness as a data scientist?</p>
+        </span>
+        <small>
+          <a href="../../2025/3/16/the-art-of-finesse-as-a-data-scientist/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1248 words, approximately 7 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2025/3/6/a-blueprint-for-data-driven-molecule-engineering/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">A blueprint for data-driven molecule engineering</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-03-06</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/biotech/">
+        biotech
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/molecule discovery/">
+        molecule discovery
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/experiment design/">
+        experiment design
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/machine learning/">
+        machine learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/protein engineering/">
+        protein engineering
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2025/3/6/a-blueprint-for-data-driven-molecule-engineering/" style="text-decoration: none;">
+        <img src="../../2025/3/6/a-blueprint-for-data-driven-molecule-engineering/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I explore how cross-functional teams in biotech can accelerate molecule discovery using a strategic playbook. Through the story of a fictitious biotech, Catalyst Therapeutics, I highlight the importance of robust experimental design, integrating data science with human intuition, and balancing computational methods with practical insights. The team&#39;s journey reveals how better experiments lead to better models and ultimately, better molecules. Are you ready to discover how these principles can transform your biotech projects?</p>
+        </span>
+        <small>
+          <a href="../../2025/3/6/a-blueprint-for-data-driven-molecule-engineering/">Read on...</a>
+          
+
+
+
+
+
+
+
+(3238 words, approximately 17 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2025/3/1/how-to-fix-pypi-upload-errors-related-to-license-metadata/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">How to fix PyPI upload errors related to license metadata</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-03-01</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/packaging/">
+        packaging
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/pypi/">
+        pypi
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/hatchling/">
+        hatchling
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/setuptools/">
+        setuptools
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/build-backend/">
+        build-backend
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/metadata/">
+        metadata
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/license/">
+        license
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/github actions/">
+        github actions
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/workflow/">
+        workflow
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/automation/">
+        automation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/deployment/">
+        deployment
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/error handling/">
+        error handling
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2025/3/1/how-to-fix-pypi-upload-errors-related-to-license-metadata/" style="text-decoration: none;">
+        <img src="../../2025/3/1/how-to-fix-pypi-upload-errors-related-to-license-metadata/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">Encountering a PyPI upload error related to license metadata? The solution is straightforward - switch from setuptools to Hatchling as your build backend. In this post, I walk through how to fix the &#34;license-file introduced in metadata version 2.4&#34; error by updating your pyproject.toml configuration. Along the way, I learned some new things, including the fact that modern build backends like Hatchling provide better support for PEP 621 metadata features compared to older tools like setuptools.</p>
+        </span>
+        <small>
+          <a href="../../2025/3/1/how-to-fix-pypi-upload-errors-related-to-license-metadata/">Read on...</a>
+          
+
+
+
+
+
+
+
+(348 words, approximately 2 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2025/2/23/reliable-biological-data-requires-physical-quantities-not-statistical-artifacts/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Reliable biological data requires physical quantities, not statistical artifacts</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-02-23</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/machine learning/">
+        machine learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/biology/">
+        biology
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/measurement/">
+        measurement
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/bayesian/">
+        bayesian
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/statistics/">
+        statistics
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/metrology/">
+        metrology
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/reproducibility/">
+        reproducibility
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/biophysics/">
+        biophysics
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/protein design/">
+        protein design
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/protein engineering/">
+        protein engineering
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/uncertainty/">
+        uncertainty
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/experimental design/">
+        experimental design
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2025/2/23/reliable-biological-data-requires-physical-quantities-not-statistical-artifacts/" style="text-decoration: none;">
+        <img src="../../2025/2/23/reliable-biological-data-requires-physical-quantities-not-statistical-artifacts/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">When building machine learning models in biology, we often encounter data that&#39;s been heavily processed with statistical transformations like p-values and normalizations. This essay argues that this practice fundamentally undermines our ability to build reliable models and maintain interpretable datasets. Through a real-world example of protein binding experiments, it demonstrates why collecting physical quantities (like binding strength in nM) with proper replicates is vastly superior to statistical artifacts, and how Bayesian estimation can help us properly handle experimental variation while maintaining physical units. Are you tired of wrestling with hard-to-interpret biological data and ready to build more reliable experimental pipelines?
+</p>
+        </span>
+        <small>
+          <a href="../../2025/2/23/reliable-biological-data-requires-physical-quantities-not-statistical-artifacts/">Read on...</a>
+          
+
+
+
+
+
+
+
+(2469 words, approximately 13 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2025/2/17/let-me-ship-you-the-python-you-need/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Let me ship you the Python you need</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-02-17</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/packaging/">
+        packaging
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/uv/">
+        uv
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/tools/">
+        tools
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/marimo/">
+        marimo
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/juv/">
+        juv
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/environments/">
+        environments
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2025/2/17/let-me-ship-you-the-python-you-need/" style="text-decoration: none;">
+        <img src="../../2025/2/17/let-me-ship-you-the-python-you-need/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I explore how modern Python tooling is flipping the script on the age-old &#34;which Python should I use?&#34; question. Through my experience with `uvx`, `marimo`, and `juv`, I show how we&#39;re moving away from the traditional headache of environment setup and toward a world where tools automatically ship you the exact Python you need. No more environment setup puzzles – just specify your Python version and get straight to work. It&#39;s a liberating shift that&#39;s changing how I approach one-off Python work, and I think it&#39;s pretty exciting!</p>
+        </span>
+        <small>
+          <a href="../../2025/2/17/let-me-ship-you-the-python-you-need/">Read on...</a>
+          
+
+
+
+
+
+
+
+(316 words, approximately 2 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2025/2/7/lightening-the-llamabot/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Lightening the LlamaBot</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-02-07</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/refactoring/">
+        refactoring
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/optimization/">
+        optimization
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/docker/">
+        docker
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/cli/">
+        cli
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/packages/">
+        packages
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/performance/">
+        performance
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/engineering/">
+        engineering
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2025/2/7/lightening-the-llamabot/" style="text-decoration: none;">
+        <img src="../../2025/2/7/lightening-the-llamabot/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I share my journey of tackling dependency bloat in LlamaBot. What began as a simple LLM bot framework had grown into a monolithic system with an extensive dependency chain, leading to massive installation sizes. By mapping dependencies, refactoring the code, and organizing optional dependencies, I managed to reduce the container size significantly. This exercise taught me the importance of regular codebase maintenance and focusing on core functionalities. Now, LlamaBot is leaner and more efficient. Curious about the strategies I used to achieve this transformation?</p>
+        </span>
+        <small>
+          <a href="../../2025/2/7/lightening-the-llamabot/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1531 words, approximately 8 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2025/1/31/pydata-bostoncambridge-talk-moderna-what-makes-an-agent/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">PyData Boston/Cambridge Talk @ Moderna: What makes an agent?</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-01-31</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/large language models/">
+        large language models
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/pydantic/">
+        pydantic
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/structuredbot/">
+        structuredbot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/agentbot/">
+        agentbot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/talks/">
+        talks
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/meetups/">
+        meetups
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2025/1/31/pydata-bostoncambridge-talk-moderna-what-makes-an-agent/" style="text-decoration: none;">
+        <img src="../../2025/1/31/pydata-bostoncambridge-talk-moderna-what-makes-an-agent/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I explore the concept of &#39;what makes an agent&#39; by discussing various implementations of LlamaBot, a Python package for LLM exploration. I dissect the differences between SimpleBots, StructuredBots, and AgentBots, highlighting their capabilities and limitations in terms of agency and decision-making. Through audience discussions and examples, I aimed to provoke thought on the definition and design of agents, and together, we had an engaging discussion. Can we truly define an agent, or is it like the Turing Test, a concept that evolves with our understanding and technological advancements?</p>
+        </span>
+        <small>
+          <a href="../../2025/1/31/pydata-bostoncambridge-talk-moderna-what-makes-an-agent/">Read on...</a>
+          
+
+
+
+
+
+
+
+(3440 words, approximately 18 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2025/1/19/why-data-from-preclinical-biotech-lab-experiments-make-machine-learning-challenging/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Why data from preclinical biotech lab experiments make machine learning challenging</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-01-19</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/biotech/">
+        biotech
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/datasets/">
+        datasets
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/machine learning/">
+        machine learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/research/">
+        research
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data fusion/">
+        data fusion
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/decision support systems/">
+        decision support systems
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2025/1/19/why-data-from-preclinical-biotech-lab-experiments-make-machine-learning-challenging/" style="text-decoration: none;">
+        <img src="../../2025/1/19/why-data-from-preclinical-biotech-lab-experiments-make-machine-learning-challenging/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I explore the challenges biotech teams face when integrating public datasets with internal data for machine learning. Despite initial excitement, issues like data compatibility, missing variables, domain shifts, and biological complexity often arise. I suggest a shift from a machine learning perspective to a decision support approach, advocating for separate models and a decision fusion layer that incorporates human expertise. This method respects the complexity of biological systems and aids in effective decision-making. How can we better navigate these challenges to accelerate biotech discoveries?</p>
+        </span>
+        <small>
+          <a href="../../2025/1/19/why-data-from-preclinical-biotech-lab-experiments-make-machine-learning-challenging/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1385 words, approximately 7 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2025/1/13/writing-at-the-speed-of-thought/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Writing at the speed of thought</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-01-13</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/dictation/">
+        dictation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/accessibility/">
+        accessibility
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/productivity/">
+        productivity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/artificial intelligence/">
+        artificial intelligence
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/writing workflow/">
+        writing workflow
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/voicepal/">
+        voicepal
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/creativity/">
+        creativity
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2025/1/13/writing-at-the-speed-of-thought/" style="text-decoration: none;">
+        <img src="../../2025/1/13/writing-at-the-speed-of-thought/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">When typing became physically demanding, I discovered that dictation tools could do more than just help me write – they could fundamentally change how I capture and develop ideas. Using Better Dictation and VoicePal, combined with AI assistance, I found a way to write that matches the natural flow of thought. This isn&#39;t just about accessibility or working around limitations; it&#39;s about finding a better way to translate the nonlinear, rapid-fire nature of our thoughts into written words. I share my approach to preserving authentic voice while using AI tools, and why sometimes constraints push us toward unexpected improvements in how we work.</p>
+        </span>
+        <small>
+          <a href="../../2025/1/13/writing-at-the-speed-of-thought/">Read on...</a>
+          
+
+
+
+
+
+
+
+(804 words, approximately 5 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="../../2025/1/10/a-practical-guide-to-securing-secrets-in-data-science-projects/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">A practical guide to securing secrets in data science projects</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-01-10</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/cybersecurity/">
+        cybersecurity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/pre-commit hooks/">
+        pre-commit hooks
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/jupyter/">
+        jupyter
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/secrets management/">
+        secrets management
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/best practices/">
+        best practices
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../tag/data science/">
+        data science
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="../../2025/1/10/a-practical-guide-to-securing-secrets-in-data-science-projects/" style="text-decoration: none;">
+        <img src="../../2025/1/10/a-practical-guide-to-securing-secrets-in-data-science-projects/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this post, I share a practical approach to managing secrets in data science workflows, learned from personal experience with both successes and mistakes. I cover essential tools like `direnv` and `.env` files for local development, strategies for secure secret handling in Jupyter notebooks, and crucial version control practices including pre-commit hooks to catch accidental API key commits. I also discuss team collaboration approaches for secret sharing, platform-specific secrets management features, and what to do when secrets accidentally get committed to repositories. While tools like AWS Secrets Manager exist for enterprise needs, I focus on practical, accessible methods that create robust security through layered defenses, following proven software development principles that apply equally well to data science work.</p>
+        </span>
+        <small>
+          <a href="../../2025/1/10/a-practical-guide-to-securing-secrets-in-data-science-projects/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1441 words, approximately 8 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+<div class="btn-group" role="group" aria-label="pagination">
+  
+  <a href="/blog" class="btn btn-ghost">&laquo;</a>
+  
+
+  
+  <a href="/blog/page/4/" class="btn btn-ghost">4</a>
+  
+
+  
+  <a href="../5/" class="btn btn-ghost">5</a>
+  
+
+  <span class="btn btn-primary disabled">6</span>
+
+  
+  <a href="../7/" class="btn btn-ghost">7</a>
+  
+
+  
+  <a href="/blog/page/8/" class="btn btn-ghost">8</a>
+  
+
+  
+  <a href="/blog/page/46/" class="btn btn-ghost">&raquo;</a>
+  
+</div>
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

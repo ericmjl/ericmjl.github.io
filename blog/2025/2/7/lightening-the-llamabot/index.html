@@ -1,0 +1,862 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Lightening the LlamaBot">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/lightening-the-llamabot' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Lightening the LlamaBot - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Lightening the LlamaBot</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-02-07</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/refactoring/">
+        refactoring
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/optimization/">
+        optimization
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/docker/">
+        docker
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/cli/">
+        cli
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/packages/">
+        packages
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/performance/">
+        performance
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/engineering/">
+        engineering
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share my journey of tackling dependency bloat in LlamaBot. What began as a simple LLM bot framework had grown into a monolithic system with an extensive dependency chain, leading to massive installation sizes. By mapping dependencies, refactoring the code, and organizing optional dependencies, I managed to reduce the container size significantly. This exercise taught me the importance of regular codebase maintenance and focusing on core functionalities. Now, LlamaBot is leaner and more efficient. Curious about the strategies I used to achieve this transformation?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>In my recent work with LlamaBot, I faced a challenge that many developers might recognize: dependency bloat. What started as a simple bot framework had grown into a monolithic beast that pulled in everything but the kitchen sink. Let me share how I tackled this issue and what I learned along the way.</p>
+<h2 id="the-weight-of-dependencies">The weight of dependencies</h2><p>When I looked at LlamaBot's dependency chain, it was extensive: Panel, Bokeh, LanceDB, ChromaDB, Tantivy, Astor, PyperClip, PromptToolkit - the list went on. Being honest with myself, I had gotten lazy with dependencies. The consequence was that every LlamaBot installation involved downloading seven gigabytes worth of packages. 7 GB!! All to just use either the git hooks (<code>llamabot git hooks</code>) CLI, or just to use <code>StructuredBot</code>.</p>
+<p>This is what the dependencies looked like before, on commit <code>5a1f67d96bbcbd031fdc7f8888aabb0a1f225e10</code> (which you can also view <a href="https://github.com/ericmjl/llamabot/blob/5a1f67d96bbcbd031fdc7f8888aabb0a1f225e10/pyproject.toml">here</a>):</p>
+<div class="hll"><pre><span></span><span class="p">...</span>
+<span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;openai&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;panel&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;jupyter_bokeh&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;bokeh&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;loguru&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;pyperclip&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;astor&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;python-dotenv&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;typer&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;gitpython&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;pyprojroot&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;frozenlist&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;beautifulsoup4&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;rich&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;pyzotero&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;case-converter&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;prompt-toolkit&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;sh&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;pre-commit&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;beartype&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;litellm&gt;=1.59.1&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1"># this is necessary to guarantee that ollama_chat models are supported for structured outputs</span>
+<span class="w">    </span><span class="s2">&quot;python-slugify&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;pydantic&gt;=2.0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;pdfminer.six&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;rank-bm25&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;lancedb&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;chromadb&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;tantivy&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;numpy&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1"># https://github.com/ericmjl/llamabot/issues/56</span>
+<span class="w">    </span><span class="s2">&quot;python-frontmatter&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;diskcache&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;nbformat&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;alembic&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;jinja2&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;fastapi&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;uvicorn&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;sentence-transformers&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;tenacity&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;python-multipart&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;httpx&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;tqdm&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;docker&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;duckduckgo-search&gt;=7.2.1,&lt;8&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;markdownify&gt;=0.14.1,&lt;0.15&quot;</span><span class="p">,</span><span class="w">  </span><span class="c1"># For secure script execution</span>
+<span class="p">]</span>
+<span class="p">...</span>
+</pre></div>
+<p>The real kicker came from dependencies like ChromaDB, which pulled in sentence-transformers, which then required PyTorch. On Linux systems, this cascade would drag in all the CUDA packages too. It was overkill for what most users needed.</p>
+<h2 id="breaking-down-the-monolith">Breaking down the monolith</h2><p>I started by mapping out where each dependency was actually used. As an example:</p>
+<ul>
+<li>CLI components: pyzotero, Rich, GitPython, nbformat</li>
+<li>RAG functionality: ChromaDB and related packages</li>
+<li>Agent features: Docker, python-docker, markdownify, dotgosearch</li>
+</ul>
+<p>For context, I developed a few prototype CLI applications within LlamaBot to test drive the user experience of some tools I had in mind. Most of them, it turns out, I don't use, and at some future date, I may just deprecate them. Others, however, like the git commit writer, are now fully integrated into my workflow that I can't do without it.</p>
+<p>An interesting realization hit me: the RAG (Retrieval-Augmented Generation) corner of LlamaBot wasn't getting much use. While cosine similarity RAG had its moment in the spotlight, it wasn't as revolutionary as I had thought it would be -- it turns out to still be useful for small context window models, but with many models hitting 128K to 2M token context lengths, and with other advances in RAG (e.g. GraphRAG), it may become less and less useful. But it still lives around just in case it's handy, as there are use cases for small LMs.</p>
+<p>Finally, the Agent features were new and experimental, so it didn't make sense to ship them as part of the core dependencies.</p>
+<h2 id="the-refactoring-strategy">The refactoring strategy</h2><p>For the core of LlamaBot, I decided to focus on <code>SimpleBot</code> and <code>StructuredBot</code> - the core components that delivered the most value. After all, I find myself using <code>StructuredBot</code> the most. The strategy? Move non-essential imports outside of <code>SimpleBot</code> and <code>StructuredBot</code> into try-except blocks. Yes, this meant more try-except blocks throughout the codebase, but the trade-off was worth it. Here's an example of what this looks like:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">LanceDBDocStore</span><span class="p">(</span><span class="n">AbstractDocumentStore</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A document store for LlamaBot that wraps around LanceDB.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">storage_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;.llamabot&quot;</span> <span class="o">/</span> <span class="s2">&quot;lancedb&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">lancedb</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">lancedb.embeddings</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmbeddingFunctionRegistry</span><span class="p">,</span> <span class="n">get_registry</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">lancedb.pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">LanceModel</span><span class="p">,</span> <span class="n">Vector</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+                <span class="s2">&quot;LanceDB is required for LanceDBDocStore. &quot;</span>
+                <span class="s2">&quot;Please `pip install llamabot[rag]` to use the LanceDB document store.&quot;</span>
+            <span class="p">)</span>
+</pre></div>
+<p>Cursor absolutely helped here; I was able to eliminate a lot of repetitive error message typing through Cursor's tab-completion.</p>
+<p>In the CLI, I went a step further. Instead of importing optional dependencies at the module level, I moved imports into specific functions. This meant managing imports at runtime rather than import time. Here's an example from the my experimental Zotero chat CLI tool:</p>
+<div class="hll"><pre><span></span><span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span>
+    <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Argument</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The thing you want to chat about.&quot;</span><span class="p">),</span>
+    <span class="n">sync</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+        <span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Whether or not to synchronize the Zotero library.&quot;</span>
+    <span class="p">),</span>
+    <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">default_language_model</span><span class="p">(),</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Chat with a paper.</span>
+
+<span class="sd">    :param query: A paper to search for, whether by title, author, or other metadata.</span>
+<span class="sd">    :param sync: Whether or not to synchronize the Zotero library.</span>
+<span class="sd">    :param model_name: The name of the model to use.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">caseconverter</span><span class="w"> </span><span class="kn">import</span> <span class="n">snakecase</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+            <span class="s2">&quot;caseconverter is not installed. Please install it with `pip install llamabot[cli]`.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">prompt_toolkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">prompt</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+            <span class="s2">&quot;prompt_toolkit is not installed. Please install it with `pip install llamabot[cli]`.&quot;</span>
+        <span class="p">)</span>
+</pre></div>
+<h2 id="new-dependency-specification">New dependency specification</h2><p>With these changes, I could change my <code>pyproject.toml</code> dependency specification to look like this:</p>
+<div class="hll"><pre><span></span><span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;openai&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;loguru&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;python-dotenv&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;typer&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;pyprojroot&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;beautifulsoup4&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;litellm&gt;=1.59.1&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1"># this is necessary to guarantee that ollama_chat models are supported for structured outputs</span>
+<span class="w">    </span><span class="s2">&quot;python-slugify&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;pydantic&gt;=2.0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;numpy&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1"># https://github.com/ericmjl/llamabot/issues/56</span>
+<span class="w">    </span><span class="s2">&quot;jinja2&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;fastapi&gt;=0.104.0&quot;</span><span class="p">,</span><span class="w">  </span><span class="c1"># This version requires Python &gt;=3.8</span>
+<span class="w">    </span><span class="s2">&quot;uvicorn&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;tenacity&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;python-multipart&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;httpx&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;tqdm&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;sqlalchemy&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;pdfminer.six&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="p">...</span>
+
+<span class="k">[project.optional-dependencies]</span>
+<span class="n">notebooks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="s2">&quot;ics&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="s2">&quot;tzlocal&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="s2">&quot;chonkie[all]&gt;=0.2.2,&lt;0.3&quot;</span>
+<span class="p">]</span>
+<span class="n">ui</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;panel&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;jupyter_bokeh&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;bokeh&quot;</span>
+<span class="p">]</span>
+<span class="n">rag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;lancedb&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;chromadb&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;tantivy&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;rank-bm25&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">agent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;docker&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;duckduckgo-search&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;markdownify&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">cli</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;pyzotero&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;nbformat&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;python-frontmatter&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;rich&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;gitpython&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;prompt-toolkit&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;case-converter&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;pyperclip&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;astor&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;llamabot[notebooks,ui,rag,agent,cli]&quot;</span>
+<span class="p">]</span>
+</pre></div>
+<p>The new dependency specification is much more organized!</p>
+<h2 id="measuring-success">Measuring success</h2><p>The results were dramatic. I created two Dockerfiles, one for the full suite of optional dependencies, and one without. Here's what the two Dockerfiles looked like:</p>
+<div class="hll"><pre><span></span><span class="c"># filename: llamabot.all.Dockerfile</span>
+<span class="c"># All optional dependencies</span>
+<span class="k">FROM</span><span class="w"> </span><span class="s">ghcr.io/astral-sh/uv:python3.12-bookworm-slim</span>
+
+<span class="k">COPY</span><span class="w"> </span>.<span class="w"> </span>/src
+
+<span class="k">RUN</span><span class="w"> </span>uv<span class="w"> </span>venv<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>/src<span class="o">[</span>all<span class="o">]</span>
+</pre></div>
+<div class="hll"><pre><span></span><span class="c"># filename: llamabot.bare.Dockerfile</span>
+<span class="c"># Only core dependencies.</span>
+<span class="k">FROM</span><span class="w"> </span><span class="s">ghcr.io/astral-sh/uv:python3.12-bookworm-slim</span>
+
+<span class="k">COPY</span><span class="w"> </span>.<span class="w"> </span>/src
+
+<span class="k">RUN</span><span class="w"> </span>uv<span class="w"> </span>venv<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>/src
+</pre></div>
+<p>To build the containers, I used the following commands:</p>
+<div class="hll"><pre><span></span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>llamabot.bare<span class="w"> </span>-f<span class="w"> </span>llamabot.bare.Dockerfile<span class="w"> </span>.
+docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>llamabot.all<span class="w"> </span>-f<span class="w"> </span>llamabot.all.Dockerfile<span class="w"> </span>.
+</pre></div>
+<p>And to view the container sizes:</p>
+<div class="hll"><pre><span></span>❯<span class="w"> </span>docker<span class="w"> </span>images<span class="w"> </span>llamabot.bare<span class="w"> </span>--format<span class="w"> </span><span class="s2">&quot;{{.Size}}&quot;</span>
+390MB
+
+❯<span class="w"> </span>docker<span class="w"> </span>images<span class="w"> </span>llamabot.all<span class="w"> </span>--format<span class="w"> </span><span class="s2">&quot;{{.Size}}&quot;</span>
+<span class="m">6</span>.75GB
+</pre></div>
+<p>The numbers don't lie -- we have an approximately 20X smaller container size by removing unnecessary dependencies. I'm all for anything that lets me squeeze out 80% of performance with 20% of effort!</p>
+<h1 id="">#</h1><h2 id="securing-the-changes">Securing the changes</h2><p>I would consider these changes to be somewhat brittle; it relies on a developer's knowledge of the codebase to know that something should be considered core v.s. non-core. To secure these changes for the future, I added safeguards:</p>
+<ol>
+<li>PR tests that verify SimpleBot and StructuredBot functionality</li>
+<li>A bare package test that runs against Gemma 2B</li>
+</ol>
+<p>The PR tests look like this:</p>
+<div class="hll"><pre><span></span><span class="c1"># File: pr-tests.yaml</span>
+<span class="nn">...</span>
+<span class="w">  </span><span class="nt">bare-package-test</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<span class="w">    </span><span class="nt">strategy</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">3.11</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3.12</span><span class="p p-Indicator">]</span>
+<span class="w">        </span><span class="nt">environment-type</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;pixi&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;uv&#39;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Checkout repository</span>
+<span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Install pixi</span>
+<span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">prefix-dev/setup-pixi@v0.8.1</span>
+<span class="w">        </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ matrix.environment-type == &#39;pixi&#39; }}</span>
+<span class="w">        </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">pixi-version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">latest</span>
+<span class="w">          </span><span class="nt">cache</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">          </span><span class="nt">cache-write</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ github.event_name == &#39;push&#39; &amp;&amp; github.ref_name == &#39;main&#39; }}</span>
+<span class="w">          </span><span class="nt">environments</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bare</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Install uv</span>
+<span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">curl -LsSf https://astral.sh/uv/install.sh | sh</span>
+<span class="w">        </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ matrix.environment-type == &#39;uv&#39; }}</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Set up Python</span>
+<span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">uv venv llamabot-env --python ${{ matrix.python-version }}</span>
+<span class="w">        </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ matrix.environment-type == &#39;uv&#39; }}</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Install gemma2:2b</span>
+<span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">sudo apt-get update</span>
+<span class="w">          </span><span class="no">sudo apt-get install -y curl</span>
+<span class="w">          </span><span class="no">curl -fsSL https://ollama.com/install.sh | sh</span>
+<span class="w">          </span><span class="no">sleep 3</span>
+<span class="w">          </span><span class="no">ollama pull gemma2:2b</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Test running llamabot (pixi)</span>
+<span class="w">        </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ matrix.environment-type == &#39;pixi&#39; }}</span>
+<span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">pixi run -e bare python scripts/yo.py</span>
+
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Test running llamabot (uv)</span>
+<span class="w">        </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ matrix.environment-type == &#39;uv&#39; }}</span>
+<span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">source llamabot-env/bin/activate</span>
+<span class="w">          </span><span class="no">uv pip install .</span>
+<span class="w">          </span><span class="no">python scripts/yo.py</span>
+</pre></div>
+<p>And that infamous <code>yo.py</code>:</p>
+<div class="hll"><pre><span></span><span class="sd">&quot;&quot;&quot;A simple script to test the llamabot package.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">llamabot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">lmb</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
+
+<span class="n">bot</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">SimpleBot</span><span class="p">(</span><span class="s2">&quot;yo&quot;</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;ollama_chat/gemma2:2b&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">bot</span><span class="p">(</span><span class="s2">&quot;sup?&quot;</span><span class="p">))</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A person.&quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">age</span><span class="p">:</span> <span class="nb">int</span>
+
+
+<span class="n">sbot</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">StructuredBot</span><span class="p">(</span>
+    <span class="s2">&quot;yo&quot;</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;ollama_chat/gemma2:2b&quot;</span><span class="p">,</span> <span class="n">pydantic_model</span><span class="o">=</span><span class="n">Person</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">sbot</span><span class="p">(</span><span class="s2">&quot;what is your name and age?&quot;</span><span class="p">))</span>
+</pre></div>
+<p>Essentially, I wanted to guarantee that this script's behaviour worked whenever we installed the package without optional dependencies. That's what motivated this test.</p>
+<h2 id="looking-forward">Looking forward</h2><p>Even before this refactor, I've found myself gravitating more toward <code>StructuredBot</code> than <code>SimpleBot</code>. Its abstractions build naturally on <code>SimpleBot</code>'s patterns, making it more versatile for my needs.</p>
+<p>The refactoring exercise taught me valuable lessons about dependency management and the importance of regular codebase maintenance. Sometimes, less really is more - especially when "more" means downloading half the Python ecosystem.</p>
+<p>Now, I have a leaner, more focused tool that does exactly what it needs to do, without the bloat. That's a win in my book!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-lightening-the-llamabot</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Lightening the LlamaBot}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{02}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{07}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/2/7/lightening-the-llamabot}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

@@ -1,0 +1,720 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="LlamaBot now has StructuredBot!">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/llamabot-now-has-structuredbot' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>LlamaBot now has StructuredBot! - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">LlamaBot now has StructuredBot!</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-08-31</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/structured generation/">
+        structured generation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/documentation/">
+        documentation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llm/">
+        llm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/pydantic/">
+        pydantic
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/software development/">
+        software development
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/testing/">
+        testing
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/structuredbot/">
+        structuredbot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/technology/">
+        technology
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I discuss the latest updates to LlamaBot, particularly focusing on the StructuredBot feature introduced by Elliot Salisbury. StructuredBot leverages JSON mode of LLMs for structured outputs, significantly simplifying the process of generating reliable and type-safe outputs without manual string parsing. I illustrate its application in an automated documentation checker and writer, enhancing productivity by integrating LLM-based and traditional programming methods. Curious about how StructuredBot can streamline your documentation process?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I've been hacking on LlamaBot on the side since SciPy, and I wanted to share some of the updates that have been coming. Barring any other time-sensitive topics I feel the need to address, LlamaBot will be the topic of the next few blog posts.</p>
+<p>The first update I wanted to discuss is LlamaBot's ability to provide structured outputs using <code>StructuredBot</code>. <a href="https://www.linkedin.com/in/elliot-salisbury/?originalSubdomain=ca">Elliot Salisbury</a> contributed the first implementation during SciPy 2024. Underneath the hood, it relies on the JSON mode of LLMs (routed by LiteLLM), and like Instructor, it requires the passing in of a Pydantic class.</p>
+<p>Once Elliot’s PR was merged, I had an easy and reliable way to start with structured generation. Not needing to do string parsing of  LLM outputs was a huge mental burden lifted off my shoulders. Being able to use any API via LiteLLM also allowed me to test the capabilities of a variety of LLMs, including but not limited to Llama3.1 (via Groq), Gemma2 (via Ollama), Claude, and GPT-4o. With that came a bunch of experimentation, and with that experimentation, I saw a lot of applications in my work!</p>
+<h2 id="how-to-use-structuredbot">How to use StructuredBot</h2><p>Let's see how to use StructuredBot in an LLM-as-a-judge setting. I use this within an automated documentation checker and writer setting, which I will touch on in a later blog post.</p>
+<p>Firstly, we set up a StructuredBot called <code>ood_checker</code>, to judge whether documentation is out-of-date. It accepts a Pydantic class that has just one field:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">DocumentationOutOfDate</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Status indicating whether a documentation is out of date.&quot;&quot;&quot;</span>
+
+    <span class="n">is_out_of_date</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether the documentation is out of date.&quot;</span>
+    <span class="p">)</span>
+</pre></div>
+<p>One thing to note here is that the description of each field is provided to the LLM as part of its intended context, so the LLM is supposed to be "aware" of your intent for the field. Naturally, the more granular, the better!</p>
+<p>I then set up a StructuredBot with its system prompt to check whether the docs are outdated. The prompt looks like this:</p>
+<div class="hll"><pre><span></span><span class="nd">@prompt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ood_checker_sysprompt</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;You are an expert in documentation management.</span>
+<span class="sd">    You will be provided with information about a written documentation file,</span>
+<span class="sd">    what the documentation is intended to convey,</span>
+<span class="sd">    a list of source files that are related to the documentation,</span>
+<span class="sd">    and their contents.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+<p>And then the bot is defined as such:</p>
+<div class="hll"><pre><span></span><span class="n">ood_checker</span> <span class="o">=</span> <span class="n">StructuredBot</span><span class="p">(</span>
+    <span class="n">system_prompt</span><span class="o">=</span><span class="n">ood_checker_sysprompt</span><span class="p">(),</span> <span class="n">pydantic_model</span><span class="o">=</span><span class="n">DocumentationOutOfDate</span>
+<span class="p">)</span>
+</pre></div>
+<p>Finally, I have a function that returns the user prompt formatted correctly:</p>
+<div class="hll"><pre><span></span><span class="nd">@prompt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">documentation_information</span><span class="p">(</span><span class="n">source_file</span><span class="p">:</span> <span class="n">MarkdownSourceFile</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Here, I will provide you with contextual information to do your work.</span>
+
+<span class="sd">    ## Referenced source files</span>
+
+<span class="sd">    These are the source files to reference:</span>
+
+<span class="sd">    {% for filename, content in source_file.linked_files.items() %}</span>
+<span class="sd">    [[ {{ filename }} BEGINS ]]</span>
+
+<span class="sd">    {{ content }}</span>
+<span class="sd">    [[ {{ filename }} ENDS ]]</span>
+<span class="sd">    {% endfor %}</span>
+
+<span class="sd">    ## Documentation source file</span>
+
+<span class="sd">    Here is the documentation in its current state, {{ source_file.file_path }}:</span>
+
+<span class="sd">    [[ CURRENT DOCUMENTATION BEGINS ]]</span>
+<span class="sd">    {% if source_file.post.content %}</span>
+<span class="sd">    {{ source_file.post.content | safe }}</span>
+<span class="sd">    {% else %}</span>
+<span class="sd">    &lt;The documentation is empty.&gt;</span>
+<span class="sd">    {% endif %}</span>
+<span class="sd">    [[ CURRENT DOCUMENTATION ENDS ]]</span>
+
+<span class="sd">    ## Intents about the documentation</span>
+
+<span class="sd">    Here is the intent of the documentation:</span>
+
+<span class="sd">    [[ INTENTS BEGIN ]]</span>
+<span class="sd">    {% for intent in source_file.post.get(&quot;intents&quot;, []) %}- {{ intent }}{% endfor %}</span>
+<span class="sd">    [[ INTENTS END ]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+<p>Once these components are in place, keeping documentation up-to-date becomes a matter of writing a Python program:</p>
+<div class="hll"><pre><span></span><span class="nd">@app</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">from_scratch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write the documentation based on the given source file.</span>
+
+<span class="sd">    The Markdown file should have frontmatter that looks like this:</span>
+
+<span class="sd">        intents:</span>
+<span class="sd">        - Point 1 that the documentation should cover.</span>
+<span class="sd">        - Point 2 that the documentation should cover.</span>
+<span class="sd">        - ...</span>
+<span class="sd">        linked_files:</span>
+<span class="sd">        - path/to/relevant_file1.py</span>
+<span class="sd">        - path/to/relevant_file2.toml</span>
+<span class="sd">        - ...</span>
+
+<span class="sd">    :param file_path: Path to the Markdown source file.</span>
+<span class="sd">    :param from_scratch: Whether to start with blank documentation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">src_file</span> <span class="o">=</span> <span class="n">MarkdownSourceFile</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">from_scratch</span><span class="p">:</span>
+        <span class="n">src_file</span><span class="o">.</span><span class="n">post</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="n">docwriter</span> <span class="o">=</span> <span class="n">StructuredBot</span><span class="p">(</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="n">docwriter_sysprompt</span><span class="p">(),</span>
+        <span class="n">pydantic_model</span><span class="o">=</span><span class="n">DocumentationContent</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ood_checker</span> <span class="o">=</span> <span class="n">StructuredBot</span><span class="p">(</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="n">ood_checker_sysprompt</span><span class="p">(),</span> <span class="n">pydantic_model</span><span class="o">=</span><span class="n">DocumentationOutOfDate</span>
+    <span class="p">)</span>
+    <span class="n">result</span><span class="p">:</span> <span class="n">DocumentationOutOfDate</span> <span class="o">=</span> <span class="n">ood_checker</span><span class="p">(</span><span class="n">documentation_information</span><span class="p">(</span><span class="n">src_file</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">src_file</span><span class="o">.</span><span class="n">post</span><span class="o">.</span><span class="n">content</span> <span class="ow">or</span> <span class="n">result</span><span class="o">.</span><span class="n">is_out_of_date</span><span class="p">:</span>
+        <span class="n">response</span><span class="p">:</span> <span class="n">DocumentationContent</span> <span class="o">=</span> <span class="n">docwriter</span><span class="p">(</span>
+            <span class="n">documentation_information</span><span class="p">(</span><span class="n">src_file</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Now please write the docs.&quot;</span>
+        <span class="p">)</span>
+        <span class="n">src_file</span><span class="o">.</span><span class="n">post</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span>
+    <span class="n">src_file</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+<p>I wrapped this all into a LlamaBot CLI tool, which you can run on your Markdown documentation:</p>
+<div class="hll"><pre><span></span>pipx<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>llamabot<span class="w"> </span><span class="c1"># or `pip install`!</span>
+llamabot<span class="w"> </span>docs<span class="w"> </span>write<span class="w"> </span>/path/to/my/documentation.md
+</pre></div>
+<p>The result is on <a href="https://github.com/ericmjl/llamabot/blob/main/docs/cli/docs.md">Llamabot's doc writer documentation</a>, which was generated using this exact program!</p>
+<h2 id="structured-generation-brings-reliability">Structured generation brings reliability</h2><p>As the <a href="https://dottxt.co/">.txt folks</a> (the creators of <a href="https://outlines-dev.github.io/outlines/">Outlines</a>) have espoused, structured generation provides a much more reliable text generation method than relying on an LLM to conform to a schema in free-form text generation mode. In the case of StructuredBot, we take it one step further: we return a Pydantic model, which guarantees the Python types of the attributes stored underneath the hood. The <code>result.is_out_of_date</code> attribute above is boolean, thus allowing me to check its truthiness with a simple <code>if ... or result.is_out_of_date</code>. This level of reliability makes it much easier to write automation that involves LLMs!</p>
+<p>Moreover, any custom validation that can be coded up in Python is valid too! This can include the length of strings generated (which is fed back to the LLM for self editing) and more. As an example, LlamaBot's git commit message writer is restricted to 160 characters, and the LLM uses the length information and validation error messages to edit the strings.</p>
+<h2 id="further-thoughts">Further thoughts</h2><p>While working with and hacking on <code>StructuredBot</code>, I had a few other thoughts that I wanted to share.</p>
+<h3 id="agentic-workflows">Agentic workflows?</h3><p>Agentic workflows are the hot rage, but they have issues. While I like the premise for decision-making automation, there are compounding error probabilities when one relies solely on LLM-based agents to coordinate work, one that makes it infeasible to construct extensive chains of LLM agents to do things reliably. In my testing of using <code>ood_checker</code> to evaluate a decision point (i.e. <em>"Is the documentation out of date?"</em>), there is always a risk that the <code>ood_checker</code> will be incorrect and not behave as intended. This would lead to the documentation writer either (a) rewriting documentation when it was not supposed to or (b) ignoring changes in source code and failing to fix them.</p>
+<p>A more reliable, productive path forward is to blend LLM-based flow control with deterministic flow control, effectively fusing agent-centric program design with traditional programming. The documentation writer is a minimally complex example of this idea. The example above shows that even though we have a bot to make a judgment call (agent-centric design), a user can override the LLM's judgment through a flag (traditional programming).</p>
+<h3 id="llm-as-a-data-engineer-through-structuredbot">LLM as a Data Engineer through StructuredBot</h3><p>StructuredBot can be used in other use cases. I may provide an example of some of these in the future.</p>
+<p>The biggest I can think of is a structured information extractor from documents. If we have an extensive collection of plain text documents for which we want to extract standardized and structured information, we can create a Pydantic model that captures the fields that we are interested in:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyOrganizedData</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">field1</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="p">)</span>
+    <span class="n">field2</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether or not...&quot;</span><span class="p">)</span>
+    <span class="n">field3</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Name of...&quot;</span><span class="p">)</span>
+    <span class="n">field4</span><span class="p">:</span> <span class="o">...</span>
+</pre></div>
+<p>Then, we create a program that loops over the documents and feeds each of the docs to a StructuredBot to extract the information:</p>
+<div class="hll"><pre><span></span><span class="n">extractor</span> <span class="o">=</span> <span class="n">StructuredBot</span><span class="p">(</span><span class="n">system_prompt</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="n">pydantic_model</span><span class="o">=</span><span class="n">MyOrganizedData</span><span class="p">)</span>
+
+<span class="n">responses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">document</span> <span class="ow">in</span> <span class="n">documents</span><span class="p">:</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">extractor</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
+    <span class="n">responses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+</pre></div>
+<p>And finally, we can turn it into a pandas DataFrame:</p>
+<div class="hll"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">response</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span> <span class="k">for</span> <span class="n">response</span> <span class="ow">in</span> <span class="n">responses</span><span class="p">])</span>
+</pre></div>
+<p>This is precisely the kind of example that Elliot provided in <a href="https://github.com/ericmjl/llamabot/blob/main/docs/examples/structuredbot.ipynb">the LlamaBot examples gallery</a> as well.</p>
+<h2 id="please-try-it-out">Please try it out!</h2><p>I'd love to get feedback on how the StructuredBot performs for you! Please do give it a try by installing llamabot:</p>
+<div class="hll"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>llamabot
+</pre></div>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-llamabot-now-has-structuredbot</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{LlamaBot now has StructuredBot!}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{08}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{31}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/8/31/llamabot-now-has-structuredbot}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

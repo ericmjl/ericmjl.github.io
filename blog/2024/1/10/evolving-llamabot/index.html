@@ -1,0 +1,834 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Evolving LlamaBot">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/evolving-llamabot' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Evolving LlamaBot - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Evolving LlamaBot</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-01-10</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/api/">
+        api
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/chromadb/">
+        chromadb
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/openai/">
+        openai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/mistral/">
+        mistral
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/anthropic/">
+        anthropic
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/claude/">
+        claude
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/mixtral/">
+        mixtral
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/simplebot/">
+        simplebot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/chatbot/">
+        chatbot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/querybot/">
+        querybot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llm/">
+        llm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/large language model/">
+        large language model
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I discuss the major changes I've made to LlamaBot, a project I've been working on in my spare time. I've integrated LiteLLM for text-based models, created a new DocumentStore class, and reimagined the SimpleBot interface. I've also experimented with the Mixin pattern to create more complex bots and switched to character-based lengths for more user-friendly calculations. How did these changes improve the functionality and efficiency of LlamaBot? Read on to find out!</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <h1 id="reworking-llamabot">Reworking LlamaBot</h1><p>In my spare time (if I can find any), I've been hacking on LlamaBot to make a bunch of internal improvements to the package. It's about ready, and I'd like to document what's changed here.</p>
+<h2 id="change-1-litellm">Change 1: LiteLLM</h2><p>The first thing worth discussing is how the text-based models now use <a href="https://github.com/BerriAI/litellm">LiteLLM</a> behind the scenes. With the explosion of models, switching between them without building out extensive internal code infrastructure is something that's going to facilitate experimentation. In my case, I was initially building out against OpenAI's GPT-4 API. Later, I experimented with Ollama for local LLMs on my tiny MacBook Air. Later, I became curious about Claude (by Anthropic) and Mixtral (by Mistral) and realized what a headache it would be to maintain my own switchboard for dispatching out to different APIs. LiteLLM fixed that problem for me efficiently, providing a uniform API interface to the various models I wanted to try. In short, LiteLLM became the API switchboard I desperately needed, and I'd recommend checking it out!</p>
+<h2 id="change-2-document-store-and-history">Change 2: Document Store and History</h2><p>The second thing I'd like to discuss here is the new DocumentStore class available in LlamaBot. I ripped out the internals of QueryBot, made DocumentStore an independent class, and reinstalled DocumentStore into the QueryBot class.</p>
+<p>What was the motivation for doing so? It was primarily my realization that I needed an interface on document storage and retrieval that (1) could be consistent across different storage backends and (2) customizable internally to work with different forms of storage + retrieval logic.</p>
+<p>As such, I started out with the following <code>DocumentStore</code> API:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">DocumentStore</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">collection_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">storage_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;.llamabot&quot;</span> <span class="o">/</span> <span class="s2">&quot;chroma.db&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">chromadb</span><span class="o">.</span><span class="n">PersistentClient</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">storage_path</span><span class="p">))</span>
+        <span class="n">collection</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span><span class="n">collection_name</span><span class="p">,</span> <span class="n">get_or_create</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage_path</span> <span class="o">=</span> <span class="n">storage_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="n">collection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection_name</span> <span class="o">=</span> <span class="n">collection_name</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">document</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}):</span>
+        <span class="n">doc_id</span> <span class="o">=</span> <span class="n">sha256</span><span class="p">(</span><span class="n">document</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">documents</span><span class="o">=</span><span class="n">document</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="n">doc_id</span><span class="p">,</span> <span class="n">metadatas</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">extend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">documents</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">document</span> <span class="ow">in</span> <span class="n">documents</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">n_results</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">results</span><span class="p">:</span> <span class="n">QueryResult</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+            <span class="n">query_texts</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">n_results</span><span class="o">=</span><span class="n">n_results</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="s2">&quot;documents&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">delete_collection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">create_collection</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">collection_name</span><span class="p">,</span> <span class="n">get_or_create</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_documents</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">document_paths</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span>
+        <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2_000</span><span class="p">,</span>
+        <span class="n">chunk_overlap</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">document_paths</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+            <span class="n">document_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">document_paths</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">document_path</span> <span class="ow">in</span> <span class="n">document_paths</span><span class="p">:</span>
+            <span class="n">document</span> <span class="o">=</span> <span class="n">magic_load_doc</span><span class="p">(</span><span class="n">document_path</span><span class="p">)</span>
+            <span class="n">splitted_document</span> <span class="o">=</span> <span class="n">split_document</span><span class="p">(</span>
+                <span class="n">document</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="n">chunk_size</span><span class="p">,</span> <span class="n">chunk_overlap</span><span class="o">=</span><span class="n">chunk_overlap</span>
+            <span class="p">)</span>
+            <span class="n">splitted_document</span> <span class="o">=</span> <span class="p">[</span><span class="n">doc</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">splitted_document</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">splitted_document</span><span class="p">)</span>
+</pre></div>
+<p>Here, <code>append</code>, <code>extend</code>, <code>retrieve</code>, and <code>reset</code> are the core APIs, while <code>add_documents</code> is a higher-level API that lets us add documents to the <code>DocumentStore</code> based on file paths. What's cool is that this core interface (init, append, extend, retrieve, and reset) applies to document storage and chat history! Let's think carefully about it, with chat history. We are always appending (or extending) it and retrieving (the last K messages) within a ChatBot setting. Re-imagining and treating chat history as a collection of documents allows us to build a uniform interface for both, simplifying the internals of our Bots. Here's what the <code>History</code> class looks like, then, with the exact same interface and adding a <code>__getitem__</code> method:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">History</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;History of messages.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">BaseMessage</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_name</span> <span class="o">=</span> <span class="n">session_name</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">BaseMessage</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Append a message to the history.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">BaseMessage</span><span class="p">,</span> <span class="n">character_budget</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">BaseMessage</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve messages from the history up to the the character budget.</span>
+
+<span class="sd">        We use the character budget in order to simplify how we retrieve messages.</span>
+
+<span class="sd">        :param query: The query to use to retrieve messages. Not used in this class.</span>
+<span class="sd">        :param character_budget: The number of characters to retrieve.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">retrieve_messages_up_to_budget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">,</span> <span class="n">character_budget</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the message at the given index.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+</pre></div>
+<p>You may have noticed that I used ChromaDB instead of LlamaIndex's tooling. There were multiple reasons for doing so, but the primary drivers were as follows.</p>
+<p>The first was the layers of complexity in LlamaIndex's tooling, which primarily revolves around a <code>VectorStoreIndex</code>, an <code>LLMPredictor</code>, a <code>ServiceContext</code>, and a <code>StorageContext</code>. The documentation does not clearly explain what each of these abstractions is all about. Additionally, it felt peculiar to pair an LLMPredictor with a VectorStoreIndex when the LLMPredictor was primarily present to synthesize answers - at most, we need an embedding function. By contrast, ChromaDB's abstractions are much more natural: we have documents (text) that are stored as vectors (numbers), and they are linked together; when we <code>query</code> the vector database with a <code>query_text</code>, we get back a collection of results that have the document and metadata linked together.</p>
+<p>The other was the so-called "cost of sane defaults": ChromaDB defaults to using SentenceTransformer from HuggingFace to compute embeddings (which is zero-cost out of the box), while LlamaIndex's examples commonly default to using OpenAI's API, which costs some money.</p>
+<p>Taken together, though I had already become somewhat familiar with LlamaIndex's API, ChromaDB felt much more natural for the way that LlamaBot's internal APIs were being designed -- bots that do text-in/text-out and document stores with customizable retrieval.</p>
+<h2 id="change-3-simplebot-as-the-core-natural-language-programmable-bot-interface">Change 3: SimpleBot as the core natural language programmable bot interface</h2><p>One critical insight I arrived at in building LlamaBot is that there is one general and valuable use case for LLMs: we can use natural language to build text-in, text-out robots. Granted, this is less rigorous than using formal programming languages, but this is really useful for applications that need human-sounding natural language outputs. I'm also not the first to arrive at this conclusion: OpenAI's "GPTs" feature is also the result of this insight!</p>
+<p>Additionally, the mechanics of sending messages out to APIs often means that we need to compose a collection of messages that get sent to the API. The APIs (OpenAI, Mistral, etc.) are stateless, meaning they do not remember the previous context. This is a natural consequence of how the neural network models are trained behind the scenes. What's usually different between <code>SimpleBot</code>, <code>ChatBot</code>, <code>QueryBot</code>, and perhaps future <code>XBots</code>, would be how the messages are composed before being sent to the API.</p>
+<p>Finally, the mechanics of streaming, which usually involve copying and pasting the same chunk of code, feel stable enough that it should be abstracted behind a boolean toggle.</p>
+<p>Taking all of this together, I thought that if I could further use <code>SimpleBot</code> to simplify the interface to LiteLLM, we could then use <code>SimpleBot</code> in such a way that we could bang out specialized little bots that operate within a bigger <code>XBot</code> for various other applications.</p>
+<p>The result is a new <code>SimpleBot</code> interface:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">SimpleBot</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">system_prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="o">=</span><span class="n">default_language_model</span><span class="p">(),</span>
+        <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">json_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span><span class="p">:</span> <span class="n">SystemMessage</span> <span class="o">=</span> <span class="n">SystemMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">system_prompt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="n">model_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temperature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream</span> <span class="o">=</span> <span class="n">stream</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">json_mode</span> <span class="o">=</span> <span class="n">json_mode</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">human_message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AIMessage</span><span class="p">:</span>
+        <span class="n">messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">BaseMessage</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span><span class="p">,</span>
+            <span class="n">HumanMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">human_message</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_response</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span>
+        <span class="n">autorecord</span><span class="p">(</span><span class="n">human_message</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AIMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">response</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">BaseMessage</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AIMessage</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a response from the given messages.&quot;&quot;&quot;</span>
+
+        <span class="n">messages_dumped</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">messages</span><span class="p">]</span>
+        <span class="n">completion_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span>
+            <span class="n">messages</span><span class="o">=</span><span class="n">messages_dumped</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
+            <span class="n">stream</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_mode</span><span class="p">:</span>
+            <span class="n">completion_kwargs</span><span class="p">[</span><span class="s2">&quot;response_format&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;json_object&quot;</span><span class="p">}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">completion</span><span class="p">(</span><span class="o">**</span><span class="n">completion_kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="p">:</span>
+            <span class="n">ai_message</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+                <span class="n">delta</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">delta</span><span class="o">.</span><span class="n">content</span>
+                <span class="k">if</span> <span class="n">delta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="n">ai_message</span> <span class="o">+=</span> <span class="n">delta</span>
+            <span class="k">return</span> <span class="n">AIMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">ai_message</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">AIMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</pre></div>
+<p>(I omitted the docstrings here for ease of reading, but the actual thing has full docstrings!)</p>
+<p>Here, <code>__call__</code> is the high-level interface that does <code>str --&gt; AIMessage</code>, while <code>generate_response</code> is a lower-level interface that does <code>list[{Human/System}Message] --&gt; AIMessage</code>. The key difference here is what the input is. <code>__call__</code> allows us to pass in a single string as input, while <code>generate_response</code> allows a developer to compose together a more complex suite of messages that get sent to the downstream APIs. In both cases, to ensure uniformity across downstream bots, <code>__call__</code> is intentionally designed to return an <code>AIMessage</code> rather than a <code>str</code>, but I may revisit that design decision in the future too. After all, turning <code>__call__</code> into a <code>str --&gt; str</code> interface is attractive too!</p>
+<p>Additionally, note how <code>generate_response</code> contains the code for streaming. By abstracting that code out, we can toggle between streamed vs. non-streamed results at will without needing to bother with that chunk of code. As has been my rule of thumb, the time for a refactor is as soon as we copy/paste the code!</p>
+<h2 id="change-4-complex-bots-as-mixins-of-simplebot-and-document-stores">Change 4: Complex Bots as Mixins of SimpleBot and Document Stores</h2><p>With this refactor, SimpleBot can be used standalone or made part of other bots. Here's an example from ChatBot: we use the Mixin pattern to compose ChatBot from SimpleBot and History.</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ChatBot</span><span class="p">(</span><span class="n">SimpleBot</span><span class="p">,</span> <span class="n">History</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">system_prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">session_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="o">=</span><span class="n">default_language_model</span><span class="p">(),</span>
+        <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">response_budget</span><span class="o">=</span><span class="mi">2_000</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">SimpleBot</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">system_prompt</span><span class="o">=</span><span class="n">system_prompt</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+            <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">History</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_name</span><span class="o">=</span><span class="n">session_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response_budget</span> <span class="o">=</span> <span class="n">response_budget</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AIMessage</span><span class="p">:</span>
+        <span class="n">human_message</span> <span class="o">=</span> <span class="n">HumanMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">human_message</span><span class="p">,</span> <span class="n">character_budget</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">response_budget</span>
+        <span class="p">)</span>
+        <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span><span class="p">]</span> <span class="o">+</span> <span class="n">history</span> <span class="o">+</span> <span class="p">[</span><span class="n">human_message</span><span class="p">]</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_response</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span>
+        <span class="n">autorecord</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">human_message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+<p>Notice how <code>ChatBot</code> now inherits all of the class methods from <code>SimpleBot</code> and <code>History</code>. Therefore, it can use <code>generate_response</code> from SimpleBot and <code>append</code> from <code>History</code>. It's <code>__call__</code> is a bit more complicated than <code>SimpleBot</code>'s, so the custom logic gets placed there. After all, <code>ChatBot</code> is nothing more than the two things mashed together. This is called the Mixin pattern, where a composite class inherits from two or more parent classes, each with its own unique set of attributes and class methods. Using the Mixin pattern results in more composable object class definitions but can also be a more significant mental burden for a code developer.</p>
+<p>That said, this isn't the only way to build a ChatBot. Instead of using the Mixin pattern, we can hard-code a <code>self.bot = SimpleBot(...)</code> and <code>self.history = History(...)</code> in the class. Indeed, this was the original updated design of ChatBot before I experimented with the Mixin pattern. It has some advantages; for example, I could have both a <code>DocumentStore</code> and a <code>History</code> system (which, if you remember, have the same interface); these interfaces would invariably clash if we tried to do a mixin from both. But it also has some disadvantages: if I wanted to access an attribute such as the <code>model_name</code>, I would have to do <code>self.bot.model_name</code>; and if I wanted to use <code>self.model_name</code> instead, I would have counterfactually had to set the attribute in the <code>__init__</code> as well -- a duplication of information.</p>
+<p>The same can be said for <code>QueryBot</code>; here's what it looks like:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">QueryBot</span><span class="p">(</span><span class="n">SimpleBot</span><span class="p">,</span> <span class="n">DocumentStore</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">system_prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">document_paths</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span>
+        <span class="n">collection_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">default_language_model</span><span class="p">(),</span>
+        <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">SimpleBot</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">system_prompt</span><span class="o">=</span><span class="n">system_prompt</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+            <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">DocumentStore</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_name</span><span class="o">=</span><span class="n">collection_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_documents</span><span class="p">(</span><span class="n">document_paths</span><span class="o">=</span><span class="n">document_paths</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response_budget</span> <span class="o">=</span> <span class="mi">2_000</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">n_results</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AIMessage</span><span class="p">:</span>
+        <span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">context_budget</span> <span class="o">=</span> <span class="n">model_context_window_sizes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="n">DEFAULT_TOKEN_BUDGET</span>
+        <span class="p">)</span>
+        <span class="n">retrieved</span> <span class="o">=</span> <span class="n">retrieve_messages_up_to_budget</span><span class="p">(</span>
+            <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">RetrievedMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">chunk</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">n_results</span><span class="o">=</span><span class="n">n_results</span><span class="p">)</span>
+            <span class="p">],</span>
+            <span class="n">character_budget</span><span class="o">=</span><span class="n">context_budget</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_budget</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">retrieved</span><span class="p">)</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">HumanMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">query</span><span class="p">))</span>
+        <span class="n">response</span><span class="p">:</span> <span class="n">AIMessage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_response</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+<p>Similar to ChatBot, <code>__call__</code> is the only overridden class method. Because we inherit from <code>DocumentStore</code>, the <code>add_documents</code> class method becomes available to QueryBot, so we can do things like:</p>
+<div class="hll"><pre><span></span><span class="n">qb</span> <span class="o">=</span> <span class="n">QueryBot</span><span class="p">(</span><span class="n">system_prompt</span><span class="o">=...</span><span class="p">,</span> <span class="n">document_paths</span><span class="o">=</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span>
+<span class="c1"># do stuff with qb</span>
+<span class="c1"># ...</span>
+<span class="c1"># then realize we need another document added in:</span>
+<span class="n">qb</span><span class="o">.</span><span class="n">add_document</span><span class="p">(</span><span class="n">document_paths</span><span class="o">=...</span><span class="p">)</span>
+</pre></div>
+<p>The Mixin pattern is one that I have come to appreciate. It encourages composability through modularity in our Python classes; in doing so, this helps force clarity in thinking when designing our classes. It's like being spiritually functional in style, even though we have stateful objects. As you can tell, many other bots we can build are nothing more than a <code>SimpleBot</code> composed together with some storage system, whether that storage system is <code>History</code> or <code>DocumentStore</code>. The biggest thing that differentiates <code>SimpleBot</code>, <code>ChatBot</code>, <code>QueryBot</code>, and maybe even <code>ChatQueryBot</code> is how messages get put together to be sent over the wire (API) and how documents are retrieved. Llamabot's new design reflects this updated knowledge.</p>
+<p>At the same time, I will freely admit that as a trained biologist, I fantasized for a moment about building bots composed of other bots... just like how biological systems are composed!</p>
+<h2 id="change-5-switching-to-character-based-lengths-instead-of-tokens">Change 5: Switching to character-based lengths instead of tokens</h2><p>While working with the OpenAI API, measuring the length of texts in terms of tokens was natural. However, now that I've worked with multiple LLMs and their providers, I've found knowing what kind of tokenization scheme each model works with is opaque. As such, I decided to switch back to counting the length of strings by the number of characters. Doing so will ensure that we stay conservatively under the actual token length (counting characters over-estimates the number of tokens used) but will also give a more humanly understood way of calculating sequence length, which will be a bit more user-friendly.</p>
+<h2 id="conclusion">Conclusion</h2><p>Having had some time to pause actual coding on LlamaBot and think carefully about how to organize the underlying code is something I felt the need to do for a while, especially as the tooling for building LLM applications begins to mature. The highlight here was changing the abstractions to build composite bots -- e.g., bots with document retrieval -- more efficiently. Greg Brockman once said that,</p>
+<blockquote><p>Much of the challenge in machine learning engineering is fitting the complexity into your head. Best way to approach is with great patience &amp; a desire to dig into any detail.</p>
+<p>Source: <a href="https://twitter.com/gdb/status/1720204306903650712">Twitter</a></p>
+</blockquote>
+<p>The same goes for any software system being built, including LLM applications. This was the primary motivation for the refactor; the previous set of abstractions made it challenging for me to wrap my head around what was happening.</p>
+<p>More than that, <strong>abstractions reflect working knowledge</strong>. Suppose my working understanding of a problem domain is clean. In that case, I'll write code that cleanly maps those abstractions. By contrast, if my working knowledge is fuzzy, I'll write fuzzy code. The code state of LlamaBot reflects my working knowledge of applied LLM usage. Hopefully, this iteration is much clearer than before!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-evolving-llamabot</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Evolving LlamaBot}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{01}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{10}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/1/10/evolving-llamabot}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

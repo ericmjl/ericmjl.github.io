@@ -1,0 +1,698 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="How to automatically write git commit messages">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/how-to-automatically-write-git-commit-messages' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>How to automatically write git commit messages - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">How to automatically write git commit messages</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2023-09-23</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/commit messages/">
+        commit messages
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/conventional commits/">
+        conventional commits
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/git workflow/">
+        git workflow
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/git/">
+        git
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/pre-commit/">
+        pre-commit
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/software development/">
+        software development
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I discuss how I used LlamaBot, a Pythonic interface to Large Language Models (LLMs), to automatically write git commit messages following the Conventional Commits specification. By feeding the git diff into the LlamaBot SimpleBot, I was able to generate informative commit messages that make it easy to track project history and create accurate change logs. I also explain how to install the prepare-commit-msg hook to run the LlamaBot after pre-commit hooks and before editing the commit message. Interacting with LLMs requires precision and clarity in thinking to effectively utilize their capabilities.</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>(The alternative title to this blog post is actually "How I made LlamaBot able to write commit messages automagically.")</p>
+<p>I've finally figured out how to automatically write git commit messages properly <em>within</em> the <code>git</code> workflow!</p>
+<p>Commit messages are handy for tracking the history of a project, but it is challenging to write informative ones.
+There are conventions for writing commits -- one is aptly named <a href="https://www.conventionalcommits.org/en/v1.0.0/">Conventional Commits</a>.
+If you read through it, you'll find it's quite a handful to remember, just like <a href="https://semver.org/">Semantic Versioning</a>.
+Yet, the conventions exist because they're helpful!
+If we write commits that follow the Conventional Commits specification,
+we gain a git history that makes it easy to:</p>
+<ol>
+<li>Figure out on which commit a specific change was done (and hence be able to study it or even undo it directly),</li>
+<li>Use the collection of commit message headers and bodies to write out accurate and succinct change logs.</li>
+</ol>
+<p>For data scientists, the commit messages can be even handier: if we commit one notebook that corresponds to one experiment, then an accurate commit message that summarizes the experiment goals (as described at the top of a notebook) and results (as described at the end of a notebook) essentially lets us have a summarized laboratory notebook.</p>
+<p>But here's the kicker: great commit messages take time to write. And nobody has that luxury of time, right? (Unless you're a PhD student!) Nobody can write that level of great commit messages, right?</p>
+<p>No longer!</p>
+<p>As you might know, I'm hacking on <a href="https://github.com/ericmjl/llamabot"><code>llamabot</code></a>, which is a Pythonic interface to Large Language Models (LLMs) hosted by OpenAI.
+One of the things I thought LlamaBot would be able to do is to write commit messages based on the <code>git diff</code> between the current state of the repository and the previous commit.
+The way this works is that we feed in the <code>git diff</code> output into a LlamaBot SimpleBot and prompt it to write a commit message that follows the Conventional Commits specification.</p>
+<h2 id="the-prompt">The Prompt</h2><p>So, what does the prompt look like?</p>
+<p>It's essentially the Conventional Commits specification plus a few more instructions! Here it is taken <a href="https://github.com/ericmjl/llamabot/blob/127b6c988eedf6673c487f5c418f3bd9c21825fe/llamabot/prompt_library/git.py#L31">directly from the source code</a>:</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">write_commit_message</span><span class="p">(</span><span class="n">diff</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Please write a commit message for the following diff.</span>
+
+<span class="sd">    {{ diff }}</span>
+
+<span class="sd">    # noqa: DAR101</span>
+
+<span class="sd">    Use the Conventional Commits specification to write the diff.</span>
+
+<span class="sd">    [COMMIT MESSAGE BEGIN]</span>
+<span class="sd">    &lt;type&gt;[optional scope]: &lt;description&gt;</span>
+
+<span class="sd">    [optional body]</span>
+
+<span class="sd">    [optional footer(s)]</span>
+<span class="sd">    [COMMIT MESSAGE END]</span>
+
+<span class="sd">    The commit contains the following structural elements,</span>
+<span class="sd">    to communicate intent to the consumers of your library:</span>
+
+<span class="sd">    fix: a commit of the type fix patches a bug in your codebase</span>
+<span class="sd">        (this correlates with PATCH in Semantic Versioning).</span>
+<span class="sd">    feat: a commit of the type feat introduces a new feature to the codebase</span>
+<span class="sd">        (this correlates with MINOR in Semantic Versioning).</span>
+<span class="sd">    BREAKING CHANGE: a commit that has a footer BREAKING CHANGE:,</span>
+<span class="sd">        or appends a ! after the type/scope,</span>
+<span class="sd">        introduces a breaking API change</span>
+<span class="sd">        (correlating with MAJOR in Semantic Versioning).</span>
+<span class="sd">        A BREAKING CHANGE can be part of commits of any type.</span>
+
+<span class="sd">    types other than fix: and feat: are allowed,</span>
+<span class="sd">    for example @commitlint/config-conventional</span>
+<span class="sd">    (based on the Angular convention) recommends</span>
+<span class="sd">    build:, chore:, ci:, docs:, style:, refactor:, perf:, test:, and others.</span>
+
+<span class="sd">    footers other than BREAKING CHANGE: &lt;description&gt; may be provided</span>
+<span class="sd">    and follow a convention similar to git trailer format.</span>
+
+<span class="sd">    Additional types are not mandated by the Conventional Commits specification,</span>
+<span class="sd">    and have no implicit effect in Semantic Versioning</span>
+<span class="sd">    (unless they include a BREAKING CHANGE).</span>
+<span class="sd">    A scope may be provided to a commit&#39;s type,</span>
+<span class="sd">    to provide additional contextual information and is contained within parenthesis,</span>
+<span class="sd">    e.g., feat(parser): add ability to parse arrays.</span>
+<span class="sd">    Within the optional body section, prefer the use of bullet points.</span>
+
+<span class="sd">    Final instructions:</span>
+
+<span class="sd">    1. Do not fence the commit message with back-ticks or quotation marks.</span>
+<span class="sd">    2. Do not add any other text except the commit message itself.</span>
+<span class="sd">    3. Only write out the commit message.</span>
+
+<span class="sd">    [BEGIN COMMIT MESSAGE]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+<p>But that alone doesn't help us much. This prompted bot is magical when it is inserted <em>at precisely the place that's needed</em>: after pre-commit hooks run and before we edit the commit message.</p>
+<h2 id="composing-the-commit-message">Composing the Commit Message</h2><p>To compose the commit message, we must first get the diff and feed it into the commit message bot. You can see it below, <a href="https://github.com/ericmjl/llamabot/blob/127b6c988eedf6673c487f5c418f3bd9c21825fe/llamabot/cli/git.py#L98">lifted from the original source</a>:</p>
+<div class="hll"><pre><span></span><span class="nd">@gitapp</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compose_commit</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Autowrite commit message based on the diff.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">get_git_diff</span><span class="p">()</span>
+        <span class="n">bot</span> <span class="o">=</span> <span class="n">commitbot</span><span class="p">()</span>
+        <span class="n">bot</span><span class="p">(</span><span class="n">write_commit_message</span><span class="p">(</span><span class="n">diff</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">echo</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error encountered: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">err</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">echo</span><span class="p">(</span><span class="s2">&quot;Please write your own commit message.&quot;</span><span class="p">,</span> <span class="n">err</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+<p>As you can see, if there's <em>any</em> error encountered, we still need to enable code committers to write their own manual commit message, so we have a graceful fallback by echoing any errors that show up but not throwing the error. (h/t Andrew Giessel for this design choice.)</p>
+<p>But this alone isn't good enough. We must also run the bot after commit hooks and before editing the message.</p>
+<h2 id="prepare-commit-msg-hook"><code>prepare-commit-msg</code> hook</h2><p>Turns out, there's a git hook that runs <em>right after</em> the pre-commit hooks and right before editing the message, and it's called the <code>prepare-commit-msg</code> hook. Installing hooks manually is often foreign to data scientists (and I'm guessing a significant fraction of software developers too), so <code>llamabot</code> provides a way of installing the hook, once again <a href="https://github.com/ericmjl/llamabot/blob/127b6c988eedf6673c487f5c418f3bd9c21825fe/llamabot/cli/git.py#L74">lifted from the source</a>:</p>
+<div class="hll"><pre><span></span><span class="nd">@gitapp</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">install_commit_message_hook</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Install a commit message hook that runs the commit message through the bot.</span>
+
+<span class="sd">    :raises RuntimeError: If the current directory is not a git repository root.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check that we are in a repository&#39;s root. There should be a &quot;.git&quot; folder.</span>
+    <span class="c1"># Use pathlib to verify.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;.git&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;You must be in a git repository root folder to use this command. &quot;</span>
+            <span class="s2">&quot;Please `cd` into your git repo&#39;s root folder and try again, &quot;</span>
+            <span class="s2">&quot;or use `git init` to create a new repository (if you haven&#39;t already).&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;.git/hooks/prepare-commit-msg&quot;</span><span class="p">,</span> <span class="s2">&quot;w+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">contents</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;#!/bin/sh</span>
+<span class="s2">llamabot git compose-commit &gt; .git/COMMIT_EDITMSG</span>
+<span class="s2">&quot;&quot;&quot;</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="s2">&quot;.git/hooks/prepare-commit-msg&quot;</span><span class="p">,</span> <span class="mo">0o755</span><span class="p">)</span>
+    <span class="n">echo</span><span class="p">(</span><span class="s2">&quot;Commit message hook successfully installed! 🎉&quot;</span><span class="p">)</span>
+</pre></div>
+<p>So to install the hook, one just has to do the following:</p>
+<div class="hll"><pre><span></span>llamabot<span class="w"> </span>git<span class="w"> </span>install-commit-message-hook
+</pre></div>
+<p>This is done once per repository. Note that <code>llamabot</code> must be on the <code>PATH</code> for the hook to work!</p>
+<h2 id="how-in-the-world-did-i-come-to-know-this">How in the world did I come to know this??</h2><p><code>git hooks</code> feel like esoteric knowledge. The most commonly known one is the pre-commit hooks. However, the <code>prepare-commit-msg</code> hook is probably not very well-known. As things turned out, I had to ask GPT-4 how to do this a few times with a slightly more refined question each time.</p>
+<p>My first question was, "how do I compose a commit message as part of the pre-commit hooks?" which, given my faulty model of git at that point, was the entirely wrong question to ask.</p>
+<p>It took me 3-4 tries to get to "how do I compose a commit message using the diff between my current staged changes and the previous commit and use that diff with a SimpleBot program that can automatically write messages to COMMIT_MESSAGE_EDIT" (notice how I even got the filename wrong!). That's when GPT-4 alerted me to the presence of the <code>prepare-msg-hook</code>, which I then read up on the <a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks">Git book</a>. Only then was my mental model clarified and correct.</p>
+<p>I've learned from this that interacting with LLMs requires a certain finesse. GPT-4 can give great code solutions (i.e. "the how") if I can describe with sufficient precision what I'm trying to accomplish (i.e. "the what"). A general description of "the what" doesn't cut it. If you're trying to solve a problem with LLMs, know that possessing precision and clarity in your thinking can go a long way to effectively using LLMs.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2023-how-to-automatically-write-git-commit-messages</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{How to automatically write git commit messages}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2023}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{09}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{23}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2023/9/23/how-to-automatically-write-git-commit-messages}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

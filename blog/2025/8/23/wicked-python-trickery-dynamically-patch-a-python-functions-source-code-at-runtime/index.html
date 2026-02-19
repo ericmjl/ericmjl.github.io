@@ -1,0 +1,794 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Wicked Python trickery - dynamically patch a Python function&#39;s source code at runtime">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/wicked-python-trickery-dynamically-patch-a-python-functions-source-code-at-runtime' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Wicked Python trickery - dynamically patch a Python function&#39;s source code at runtime - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Wicked Python trickery - dynamically patch a Python function&#39;s source code at runtime</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-08-23</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/runtime/">
+        runtime
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llm/">
+        llm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/security/">
+        security
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/namespace/">
+        namespace
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/compilation/">
+        compilation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/execution/">
+        execution
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/functions/">
+        functions
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/toolbot/">
+        toolbot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/monkeypatching/">
+        monkeypatching
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share how I discovered a powerful Python trick: dynamically changing a function's source code at runtime using the compile and exec functions. This technique enabled me to build more flexible AI bots, like ToolBot, that can generate and execute code with access to the current environment. While this opens up exciting possibilities for LLM-powered agents and generative UIs, it also raises serious security concerns. Curious how this hack can supercharge your AI projects—and what risks you should watch out for?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>So today, I learned a very dangerous and yet fascinating trick.</p>
+<p>It's possible to dynamically change a Python function's source code <em>at runtime</em>.</p>
+<p>What this does is open a world of possibilities in building AI bots!</p>
+<h2 id="how-this-actually-works">How this actually works</h2><p>Every function has a <code>.__code__</code> attribute. For example, for this function:</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">something</span><span class="p">():</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+</pre></div>
+<p><code>something.__code__</code> looks like this:</p>
+<div class="hll"><pre><span></span><span class="o">&lt;</span><span class="n">code</span> <span class="nb">object</span> <span class="n">something</span> <span class="n">at</span> <span class="mh">0x149bdfc90</span><span class="p">,</span> <span class="n">file</span> <span class="s2">&quot;/var/folders/36/vb250n_s0zncstw3sk74qfxr0000gn/T/marimo_80086/__marimo__cell_kJqw_.py&quot;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">1</span><span class="o">&gt;</span>
+</pre></div>
+<p>If I were to execute <code>something()</code>, it would return a <code>NotImplementedError</code>.</p>
+<p>Now, let's say that, for some reason that I shall not speculate, I decided that I wanted <code>something()</code> to instead do multiplication by 2. I can create new source code:</p>
+<div class="hll"><pre><span></span><span class="n">new_code</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">def something(x: int) -&gt; int:</span>
+<span class="s2">    return x * 2</span>
+<span class="s2">&quot;&quot;&quot;</span>
+</pre></div>
+<p>I can do the following three magical steps to swap it in.</p>
+<p>Firstly, compile the code into bytecode:</p>
+<div class="hll"><pre><span></span><span class="n">compiled</span> <span class="o">=</span> <span class="nb">compile</span><span class="p">(</span><span class="n">new_code</span><span class="p">,</span> <span class="s2">&quot;&lt;magic&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;exec&quot;</span><span class="p">)</span>
+</pre></div>
+<p>The three arguments to <code>compile</code> are:</p>
+<ol>
+<li>The code to compile (<code>new_code</code>),</li>
+<li>The filename in which the code is compiled (<code>&lt;magic&gt;</code>), and</li>
+<li>The mode in which compilation happens (in this case, <code>exec</code> mode).</li>
+</ol>
+<p>On the third point, the docstring of <code>compile</code> explains what the three modes are:</p>
+<blockquote><p>The mode must be 'exec' to compile a module, 'single' to compile a single (interactive) statement, or 'eval' to compile an expression.</p>
+</blockquote>
+<p>The <code>compiled</code> object now is a "code object":</p>
+<div class="hll"><pre><span></span><span class="o">&lt;</span><span class="n">code</span> <span class="nb">object</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span> <span class="n">at</span> <span class="mh">0x149bcbad0</span><span class="p">,</span> <span class="n">file</span> <span class="s2">&quot;&lt;magic&gt;&quot;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">1</span><span class="o">&gt;</span>
+</pre></div>
+<p>I can then execute the compiled code to make it imported into a particular namespace.</p>
+<div class="hll"><pre><span></span><span class="n">ns</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">exec</span><span class="p">(</span><span class="n">compiled</span><span class="p">,</span> <span class="p">{},</span> <span class="n">ns</span><span class="p">)</span>
+</pre></div>
+<p>Here, the three arguments passed to <code>exec</code> are:</p>
+<ol>
+<li>The code we want to execute (<code>compiled</code>), and in this case, by "executing" it after being compiled in <code>exec</code> mode, we are really just simulating an <code>import</code> into our namespace.</li>
+<li>The globals (<code>{}</code>), which in this case are passed in as an empty dictionary. These are the global variables that are available to the function at runtime.</li>
+<li><code>ns</code> is the "namespace" in which we want the function to be present; namespaces in Python are just dictionary mappings from function/object name to the function/object itself.</li>
+</ol>
+<p>Finally, I can replace my existing function with the compiled function inserted into the <code>ns</code> namespace:</p>
+<div class="hll"><pre><span></span><span class="n">something_new</span> <span class="o">=</span> <span class="n">ns</span><span class="p">[</span><span class="s2">&quot;something&quot;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">something_new</span><span class="p">(</span><span class="mi">21</span><span class="p">))</span>  <span class="c1"># this will print 42 to stdout!</span>
+</pre></div>
+<p>But really, the real lesson here is not that one can monkeypatch over an existing Python function's source code at runtime, but that you can actually <strong>compile the string of a Python function definition and give it access to a namespace's variables</strong>, including that of the current global namespace.</p>
+<h2 id="when-would-you-ever-want-to-do-this">When would you ever want to do this?</h2><p>At first glance, never really! This is a bit of hackery that lives on the fringes of Python-land, and is basically a party trick.</p>
+<p>But as it turns out, I <em>actually</em> had a real motivation for wanting to do this.</p>
+<p>Within <a href="https://github.com/ericmjl/llamabot">LlamaBot</a>, I've always had <code>AgentBot</code> as a first-pass implementation of what I think an LLM agent should look like, having studied LLM agent implementations in other libraries. However, I've never been fully satisfied with <code>AgentBot</code>'s implementation. The core issue was that it mixed too many concerns together - function execution, function call determination, and user response generation all lived in the same loop.</p>
+<p>Here's what <code>AgentBot</code> looked like at a high level:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">AgentBot</span><span class="p">(</span><span class="n">SimpleBot</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">messages</span><span class="p">,</span> <span class="n">num_iterations</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_iterations</span><span class="p">):</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="o">...</span> <span class="c1"># get response object, passing in messages</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1"># Execute tool calls if they are present</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">tool_call</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name_to_tools</span><span class="p">[</span><span class="n">tool_call</span><span class="o">.</span><span class="n">name</span><span class="p">](</span><span class="o">**</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">tool_call</span><span class="o">.</span><span class="n">arguments</span><span class="p">))</span>
+
+            <span class="c1"># continue until LLM decides we&#39;re done.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># just respond to users.</span>
+</pre></div>
+<p>While this worked, it wasn't great at separating concerns. I had function execution mixed in with function call determination mixed in with responding to a user.</p>
+<p>The bigger limitation was with code execution tools. My original implementation isolated generated code in a Docker container sandbox, which was secure but meant the code couldn't access variables from my current Python runtime. This severely limited what kinds of useful tasks the bot could perform with my existing data and variables.</p>
+<p>I realized that if I could:</p>
+<ol>
+<li>Use an LLM to generate Python functions that referenced existing variables in my runtime,</li>
+<li>Compile those functions on-the-fly within the same Python environment, and</li>
+<li>Execute them with access to my current namespace,</li>
+</ol>
+<p>I could build something much more powerful. This led me to create <code>ToolBot</code> within LlamaBot.</p>
+<h2 id="toolbot-focuses-on-tool-selection-instead-of-execution">ToolBot focuses on tool selection instead of execution</h2><p><code>ToolBot</code> takes a different approach - it focuses purely on tool selection rather than execution. Here's the key structure:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ToolBot</span><span class="p">(</span><span class="n">SimpleBot</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system_prompt</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># Initialize with core tools like today_date and respond_to_user</span>
+        <span class="n">all_tools</span> <span class="o">=</span> <span class="p">[</span><span class="n">today_date</span><span class="p">,</span> <span class="n">respond_to_user</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">tools</span><span class="p">:</span>
+            <span class="n">all_tools</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">tools</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">json_schema</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">all_tools</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name_to_tool_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">f</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span> <span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">all_tools</span><span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="c1"># Process message and return tool calls (but don&#39;t execute them)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">make_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message_list</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">)</span>
+        <span class="n">tool_calls</span> <span class="o">=</span> <span class="n">extract_tool_calls</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tool_calls</span>  <span class="c1"># Just return the calls, don&#39;t execute</span>
+</pre></div>
+<p>The key insight: <code>ToolBot</code> just selects a tool to be executed, but does <em>not</em> execute it. Instead, it returns the tools to be called to the external environment, giving you full control over execution.</p>
+<h2 id="the-magic-happens-with-write-and-execute-code">The magic happens with write_and_execute_code</h2><p>One of the most powerful tools that can be chosen is <code>write_and_execute_code</code>. Here's the core implementation:</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">write_and_execute_code</span><span class="p">(</span><span class="n">globals_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="nd">@tool</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_and_execute_code_wrapper</span><span class="p">(</span><span class="n">placeholder_function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">keyword_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="s2">&quot;&quot;&quot;Write and execute `placeholder_function` with the passed in `keyword_args`.</span>
+
+<span class="s2">        Use this tool for any task that requires custom Python code generation and execution.</span>
+<span class="s2">        This tool has access to ALL globals in the current runtime environment (variables, dataframes, functions, etc.).</span>
+<span class="s2">        Perfect for: data analysis, calculations, transformations, visualizations, custom algorithms.</span>
+
+<span class="s2">        ## Code Generation Guidelines:</span>
+
+<span class="s2">        1. **Write self-contained Python functions** with ALL imports inside the function body</span>
+<span class="s2">        2. **Place all imports at the beginning of the function**: import statements must be the first lines inside the function</span>
+<span class="s2">        3. **Include all required libraries**: pandas, numpy, matplotlib, etc. - import everything the function needs</span>
+<span class="s2">        4. **Leverage existing global variables**: Can reference variables that exist in the runtime</span>
+<span class="s2">        5. **Include proper error handling** and docstrings</span>
+<span class="s2">        6. **Provide keyword arguments** when the function requires parameters</span>
+<span class="s2">        7. **Make functions reusable** - they will be stored globally for future use</span>
+<span class="s2">        8. **ALWAYS RETURN A VALUE**: Every function must explicitly return something - never just print, display, or show results without returning them. Even for plotting functions, return the figure/axes object.</span>
+
+<span class="s2">        ## Function Arguments Handling:</span>
+
+<span class="s2">        **CRITICAL**: You MUST match the function signature with the keyword_args:</span>
+<span class="s2">        - **If your function takes NO parameters** (e.g., `def analyze_data():`), then pass an **empty dictionary**: `</span><span class="si">{}</span><span class="s2">`</span>
+<span class="s2">        - **If your function takes parameters** (e.g., `def filter_data(min_age, department):`), then pass the required arguments as a dictionary: `{&quot;min_age&quot;: 30, &quot;department&quot;: &quot;Engineering&quot;}`</span>
+<span class="s2">        - **Never pass keyword_args that don&#39;t match the function signature** - this will cause execution errors</span>
+
+<span class="s2">        ## Code Structure Example:</span>
+
+<span class="s2">        ```python</span>
+<span class="s2">        # Function with NO parameters - use empty dict </span><span class="si">{}</span>
+<span class="s2">        def analyze_departments():</span>
+<span class="s2">            &#39;&#39;&#39;Analyze department performance.&#39;&#39;&#39;</span>
+<span class="s2">            import pandas as pd</span>
+<span class="s2">            import numpy as np</span>
+<span class="s2">            result = fake_df.groupby(&#39;department&#39;)[&#39;salary&#39;].mean()</span>
+<span class="s2">            return result</span>
+<span class="s2">        # Function WITH parameters - pass matching keyword_args</span>
+<span class="s2">        def filter_employees(min_age, department):</span>
+<span class="s2">            &#39;&#39;&#39;Filter employees by criteria.&#39;&#39;&#39;</span>
+<span class="s2">            import pandas as pd</span>
+<span class="s2">            filtered = fake_df[(fake_df[&#39;age&#39;] &gt;= min_age) &amp; (fake_df[&#39;department&#39;] == department)]</span>
+<span class="s2">            return filtered</span>
+</pre></div>
+<pre><code>    ## Return Value Requirements:
+
+    - **Data analysis functions**: Return the computed results (numbers, DataFrames, lists, dictionaries)
+    - **Plotting functions**: Return the figure or axes object (e.g., `return fig` or `return plt.gca()`)
+    - **Filter/transformation functions**: Return the processed data
+    - **Calculation functions**: Return the calculated values
+    - **Utility functions**: Return relevant output (status, processed data, etc.)
+    - **Never return None implicitly** - always have an explicit return statement
+
+    ## Code Access Capabilities:
+
+    The generated code will have access to:
+    - All global variables and dataframes in the current session
+    - Any previously defined functions
+    - The ability to import any standard Python libraries within the function
+    - The ability to create new reusable functions that will be stored globally
+    :param placeholder_function: The function to execute (complete Python function as string).
+    :param keyword_args: The keyword arguments to pass to the function (dictionary matching function parameters).
+    :return: The result of the function execution.
+    """
+
+    # Parse the code to extract the function name
+    tree = ast.parse(placeholder_function)
+    function_name = None
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef):
+            function_name = node.name
+            break
+    # Compile and execute the function with access to globals
+    ns = globals_dict
+    compiled = compile(placeholder_function, "&lt;llm&gt;", "exec")
+    exec(compiled, globals_dict, ns)
+    return ns[function_name](**keyword_args)
+
+return write_and_execute_code_wrapper
+</code></pre>
+<pre><code>
+This extensive docstring gets passed as part of the JSON schema and effectively serves as instructions to the LLM on when and how to use this tool. I stripped out logging and error handling to simplify what's shown here, but the actual codebase has more robustness built in.
+
+Notice how `ToolBot`, and more specifically `write_and_execute_code`, gains explicit access to the `globals()` dictionary when a user passes it in. This approach allows us to ensure that function execution takes place within the proper namespace. If `ToolBot` chooses `write_and_execute_code`, I can control exactly where and how it executes within my Python runtime environment - and this opens up a world of possibilities!
+
+For example, inspired by [the Marimo blog](https://marimo.io/blog/marimo-chat), which wrote about generative UIs and tool calling:
+
+&gt; marimo’s chat interface supports Generative UI - the ability to stream rich, interactive UI components directly from LLM responses. This goes beyond traditional text and markdown outputs, allowing chatbots to return dynamic elements like tables, charts, and interactive visualizations.
+
+I decided to build out a _generalized_ version of a tool that an LLM could choose to call on that would also have access to any variable present within the runtime environment... much like Marimo's AI chat has access to any variable within the environment with an `@variable_name`, now I just dump the full set of `globals()` into the LLM's context window, and that's what `write_and_execute_code` looked like.
+
+Here's an example, imagine I have two dataframes that I want an LLM to manipulate. Without `write_and_execute_code`, I'd have to write bespoke tools for the dataframe, in which I access the `df` as a "global" variable, much like the following:
+
+```python
+@lmb.tool
+def chart_data(x_encoding: str, y_encoding: str, color: str):
+    """Generate an altair chart"""
+    import altair as alt
+    return (
+        alt.Chart(df)
+        .mark_circle()
+        .encode(x=x_encoding, y=y_encoding, color=color)
+        .properties(width=500)
+    )
+</code></pre>
+<p>So the writing on the wall is that I'd have to write one tool for every possible operation that I'd desire, but that's a big hassle. With this <code>globals()</code>, <code>compile</code>, and <code>exec</code> trickery baked into <code>write_and_execute_code</code>, I no longer have to specify bespoke tools for the environment that I'm in!</p>
+<p>Further more, inspired by the Marimo blog post, <code>ToolBot</code> is designed to just do the tool picking, delegating the execution and return of the broader LLM-powered Python program back to the developer. In this way, I can give myself more flexibility when building entire "Agentic" programs, more so than if I were to use <code>AgentBot</code> in its current form. It allowed me to build a more powerful version of a tool-calling agent using <code>ToolBot</code> with generative UIs in a Marimo notebook. For this, it's easier to demo via a screencast instead of by me describing it in prose:</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/tk5wvb556f8?si=sXSRulZ2ooBplapr" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe><p>And if you're curious to try running it, you can run it with the following command:</p>
+<div class="hll"><pre><span></span>uvx<span class="w"> </span>marimo<span class="w"> </span>edit<span class="w"> </span>--sandbox<span class="w"> </span>https://raw.githubusercontent.com/ericmjl/website/refs/heads/main/content/blog/wicked-python-trickery-dynamically-patch-a-python-functions-source-code-at-runtime/agents.py
+</pre></div>
+<h2 id="security-concerns-are-very-real-with-this-approach">Security concerns are very real with this approach</h2><p>Comparing this to what we had before with <code>write_and_execute_script</code>, which performed execution in a sandboxed Docker container with limited read/write capabilities, <code>write_and_execute_code</code> is <em>much, much less secure</em>.</p>
+<p>Obviously, I'm playing with fire here. A malicious LLM output could run code directly and do enormous damage to my machine and from my machine to the outside world. I have yet to implement code sanitization, but one big idea I have, which I just learned through discourse with GPT-4, is to use <a href="https://github.com/zopefoundation/RestrictedPython">Restricted Python</a>. I think that will be the next big upgrade after I let the current version of <code>write_and_execute_code</code> sit for a while.</p>
+<p>As such, I don't suggest that the <code>write_and_execute_code</code> pattern be used for anything really serious in its current form.</p>
+<h2 id="what-i-learned-from-this-python-trickery">What I learned from this Python trickery</h2><p>This journey taught me several things. First, Python's runtime is far more malleable than I initially realized - the ability to compile strings into executable code and inject them into specific namespaces opens up incredible possibilities for dynamic programming.</p>
+<p>Second, building effective LLM agents isn't just about the AI - it's about thoughtful system design. Separating tool selection from execution (as <code>ToolBot</code> does) creates much more flexible and controllable systems than monolithic agents.</p>
+<p>Finally, this wouldn't have been possible without <a href="https://ericmjl.github.io/blog/2025/6/7/principles-for-using-ai-autodidactically/">autodidactic learning with LLMs</a>. I'm becoming more and more convinced that LLMs are a great tool for learning, but one must learn how to use them for learning, and one must <a href="https://ericmjl.github.io/blog/2025/7/13/earn-the-privilege-to-use-automation/">earn the automation</a> as well.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-wicked-python-trickery-dynamically-patch-a-python-functions-source-code-at-runtime</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Wicked Python trickery - dynamically patch a Python function&#39;s source code at runtime}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{08}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{23}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/8/23/wicked-python-trickery-dynamically-patch-a-python-functions-source-code-at-runtime}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

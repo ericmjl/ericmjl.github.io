@@ -1,0 +1,5508 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+    
+
+    
+    
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Tags - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+<h1><i class="fas fa-tag"></i> Tags</h1>
+
+
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+
+  
+
+  
+    
+  
+    
+  
+
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+    
+  
+    
+  
+
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+    
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+    
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+  
+    
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+    
+  
+
+  
+    
+  
+
+
+<ul>
+  
+    <li><a href="/blog/tag/3d printing">3d printing</a></li>
+  
+    <li><a href="/blog/tag/4-bit quantized">4-bit quantized</a></li>
+  
+    <li><a href="/blog/tag/abstractions">abstractions</a></li>
+  
+    <li><a href="/blog/tag/academia">academia</a></li>
+  
+    <li><a href="/blog/tag/accessibility">accessibility</a></li>
+  
+    <li><a href="/blog/tag/accounts">accounts</a></li>
+  
+    <li><a href="/blog/tag/adaptability">adaptability</a></li>
+  
+    <li><a href="/blog/tag/advi">advi</a></li>
+  
+    <li><a href="/blog/tag/advice">advice</a></li>
+  
+    <li><a href="/blog/tag/agency">agency</a></li>
+  
+    <li><a href="/blog/tag/agentbot">agentbot</a></li>
+  
+    <li><a href="/blog/tag/agentic">agentic</a></li>
+  
+    <li><a href="/blog/tag/agents">agents</a></li>
+  
+    <li><a href="/blog/tag/agile">agile</a></li>
+  
+    <li><a href="/blog/tag/ai">ai</a></li>
+  
+    <li><a href="/blog/tag/ai coding">ai coding</a></li>
+  
+    <li><a href="/blog/tag/ai innovation">ai innovation</a></li>
+  
+    <li><a href="/blog/tag/ai tooling">ai tooling</a></li>
+  
+    <li><a href="/blog/tag/ai training">ai training</a></li>
+  
+    <li><a href="/blog/tag/algorithms">algorithms</a></li>
+  
+    <li><a href="/blog/tag/alignment">alignment</a></li>
+  
+    <li><a href="/blog/tag/alphafold">alphafold</a></li>
+  
+    <li><a href="/blog/tag/anaconda">anaconda</a></li>
+  
+    <li><a href="/blog/tag/analysis">analysis</a></li>
+  
+    <li><a href="/blog/tag/ancestral sequences">ancestral sequences</a></li>
+  
+    <li><a href="/blog/tag/animation">animation</a></li>
+  
+    <li><a href="/blog/tag/anthropic">anthropic</a></li>
+  
+    <li><a href="/blog/tag/antibiotic resistance">antibiotic resistance</a></li>
+  
+    <li><a href="/blog/tag/antibody therapies">antibody therapies</a></li>
+  
+    <li><a href="/blog/tag/anywidget">anywidget</a></li>
+  
+    <li><a href="/blog/tag/api">api</a></li>
+  
+    <li><a href="/blog/tag/api key">api key</a></li>
+  
+    <li><a href="/blog/tag/app">app</a></li>
+  
+    <li><a href="/blog/tag/apple">apple</a></li>
+  
+    <li><a href="/blog/tag/application tips">application tips</a></li>
+  
+    <li><a href="/blog/tag/apps">apps</a></li>
+  
+    <li><a href="/blog/tag/arc browser">arc browser</a></li>
+  
+    <li><a href="/blog/tag/architecture">architecture</a></li>
+  
+    <li><a href="/blog/tag/arm">arm</a></li>
+  
+    <li><a href="/blog/tag/artificial intelligence">artificial intelligence</a></li>
+  
+    <li><a href="/blog/tag/assessment">assessment</a></li>
+  
+    <li><a href="/blog/tag/assistance">assistance</a></li>
+  
+    <li><a href="/blog/tag/asynchronous feedback">asynchronous feedback</a></li>
+  
+    <li><a href="/blog/tag/audience">audience</a></li>
+  
+    <li><a href="/blog/tag/audience interaction">audience interaction</a></li>
+  
+    <li><a href="/blog/tag/augmentation">augmentation</a></li>
+  
+    <li><a href="/blog/tag/authentication">authentication</a></li>
+  
+    <li><a href="/blog/tag/autodidactic">autodidactic</a></li>
+  
+    <li><a href="/blog/tag/automation">automation</a></li>
+  
+    <li><a href="/blog/tag/automl">automl</a></li>
+  
+    <li><a href="/blog/tag/autonomy">autonomy</a></li>
+  
+    <li><a href="/blog/tag/autoregressive models">autoregressive models</a></li>
+  
+    <li><a href="/blog/tag/autoregressive training">autoregressive training</a></li>
+  
+    <li><a href="/blog/tag/aws">aws</a></li>
+  
+    <li><a href="/blog/tag/baarn 2016">baarn 2016</a></li>
+  
+    <li><a href="/blog/tag/backend">backend</a></li>
+  
+    <li><a href="/blog/tag/bacterial detection">bacterial detection</a></li>
+  
+    <li><a href="/blog/tag/bash">bash</a></li>
+  
+    <li><a href="/blog/tag/bayesian">bayesian</a></li>
+  
+    <li><a href="/blog/tag/bayesian estimation">bayesian estimation</a></li>
+  
+    <li><a href="/blog/tag/bayesian model">bayesian model</a></li>
+  
+    <li><a href="/blog/tag/bayesian optimization">bayesian optimization</a></li>
+  
+    <li><a href="/blog/tag/bayesian statistics">bayesian statistics</a></li>
+  
+    <li><a href="/blog/tag/benchmarking">benchmarking</a></li>
+  
+    <li><a href="/blog/tag/best practices">best practices</a></li>
+  
+    <li><a href="/blog/tag/bible">bible</a></li>
+  
+    <li><a href="/blog/tag/binder">binder</a></li>
+  
+    <li><a href="/blog/tag/biochemistry">biochemistry</a></li>
+  
+    <li><a href="/blog/tag/bioinformatics">bioinformatics</a></li>
+  
+    <li><a href="/blog/tag/bioit world">bioit world</a></li>
+  
+    <li><a href="/blog/tag/biological sequences">biological sequences</a></li>
+  
+    <li><a href="/blog/tag/biology">biology</a></li>
+  
+    <li><a href="/blog/tag/biomedical texts">biomedical texts</a></li>
+  
+    <li><a href="/blog/tag/biophysics">biophysics</a></li>
+  
+    <li><a href="/blog/tag/biotech">biotech</a></li>
+  
+    <li><a href="/blog/tag/biotech research">biotech research</a></li>
+  
+    <li><a href="/blog/tag/blink">blink</a></li>
+  
+    <li><a href="/blog/tag/blogging">blogging</a></li>
+  
+    <li><a href="/blog/tag/blood donation">blood donation</a></li>
+  
+    <li><a href="/blog/tag/bokeh">bokeh</a></li>
+  
+    <li><a href="/blog/tag/bonus">bonus</a></li>
+  
+    <li><a href="/blog/tag/brag doc">brag doc</a></li>
+  
+    <li><a href="/blog/tag/broad institute">broad institute</a></li>
+  
+    <li><a href="/blog/tag/browser">browser</a></li>
+  
+    <li><a href="/blog/tag/browser features">browser features</a></li>
+  
+    <li><a href="/blog/tag/browser review">browser review</a></li>
+  
+    <li><a href="/blog/tag/bugfix">bugfix</a></li>
+  
+    <li><a href="/blog/tag/build-backend">build-backend</a></li>
+  
+    <li><a href="/blog/tag/building">building</a></li>
+  
+    <li><a href="/blog/tag/bump2version">bump2version</a></li>
+  
+    <li><a href="/blog/tag/business">business</a></li>
+  
+    <li><a href="/blog/tag/caching">caching</a></li>
+  
+    <li><a href="/blog/tag/callable objects">callable objects</a></li>
+  
+    <li><a href="/blog/tag/candidate assessment">candidate assessment</a></li>
+  
+    <li><a href="/blog/tag/canvas">canvas</a></li>
+  
+    <li><a href="/blog/tag/career">career</a></li>
+  
+    <li><a href="/blog/tag/career advice">career advice</a></li>
+  
+    <li><a href="/blog/tag/career development">career development</a></li>
+  
+    <li><a href="/blog/tag/career growth">career growth</a></li>
+  
+    <li><a href="/blog/tag/career panel">career panel</a></li>
+  
+    <li><a href="/blog/tag/career strategies">career strategies</a></li>
+  
+    <li><a href="/blog/tag/careers">careers</a></li>
+  
+    <li><a href="/blog/tag/catalysis">catalysis</a></li>
+  
+    <li><a href="/blog/tag/category theory">category theory</a></li>
+  
+    <li><a href="/blog/tag/causal inference">causal inference</a></li>
+  
+    <li><a href="/blog/tag/centaurs">centaurs</a></li>
+  
+    <li><a href="/blog/tag/central tendency">central tendency</a></li>
+  
+    <li><a href="/blog/tag/chalk talk">chalk talk</a></li>
+  
+    <li><a href="/blog/tag/change management">change management</a></li>
+  
+    <li><a href="/blog/tag/changes">changes</a></li>
+  
+    <li><a href="/blog/tag/charity">charity</a></li>
+  
+    <li><a href="/blog/tag/chatbot">chatbot</a></li>
+  
+    <li><a href="/blog/tag/chatbots">chatbots</a></li>
+  
+    <li><a href="/blog/tag/chatgpt">chatgpt</a></li>
+  
+    <li><a href="/blog/tag/chatui">chatui</a></li>
+  
+    <li><a href="/blog/tag/chemical screening">chemical screening</a></li>
+  
+    <li><a href="/blog/tag/chemistry">chemistry</a></li>
+  
+    <li><a href="/blog/tag/chemistry ml">chemistry ml</a></li>
+  
+    <li><a href="/blog/tag/christianity">christianity</a></li>
+  
+    <li><a href="/blog/tag/chromadb">chromadb</a></li>
+  
+    <li><a href="/blog/tag/chromatography">chromatography</a></li>
+  
+    <li><a href="/blog/tag/cicd">cicd</a></li>
+  
+    <li><a href="/blog/tag/clarity">clarity</a></li>
+  
+    <li><a href="/blog/tag/class-based programming">class-based programming</a></li>
+  
+    <li><a href="/blog/tag/claude">claude</a></li>
+  
+    <li><a href="/blog/tag/clean code">clean code</a></li>
+  
+    <li><a href="/blog/tag/cli">cli</a></li>
+  
+    <li><a href="/blog/tag/cli tool">cli tool</a></li>
+  
+    <li><a href="/blog/tag/click">click</a></li>
+  
+    <li><a href="/blog/tag/cloud">cloud</a></li>
+  
+    <li><a href="/blog/tag/cloud adoption">cloud adoption</a></li>
+  
+    <li><a href="/blog/tag/cloudcomputing">cloudcomputing</a></li>
+  
+    <li><a href="/blog/tag/cloudmailin">cloudmailin</a></li>
+  
+    <li><a href="/blog/tag/coaching">coaching</a></li>
+  
+    <li><a href="/blog/tag/code completion">code completion</a></li>
+  
+    <li><a href="/blog/tag/code correctness">code correctness</a></li>
+  
+    <li><a href="/blog/tag/code formatting">code formatting</a></li>
+  
+    <li><a href="/blog/tag/code generation">code generation</a></li>
+  
+    <li><a href="/blog/tag/code ghostwriting">code ghostwriting</a></li>
+  
+    <li><a href="/blog/tag/code optimization">code optimization</a></li>
+  
+    <li><a href="/blog/tag/code quality">code quality</a></li>
+  
+    <li><a href="/blog/tag/code review">code review</a></li>
+  
+    <li><a href="/blog/tag/code security">code security</a></li>
+  
+    <li><a href="/blog/tag/code snippet">code snippet</a></li>
+  
+    <li><a href="/blog/tag/code snippets">code snippets</a></li>
+  
+    <li><a href="/blog/tag/code sprint">code sprint</a></li>
+  
+    <li><a href="/blog/tag/code style">code style</a></li>
+  
+    <li><a href="/blog/tag/code style checks">code style checks</a></li>
+  
+    <li><a href="/blog/tag/code summarization">code summarization</a></li>
+  
+    <li><a href="/blog/tag/codeartifacts">codeartifacts</a></li>
+  
+    <li><a href="/blog/tag/codespaces">codespaces</a></li>
+  
+    <li><a href="/blog/tag/coding">coding</a></li>
+  
+    <li><a href="/blog/tag/coding agents">coding agents</a></li>
+  
+    <li><a href="/blog/tag/coding bot">coding bot</a></li>
+  
+    <li><a href="/blog/tag/coding skills">coding skills</a></li>
+  
+    <li><a href="/blog/tag/coding snippets">coding snippets</a></li>
+  
+    <li><a href="/blog/tag/cognition">cognition</a></li>
+  
+    <li><a href="/blog/tag/cognitive">cognitive</a></li>
+  
+    <li><a href="/blog/tag/coiled computing">coiled computing</a></li>
+  
+    <li><a href="/blog/tag/collaboration">collaboration</a></li>
+  
+    <li><a href="/blog/tag/command execution">command execution</a></li>
+  
+    <li><a href="/blog/tag/command line">command line</a></li>
+  
+    <li><a href="/blog/tag/command line interfaces">command line interfaces</a></li>
+  
+    <li><a href="/blog/tag/command line tools">command line tools</a></li>
+  
+    <li><a href="/blog/tag/commit messages">commit messages</a></li>
+  
+    <li><a href="/blog/tag/communication">communication</a></li>
+  
+    <li><a href="/blog/tag/community">community</a></li>
+  
+    <li><a href="/blog/tag/community development">community development</a></li>
+  
+    <li><a href="/blog/tag/community service">community service</a></li>
+  
+    <li><a href="/blog/tag/competencies">competencies</a></li>
+  
+    <li><a href="/blog/tag/competitive advantage">competitive advantage</a></li>
+  
+    <li><a href="/blog/tag/compilation">compilation</a></li>
+  
+    <li><a href="/blog/tag/composable prompts">composable prompts</a></li>
+  
+    <li><a href="/blog/tag/computation">computation</a></li>
+  
+    <li><a href="/blog/tag/computational biology">computational biology</a></li>
+  
+    <li><a href="/blog/tag/computational notebooks">computational notebooks</a></li>
+  
+    <li><a href="/blog/tag/conda">conda</a></li>
+  
+    <li><a href="/blog/tag/conference">conference</a></li>
+  
+    <li><a href="/blog/tag/conference activities">conference activities</a></li>
+  
+    <li><a href="/blog/tag/conferences">conferences</a></li>
+  
+    <li><a href="/blog/tag/configuration">configuration</a></li>
+  
+    <li><a href="/blog/tag/conflict resolution">conflict resolution</a></li>
+  
+    <li><a href="/blog/tag/connection mistakes">connection mistakes</a></li>
+  
+    <li><a href="/blog/tag/consistency">consistency</a></li>
+  
+    <li><a href="/blog/tag/containerization">containerization</a></li>
+  
+    <li><a href="/blog/tag/containers">containers</a></li>
+  
+    <li><a href="/blog/tag/content">content</a></li>
+  
+    <li><a href="/blog/tag/content delivery">content delivery</a></li>
+  
+    <li><a href="/blog/tag/context">context</a></li>
+  
+    <li><a href="/blog/tag/context manager">context manager</a></li>
+  
+    <li><a href="/blog/tag/contextual">contextual</a></li>
+  
+    <li><a href="/blog/tag/contextvars">contextvars</a></li>
+  
+    <li><a href="/blog/tag/continuous delivery">continuous delivery</a></li>
+  
+    <li><a href="/blog/tag/continuous improvement">continuous improvement</a></li>
+  
+    <li><a href="/blog/tag/continuous integration">continuous integration</a></li>
+  
+    <li><a href="/blog/tag/continuous learning">continuous learning</a></li>
+  
+    <li><a href="/blog/tag/contributions">contributions</a></li>
+  
+    <li><a href="/blog/tag/conventional commits">conventional commits</a></li>
+  
+    <li><a href="/blog/tag/convergence">convergence</a></li>
+  
+    <li><a href="/blog/tag/conversations">conversations</a></li>
+  
+    <li><a href="/blog/tag/cookiecutter">cookiecutter</a></li>
+  
+    <li><a href="/blog/tag/copilot">copilot</a></li>
+  
+    <li><a href="/blog/tag/correlations">correlations</a></li>
+  
+    <li><a href="/blog/tag/cost efficiency">cost efficiency</a></li>
+  
+    <li><a href="/blog/tag/covid-19">covid-19</a></li>
+  
+    <li><a href="/blog/tag/creativity">creativity</a></li>
+  
+    <li><a href="/blog/tag/credibility">credibility</a></li>
+  
+    <li><a href="/blog/tag/crispr-cas">crispr-cas</a></li>
+  
+    <li><a href="/blog/tag/criteria">criteria</a></li>
+  
+    <li><a href="/blog/tag/critical">critical</a></li>
+  
+    <li><a href="/blog/tag/croc">croc</a></li>
+  
+    <li><a href="/blog/tag/cron">cron</a></li>
+  
+    <li><a href="/blog/tag/cron jobs">cron jobs</a></li>
+  
+    <li><a href="/blog/tag/cryptography">cryptography</a></li>
+  
+    <li><a href="/blog/tag/css">css</a></li>
+  
+    <li><a href="/blog/tag/cuda">cuda</a></li>
+  
+    <li><a href="/blog/tag/cudnn">cudnn</a></li>
+  
+    <li><a href="/blog/tag/culture">culture</a></li>
+  
+    <li><a href="/blog/tag/cursor">cursor</a></li>
+  
+    <li><a href="/blog/tag/customization">customization</a></li>
+  
+    <li><a href="/blog/tag/cybersecurity">cybersecurity</a></li>
+  
+    <li><a href="/blog/tag/cyborgs">cyborgs</a></li>
+  
+    <li><a href="/blog/tag/cycling">cycling</a></li>
+  
+    <li><a href="/blog/tag/dalle-3">dalle-3</a></li>
+  
+    <li><a href="/blog/tag/darglint">darglint</a></li>
+  
+    <li><a href="/blog/tag/dashboarding">dashboarding</a></li>
+  
+    <li><a href="/blog/tag/dask">dask</a></li>
+  
+    <li><a href="/blog/tag/data">data</a></li>
+  
+    <li><a href="/blog/tag/data access">data access</a></li>
+  
+    <li><a href="/blog/tag/data analysis">data analysis</a></li>
+  
+    <li><a href="/blog/tag/data apps">data apps</a></li>
+  
+    <li><a href="/blog/tag/data bounds">data bounds</a></li>
+  
+    <li><a href="/blog/tag/data carpentry">data carpentry</a></li>
+  
+    <li><a href="/blog/tag/data catalog">data catalog</a></li>
+  
+    <li><a href="/blog/tag/data challenge">data challenge</a></li>
+  
+    <li><a href="/blog/tag/data checking">data checking</a></li>
+  
+    <li><a href="/blog/tag/data curation">data curation</a></li>
+  
+    <li><a href="/blog/tag/data discovery">data discovery</a></li>
+  
+    <li><a href="/blog/tag/data engineering">data engineering</a></li>
+  
+    <li><a href="/blog/tag/data files">data files</a></li>
+  
+    <li><a href="/blog/tag/data fusion">data fusion</a></li>
+  
+    <li><a href="/blog/tag/data governance">data governance</a></li>
+  
+    <li><a href="/blog/tag/data insights">data insights</a></li>
+  
+    <li><a href="/blog/tag/data management">data management</a></li>
+  
+    <li><a href="/blog/tag/data modeling">data modeling</a></li>
+  
+    <li><a href="/blog/tag/data patterns">data patterns</a></li>
+  
+    <li><a href="/blog/tag/data processing">data processing</a></li>
+  
+    <li><a href="/blog/tag/data product">data product</a></li>
+  
+    <li><a href="/blog/tag/data products">data products</a></li>
+  
+    <li><a href="/blog/tag/data publishing">data publishing</a></li>
+  
+    <li><a href="/blog/tag/data science">data science</a></li>
+  
+    <li><a href="/blog/tag/data science team">data science team</a></li>
+  
+    <li><a href="/blog/tag/data scientist">data scientist</a></li>
+  
+    <li><a href="/blog/tag/data splitting">data splitting</a></li>
+  
+    <li><a href="/blog/tag/data spread">data spread</a></li>
+  
+    <li><a href="/blog/tag/data storage">data storage</a></li>
+  
+    <li><a href="/blog/tag/data structures">data structures</a></li>
+  
+    <li><a href="/blog/tag/data testing">data testing</a></li>
+  
+    <li><a href="/blog/tag/data transformation">data transformation</a></li>
+  
+    <li><a href="/blog/tag/data validation">data validation</a></li>
+  
+    <li><a href="/blog/tag/data visualization">data visualization</a></li>
+  
+    <li><a href="/blog/tag/data workflow">data workflow</a></li>
+  
+    <li><a href="/blog/tag/datacamp">datacamp</a></li>
+  
+    <li><a href="/blog/tag/dataops">dataops</a></li>
+  
+    <li><a href="/blog/tag/datascience">datascience</a></li>
+  
+    <li><a href="/blog/tag/dataset curation">dataset curation</a></li>
+  
+    <li><a href="/blog/tag/datasets">datasets</a></li>
+  
+    <li><a href="/blog/tag/datasette">datasette</a></li>
+  
+    <li><a href="/blog/tag/debugging">debugging</a></li>
+  
+    <li><a href="/blog/tag/decision making">decision making</a></li>
+  
+    <li><a href="/blog/tag/decision support systems">decision support systems</a></li>
+  
+    <li><a href="/blog/tag/decisions">decisions</a></li>
+  
+    <li><a href="/blog/tag/deep learning">deep learning</a></li>
+  
+    <li><a href="/blog/tag/deep work">deep work</a></li>
+  
+    <li><a href="/blog/tag/defence">defence</a></li>
+  
+    <li><a href="/blog/tag/dependencies">dependencies</a></li>
+  
+    <li><a href="/blog/tag/dependency management">dependency management</a></li>
+  
+    <li><a href="/blog/tag/deployment">deployment</a></li>
+  
+    <li><a href="/blog/tag/design">design</a></li>
+  
+    <li><a href="/blog/tag/design choices">design choices</a></li>
+  
+    <li><a href="/blog/tag/developertools">developertools</a></li>
+  
+    <li><a href="/blog/tag/development">development</a></li>
+  
+    <li><a href="/blog/tag/devops">devops</a></li>
+  
+    <li><a href="/blog/tag/diataxis">diataxis</a></li>
+  
+    <li><a href="/blog/tag/dictation">dictation</a></li>
+  
+    <li><a href="/blog/tag/differentiable computing">differentiable computing</a></li>
+  
+    <li><a href="/blog/tag/digital">digital</a></li>
+  
+    <li><a href="/blog/tag/digital decluttering">digital decluttering</a></li>
+  
+    <li><a href="/blog/tag/digital ocean">digital ocean</a></li>
+  
+    <li><a href="/blog/tag/digitalocean">digitalocean</a></li>
+  
+    <li><a href="/blog/tag/dihedral angles">dihedral angles</a></li>
+  
+    <li><a href="/blog/tag/dirichlet">dirichlet</a></li>
+  
+    <li><a href="/blog/tag/discovery">discovery</a></li>
+  
+    <li><a href="/blog/tag/distribution">distribution</a></li>
+  
+    <li><a href="/blog/tag/distributions">distributions</a></li>
+  
+    <li><a href="/blog/tag/diy">diy</a></li>
+  
+    <li><a href="/blog/tag/docathon">docathon</a></li>
+  
+    <li><a href="/blog/tag/docker">docker</a></li>
+  
+    <li><a href="/blog/tag/docling">docling</a></li>
+  
+    <li><a href="/blog/tag/docstrings">docstrings</a></li>
+  
+    <li><a href="/blog/tag/document parsing">document parsing</a></li>
+  
+    <li><a href="/blog/tag/documentation">documentation</a></li>
+  
+    <li><a href="/blog/tag/documentstore">documentstore</a></li>
+  
+    <li><a href="/blog/tag/dokku">dokku</a></li>
+  
+    <li><a href="/blog/tag/dokku deployment">dokku deployment</a></li>
+  
+    <li><a href="/blog/tag/dokku server">dokku server</a></li>
+  
+    <li><a href="/blog/tag/donations">donations</a></li>
+  
+    <li><a href="/blog/tag/dose response">dose response</a></li>
+  
+    <li><a href="/blog/tag/dropbox">dropbox</a></li>
+  
+    <li><a href="/blog/tag/drug development">drug development</a></li>
+  
+    <li><a href="/blog/tag/drug resistance">drug resistance</a></li>
+  
+    <li><a href="/blog/tag/dspy">dspy</a></li>
+  
+    <li><a href="/blog/tag/dynamic libraries">dynamic libraries</a></li>
+  
+    <li><a href="/blog/tag/ebooks">ebooks</a></li>
+  
+    <li><a href="/blog/tag/eda">eda</a></li>
+  
+    <li><a href="/blog/tag/education">education</a></li>
+  
+    <li><a href="/blog/tag/efficiency">efficiency</a></li>
+  
+    <li><a href="/blog/tag/efficient">efficient</a></li>
+  
+    <li><a href="/blog/tag/email">email</a></li>
+  
+    <li><a href="/blog/tag/embedding conversion">embedding conversion</a></li>
+  
+    <li><a href="/blog/tag/embedding models">embedding models</a></li>
+  
+    <li><a href="/blog/tag/emerging tech">emerging tech</a></li>
+  
+    <li><a href="/blog/tag/empathy">empathy</a></li>
+  
+    <li><a href="/blog/tag/engineering">engineering</a></li>
+  
+    <li><a href="/blog/tag/enhancement proposal">enhancement proposal</a></li>
+  
+    <li><a href="/blog/tag/environment">environment</a></li>
+  
+    <li><a href="/blog/tag/environment management">environment management</a></li>
+  
+    <li><a href="/blog/tag/environment variables">environment variables</a></li>
+  
+    <li><a href="/blog/tag/environment-variables">environment-variables</a></li>
+  
+    <li><a href="/blog/tag/environments">environments</a></li>
+  
+    <li><a href="/blog/tag/enzyme engineering">enzyme engineering</a></li>
+  
+    <li><a href="/blog/tag/epidemiology">epidemiology</a></li>
+  
+    <li><a href="/blog/tag/ergonomics">ergonomics</a></li>
+  
+    <li><a href="/blog/tag/error handling">error handling</a></li>
+  
+    <li><a href="/blog/tag/esm3">esm3</a></li>
+  
+    <li><a href="/blog/tag/essays">essays</a></li>
+  
+    <li><a href="/blog/tag/estimation">estimation</a></li>
+  
+    <li><a href="/blog/tag/evals">evals</a></li>
+  
+    <li><a href="/blog/tag/evaluation">evaluation</a></li>
+  
+    <li><a href="/blog/tag/evaluations">evaluations</a></li>
+  
+    <li><a href="/blog/tag/event cycle times">event cycle times</a></li>
+  
+    <li><a href="/blog/tag/event planning">event planning</a></li>
+  
+    <li><a href="/blog/tag/evolution">evolution</a></li>
+  
+    <li><a href="/blog/tag/execution">execution</a></li>
+  
+    <li><a href="/blog/tag/execution capability">execution capability</a></li>
+  
+    <li><a href="/blog/tag/expenses">expenses</a></li>
+  
+    <li><a href="/blog/tag/experiment design">experiment design</a></li>
+  
+    <li><a href="/blog/tag/experimental design">experimental design</a></li>
+  
+    <li><a href="/blog/tag/experimentation">experimentation</a></li>
+  
+    <li><a href="/blog/tag/experiments">experiments</a></li>
+  
+    <li><a href="/blog/tag/exploration">exploration</a></li>
+  
+    <li><a href="/blog/tag/exploratory analysis">exploratory analysis</a></li>
+  
+    <li><a href="/blog/tag/exploratory data analysis">exploratory data analysis</a></li>
+  
+    <li><a href="/blog/tag/extensions">extensions</a></li>
+  
+    <li><a href="/blog/tag/extraction">extraction</a></li>
+  
+    <li><a href="/blog/tag/faith">faith</a></li>
+  
+    <li><a href="/blog/tag/faq">faq</a></li>
+  
+    <li><a href="/blog/tag/fastapi">fastapi</a></li>
+  
+    <li><a href="/blog/tag/features">features</a></li>
+  
+    <li><a href="/blog/tag/feedback">feedback</a></li>
+  
+    <li><a href="/blog/tag/feel good">feel good</a></li>
+  
+    <li><a href="/blog/tag/file download">file download</a></li>
+  
+    <li><a href="/blog/tag/filesystem">filesystem</a></li>
+  
+    <li><a href="/blog/tag/finesse">finesse</a></li>
+  
+    <li><a href="/blog/tag/first job">first job</a></li>
+  
+    <li><a href="/blog/tag/flask">flask</a></li>
+  
+    <li><a href="/blog/tag/flattenthecurve">flattenthecurve</a></li>
+  
+    <li><a href="/blog/tag/fluorescence">fluorescence</a></li>
+  
+    <li><a href="/blog/tag/focus">focus</a></li>
+  
+    <li><a href="/blog/tag/focus time">focus time</a></li>
+  
+    <li><a href="/blog/tag/foresight">foresight</a></li>
+  
+    <li><a href="/blog/tag/framework">framework</a></li>
+  
+    <li><a href="/blog/tag/frameworks">frameworks</a></li>
+  
+    <li><a href="/blog/tag/frontend">frontend</a></li>
+  
+    <li><a href="/blog/tag/function-based programming">function-based programming</a></li>
+  
+    <li><a href="/blog/tag/functions">functions</a></li>
+  
+    <li><a href="/blog/tag/fuzzy search">fuzzy search</a></li>
+  
+    <li><a href="/blog/tag/gadgets">gadgets</a></li>
+  
+    <li><a href="/blog/tag/gatherings">gatherings</a></li>
+  
+    <li><a href="/blog/tag/gear">gear</a></li>
+  
+    <li><a href="/blog/tag/gene editing">gene editing</a></li>
+  
+    <li><a href="/blog/tag/general stuff">general stuff</a></li>
+  
+    <li><a href="/blog/tag/generative ai">generative ai</a></li>
+  
+    <li><a href="/blog/tag/generative artificial intelligence">generative artificial intelligence</a></li>
+  
+    <li><a href="/blog/tag/generative model">generative model</a></li>
+  
+    <li><a href="/blog/tag/generative models">generative models</a></li>
+  
+    <li><a href="/blog/tag/genomic data">genomic data</a></li>
+  
+    <li><a href="/blog/tag/genomic surveillance">genomic surveillance</a></li>
+  
+    <li><a href="/blog/tag/gh-cli">gh-cli</a></li>
+  
+    <li><a href="/blog/tag/ghostwriting">ghostwriting</a></li>
+  
+    <li><a href="/blog/tag/git">git</a></li>
+  
+    <li><a href="/blog/tag/git configuration">git configuration</a></li>
+  
+    <li><a href="/blog/tag/git workflow">git workflow</a></li>
+  
+    <li><a href="/blog/tag/gitbot">gitbot</a></li>
+  
+    <li><a href="/blog/tag/github">github</a></li>
+  
+    <li><a href="/blog/tag/github actions">github actions</a></li>
+  
+    <li><a href="/blog/tag/github permissions">github permissions</a></li>
+  
+    <li><a href="/blog/tag/github token">github token</a></li>
+  
+    <li><a href="/blog/tag/github workflow">github workflow</a></li>
+  
+    <li><a href="/blog/tag/glm">glm</a></li>
+  
+    <li><a href="/blog/tag/good practices">good practices</a></li>
+  
+    <li><a href="/blog/tag/google">google</a></li>
+  
+    <li><a href="/blog/tag/google cloud">google cloud</a></li>
+  
+    <li><a href="/blog/tag/google docs">google docs</a></li>
+  
+    <li><a href="/blog/tag/google drive">google drive</a></li>
+  
+    <li><a href="/blog/tag/gpt">gpt</a></li>
+  
+    <li><a href="/blog/tag/gpt-4">gpt-4</a></li>
+  
+    <li><a href="/blog/tag/gpt3">gpt3</a></li>
+  
+    <li><a href="/blog/tag/gpt4">gpt4</a></li>
+  
+    <li><a href="/blog/tag/gpu">gpu</a></li>
+  
+    <li><a href="/blog/tag/grad school">grad school</a></li>
+  
+    <li><a href="/blog/tag/gradient descent">gradient descent</a></li>
+  
+    <li><a href="/blog/tag/gradient-based optimization">gradient-based optimization</a></li>
+  
+    <li><a href="/blog/tag/graduate school">graduate school</a></li>
+  
+    <li><a href="/blog/tag/graduation">graduation</a></li>
+  
+    <li><a href="/blog/tag/graph">graph</a></li>
+  
+    <li><a href="/blog/tag/graph neural networks">graph neural networks</a></li>
+  
+    <li><a href="/blog/tag/graph theory">graph theory</a></li>
+  
+    <li><a href="/blog/tag/graph visualization">graph visualization</a></li>
+  
+    <li><a href="/blog/tag/graphs">graphs</a></li>
+  
+    <li><a href="/blog/tag/gridengine">gridengine</a></li>
+  
+    <li><a href="/blog/tag/growth">growth</a></li>
+  
+    <li><a href="/blog/tag/guest network">guest network</a></li>
+  
+    <li><a href="/blog/tag/guides">guides</a></li>
+  
+    <li><a href="/blog/tag/hacks">hacks</a></li>
+  
+    <li><a href="/blog/tag/harness">harness</a></li>
+  
+    <li><a href="/blog/tag/hatchling">hatchling</a></li>
+  
+    <li><a href="/blog/tag/hesitation">hesitation</a></li>
+  
+    <li><a href="/blog/tag/highlighting">highlighting</a></li>
+  
+    <li><a href="/blog/tag/hiring">hiring</a></li>
+  
+    <li><a href="/blog/tag/hiring challenges">hiring challenges</a></li>
+  
+    <li><a href="/blog/tag/hiring process">hiring process</a></li>
+  
+    <li><a href="/blog/tag/hobbies">hobbies</a></li>
+  
+    <li><a href="/blog/tag/home project">home project</a></li>
+  
+    <li><a href="/blog/tag/html">html</a></li>
+  
+    <li><a href="/blog/tag/htmx">htmx</a></li>
+  
+    <li><a href="/blog/tag/huggingface">huggingface</a></li>
+  
+    <li><a href="/blog/tag/humility">humility</a></li>
+  
+    <li><a href="/blog/tag/hybrid search">hybrid search</a></li>
+  
+    <li><a href="/blog/tag/hypothesis testing">hypothesis testing</a></li>
+  
+    <li><a href="/blog/tag/ide">ide</a></li>
+  
+    <li><a href="/blog/tag/impact">impact</a></li>
+  
+    <li><a href="/blog/tag/improvement">improvement</a></li>
+  
+    <li><a href="/blog/tag/incentives">incentives</a></li>
+  
+    <li><a href="/blog/tag/individual contributor">individual contributor</a></li>
+  
+    <li><a href="/blog/tag/infectious disease">infectious disease</a></li>
+  
+    <li><a href="/blog/tag/inference">inference</a></li>
+  
+    <li><a href="/blog/tag/influenza">influenza</a></li>
+  
+    <li><a href="/blog/tag/influenza research">influenza research</a></li>
+  
+    <li><a href="/blog/tag/infrastructure">infrastructure</a></li>
+  
+    <li><a href="/blog/tag/init.d">init.d</a></li>
+  
+    <li><a href="/blog/tag/innovation">innovation</a></li>
+  
+    <li><a href="/blog/tag/insight data science">insight data science</a></li>
+  
+    <li><a href="/blog/tag/integration">integration</a></li>
+  
+    <li><a href="/blog/tag/interface">interface</a></li>
+  
+    <li><a href="/blog/tag/interfaces">interfaces</a></li>
+  
+    <li><a href="/blog/tag/internet browsing">internet browsing</a></li>
+  
+    <li><a href="/blog/tag/internet connection">internet connection</a></li>
+  
+    <li><a href="/blog/tag/internet tools">internet tools</a></li>
+  
+    <li><a href="/blog/tag/interview preparation">interview preparation</a></li>
+  
+    <li><a href="/blog/tag/interviewing">interviewing</a></li>
+  
+    <li><a href="/blog/tag/interviews">interviews</a></li>
+  
+    <li><a href="/blog/tag/investment">investment</a></li>
+  
+    <li><a href="/blog/tag/ipad">ipad</a></li>
+  
+    <li><a href="/blog/tag/iteration">iteration</a></li>
+  
+    <li><a href="/blog/tag/javascript">javascript</a></li>
+  
+    <li><a href="/blog/tag/jax">jax</a></li>
+  
+    <li><a href="/blog/tag/jinja">jinja</a></li>
+  
+    <li><a href="/blog/tag/jinja2">jinja2</a></li>
+  
+    <li><a href="/blog/tag/job hunt">job hunt</a></li>
+  
+    <li><a href="/blog/tag/job interviews">job interviews</a></li>
+  
+    <li><a href="/blog/tag/job offer">job offer</a></li>
+  
+    <li><a href="/blog/tag/job search">job search</a></li>
+  
+    <li><a href="/blog/tag/job seeking">job seeking</a></li>
+  
+    <li><a href="/blog/tag/jobs theory">jobs theory</a></li>
+  
+    <li><a href="/blog/tag/journal">journal</a></li>
+  
+    <li><a href="/blog/tag/journal club">journal club</a></li>
+  
+    <li><a href="/blog/tag/joy">joy</a></li>
+  
+    <li><a href="/blog/tag/jupyter">jupyter</a></li>
+  
+    <li><a href="/blog/tag/jupyter notebook">jupyter notebook</a></li>
+  
+    <li><a href="/blog/tag/jupyter notebooks">jupyter notebooks</a></li>
+  
+    <li><a href="/blog/tag/juv">juv</a></li>
+  
+    <li><a href="/blog/tag/katex">katex</a></li>
+  
+    <li><a href="/blog/tag/key results">key results</a></li>
+  
+    <li><a href="/blog/tag/keybindings">keybindings</a></li>
+  
+    <li><a href="/blog/tag/keyword generator">keyword generator</a></li>
+  
+    <li><a href="/blog/tag/keyword search">keyword search</a></li>
+  
+    <li><a href="/blog/tag/knowledge">knowledge</a></li>
+  
+    <li><a href="/blog/tag/knowledge graph">knowledge graph</a></li>
+  
+    <li><a href="/blog/tag/knowledge sharing">knowledge sharing</a></li>
+  
+    <li><a href="/blog/tag/lab notebook">lab notebook</a></li>
+  
+    <li><a href="/blog/tag/laboratory">laboratory</a></li>
+  
+    <li><a href="/blog/tag/laboratory science">laboratory science</a></li>
+  
+    <li><a href="/blog/tag/lambda expression">lambda expression</a></li>
+  
+    <li><a href="/blog/tag/lancedb">lancedb</a></li>
+  
+    <li><a href="/blog/tag/langchain">langchain</a></li>
+  
+    <li><a href="/blog/tag/language model">language model</a></li>
+  
+    <li><a href="/blog/tag/language models">language models</a></li>
+  
+    <li><a href="/blog/tag/large dataset">large dataset</a></li>
+  
+    <li><a href="/blog/tag/large datasets">large datasets</a></li>
+  
+    <li><a href="/blog/tag/large language model">large language model</a></li>
+  
+    <li><a href="/blog/tag/large language models">large language models</a></li>
+  
+    <li><a href="/blog/tag/lax">lax</a></li>
+  
+    <li><a href="/blog/tag/lead optimization">lead optimization</a></li>
+  
+    <li><a href="/blog/tag/leadership">leadership</a></li>
+  
+    <li><a href="/blog/tag/learning">learning</a></li>
+  
+    <li><a href="/blog/tag/lessons">lessons</a></li>
+  
+    <li><a href="/blog/tag/lessons learned">lessons learned</a></li>
+  
+    <li><a href="/blog/tag/leukemia">leukemia</a></li>
+  
+    <li><a href="/blog/tag/library design">library design</a></li>
+  
+    <li><a href="/blog/tag/license">license</a></li>
+  
+    <li><a href="/blog/tag/life sciences">life sciences</a></li>
+  
+    <li><a href="/blog/tag/lifesciences">lifesciences</a></li>
+  
+    <li><a href="/blog/tag/linear algebra">linear algebra</a></li>
+  
+    <li><a href="/blog/tag/linkedin">linkedin</a></li>
+  
+    <li><a href="/blog/tag/linux">linux</a></li>
+  
+    <li><a href="/blog/tag/linux commands">linux commands</a></li>
+  
+    <li><a href="/blog/tag/linux startup">linux startup</a></li>
+  
+    <li><a href="/blog/tag/linux tower">linux tower</a></li>
+  
+    <li><a href="/blog/tag/linux tutorial">linux tutorial</a></li>
+  
+    <li><a href="/blog/tag/litellm">litellm</a></li>
+  
+    <li><a href="/blog/tag/llama bot">llama bot</a></li>
+  
+    <li><a href="/blog/tag/llama_index">llama_index</a></li>
+  
+    <li><a href="/blog/tag/llamabot">llamabot</a></li>
+  
+    <li><a href="/blog/tag/llm">llm</a></li>
+  
+    <li><a href="/blog/tag/llms">llms</a></li>
+  
+    <li><a href="/blog/tag/local llms">local llms</a></li>
+  
+    <li><a href="/blog/tag/logging">logging</a></li>
+  
+    <li><a href="/blog/tag/logic">logic</a></li>
+  
+    <li><a href="/blog/tag/m1">m1</a></li>
+  
+    <li><a href="/blog/tag/macbook">macbook</a></li>
+  
+    <li><a href="/blog/tag/macbook air">macbook air</a></li>
+  
+    <li><a href="/blog/tag/machine learning">machine learning</a></li>
+  
+    <li><a href="/blog/tag/macos">macos</a></li>
+  
+    <li><a href="/blog/tag/mambaforge">mambaforge</a></li>
+  
+    <li><a href="/blog/tag/management">management</a></li>
+  
+    <li><a href="/blog/tag/marimo">marimo</a></li>
+  
+    <li><a href="/blog/tag/markdown">markdown</a></li>
+  
+    <li><a href="/blog/tag/markov models">markov models</a></li>
+  
+    <li><a href="/blog/tag/masked language modeling">masked language modeling</a></li>
+  
+    <li><a href="/blog/tag/masked language modelling">masked language modelling</a></li>
+  
+    <li><a href="/blog/tag/mass">mass</a></li>
+  
+    <li><a href="/blog/tag/masters careers">masters careers</a></li>
+  
+    <li><a href="/blog/tag/mastodon">mastodon</a></li>
+  
+    <li><a href="/blog/tag/math">math</a></li>
+  
+    <li><a href="/blog/tag/matplotlib">matplotlib</a></li>
+  
+    <li><a href="/blog/tag/matplotlib plotting">matplotlib plotting</a></li>
+  
+    <li><a href="/blog/tag/matrices">matrices</a></li>
+  
+    <li><a href="/blog/tag/matrix math">matrix math</a></li>
+  
+    <li><a href="/blog/tag/mcp">mcp</a></li>
+  
+    <li><a href="/blog/tag/measurement">measurement</a></li>
+  
+    <li><a href="/blog/tag/medicine">medicine</a></li>
+  
+    <li><a href="/blog/tag/meeting notes">meeting notes</a></li>
+  
+    <li><a href="/blog/tag/meetings">meetings</a></li>
+  
+    <li><a href="/blog/tag/meetups">meetups</a></li>
+  
+    <li><a href="/blog/tag/memory">memory</a></li>
+  
+    <li><a href="/blog/tag/mentorship">mentorship</a></li>
+  
+    <li><a href="/blog/tag/message passing neural networks">message passing neural networks</a></li>
+  
+    <li><a href="/blog/tag/metadata">metadata</a></li>
+  
+    <li><a href="/blog/tag/methodologies">methodologies</a></li>
+  
+    <li><a href="/blog/tag/metrics">metrics</a></li>
+  
+    <li><a href="/blog/tag/metrology">metrology</a></li>
+  
+    <li><a href="/blog/tag/micromamba">micromamba</a></li>
+  
+    <li><a href="/blog/tag/mimetype">mimetype</a></li>
+  
+    <li><a href="/blog/tag/miniforge">miniforge</a></li>
+  
+    <li><a href="/blog/tag/minimum viable products">minimum viable products</a></li>
+  
+    <li><a href="/blog/tag/minion sequencer">minion sequencer</a></li>
+  
+    <li><a href="/blog/tag/mission statement">mission statement</a></li>
+  
+    <li><a href="/blog/tag/mistakes">mistakes</a></li>
+  
+    <li><a href="/blog/tag/mistral">mistral</a></li>
+  
+    <li><a href="/blog/tag/mit">mit</a></li>
+  
+    <li><a href="/blog/tag/mixin">mixin</a></li>
+  
+    <li><a href="/blog/tag/mixtral">mixtral</a></li>
+  
+    <li><a href="/blog/tag/mixtral 8x7b-instruct">mixtral 8x7b-instruct</a></li>
+  
+    <li><a href="/blog/tag/mixture models">mixture models</a></li>
+  
+    <li><a href="/blog/tag/mkdocs">mkdocs</a></li>
+  
+    <li><a href="/blog/tag/ml models">ml models</a></li>
+  
+    <li><a href="/blog/tag/mobile">mobile</a></li>
+  
+    <li><a href="/blog/tag/modal">modal</a></li>
+  
+    <li><a href="/blog/tag/model architecture">model architecture</a></li>
+  
+    <li><a href="/blog/tag/model building">model building</a></li>
+  
+    <li><a href="/blog/tag/model specification">model specification</a></li>
+  
+    <li><a href="/blog/tag/model training">model training</a></li>
+  
+    <li><a href="/blog/tag/modeling">modeling</a></li>
+  
+    <li><a href="/blog/tag/models">models</a></li>
+  
+    <li><a href="/blog/tag/moderna">moderna</a></li>
+  
+    <li><a href="/blog/tag/molecule discovery">molecule discovery</a></li>
+  
+    <li><a href="/blog/tag/monkeypatching">monkeypatching</a></li>
+  
+    <li><a href="/blog/tag/morale">morale</a></li>
+  
+    <li><a href="/blog/tag/motivation">motivation</a></li>
+  
+    <li><a href="/blog/tag/multi-modal learning">multi-modal learning</a></li>
+  
+    <li><a href="/blog/tag/multi-modality">multi-modality</a></li>
+  
+    <li><a href="/blog/tag/multilevel">multilevel</a></li>
+  
+    <li><a href="/blog/tag/musings">musings</a></li>
+  
+    <li><a href="/blog/tag/namespace">namespace</a></li>
+  
+    <li><a href="/blog/tag/nano">nano</a></li>
+  
+    <li><a href="/blog/tag/narrative">narrative</a></li>
+  
+    <li><a href="/blog/tag/natural language processing">natural language processing</a></li>
+  
+    <li><a href="/blog/tag/navigation">navigation</a></li>
+  
+    <li><a href="/blog/tag/negative infinity">negative infinity</a></li>
+  
+    <li><a href="/blog/tag/negotiation">negotiation</a></li>
+  
+    <li><a href="/blog/tag/negotiation tips">negotiation tips</a></li>
+  
+    <li><a href="/blog/tag/netlify">netlify</a></li>
+  
+    <li><a href="/blog/tag/network">network</a></li>
+  
+    <li><a href="/blog/tag/network analysis">network analysis</a></li>
+  
+    <li><a href="/blog/tag/network analysis made simple">network analysis made simple</a></li>
+  
+    <li><a href="/blog/tag/network science">network science</a></li>
+  
+    <li><a href="/blog/tag/networking">networking</a></li>
+  
+    <li><a href="/blog/tag/networking tips">networking tips</a></li>
+  
+    <li><a href="/blog/tag/networks">networks</a></li>
+  
+    <li><a href="/blog/tag/networkx">networkx</a></li>
+  
+    <li><a href="/blog/tag/neural network">neural network</a></li>
+  
+    <li><a href="/blog/tag/neural networks">neural networks</a></li>
+  
+    <li><a href="/blog/tag/nlp">nlp</a></li>
+  
+    <li><a href="/blog/tag/notebook">notebook</a></li>
+  
+    <li><a href="/blog/tag/notebooks">notebooks</a></li>
+  
+    <li><a href="/blog/tag/notetaking">notetaking</a></li>
+  
+    <li><a href="/blog/tag/notion">notion</a></li>
+  
+    <li><a href="/blog/tag/nougat">nougat</a></li>
+  
+    <li><a href="/blog/tag/numba">numba</a></li>
+  
+    <li><a href="/blog/tag/numpy">numpy</a></li>
+  
+    <li><a href="/blog/tag/nuts mcmc">nuts mcmc</a></li>
+  
+    <li><a href="/blog/tag/nvidia">nvidia</a></li>
+  
+    <li><a href="/blog/tag/nxviz">nxviz</a></li>
+  
+    <li><a href="/blog/tag/obama">obama</a></li>
+  
+    <li><a href="/blog/tag/object-oriented">object-oriented</a></li>
+  
+    <li><a href="/blog/tag/objectives">objectives</a></li>
+  
+    <li><a href="/blog/tag/odsc">odsc</a></li>
+  
+    <li><a href="/blog/tag/odsc east">odsc east</a></li>
+  
+    <li><a href="/blog/tag/okrs">okrs</a></li>
+  
+    <li><a href="/blog/tag/old gpu">old gpu</a></li>
+  
+    <li><a href="/blog/tag/older commodity hardware">older commodity hardware</a></li>
+  
+    <li><a href="/blog/tag/ollama">ollama</a></li>
+  
+    <li><a href="/blog/tag/online workspace">online workspace</a></li>
+  
+    <li><a href="/blog/tag/open science">open science</a></li>
+  
+    <li><a href="/blog/tag/open source">open source</a></li>
+  
+    <li><a href="/blog/tag/openai">openai</a></li>
+  
+    <li><a href="/blog/tag/openai api">openai api</a></li>
+  
+    <li><a href="/blog/tag/opencode">opencode</a></li>
+  
+    <li><a href="/blog/tag/opensource">opensource</a></li>
+  
+    <li><a href="/blog/tag/optimization">optimization</a></li>
+  
+    <li><a href="/blog/tag/organization">organization</a></li>
+  
+    <li><a href="/blog/tag/organizational change">organizational change</a></li>
+  
+    <li><a href="/blog/tag/organizational dynamics">organizational dynamics</a></li>
+  
+    <li><a href="/blog/tag/outcomes">outcomes</a></li>
+  
+    <li><a href="/blog/tag/outlines">outlines</a></li>
+  
+    <li><a href="/blog/tag/outlines library">outlines library</a></li>
+  
+    <li><a href="/blog/tag/package">package</a></li>
+  
+    <li><a href="/blog/tag/package management">package management</a></li>
+  
+    <li><a href="/blog/tag/packages">packages</a></li>
+  
+    <li><a href="/blog/tag/packaging">packaging</a></li>
+  
+    <li><a href="/blog/tag/pair coding">pair coding</a></li>
+  
+    <li><a href="/blog/tag/pair programming">pair programming</a></li>
+  
+    <li><a href="/blog/tag/pair-programming">pair-programming</a></li>
+  
+    <li><a href="/blog/tag/pairing">pairing</a></li>
+  
+    <li><a href="/blog/tag/pandas">pandas</a></li>
+  
+    <li><a href="/blog/tag/pandera">pandera</a></li>
+  
+    <li><a href="/blog/tag/panel">panel</a></li>
+  
+    <li><a href="/blog/tag/paper">paper</a></li>
+  
+    <li><a href="/blog/tag/paper writing">paper writing</a></li>
+  
+    <li><a href="/blog/tag/parallel">parallel</a></li>
+  
+    <li><a href="/blog/tag/parameter learning">parameter learning</a></li>
+  
+    <li><a href="/blog/tag/patch release">patch release</a></li>
+  
+    <li><a href="/blog/tag/pathlib">pathlib</a></li>
+  
+    <li><a href="/blog/tag/pattern matching">pattern matching</a></li>
+  
+    <li><a href="/blog/tag/patterns">patterns</a></li>
+  
+    <li><a href="/blog/tag/pdb files">pdb files</a></li>
+  
+    <li><a href="/blog/tag/peer review">peer review</a></li>
+  
+    <li><a href="/blog/tag/perfectionism">perfectionism</a></li>
+  
+    <li><a href="/blog/tag/performance">performance</a></li>
+  
+    <li><a href="/blog/tag/performance management">performance management</a></li>
+  
+    <li><a href="/blog/tag/permissions">permissions</a></li>
+  
+    <li><a href="/blog/tag/personal">personal</a></li>
+  
+    <li><a href="/blog/tag/personal cdn">personal cdn</a></li>
+  
+    <li><a href="/blog/tag/personality">personality</a></li>
+  
+    <li><a href="/blog/tag/personalized messages">personalized messages</a></li>
+  
+    <li><a href="/blog/tag/peter principle">peter principle</a></li>
+  
+    <li><a href="/blog/tag/phd advice">phd advice</a></li>
+  
+    <li><a href="/blog/tag/phd careers">phd careers</a></li>
+  
+    <li><a href="/blog/tag/phenotype prediction">phenotype prediction</a></li>
+  
+    <li><a href="/blog/tag/phenotypic surveillance">phenotypic surveillance</a></li>
+  
+    <li><a href="/blog/tag/philosophy">philosophy</a></li>
+  
+    <li><a href="/blog/tag/phylogenetic trees">phylogenetic trees</a></li>
+  
+    <li><a href="/blog/tag/phylogenetics">phylogenetics</a></li>
+  
+    <li><a href="/blog/tag/pip">pip</a></li>
+  
+    <li><a href="/blog/tag/pipeline">pipeline</a></li>
+  
+    <li><a href="/blog/tag/pipelines">pipelines</a></li>
+  
+    <li><a href="/blog/tag/pixi">pixi</a></li>
+  
+    <li><a href="/blog/tag/plaintext">plaintext</a></li>
+  
+    <li><a href="/blog/tag/planning">planning</a></li>
+  
+    <li><a href="/blog/tag/plots">plots</a></li>
+  
+    <li><a href="/blog/tag/pocketflow">pocketflow</a></li>
+  
+    <li><a href="/blog/tag/podcast">podcast</a></li>
+  
+    <li><a href="/blog/tag/poisson likelihood">poisson likelihood</a></li>
+  
+    <li><a href="/blog/tag/portability">portability</a></li>
+  
+    <li><a href="/blog/tag/portfolio management">portfolio management</a></li>
+  
+    <li><a href="/blog/tag/power">power</a></li>
+  
+    <li><a href="/blog/tag/practice">practice</a></li>
+  
+    <li><a href="/blog/tag/pre-commit">pre-commit</a></li>
+  
+    <li><a href="/blog/tag/pre-commit hook">pre-commit hook</a></li>
+  
+    <li><a href="/blog/tag/pre-commit hooks">pre-commit hooks</a></li>
+  
+    <li><a href="/blog/tag/predictive models">predictive models</a></li>
+  
+    <li><a href="/blog/tag/presentation">presentation</a></li>
+  
+    <li><a href="/blog/tag/presentation skills">presentation skills</a></li>
+  
+    <li><a href="/blog/tag/presentations">presentations</a></li>
+  
+    <li><a href="/blog/tag/priors">priors</a></li>
+  
+    <li><a href="/blog/tag/privilege">privilege</a></li>
+  
+    <li><a href="/blog/tag/probabilistic modelling">probabilistic modelling</a></li>
+  
+    <li><a href="/blog/tag/probabilistic programming">probabilistic programming</a></li>
+  
+    <li><a href="/blog/tag/probability">probability</a></li>
+  
+    <li><a href="/blog/tag/probability distribution">probability distribution</a></li>
+  
+    <li><a href="/blog/tag/probability distributions">probability distributions</a></li>
+  
+    <li><a href="/blog/tag/probability of superiority">probability of superiority</a></li>
+  
+    <li><a href="/blog/tag/problem scoping">problem scoping</a></li>
+  
+    <li><a href="/blog/tag/problem shepherding">problem shepherding</a></li>
+  
+    <li><a href="/blog/tag/problem solving">problem solving</a></li>
+  
+    <li><a href="/blog/tag/problem spotting">problem spotting</a></li>
+  
+    <li><a href="/blog/tag/process">process</a></li>
+  
+    <li><a href="/blog/tag/product">product</a></li>
+  
+    <li><a href="/blog/tag/product development">product development</a></li>
+  
+    <li><a href="/blog/tag/product oriented">product oriented</a></li>
+  
+    <li><a href="/blog/tag/product-oriented">product-oriented</a></li>
+  
+    <li><a href="/blog/tag/production">production</a></li>
+  
+    <li><a href="/blog/tag/productivity">productivity</a></li>
+  
+    <li><a href="/blog/tag/productivity tips">productivity tips</a></li>
+  
+    <li><a href="/blog/tag/productivity tools">productivity tools</a></li>
+  
+    <li><a href="/blog/tag/professional development">professional development</a></li>
+  
+    <li><a href="/blog/tag/professional growth">professional growth</a></li>
+  
+    <li><a href="/blog/tag/professional networking">professional networking</a></li>
+  
+    <li><a href="/blog/tag/professional transition">professional transition</a></li>
+  
+    <li><a href="/blog/tag/profile optimization">profile optimization</a></li>
+  
+    <li><a href="/blog/tag/profit">profit</a></li>
+  
+    <li><a href="/blog/tag/programming">programming</a></li>
+  
+    <li><a href="/blog/tag/programming best practices">programming best practices</a></li>
+  
+    <li><a href="/blog/tag/programming style">programming style</a></li>
+  
+    <li><a href="/blog/tag/programming tips">programming tips</a></li>
+  
+    <li><a href="/blog/tag/project">project</a></li>
+  
+    <li><a href="/blog/tag/project configuration">project configuration</a></li>
+  
+    <li><a href="/blog/tag/project management">project management</a></li>
+  
+    <li><a href="/blog/tag/project structure">project structure</a></li>
+  
+    <li><a href="/blog/tag/promotion">promotion</a></li>
+  
+    <li><a href="/blog/tag/prompt engineering">prompt engineering</a></li>
+  
+    <li><a href="/blog/tag/prompt experimentation">prompt experimentation</a></li>
+  
+    <li><a href="/blog/tag/prompt management">prompt management</a></li>
+  
+    <li><a href="/blog/tag/prompting">prompting</a></li>
+  
+    <li><a href="/blog/tag/property prediction">property prediction</a></li>
+  
+    <li><a href="/blog/tag/protein">protein</a></li>
+  
+    <li><a href="/blog/tag/protein backbone generation">protein backbone generation</a></li>
+  
+    <li><a href="/blog/tag/protein design">protein design</a></li>
+  
+    <li><a href="/blog/tag/protein engineering">protein engineering</a></li>
+  
+    <li><a href="/blog/tag/protein language models">protein language models</a></li>
+  
+    <li><a href="/blog/tag/protein modeling">protein modeling</a></li>
+  
+    <li><a href="/blog/tag/protein sequences">protein sequences</a></li>
+  
+    <li><a href="/blog/tag/protein structure">protein structure</a></li>
+  
+    <li><a href="/blog/tag/protein visualization">protein visualization</a></li>
+  
+    <li><a href="/blog/tag/prototype">prototype</a></li>
+  
+    <li><a href="/blog/tag/prototyping">prototyping</a></li>
+  
+    <li><a href="/blog/tag/psychological safety">psychological safety</a></li>
+  
+    <li><a href="/blog/tag/public profile">public profile</a></li>
+  
+    <li><a href="/blog/tag/public speaking">public speaking</a></li>
+  
+    <li><a href="/blog/tag/pull requests">pull requests</a></li>
+  
+    <li><a href="/blog/tag/puzzles">puzzles</a></li>
+  
+    <li><a href="/blog/tag/pycon">pycon</a></li>
+  
+    <li><a href="/blog/tag/pycon 2019">pycon 2019</a></li>
+  
+    <li><a href="/blog/tag/pydantic">pydantic</a></li>
+  
+    <li><a href="/blog/tag/pydata">pydata</a></li>
+  
+    <li><a href="/blog/tag/pydoclint">pydoclint</a></li>
+  
+    <li><a href="/blog/tag/pyds-cli">pyds-cli</a></li>
+  
+    <li><a href="/blog/tag/pyjanitor">pyjanitor</a></li>
+  
+    <li><a href="/blog/tag/pymc">pymc</a></li>
+  
+    <li><a href="/blog/tag/pymc3">pymc3</a></li>
+  
+    <li><a href="/blog/tag/pymol">pymol</a></li>
+  
+    <li><a href="/blog/tag/pypi">pypi</a></li>
+  
+    <li><a href="/blog/tag/pypng">pypng</a></li>
+  
+    <li><a href="/blog/tag/pyproject.toml">pyproject.toml</a></li>
+  
+    <li><a href="/blog/tag/pyqrcode">pyqrcode</a></li>
+  
+    <li><a href="/blog/tag/pyscript">pyscript</a></li>
+  
+    <li><a href="/blog/tag/pytest">pytest</a></li>
+  
+    <li><a href="/blog/tag/python">python</a></li>
+  
+    <li><a href="/blog/tag/python distribution">python distribution</a></li>
+  
+    <li><a href="/blog/tag/python packages">python packages</a></li>
+  
+    <li><a href="/blog/tag/python pickles">python pickles</a></li>
+  
+    <li><a href="/blog/tag/python script">python script</a></li>
+  
+    <li><a href="/blog/tag/python scripting">python scripting</a></li>
+  
+    <li><a href="/blog/tag/python version">python version</a></li>
+  
+    <li><a href="/blog/tag/python310">python310</a></li>
+  
+    <li><a href="/blog/tag/pythontips">pythontips</a></li>
+  
+    <li><a href="/blog/tag/pythonversioning">pythonversioning</a></li>
+  
+    <li><a href="/blog/tag/qr code">qr code</a></li>
+  
+    <li><a href="/blog/tag/qr codes">qr codes</a></li>
+  
+    <li><a href="/blog/tag/quartile range">quartile range</a></li>
+  
+    <li><a href="/blog/tag/quarto tutorial">quarto tutorial</a></li>
+  
+    <li><a href="/blog/tag/querybot">querybot</a></li>
+  
+    <li><a href="/blog/tag/quotes">quotes</a></li>
+  
+    <li><a href="/blog/tag/R">R</a></li>
+  
+    <li><a href="/blog/tag/r2d2">r2d2</a></li>
+  
+    <li><a href="/blog/tag/random">random</a></li>
+  
+    <li><a href="/blog/tag/random forest">random forest</a></li>
+  
+    <li><a href="/blog/tag/random sampling">random sampling</a></li>
+  
+    <li><a href="/blog/tag/rants">rants</a></li>
+  
+    <li><a href="/blog/tag/rapid detection">rapid detection</a></li>
+  
+    <li><a href="/blog/tag/raspberry pi">raspberry pi</a></li>
+  
+    <li><a href="/blog/tag/rc.local">rc.local</a></li>
+  
+    <li><a href="/blog/tag/reactive notebooks">reactive notebooks</a></li>
+  
+    <li><a href="/blog/tag/readability">readability</a></li>
+  
+    <li><a href="/blog/tag/reading notes">reading notes</a></li>
+  
+    <li><a href="/blog/tag/reasoning">reasoning</a></li>
+  
+    <li><a href="/blog/tag/refactor">refactor</a></li>
+  
+    <li><a href="/blog/tag/refactoring">refactoring</a></li>
+  
+    <li><a href="/blog/tag/reference">reference</a></li>
+  
+    <li><a href="/blog/tag/reflections">reflections</a></li>
+  
+    <li><a href="/blog/tag/regularization">regularization</a></li>
+  
+    <li><a href="/blog/tag/relationships">relationships</a></li>
+  
+    <li><a href="/blog/tag/release notes">release notes</a></li>
+  
+    <li><a href="/blog/tag/remotes">remotes</a></li>
+  
+    <li><a href="/blog/tag/repo chat">repo chat</a></li>
+  
+    <li><a href="/blog/tag/repo settings">repo settings</a></li>
+  
+    <li><a href="/blog/tag/reports">reports</a></li>
+  
+    <li><a href="/blog/tag/repository">repository</a></li>
+  
+    <li><a href="/blog/tag/repository secret">repository secret</a></li>
+  
+    <li><a href="/blog/tag/reproducibility">reproducibility</a></li>
+  
+    <li><a href="/blog/tag/reputation">reputation</a></li>
+  
+    <li><a href="/blog/tag/requests">requests</a></li>
+  
+    <li><a href="/blog/tag/requests library">requests library</a></li>
+  
+    <li><a href="/blog/tag/research">research</a></li>
+  
+    <li><a href="/blog/tag/research presentation">research presentation</a></li>
+  
+    <li><a href="/blog/tag/resilience">resilience</a></li>
+  
+    <li><a href="/blog/tag/resume">resume</a></li>
+  
+    <li><a href="/blog/tag/retrieval augmented generation">retrieval augmented generation</a></li>
+  
+    <li><a href="/blog/tag/retrospective">retrospective</a></li>
+  
+    <li><a href="/blog/tag/review">review</a></li>
+  
+    <li><a href="/blog/tag/reviews">reviews</a></li>
+  
+    <li><a href="/blog/tag/risk management">risk management</a></li>
+  
+    <li><a href="/blog/tag/robust estimation">robust estimation</a></li>
+  
+    <li><a href="/blog/tag/routing">routing</a></li>
+  
+    <li><a href="/blog/tag/ruff">ruff</a></li>
+  
+    <li><a href="/blog/tag/runtime">runtime</a></li>
+  
+    <li><a href="/blog/tag/rust">rust</a></li>
+  
+    <li><a href="/blog/tag/safety">safety</a></li>
+  
+    <li><a href="/blog/tag/sanity check">sanity check</a></li>
+  
+    <li><a href="/blog/tag/scaffolding">scaffolding</a></li>
+  
+    <li><a href="/blog/tag/scalability">scalability</a></li>
+  
+    <li><a href="/blog/tag/scaling">scaling</a></li>
+  
+    <li><a href="/blog/tag/scaling challenges">scaling challenges</a></li>
+  
+    <li><a href="/blog/tag/schema">schema</a></li>
+  
+    <li><a href="/blog/tag/science">science</a></li>
+  
+    <li><a href="/blog/tag/science communication">science communication</a></li>
+  
+    <li><a href="/blog/tag/science one">science one</a></li>
+  
+    <li><a href="/blog/tag/scientific research">scientific research</a></li>
+  
+    <li><a href="/blog/tag/scipy">scipy</a></li>
+  
+    <li><a href="/blog/tag/scipy2019">scipy2019</a></li>
+  
+    <li><a href="/blog/tag/scipy2024">scipy2024</a></li>
+  
+    <li><a href="/blog/tag/scripting">scripting</a></li>
+  
+    <li><a href="/blog/tag/scripts">scripts</a></li>
+  
+    <li><a href="/blog/tag/scrum">scrum</a></li>
+  
+    <li><a href="/blog/tag/seaborn">seaborn</a></li>
+  
+    <li><a href="/blog/tag/search">search</a></li>
+  
+    <li><a href="/blog/tag/seattle">seattle</a></li>
+  
+    <li><a href="/blog/tag/secrets">secrets</a></li>
+  
+    <li><a href="/blog/tag/secrets management">secrets management</a></li>
+  
+    <li><a href="/blog/tag/security">security</a></li>
+  
+    <li><a href="/blog/tag/selection">selection</a></li>
+  
+    <li><a href="/blog/tag/semantic alignment">semantic alignment</a></li>
+  
+    <li><a href="/blog/tag/semantic search">semantic search</a></li>
+  
+    <li><a href="/blog/tag/seminar series">seminar series</a></li>
+  
+    <li><a href="/blog/tag/sentence transformer">sentence transformer</a></li>
+  
+    <li><a href="/blog/tag/sequence">sequence</a></li>
+  
+    <li><a href="/blog/tag/sequence generation">sequence generation</a></li>
+  
+    <li><a href="/blog/tag/sequence representation">sequence representation</a></li>
+  
+    <li><a href="/blog/tag/servant">servant</a></li>
+  
+    <li><a href="/blog/tag/serverless">serverless</a></li>
+  
+    <li><a href="/blog/tag/service account">service account</a></li>
+  
+    <li><a href="/blog/tag/service oriented">service oriented</a></li>
+  
+    <li><a href="/blog/tag/service-oriented">service-oriented</a></li>
+  
+    <li><a href="/blog/tag/setup">setup</a></li>
+  
+    <li><a href="/blog/tag/setup.cfg">setup.cfg</a></li>
+  
+    <li><a href="/blog/tag/setup.py">setup.py</a></li>
+  
+    <li><a href="/blog/tag/setuptools">setuptools</a></li>
+  
+    <li><a href="/blog/tag/shape up">shape up</a></li>
+  
+    <li><a href="/blog/tag/shell">shell</a></li>
+  
+    <li><a href="/blog/tag/shortcuts">shortcuts</a></li>
+  
+    <li><a href="/blog/tag/shrinkage">shrinkage</a></li>
+  
+    <li><a href="/blog/tag/side projects">side projects</a></li>
+  
+    <li><a href="/blog/tag/simplebot">simplebot</a></li>
+  
+    <li><a href="/blog/tag/skill adaptation">skill adaptation</a></li>
+  
+    <li><a href="/blog/tag/skilled practitioners">skilled practitioners</a></li>
+  
+    <li><a href="/blog/tag/skills">skills</a></li>
+  
+    <li><a href="/blog/tag/skiplevels">skiplevels</a></li>
+  
+    <li><a href="/blog/tag/slas2024">slas2024</a></li>
+  
+    <li><a href="/blog/tag/slide decks">slide decks</a></li>
+  
+    <li><a href="/blog/tag/social graph">social graph</a></li>
+  
+    <li><a href="/blog/tag/social media">social media</a></li>
+  
+    <li><a href="/blog/tag/software">software</a></li>
+  
+    <li><a href="/blog/tag/software carpentry">software carpentry</a></li>
+  
+    <li><a href="/blog/tag/software development">software development</a></li>
+  
+    <li><a href="/blog/tag/software engineering">software engineering</a></li>
+  
+    <li><a href="/blog/tag/software installation">software installation</a></li>
+  
+    <li><a href="/blog/tag/software methodologies">software methodologies</a></li>
+  
+    <li><a href="/blog/tag/software skills">software skills</a></li>
+  
+    <li><a href="/blog/tag/software testing">software testing</a></li>
+  
+    <li><a href="/blog/tag/software tools">software tools</a></li>
+  
+    <li><a href="/blog/tag/solidpython">solidpython</a></li>
+  
+    <li><a href="/blog/tag/solution translating">solution translating</a></li>
+  
+    <li><a href="/blog/tag/sparse matrix">sparse matrix</a></li>
+  
+    <li><a href="/blog/tag/speaking">speaking</a></li>
+  
+    <li><a href="/blog/tag/speed">speed</a></li>
+  
+    <li><a href="/blog/tag/sprint">sprint</a></li>
+  
+    <li><a href="/blog/tag/sprints">sprints</a></li>
+  
+    <li><a href="/blog/tag/sqlite">sqlite</a></li>
+  
+    <li><a href="/blog/tag/ssh">ssh</a></li>
+  
+    <li><a href="/blog/tag/stakeholder management">stakeholder management</a></li>
+  
+    <li><a href="/blog/tag/stakeholders">stakeholders</a></li>
+  
+    <li><a href="/blog/tag/staleness">staleness</a></li>
+  
+    <li><a href="/blog/tag/standardization">standardization</a></li>
+  
+    <li><a href="/blog/tag/standards">standards</a></li>
+  
+    <li><a href="/blog/tag/startup scripts">startup scripts</a></li>
+  
+    <li><a href="/blog/tag/state">state</a></li>
+  
+    <li><a href="/blog/tag/statistical inference">statistical inference</a></li>
+  
+    <li><a href="/blog/tag/statistics">statistics</a></li>
+  
+    <li><a href="/blog/tag/storage">storage</a></li>
+  
+    <li><a href="/blog/tag/strategic thinking">strategic thinking</a></li>
+  
+    <li><a href="/blog/tag/strategy">strategy</a></li>
+  
+    <li><a href="/blog/tag/structure">structure</a></li>
+  
+    <li><a href="/blog/tag/structured generation">structured generation</a></li>
+  
+    <li><a href="/blog/tag/structuredbot">structuredbot</a></li>
+  
+    <li><a href="/blog/tag/success">success</a></li>
+  
+    <li><a href="/blog/tag/supervision">supervision</a></li>
+  
+    <li><a href="/blog/tag/susceptibility testing">susceptibility testing</a></li>
+  
+    <li><a href="/blog/tag/syllabus">syllabus</a></li>
+  
+    <li><a href="/blog/tag/syntax highlighting">syntax highlighting</a></li>
+  
+    <li><a href="/blog/tag/system design">system design</a></li>
+  
+    <li><a href="/blog/tag/systemd">systemd</a></li>
+  
+    <li><a href="/blog/tag/tab management">tab management</a></li>
+  
+    <li><a href="/blog/tag/tacoma">tacoma</a></li>
+  
+    <li><a href="/blog/tag/tailscale">tailscale</a></li>
+  
+    <li><a href="/blog/tag/talent acquisition">talent acquisition</a></li>
+  
+    <li><a href="/blog/tag/talk preparation">talk preparation</a></li>
+  
+    <li><a href="/blog/tag/talks">talks</a></li>
+  
+    <li><a href="/blog/tag/tdd">tdd</a></li>
+  
+    <li><a href="/blog/tag/teaching">teaching</a></li>
+  
+    <li><a href="/blog/tag/team">team</a></li>
+  
+    <li><a href="/blog/tag/team activities">team activities</a></li>
+  
+    <li><a href="/blog/tag/team autonomy">team autonomy</a></li>
+  
+    <li><a href="/blog/tag/team building">team building</a></li>
+  
+    <li><a href="/blog/tag/team collaboration">team collaboration</a></li>
+  
+    <li><a href="/blog/tag/team management">team management</a></li>
+  
+    <li><a href="/blog/tag/team productivity">team productivity</a></li>
+  
+    <li><a href="/blog/tag/team strategy">team strategy</a></li>
+  
+    <li><a href="/blog/tag/teamwork">teamwork</a></li>
+  
+    <li><a href="/blog/tag/tech adoption">tech adoption</a></li>
+  
+    <li><a href="/blog/tag/tech review">tech review</a></li>
+  
+    <li><a href="/blog/tag/technical">technical</a></li>
+  
+    <li><a href="/blog/tag/technical feedback">technical feedback</a></li>
+  
+    <li><a href="/blog/tag/technical hiring">technical hiring</a></li>
+  
+    <li><a href="/blog/tag/technical skill">technical skill</a></li>
+  
+    <li><a href="/blog/tag/technical skills">technical skills</a></li>
+  
+    <li><a href="/blog/tag/technical strategy">technical strategy</a></li>
+  
+    <li><a href="/blog/tag/technological trinity">technological trinity</a></li>
+  
+    <li><a href="/blog/tag/technologies">technologies</a></li>
+  
+    <li><a href="/blog/tag/technology">technology</a></li>
+  
+    <li><a href="/blog/tag/technology guardrails">technology guardrails</a></li>
+  
+    <li><a href="/blog/tag/technology ladder">technology ladder</a></li>
+  
+    <li><a href="/blog/tag/templates">templates</a></li>
+  
+    <li><a href="/blog/tag/templating">templating</a></li>
+  
+    <li><a href="/blog/tag/tensors">tensors</a></li>
+  
+    <li><a href="/blog/tag/terminal">terminal</a></li>
+  
+    <li><a href="/blog/tag/testing">testing</a></li>
+  
+    <li><a href="/blog/tag/text editor">text editor</a></li>
+  
+    <li><a href="/blog/tag/text generation">text generation</a></li>
+  
+    <li><a href="/blog/tag/therapeutics">therapeutics</a></li>
+  
+    <li><a href="/blog/tag/thesis">thesis</a></li>
+  
+    <li><a href="/blog/tag/thesis defence">thesis defence</a></li>
+  
+    <li><a href="/blog/tag/thought framework">thought framework</a></li>
+  
+    <li><a href="/blog/tag/thoughts">thoughts</a></li>
+  
+    <li><a href="/blog/tag/til">til</a></li>
+  
+    <li><a href="/blog/tag/time management">time management</a></li>
+  
+    <li><a href="/blog/tag/tips">tips</a></li>
+  
+    <li><a href="/blog/tag/tips and tricks">tips and tricks</a></li>
+  
+    <li><a href="/blog/tag/tmux">tmux</a></li>
+  
+    <li><a href="/blog/tag/token">token</a></li>
+  
+    <li><a href="/blog/tag/tokenization">tokenization</a></li>
+  
+    <li><a href="/blog/tag/tool building">tool building</a></li>
+  
+    <li><a href="/blog/tag/tool making">tool making</a></li>
+  
+    <li><a href="/blog/tag/toolbot">toolbot</a></li>
+  
+    <li><a href="/blog/tag/tooling">tooling</a></li>
+  
+    <li><a href="/blog/tag/tools">tools</a></li>
+  
+    <li><a href="/blog/tag/tpot">tpot</a></li>
+  
+    <li><a href="/blog/tag/translation">translation</a></li>
+  
+    <li><a href="/blog/tag/transparency">transparency</a></li>
+  
+    <li><a href="/blog/tag/tree adjacency">tree adjacency</a></li>
+  
+    <li><a href="/blog/tag/tricks">tricks</a></li>
+  
+    <li><a href="/blog/tag/troubleshooting">troubleshooting</a></li>
+  
+    <li><a href="/blog/tag/trust">trust</a></li>
+  
+    <li><a href="/blog/tag/tutorial">tutorial</a></li>
+  
+    <li><a href="/blog/tag/tutorials">tutorials</a></li>
+  
+    <li><a href="/blog/tag/twitter">twitter</a></li>
+  
+    <li><a href="/blog/tag/ubuntu">ubuntu</a></li>
+  
+    <li><a href="/blog/tag/ui">ui</a></li>
+  
+    <li><a href="/blog/tag/ui design">ui design</a></li>
+  
+    <li><a href="/blog/tag/ultralearning">ultralearning</a></li>
+  
+    <li><a href="/blog/tag/uncertainty">uncertainty</a></li>
+  
+    <li><a href="/blog/tag/unit tests">unit tests</a></li>
+  
+    <li><a href="/blog/tag/updates">updates</a></li>
+  
+    <li><a href="/blog/tag/upskilling">upskilling</a></li>
+  
+    <li><a href="/blog/tag/user experience">user experience</a></li>
+  
+    <li><a href="/blog/tag/uv">uv</a></li>
+  
+    <li><a href="/blog/tag/ux">ux</a></li>
+  
+    <li><a href="/blog/tag/vae">vae</a></li>
+  
+    <li><a href="/blog/tag/validation">validation</a></li>
+  
+    <li><a href="/blog/tag/value delivery">value delivery</a></li>
+  
+    <li><a href="/blog/tag/value exchange">value exchange</a></li>
+  
+    <li><a href="/blog/tag/variance">variance</a></li>
+  
+    <li><a href="/blog/tag/variance modelling">variance modelling</a></li>
+  
+    <li><a href="/blog/tag/variational autoencoder">variational autoencoder</a></li>
+  
+    <li><a href="/blog/tag/variational inference">variational inference</a></li>
+  
+    <li><a href="/blog/tag/vector database">vector database</a></li>
+  
+    <li><a href="/blog/tag/vector databases">vector databases</a></li>
+  
+    <li><a href="/blog/tag/vector embedding">vector embedding</a></li>
+  
+    <li><a href="/blog/tag/vector retrieval">vector retrieval</a></li>
+  
+    <li><a href="/blog/tag/vector search">vector search</a></li>
+  
+    <li><a href="/blog/tag/verbosity">verbosity</a></li>
+  
+    <li><a href="/blog/tag/verification">verification</a></li>
+  
+    <li><a href="/blog/tag/version control">version control</a></li>
+  
+    <li><a href="/blog/tag/versioning">versioning</a></li>
+  
+    <li><a href="/blog/tag/viral detection">viral detection</a></li>
+  
+    <li><a href="/blog/tag/viral genotype">viral genotype</a></li>
+  
+    <li><a href="/blog/tag/visualization">visualization</a></li>
+  
+    <li><a href="/blog/tag/vmap">vmap</a></li>
+  
+    <li><a href="/blog/tag/voicepal">voicepal</a></li>
+  
+    <li><a href="/blog/tag/von mises distribution">von mises distribution</a></li>
+  
+    <li><a href="/blog/tag/vscode">vscode</a></li>
+  
+    <li><a href="/blog/tag/wayne gretzky">wayne gretzky</a></li>
+  
+    <li><a href="/blog/tag/web">web</a></li>
+  
+    <li><a href="/blog/tag/web app">web app</a></li>
+  
+    <li><a href="/blog/tag/web development">web development</a></li>
+  
+    <li><a href="/blog/tag/web tools">web tools</a></li>
+  
+    <li><a href="/blog/tag/webp">webp</a></li>
+  
+    <li><a href="/blog/tag/wget">wget</a></li>
+  
+    <li><a href="/blog/tag/whiteboard talk">whiteboard talk</a></li>
+  
+    <li><a href="/blog/tag/wifi">wifi</a></li>
+  
+    <li><a href="/blog/tag/work">work</a></li>
+  
+    <li><a href="/blog/tag/work culture">work culture</a></li>
+  
+    <li><a href="/blog/tag/work effectiveness">work effectiveness</a></li>
+  
+    <li><a href="/blog/tag/work life balance">work life balance</a></li>
+  
+    <li><a href="/blog/tag/work rewards">work rewards</a></li>
+  
+    <li><a href="/blog/tag/workflow">workflow</a></li>
+  
+    <li><a href="/blog/tag/workflow permissions">workflow permissions</a></li>
+  
+    <li><a href="/blog/tag/workflow runner">workflow runner</a></li>
+  
+    <li><a href="/blog/tag/workflow step">workflow step</a></li>
+  
+    <li><a href="/blog/tag/workflows">workflows</a></li>
+  
+    <li><a href="/blog/tag/workplace">workplace</a></li>
+  
+    <li><a href="/blog/tag/workspace">workspace</a></li>
+  
+    <li><a href="/blog/tag/workspaces">workspaces</a></li>
+  
+    <li><a href="/blog/tag/writing">writing</a></li>
+  
+    <li><a href="/blog/tag/writing tips">writing tips</a></li>
+  
+    <li><a href="/blog/tag/writing workflow">writing workflow</a></li>
+  
+    <li><a href="/blog/tag/xarray">xarray</a></li>
+  
+    <li><a href="/blog/tag/yaml">yaml</a></li>
+  
+    <li><a href="/blog/tag/zephyr">zephyr</a></li>
+  
+    <li><a href="/blog/tag/zotero">zotero</a></li>
+  
+</ul>
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

@@ -1,0 +1,622 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="An (incomplete and opinionated) survey of LLM tooling">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/an-incomplete-and-opinionated-survey-of-llm-tooling' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>An (incomplete and opinionated) survey of LLM tooling - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">An (incomplete and opinionated) survey of LLM tooling</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-02-01</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/language model/">
+        language model
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/open source/">
+        open source
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/api/">
+        api
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/vector retrieval/">
+        vector retrieval
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/prompt experimentation/">
+        prompt experimentation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ui/">
+        ui
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/command line interfaces/">
+        command line interfaces
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llms/">
+        llms
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/framework/">
+        framework
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/zotero/">
+        zotero
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I explore the rapidly evolving landscape of large language model (LLM) tooling, discussing APIs, self-hosting, API switchboards, Python-based LLM Application SDKs, vector-based retrieval, prompt experimentation, evaluation, UI builders, and command-line interfaces. I share my experiences building LlamaBot and offer principles for making smart tech stack choices in this ever-changing field. How can you navigate this dynamic ecosystem and make the best decisions for your LLM projects? Read on to find out!</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>As the large language model (LLM) world has exploded in popularity, I see the need for clarity on the state of LLM tooling. More critical than specifying specific tools, my goal with this blog post is to outline a framework for thinking about the components of LLM tools. I hope you find it valuable!</p>
+<blockquote><p>Disclaimer: As someone who was professionally raised in the community-driven open source software (CDOSS) world, you will probably see my biases shine through company-backed open source software (CBOSS) that is used as a play to attract business. (CBOSS that is a derivative of one's core business, is a different story.) As such, I can confidently assure you that I am not paid by any tool developers or the companies that back them.</p>
+</blockquote>
+<h2 id="access">Access</h2><p>To build anything that uses LLMs, one needs access to LLMs. There are two sources: APIs and locally hosted.</p>
+<h3 id="apis">APIs</h3><p>The easiest way is to get access using an API provider, and the one that has the most mindshare is OpenAI's API. (Much of the LLM Python tooling I've seen is built around OpenAI's API.) Another contender is the Mistral API, which provides the Mixtral models hosted. Anyscale also has an offering for hosted LLM APIs. As we will see in the API Switchboards section below, there are more!</p>
+<h3 id="self-hosted">Self-Hosted</h3><p>Alternatively, you can self-host open-source models. Self-hosting requires more tooling but allows for control of costs. To this end, <a href="https://ollama.ai/">Ollama</a> is a fast-growing alternative to hosted APIs (its community Discord is active with ~2k members online on 30 January 2024). Ollama provides a dead-simple (and, most straightforward) mechanism for exposing an API endpoint for open-source models. The alternative would be to build a <a href="https://fastapi.tiangolo.com/">FastAPI</a> server and combine it with HuggingFace's <a href="https://github.com/huggingface/transformers">Transformers</a> models, which would take more technical finesse.</p>
+<h2 id="api-switchboards">API Switchboards</h2><p>One may desire to switch between different models or even model providers. Hence, one will need an API switchboard for experimentation. To that end, <a href="https://github.com/BerriAI/litellm">LiteLLM</a> provides an API switchboard that enables OpenAI API compatibility for the broadest subset of API providers: Claude, Anyscale, OpenAI, Mistral, Azure, AWS Bedrock... you name it!</p>
+<h2 id="python-based-llm-application-sdks">Python-based LLM Application SDKs</h2><p>Regarding the Python toolkits needed to build LLM applications, <a href="https://github.com/langchain-ai/langchain">LangChain</a> is possibly the first thing most people will think of. Indeed, it has grown massively in popularity, hitting 75K stars on GitHub (as of 29 January 2024) through a concerted community-building effort, content marketing, and (I am imagining) VC dollars.</p>
+<p><a href="https://github.com/run-llama/llama_index">LlamaIndex</a> is another application-building toolkit focusing on Retrieval-Augmented Generation (RAG) applications. It is also another hugely popular toolkit, hitting 25K stars on GitHub (as of 29 January 2024).</p>
+<p>There are also high-level developer tools, such as <a href="https://github.com/embedchain/embedchain">EmbedChain</a>, an open-source retrieval augmented generation (RAG) framework. (More on RAG below.)</p>
+<h2 id="vector-based-retrieval">Vector-based Retrieval</h2><p>For RAG applications, one needs a vector database to store vector embeddings of text and retrieve them based on vector similarity. The number of different vector databases available has exploded in number, and so it may be challenging to keep track of what to use. My choice of vector database has been <a href="https://www.trychroma.com/">ChromaDB</a>, but there are other compelling offerings as well: <a href="https://www.pinecone.io/">Pinecone</a>, <a href="https://weaviate.io/">Weaviate</a>, <a href="https://github.com/lancedb/lancedb">LanceDB</a> and <a href="https://github.com/facebookresearch/faiss?tab=readme-ov-file">FAISS</a> are all examples of vector storage systems, and packages like <a href="https://github.com/bclavie/ragatouille">RAGatouille</a> provide state-of-the-art vector search &amp; retrieval systems (like <a href="https://github.com/stanford-futuredata/ColBERT?tab=readme-ov-file">ColBERT</a>). Additionally, LlamaIndex implements vector indexes that live entirely in memory and are cacheable to disk as standalone files.</p>
+<p>The primary use case for vector-based retrieval systems is RAG. RAG is emerging as an essential method for augmenting LLMs with additional data that lives outside the scope of its training data. As such, the criteria used to evaluate RAG tools are worth considering.</p>
+<p>But what should one focus on? As a builder type, I focus on the following criteria: ease of setup, ease of retrieval, cost, and quality of documentation. Here's what I think about them.</p>
+<p>For <strong>ease of setup</strong>, this meant gravitating towards anything that could be stored locally (or in memory) without manually setting up a server/client interface, akin to what SQLite does for relational databases. (Both ChromaDB and LanceDB do this.)</p>
+<p>For <strong>ease of retrieval</strong>, this meant picking tools that, within a single API call (e.g. <code>.query("some query string here")</code>), would automatically embed the query string and return texts rank-ordered.</p>
+<p>For <strong>cost</strong>, the key driver here is money spent on embedding texts to obtain vector representations of it; ChromaDB, for example, defaults to the HuggingFace SentenceTransformer (which is free to run locally), while LlamaIndex defaults to using the OpenAI Embedding models, which requires a modest (but affordable) amount of spend for prototyping.</p>
+<p>Finally, the <strong>documentation quality</strong> matters as always: we developer types will spend much time wrangling tools, and good documentation will deliver us from immense headaches. (Good documentation will also help developers robustly build their mental model!)</p>
+<h2 id="prompt-experimentation-and-evaluation">Prompt Experimentation and Evaluation</h2><p>From an application developer's perspective, experimenting with prompts and evaluating the quality of the outputs is hugely important. HegelAI develops <a href="https://github.com/hegelai/prompttools">PromptTools</a>, which is a toolkit for recording prompts and outputs. Jumping ahead to my work, <a href="https://github.com/ericmjl/llamabot">LlamaBot</a> contains a <a href="https://ericmjl.github.io/llamabot/examples/recorder/">PromptRecorder</a> that does the same.</p>
+<p>Evaluation is trickier, because "evaluation" as a concept is very broad. Evaluation is used to ensure that outputs conform to both hard rules (e.g. do not mention the phrase, "As an AI") and softer rules (e.g. positive mood). The usual playbook for evaluation is to mix custom rules and code; getting a human to score the outputs is not scalable (if scale is what one is concerned with), but it is the highest quality way to score outputs. The tooling for prompt evaluation is evolving fast (alongside the rest of the ecosystem), but there are a few to note, including <a href="https://github.com/promptfoo/promptfoo">PromptFoo</a>, <a href="https://github.com/preset-io/promptimize">Promptimize</a>, and <a href="https://github.com/truera/trulens/">TruLens</a>.</p>
+<h2 id="ui-builders">UI Builders</h2><p>Sometimes, you may be on a team where you don't have dedicated front-end developers, or you're at a point where you need to set up a UI front-end for your LLM-based application quickly. For someone in the Python world, <a href="https://panel.holoviz.org/">Panel</a>, <a href="https://streamlit.io/">Streamlit</a>, and <a href="https://www.gradio.app/">Gradio</a> all provide UI-building toolkits. Of the three, Panel is close to my heart because of its flexibility. That said, Streamlit is a compelling alternative with a different technical execution model behind it. HuggingFace backs Gradio, so it offers tight integration with its platform.</p>
+<h2 id="command-line-interfaces">Command-Line Interfaces</h2><p>If you are a command-line type of person, Simon Willison built the <a href="https://github.com/simonw/llm"><code>llm</code></a> CLI tool that enables access to LLMs. I'm unaware of any other tooling here -- Simon is unique in his ability to build composable tools!</p>
+<h2 id="my-work">My work</h2><p>The content of this post came through because of my experience building a Python application toolkit (<a href="https://github.com/ericmjl/llamabot">LlamaBot</a>), which is built on top of ChromaDB, LiteLLM, and other LLM toolkits. As I built out LlamaBot, I also built test case applications further to develop my understanding of the LLM space. What resulted was a bunch of use cases, such as <a href="https://ericmjl.github.io/llamabot/cli/zotero/">Zotero Chat</a>, a <a href="https://ericmjl.github.io/llamabot/cli/git/">Git commit writer</a>, a <a href="https://github.com/ericmjl/website/blob/main/apis/blogbot/api.py">blog social media composer</a> written using FastAPI, HTMX, and LlamaBot, and many more tools where LLMs were part of the workflow.</p>
+<h2 id="make-smart-and-sane-choices">Make smart (and sane) choices</h2><p>Amidst this flurry of activity and excitement about LLMs, how do we make smart and sane choices on our tech stack when it's ever-evolving?</p>
+<p>I'll outline briefly a few principles for doing so.</p>
+<p>Firstly, work backwards from desired measurable outcomes. If your goal for using LLMs is to improve accessibility of technical tools to non-technical folks, find a way to measure "accessibility" first by defining it quantitatively and qualitatively, emphasizing quantification. Only then should you proceed with an effort on prototyping using LLMs. Ensure that you agree with your collaborators on that definition of value first.</p>
+<p>Secondly, once you're at the prototyping stage, pick and evaluate tools according to the criteria that give you the fastest path to demonstrating value without compromising on the engineering side (composability of tools). Make sure you're always thinking 4 steps downstream about the implications of your choices now! But don't get paralyzed by the analysis: every tech stack choice comes with tradeoffs, none will be optimal, and all choices are reversible. Learn from my lesson building LlamaBot: I initially built on top of LangChain, but its abstractions eventually locked me in, so getting out of the ecosystem was quite a huge lift. But more important than the toolset is your ability to demonstrate <em>value</em> quickly.</p>
+<p>To that end, my personal favourite stack choice is reflected in LlamaBot's default settings:</p>
+<ul>
+<li><code>mistral/mistral-medium</code> for APIs (cheaper than GPT-4 but with qualitatively similar outputs),</li>
+<li><code>litellm</code> for the switchboard (open source software)</li>
+<li><code>chromadb</code> for vector database (open source software)</li>
+<li>LlamaBot's PromptRecorder (which is in active development) for simple prompt evaluation.</li>
+</ul>
+<p>Of course, that's all subject to change over time.</p>
+<p>Once you've demonstrated value, you can have some credibility points (and breathing room) to spend on making the stack that backs your LLM application easier to manage. At this point, consider the cost of maintenance, technical proficiency of your staff (hopefully, you have high-quality and talented individuals), and flexibility in architecture to pivot away from what you already have built.</p>
+<h2 id="summary">Summary</h2><p>This blog post will be outdated as soon as it gets released in the wild. That's because the LLM space is growing extremely fast. More important than that is having a thought framework to organize one's work and a sense of taste for what tools to use. I hope this post helps you develop your thought framework for the LLM tooling space!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-an-incomplete-and-opinionated-survey-of-llm-tooling</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{An (incomplete and opinionated) survey of LLM tooling}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{02}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{01}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/2/1/an-incomplete-and-opinionated-survey-of-llm-tooling}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

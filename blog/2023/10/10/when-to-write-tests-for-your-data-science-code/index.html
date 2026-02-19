@@ -1,0 +1,681 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="When to write tests for your data science code">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/when-to-write-tests-for-your-data-science-code' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>When to write tests for your data science code - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">When to write tests for your data science code</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2023-10-10</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/datascience/">
+        datascience
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/testing/">
+        testing
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/machine learning/">
+        machine learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/best practices/">
+        best practices
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/production/">
+        production
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/research/">
+        research
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/exploratory analysis/">
+        exploratory analysis
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I discuss the importance of testing in data science code. I explain how research code can transition into production code and the potential implications of errors or oversights. I suggest three levels of testing: adding assertions within your notebook, migrating code into functions and testing them, and refactoring code into a library with associated test functions. By testing and refactoring our code, we can ensure its accuracy and reliability. Are you curious to see how you can test your code as a data scientist?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>As data scientists,
+our work often exists in a continuum
+ranging from initial, tentative exploratory analysis
+to mature, production-ready solutions.
+The ephemeral nature of exploratory code
+can sometimes mislead us into believing that it's fleeting
+and doesn't warrant the rigor of tests.
+However, I think this perspective deserves a re-evaluation.</p>
+<h2 id="production-vs-research-code">Production vs. Research Code</h2><p>One might think, "It's just a preliminary analysis, not the final product."
+But herein lies a crucial distinction:
+<strong>When decisions are derived from your research code,
+that code transitions from being 'just research' to pivotal 'production'.</strong>
+This perspective mirrors that of <a href="https://www.linkedin.com/in/nbantilan/">Niels Bantilan</a>,
+who insightfully <a href="https://www.linkedin.com/feed/update/urn:li:ugcPost:7112753423216730112?commentUrn=urn%3Ali%3Acomment%3A%28ugcPost%3A7112753423216730112%2C7112806327323693056%29&amp;dashCommentUrn=urn%3Ali%3Afsd_comment%3A%287112806327323693056%2Curn%3Ali%3AugcPost%3A7112753423216730112%29">commented on my LinkedIn post</a>:</p>
+<blockquote><p>"but it's not production!"...
+if you make conclusions from research findings
+based on incorrectly implemented code,
+then research <em>is</em> production.</p>
+</blockquote>
+<p>Such code, veiled as 'research', affects stakeholders.
+The implications of errors or oversights
+can range from minor hiccups to major organizational setbacks.
+I don't have to look too far from my professional neighborhood
+to find places where testing will be worthwhile.
+In the discovery of a drug,
+buggy machine learning code that is used to prioritize candidates
+can lead us to erroneously prioritize duds.
+As for the range of impacts,
+it could range from days (if caught early) to years (if caught very late)
+of wasted laboratory time and effort on prioritized candidates.</p>
+<h2 id="not-everything-requires-testing-initially">Not everything requires testing... initially</h2><p>Initiating a new project or analysis
+doesn't always imply diving straight into writing tests.
+In the nascent stages, especially during exploratory phases,
+the terrain is still unfolding.
+You're sketching possibilities, and the path isn't concrete.
+But, as your code matures and starts to take shape,
+bringing in testing becomes crucial.
+The evolution of code demands an evolution in its verification.</p>
+<h2 id="the-golden-principle">The Golden Principle</h2><p>Here's how you know when to test:
+<strong>test the stuff that needs guarantees</strong>!
+This isn't just about the mechanics of testing; it's a philosophy.
+Pieces of code that possess the potential to wreak havoc
+or disseminate incorrect information demand rigorous testing.
+At this point, we're not just talking about lines of code;
+we're talking about the bedrock of trustworthiness.</p>
+<h2 id="levels-of-test-writing-for-data-science-code">Levels of test-writing for data science code</h2><p>So, how do we embark on our testing journey?
+I'd like to suggest three levels of testing.
+Consider them as progressive milestones;
+ascending these levels not only instills confidence in your code
+but also strengthens its foundation.</p>
+<h3 id="level-0-add-assertions-within-your-notebook">Level 0: Add assertions within your notebook</h3><p>Even seasoned data scientists,
+while engrossed in their work,
+might resort to a mere visual inspection of variables as a sanity check.
+If you find yourself doing visual checks of variable values,
+then consider elevating this informal process to structured <code>assert</code> statements.
+Doing so lends your code an added layer of validation:</p>
+<div class="hll"><pre><span></span><span class="c1"># An initial piece of code yielding my_value</span>
+<span class="o">...</span>
+<span class="n">my_value</span> <span class="o">=</span> <span class="o">...</span>
+<span class="k">assert</span> <span class="n">my_value</span> <span class="o">&lt;</span> <span class="mi">20</span>
+</pre></div>
+<p>The key here is to formalize what we're intuiting and translating it into code.
+It may take a bit of critical thinking to do that formalization,
+but it'll help us make the code much more reliable.
+If your desired code logic has changed,
+then these assertions can help you catch the effects of those changes,
+giving you additional confidence that your change is what you indeed desire.</p>
+<h3 id="level-1-migrate-your-notebook-code-into-a-function-and-test-it">Level 1: Migrate Your Notebook Code into a Function and Test It</h3><p>For those chunks of code
+that are bound within the confines of a single Jupyter notebook,
+structuring them into functions can be a game-changer.
+This compartmentalization allows for a more streamlined testing process.</p>
+<div class="hll"><pre><span></span><span class="c1"># Define the test function:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_my_function</span><span class="p">():</span>
+    <span class="n">my_value</span> <span class="o">=</span> <span class="n">my_function</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="o">...</span><span class="n">something</span> <span class="n">about</span> <span class="n">my_value</span><span class="o">...</span>
+
+<span class="c1"># Then call it within the same notebook cell:</span>
+<span class="n">test_my_function</span><span class="p">()</span>
+</pre></div>
+<p>Here's a caveat:
+Ensure that your tests don't become
+entangled with the specific state of your Jupyter notebook.
+Maintain their independence!
+The function being tested should be self-sufficient
+and not rely on any other state within the notebook.
+Additionally, the test function itself should also be self-sufficient.</p>
+<h3 id="level-2-refactor-code-into-a-library-and-associate-it-with-a-test-function">Level 2: Refactor code into a library and associate it with a test function</h3><p>When you find yourself revisiting certain functions
+or realize their broader applicability,
+it's a signal to house them in a dedicated library.
+This not only amplifies reusability but also facilitates structured testing.</p>
+<p><strong>Library Code:</strong></p>
+<div class="hll"><pre><span></span><span class="c1"># custom_library.py</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_function</span><span class="p">():</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="n">my_value</span>
+</pre></div>
+<p><strong>Test Function:</strong></p>
+<div class="hll"><pre><span></span><span class="c1"># test_custom_library.py</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_my_function</span><span class="p">():</span>
+    <span class="n">my_value</span> <span class="o">=</span> <span class="n">my_function</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">my_value</span> <span class="o">&lt;</span> <span class="mi">20</span>
+</pre></div>
+<h2 id="bonus-the-right-time-to-refactor">Bonus: The right time to refactor</h2><p>The art of refactoring isn't just about the 'how' but also about the 'when'.
+A pragmatic rule of thumb is:
+<strong>If you find yourself cloning a notebook to make minor tweaks
+or frequently copying and pasting code segments,
+it's a beacon signaling refactor time.</strong></p>
+<p>Each refactoring iteration brings with it
+not just the promise of cleaner code but also the commitment to testing.</p>
+<h2 id="summary">Summary</h2><p>Your data science journey might begin with uncharted, exploratory paths.
+And that can be exciting, exhilarating, and thrilling!
+But remember, the code you write can shape consequential decisions.
+Arm your analyses with robust testing and mindful refactoring
+to ensure their accuracy and reliability,
+guiding your organization towards informed and dependable outcomes!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2023-when-to-write-tests-for-your-data-science-code</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{When to write tests for your data science code}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2023}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{10}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{10}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2023/10/10/when-to-write-tests-for-your-data-science-code}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

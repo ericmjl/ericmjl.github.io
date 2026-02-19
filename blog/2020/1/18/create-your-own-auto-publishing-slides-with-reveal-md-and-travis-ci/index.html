@@ -1,0 +1,675 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Create your own auto-publishing slides with reveal-md and Travis CI">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/create-your-own-auto-publishing-slides-with-reveal-md-and-travis-ci' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Create your own auto-publishing slides with reveal-md and Travis CI - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Create your own auto-publishing slides with reveal-md and Travis CI</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2020-01-18</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/presentation skills/">
+        presentation skills
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/continuous integration/">
+        continuous integration
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p><a href="https://hugobowne.github.io/">Hugo Bowne-Anderson</a>, a long-time collaborator and friend in the PyData community, asked in passing about whether I would write a blog post detailing how to set up Travis CI to continually publish my Markdown-sourced slides to the web. I gladly obliged, and I hope you find it useful!</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>For my PyData Ann Arbor Meetup talk, I decided to use <a href="https://github.com/webpro/reveal-md"><code>reveal-md</code></a> and a Markdown file to generate my slides. Here, I'd like to write about how I used <code>reveal-md</code> and Travis CI to continually publish my slides as I updated them, thus making them accessible to everybody on the web.</p>
+<h2 id="what-is-reveal-md">What is <code>reveal-md</code>?</h2><p><code>reveal-md</code> is nothing more than a live web server for that converts Markdown files into <code>reveal.js</code> slides that can be hosted via a web server, static site, or PDF.</p>
+<h2 id="why-reveal-md">Why <code>reveal-md</code>?</h2><p>I much prefer to use Markdown to write my slides, as doing so comes with one big benefit: I am focused on the content that I want to deliver, and not the less important details that are easy to screw up (animations, positioning, etc.). Constraining what's accessible to me forces me to be extremely clear and succinct on what I'm trying to communicate. And if I really desired anything fancier, I could weave in some HTML with no issue.</p>
+<h2 id="create-your-own-auto-publishing-reveal-md-slides">Create your own auto-publishing <code>reveal-md</code> slides!</h2><p>Let’s walk through the steps needed to make this a reality for you!</p>
+<h3 id="create-a-new-repository">Create a new repository</h3><p>On GitHub, create a new repository that has a nice and informative name. (For now, we’ll just refer to that repository as <code>my-talk</code> for convenience.)</p>
+<h3 id="get-setup-locally">Get setup locally</h3><p>To get setup, you need to make sure that <code>reveal-md</code> is on your <code>PATH</code>. I choose to use <code>conda</code> environments to manage my packages, so I have a slightly convoluted way of doing this, by using <code>conda</code> to install <code>nodejs</code> (which installs the <code>npm</code> node package manager), followed by using the node package manager to install <code>reveal-md</code>. We first start by preparing an <code>environment.yml</code> specification file that <code>conda</code> can use to build your environment:</p>
+<div class="hll"><pre><span></span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_talk</span>
+<span class="nt">channels</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda-forge</span>
+<span class="nt">dependencies</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python=3.8</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nodejs</span>
+</pre></div>
+<p>Now, we can execute the installation commands.</p>
+<div class="hll"><pre><span></span><span class="c1"># Installation commands</span>
+
+<span class="c1"># Create environment</span>
+conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>environment.yml
+
+<span class="c1"># Activate environment</span>
+conda<span class="w"> </span>activate<span class="w"> </span>my_talk
+
+<span class="c1"># Install reveal-md</span>
+npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>reveal-md
+</pre></div>
+<p>To learn more about <code>conda</code> hacks that can improve your efficiency, I <a href="https://ericmjl.github.io/blog/2018/12/25/conda-hacks-for-data-science-efficiency/">have a blog post</a> that you can reference.</p>
+<h3 id="write-your-slides">Write your slides</h3><p>Before we go onto the automation, it’s important that you get a feel for the workflow so you know what’s being automated.</p>
+<p>Let’s write a simple Markdown file that has two slides:</p>
+<div class="hll"><pre><span></span>---
+<span class="gu">title: My Fancy Talk!</span>
+<span class="gu">---</span>
+
+<span class="gh"># My Fancy Talk</span>
+
+Speaker Name
+
+Date
+
+---
+
+<span class="gu">## Hello!</span>
+</pre></div>
+<p>Save it as <code>slides.md</code>. The filename isn’t special, it’s just convenient to remember.</p>
+<p>To see more of what <code>reveal.js</code> can do, check out the <a href="https://github.com/hakimel/reveal.js">RevealJS GitHub repository</a>!</p>
+<h3 id="preview-your-slides">Preview your slides</h3><p>To serve it up, run the following command at your terminal:</p>
+<div class="hll"><pre><span></span>reveal-md<span class="w"> </span>slides.md<span class="w">  </span><span class="c1"># replace with the filename of your slides</span>
+</pre></div>
+<p>Your browser should now pop open, and your slides will be there! <code>reveal.js</code> made simple, thanks to <code>reveal-md</code>.</p>
+<h3 id="continue-editing-your-slides">Continue editing your slides</h3><p>Now, you can continue editing your slides, keeping in mind the following pointers.</p>
+<p>Firstly, <code>---</code> (three of them) denotes horizontal slide transition, while <code>----</code> (four of them) denotes vertical slide transitions. Use this to organize your content.</p>
+<p>Secondly, to progressively reveal pointers on a slide, you need to add the following HTML comment right after the element. For example, to show bullet points progressively:</p>
+<div class="hll"><pre><span></span><span class="k">-</span><span class="w"> </span>Bullet Point 1
+&lt;!-- .element class=&quot;fragment&quot; --&gt;
+<span class="k">-</span><span class="w"> </span>Bullet Point 2
+&lt;!-- .element class=&quot;fragment&quot; --&gt;
+</pre></div>
+<h3 id="aside-fancier-items">Aside: fancier items</h3><p>If you need fancier things, you can weave in HTML at your own convenience. For example, I embedded an HTML table to organize <a href="https://github.com/ColCarroll/imcmc"><code>imcmc</code></a> logos that I had previously compiled.</p>
+<h3 id="get-travis-ci-setup">Get Travis CI setup</h3><p>You’ll now want to create a <code>.travis.yml</code>, which commands Travis to do things. It’s generally nothing more than a collection of bash commands that are executed in order. An example Travis configuration file from my <a href="https://ericmjl.github.io/testing-for-data-scientists">data science testing talk</a> looks like this:</p>
+<div class="hll"><pre><span></span><span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="nt">python</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># We don&#39;t actually use the Travis Python, but this keeps it organized.</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;3.5&quot;</span>
+<span class="nt">install</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># We do this conditionally because it saves us some downloading if the</span>
+<span class="w">    </span><span class="c1"># version is the same.</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bash miniconda.sh -b -p $HOME/miniconda</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">export PATH=&quot;$HOME/miniconda/bin:$PATH&quot;</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hash -r</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda config --set always_yes yes --set changeps1 no</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda update -q conda</span>
+
+<span class="w">    </span><span class="c1"># Useful for debugging any issues with conda</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda info -a</span>
+
+<span class="w">    </span><span class="c1"># Install Python and required packages.</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">conda env create -f environment.yml</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">source activate testing-for-data-scientists</span>
+
+<span class="w">    </span><span class="c1"># Install reveal-md</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">npm install -g reveal-md</span>
+
+
+<span class="nt">script</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># Create the docs directory. This is where we will be publishing from</span>
+<span class="w">    </span><span class="c1"># (see the &quot;deploy&quot; section below).</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mkdir -p docs/</span>
+<span class="w">    </span><span class="c1"># Use reveal-md to generate static docs.</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reveal-md slides.md --static docs --disable-auto-open --theme white</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cp -r assets docs/.</span>
+<span class="w">    </span><span class="c1"># Use reveal-md to generate PDF.</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reveal-md slides.md --disable-auto-open --theme white --print slides.pdf</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cp slides.pdf docs/.</span>
+
+
+<span class="c1"># This is an example to deploy to a branch through Travis.</span>
+<span class="nt">deploy</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pages</span>
+<span class="w">    </span><span class="nt">skip-cleanup</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">github-token</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$GITHUB_TOKEN</span><span class="w">  </span><span class="c1"># Set in the settings page of your repository, as a secure variable</span>
+<span class="w">    </span><span class="nt">keep-history</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="c1"># We read the master branch</span>
+<span class="w">    </span><span class="nt">on</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">branch</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">master</span>
+<span class="w">    </span><span class="c1"># Take the docs/ directory</span>
+<span class="w">    </span><span class="nt">local-dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docs</span>
+<span class="w">    </span><span class="c1"># Publish to the gh-pages branch</span>
+<span class="w">    </span><span class="nt">target-branch</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gh-pages</span>
+<span class="w">    </span><span class="nt">verbose</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+<p>You’ll notice that the commands we want Travis to execute are basically the same as those we executed manually. The only difference now is that we command <code>reveal-md</code> to build a static site under the directory <code>site/</code>, which we then command Travis to push to GitHub pages.</p>
+<p>In the <code>deploy</code> section, we are specifying to Travis that we want all of the content under the directory <code>site/</code> to be pushed to the <code>gh-pages</code> branch of our repository. (We have not yet connected Travis to our repo; that will happen next, so sit tight!)</p>
+<p>Notice also the <code>$GITHUB_TOKEN</code> environment variable: we need to declare that as well. The <code>GITHUB_TOKEN</code> is an authentication token that GitHub will recognize when Travis CI pushes the <code>site/</code> directory to <code>gh-pages</code>. Because underneath the hood we are using <code>bash</code> syntax in the YAML file, when we declare the <code>GITHUB_TOKEN</code>, we do it without the <code>$</code> symbol, but when we need to grab it from the environment, we include the <code>$</code> symbol, just as in regular plain old <code>bash</code>.</p>
+<h3 id="get-a-github-deploy-token">Get a GitHub deploy token</h3><p>Under your repository settings, generate a deploy/"personal access" token. Exact docs are <a href="https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line">here</a>, so in the spirit of "don’t repeat yourself" and "learn to read the docs", I will encourage you to read them.</p>
+<p>Once you have generated a deploy key, copy them somewhere - you will need it later. (Tip: also make sure you don’t accidentally save it to disk!)</p>
+<h3 id="connect-travis-ci-to-your-repository">Connect Travis CI to your repository</h3><p>On Travis CI, connect your Travis CI account to GitHub, and then enable Travis to look for changes on the <code>my-talk</code> repository. Generally, this is done by going to your user settings, and searching for "Legacy Services Integration", then toggling the checkbox to enable it on your <code>my-talk</code> repository.</p>
+<p>Once that is done, go into the Travis CI settings for the repository. Navigate to the "Environment Variables" section, and declare the <code>GITHUB_TOKEN</code> there. Be sure to keep it hidden from the output!</p>
+<h3 id="turn-on-github-pages">Turn on GitHub pages</h3><p>To turn on GitHub pages, we are going to stick to a pretty sane and widely-used set of practices when interacting with GitHub repositories and static sites.</p>
+<p>Firstly, on the GitHub repository for <code>my-talk</code>, create a new branch (using the web interface or through the CLI) called <code>gh-pages</code>. This time round, the name is definitely special, as GitHub recognizes this branch as a legitimate GitHub pages branch to serve content from.</p>
+<p>Secondly, go to the <strong>repository</strong> settings (not your user settings), and ensure that GitHub pages is enabled for the repository. Usually, adding the <code>gh-pages</code> branch will result in this option being  automagically turned on.</p>
+<p>Now, run:</p>
+<div class="hll"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">git add slides.md environment.yml .travis.yml</span>
+<span class="l l-Scalar l-Scalar-Plain">git commit -m &quot;first commit&quot;</span>
+<span class="l l-Scalar l-Scalar-Plain">git push</span>
+</pre></div>
+<p>Your slides, environment config, and Travis CI config files are now pushed to GitHub.</p>
+<h3 id="check-on-travis">Check on Travis</h3><p>Travis is now going to be building your slides and pushing them to the <code>gh-pages</code> branch. If all goes well, you will see the slides show up at the URL: <code>https://your_username.github.io/my-talk</code>. (Naturally, replace <code>your_username</code> with your GitHub username, and <code>my-talk</code> with your repository name.</p>
+<h2 id="debugging-builds">Debugging builds</h2><p>In case the build fails, you can inspect the output. Any errors are basically your standard bash <code>stderr</code>, so if you know how to debug error messages, you should be able to debug issues with the build.</p>
+<h2 id="beyond-this">Beyond this</h2><p>Going beyond serving up <code>reveal.js</code> slides, Travis hooked up to GitHub pages can help you build static sites very easily.</p>
+<p>If you use a static site generator (such as <a href="https://www.getlektor.com/">Lektor</a>, <a href="https://gohugo.io/">Hugo</a>, <a href="https://blog.getpelican.com/">Pelican</a>, <a href="https://www.gatsbyjs.org/">Gatsby</a> or <a href="https://getnikola.com/">Nikola</a>), then you can create websites whose sources are fully under your control, 100% customizable, and fast to load. I do not blog on Medium because I desire full control over the display of my blog content, and I want to be able to take it anywhere I desire, without relying on a platform that might lock my content in. My personal website uses Lektor + Travis to push to GitHub pages; please feel free to look at <a href="https://github.com/ericmjl/website">the source</a> and raid the repo for anything you’d like!</p>
+<p><em>Addendum: I learned today from a fellow friend Nathan Matias that Netflix’s blog posts on Medium have been paywalled. Another reason for us to take back hosting of slides and blog content into our own hands!</em></p>
+<p><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Today I learned the <a href="https://twitter.com/netflix?ref_src=twsrc%5Etfw">@netflix</a> tech blog posts are paywalled by Medium and I may have to take their post off my syllabus.<br><br>Now I wonder if they paywalled posts which I intend to be freely available. Have any of you found that Medium was unexpectedly charging people for your work?</p>&mdash; J. Nathan Matias (@natematias) <a href="https://twitter.com/natematias/status/1218244174299963392?ref_src=twsrc%5Etfw">January 17, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2020-create-your-own-auto-publishing-slides-with-reveal-md-and-travis-ci</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Create your own auto-publishing slides with reveal-md and Travis CI}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2020}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{01}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{18}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2020/1/18/create-your-own-auto-publishing-slides-with-reveal-md-and-travis-ci}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>
