@@ -1,0 +1,727 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Building Pigeon Secure Notes in under 15 minutes of coding">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/building-pigeon-secure-notes-in-under-15-minutes-of-coding' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Building Pigeon Secure Notes in under 15 minutes of coding - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Building Pigeon Secure Notes in under 15 minutes of coding</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-10-06</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/programming/">
+        programming
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/productivity/">
+        productivity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/software development/">
+        software development
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/automation/">
+        automation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/cryptography/">
+        cryptography
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this post,
+I detail my experience building Pigeon Secure Notes,
+a secure note-sharing app,
+in under 15 minutes of coding time.
+I highlight the use of AI-assisted coding tools like Cursor and Claude Sonnet,
+discuss the challenges faced during development and deployment,
+and reflect on the benefits and limitations of AI-assisted programming for experienced developers.
+The post also touches on the importance of practical wisdom in software development
+and the thrill of building at "the speed of thought."</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <h2 id="15-minutes-of-work">15 minutes of work</h2><p>This past week,
+I gave myself a challenge:
+to replicate <a href="https://cryptgeon.org/">Cryptgeon</a>'s core functionality
+as fast as I could using AI-assisted coding.
+I did it!
+And I put a demo up at <a href="https://pigeon.ericmjl.com">https://pigeon.ericmjl.com</a>.
+Turns out,
+I only needed 15 minutes of coding to make it happen.
+This is how it went.</p>
+<h3 id="7-minutes-to-local-development-version">7 minutes to local development version</h3><p>First off, I opened up Cursor,
+took a screenshot of Cryptgeon,
+and prompted Claude Sonnet 3.5
+with the screenshot and the following prompt
+in the Composer UI:</p>
+<blockquote><p>I would like to replicate the website in the attached screenshot.
+It is an app that lets people create encrypted notes that are only viewable X number of times.
+Use HTMX for the front-end, FastAPI for the back-end, and SQLite for data storage.</p>
+</blockquote>
+<p><img src="cryptgeon.webp" alt="Cryptgeon screenshot"></p>
+<p><em>Caption: Screenshot of Cryptgeon.</em></p>
+<p>Cursor went ahead and created 3 (!) files immediately:</p>
+<ul>
+<li><code>app/main.py</code>,</li>
+<li><code>templates/index.html</code>,</li>
+<li><code>styles.css</code></li>
+</ul>
+<p>I then hand-configured <code>pixi.toml</code> to provide an <code>app</code> command that I could run at the terminal as follows:</p>
+<div class="hll"><pre><span></span><span class="n">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;uvicorn app.main:app --host 0.0.0.0 --port 8174 --reload&quot;</span>
+</pre></div>
+<p>such that I would be able to run the following command and view the development server:</p>
+<div class="hll"><pre><span></span>pixi<span class="w"> </span>run<span class="w"> </span>app
+</pre></div>
+<p>Running that,
+I was able to get the development server up and running.
+The UI wasn't stunning,
+but wasn't shabby either.
+I wish I had grabbed a screenshot,
+because this was just 7 minutes of coding to making it happen thus far,
+but alas,
+in my excitement I forgot to.</p>
+<h3 id="8-minutes-to-expand-app-functionality-and-upgrade-the-app">8 minutes to expand app functionality and upgrade the app</h3><p>Cryptgeon is capable of doing more than just one-time notes, however.
+One can configure the app to provide a time limit for viewing as well.
+To add that functionality, after work,
+I took a screenshot of cryptgeon with its advanced settings and prompted:</p>
+<blockquote><p>Based on the screenshot, there is one other functionality that I need:
+to enable users to configure Pigeon's notes to be non-viewable after X minutes OR views.
+Add this functionality for me.</p>
+</blockquote>
+<p>Within a minute, Cursor had modified the relevant files.
+I double-checked the functionality to make sure it was correct (it was!),
+and did a, ahem, <em>cursory</em> check on the files
+to make sure they didn't violate any obvious patterns,
+and decided it was good enough, and committed the changes.
+This was 3 minutes total.</p>
+<p>From developing <a href="https://koalamail.ericmjl.com/">Shortmail</a>,
+I picked up quite a number of patterns
+<a href="https://ericmjl.github.io/blog/2024/9/23/recreating-shortwhale-with-ai-assisted-coding/">that I had to figure out the first time round</a>
+(which is partly why it took 2 hours to get to the first prototype while this app took 15 minutes),
+such as deciding where to mount static assets,
+the SQLite database file,
+and configure relative paths.
+Having wrestled with these issues in one app before helped me a lot.
+I did a few file moves
+(such as moving <code>templates/</code> and <code>static/</code> to live side by side with <code>main.py</code>)
+as well as changing hard-coded paths to environment variables
+(e.g. the location of the database file).
+This took a bit longer than I had expected,
+but wasn't too difficult either --
+just 5 minutes of reconfiguring,
+and I had the core functionality of Cryptgeon working
+in a way that I would be confident to deploy.</p>
+<h3 id="a-day-or-two-on-and-off-deploying">A day or two (on-and-off) deploying</h3><p>I followed the deployment pattern
+that I had previously set up for Shortmail
+(and other utility apps that I've deployed on my own Dokku server on DigitalOcean),
+using the official Dokku GitHub Actions to automate deployment
+so I wouldn't have to do it manually myself.
+Nonetheless, I still ran into some errors with deployment,
+getting the dreaded light blue screen.
+As I had some unforeseen errors that weren't showing up in the logs,
+it was challenging to debug,
+until I set up a Docker container locally
+to mimic what was going on in the Dokku server.
+(Those turned out to be more file path issues!)
+By fixing these, I deployed with confidence,
+and now I have Pigeon Secure Notes deployed:</p>
+<p><img src="pigeon.webp" alt="Screenshot of Pigeon Secure Notes"></p>
+<p><em>Caption: Screenshot of Pigeon Secure Notes.</em></p>
+<h2 id="exoskeleton-for-experienced-devs">Exoskeleton for experienced devs</h2><p>What I think was very cool about this whole experience
+was getting a taste of what it's like to have an <em>exoskeleton</em>
+(borrowing a phrase from my friend Virgile Andreani,
+who found it from another written piece on AI-assisted coding).
+Having an AI do the metaphorical heavy lifting of typing was liberating:
+my brain runs faster than my fingers,
+so the bottleneck to operating at the speed of thought,
+for me, is literally the speed at which I can type.</p>
+<p>That said, while I was reliant heavily on Cursor and Claude Sonnet
+to do a lot of the heavy lift in typing,
+there was no substitute for experience in judgment to know:</p>
+<ul>
+<li>What to hard-code and what to leave to environment variables,</li>
+<li>How to organize files in a project,</li>
+<li>Which tech stack to choose (I chose boring but composable stuff)</li>
+<li>What data structures to reach for (e.g. Pydantic models instead of plain dictionaries)</li>
+<li>Judging whether to use someone else's package or just reimplement the code directly</li>
+</ul>
+<p>That kind of practical wisdom
+can only come from practicing building stuff
+over and over and over.
+There's no theory class to teach this stuff,
+because it's phenomenologically driven
+by the constraints of reality --
+human limitations,
+tech stack constraints,
+language bottlenecks,
+and more.
+In building Shortmail and Pigeon Secure Notes,
+I spent most of my time double-checking
+that things worked correctly
+and according to my own requirements.
+This jives with <a href="https://sourcegraph.com/blog/the-death-of-the-junior-developer">a view of what Steve Yegge suggests
+that experienced coders will do</a>:</p>
+<blockquote><ol>
+<li>You know what you want before the AI writes it. You already have a vision for how you would write this by hand, or have it narrowed to a few reasonable options.</li>
+<li>You can detect when it is giving you bad guidance.</li>
+</ol>
+</blockquote>
+<p>Gary Marcus has <a href="https://garymarcus.substack.com/p/sorry-genai-is-not-going-to-10x-computer">written at length cautioning against the hype of AI</a>.
+While I'm generally anti-hype,
+my own experiences coding with AI assistance are that
+when conducted with appropriately adjusted mindsets,
+instead of feeling and fueling the hype,
+I feel like I'm <em>flying high</em>.
+There is an undeniable thrill in this mode of programming,
+being able to build stuff at a fast clip,
+to iterate <em>at the speed of thought</em>.</p>
+<h2 id="caveats-to-pigeon-secure-notes">Caveats to pigeon secure notes</h2><p>The biggest one is this:
+Because I'm not a cryptography or security expert,
+I can't vouch for the methods that I've used on pigeon.
+It may not be as secure as Cryptgeon.
+I bet if I had the necessary expertise,
+with a bit more time I'd be able to secure it to the same degree.
+I think the big weakness at the moment is that
+there is a Fernet encryption key that needs to be set globally,
+and so if anyone gets their hand on that key,
+I will have to rotate them.
+Well, typing this out just gave me an idea on how to make this more secure --
+writing is a way of thinking, after all --
+so I'm glad I'm blogging about this!</p>
+<p>UPDATE:
+Within a minute of blogging this,
+I updated the app to do a per-message Fernet key
+which get stored in the database alongside the message,
+and is deleted with the message when the message expires.
+Cursor introduced a bug on its first attempt
+(it was using different keys to decrypt the message),
+but when I further inspected the code
+and described what I thought was the bug,
+Cursor got it right on the retry.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-building-pigeon-secure-notes-in-under-15-minutes-of-coding</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Building Pigeon Secure Notes in under 15 minutes of coding}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{10}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{06}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/10/6/building-pigeon-secure-notes-in-under-15-minutes-of-coding}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

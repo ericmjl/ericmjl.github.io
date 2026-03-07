@@ -1,0 +1,625 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Earn the privilege to use automation">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/earn-the-privilege-to-use-automation' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Earn the privilege to use automation - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Earn the privilege to use automation</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-07-13</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/education/">
+        education
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/assessment/">
+        assessment
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/automation/">
+        automation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/learning/">
+        learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workplace/">
+        workplace
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/skills/">
+        skills
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/process/">
+        process
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/outcomes/">
+        outcomes
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/privilege/">
+        privilege
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I reflect on the challenges of integrating AI into education and the workplace, sharing lessons from educators who found that unrestricted AI access can undermine true learning and assessment. I discuss why it's crucial to earn the privilege to use automation by first mastering foundational skills and demonstrating the ability to verify AI outputs. How can we ensure that AI enhances, rather than replaces, our critical thinking and problem-solving abilities?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>AI in education was supposed to be transformative.</p>
+<p>We imagined students with AI tutors available 24/7, personalized learning at scale, and democratized access to high-quality education. The promise was intoxicating: every student could have their own Socrates, guiding them through complex concepts with infinite patience.</p>
+<p>Then reality hit.</p>
+<h2 id="when-ai-integration-fails-spectacularly">When AI integration fails spectacularly</h2><p>Lorena Barba, a respected engineering professor at George Washington University, shared her experience at SciPy 2025 of deciding to fully embrace AI in her computational engineering course. She built a custom AI tool with her technical partners, complete with document upload capabilities, retrieval augmented generation, and safety moderation features. She gave her students what seemed like the perfect educational AI assistant.</p>
+<p>The results were devastating.</p>
+<p>Her course evaluations plummeted from 4.8/5 to 2.3/5. Students stopped attending class. They stopped doing homework with any rigor. Some copied entire assignment questions, including instructions like "your code here," and expected complete answers they could submit without understanding.</p>
+<p>The most damning feedback? Students told her: "I would have learned better if AI were not present."</p>
+<p>What went wrong? Lorena had given her students unbridled access to AI without ensuring they had the foundational skills to use it effectively. Students developed what she called an "illusion of competence"—they overestimated their knowledge because AI made everything feel easy. They missed the deep processing necessary for long-term memory formation.</p>
+<p>After 20 years of successful teaching, Lorena experienced what she called a "frustrating, humbling failure." She's now considering returning to oral examinations to preserve assessment authenticity.</p>
+<h2 id="the-assessment-validity-crisis">The assessment validity crisis</h2><p>Lorena's experience reveals a fundamental problem: AI has broken traditional assessment methods. If students can get AI to do their work, how do we evaluate their actual understanding? How do we conduct meaningful assessments in both educational and workplace settings?</p>
+<p>This question hits close to home for me. As a team lead, I constantly assess whether candidates are ready for the job and whether my teammates are performing at expected levels. If I'm only looking at work outputs—the final code, the completed analysis, the polished presentation—that's an inadequate assessment method. AI has made it trivially easy to produce impressive-looking outputs while learning nothing.</p>
+<p>I need to understand <em>how</em> people think through problems, not just whether they can deliver results. This challenge sparked intense conversations with educators at SciPy 2025. Daniel Chen (University of British Columbia) and Ryan Cooper (University of Connecticut) each brought unique perspectives on adapting our assessment methods to this new reality.</p>
+<h2 id="assessing-the-process-not-just-the-product">Assessing the process, not just the product</h2><p>Daniel Chen had to fundamentally shift his approach. He moved up Bloom's taxonomy for assessment, focusing on questioning and synthesis rather than factual regurgitation. His key insight: <strong>when students ask questions, it reveals their level of understanding</strong>.</p>
+<p>Insightful questions indicate pursuit of mastery. Surface-level "how do I get this done" questions reveal a lack of deep engagement.</p>
+<p>Daniel proposed assessing students through their AI chat transcripts. Instead of only evaluating final products, we could examine both process and outcome. This approach reveals <em>how</em> students think through problems, potentially restoring validity to our assessments.</p>
+<p>Ryan Cooper had already started implementing this idea, collecting chat transcripts to understand student thinking patterns. He also experimented with having students generate their own exam questions—leveraging the fact that creation sits at the highest level of Bloom's taxonomy.</p>
+<p>Ryan gave students access to a curated AI system conditioned with course context, generating on-the-fly assessment questions. While innovative, he encountered challenges with rubric-based grading when AI suggested grades without clear criteria.</p>
+<h2 id="why-this-matters-in-the-workplace">Why this matters in the workplace</h2><p>These educational assessment challenges directly mirror my daily reality as a team lead. AI assistance allows me to work solo and move incredibly fast—I love that turbocharged feeling. But this speed creates a dangerous blind spot that affects both my personal development and my team's growth.</p>
+<p>Here's my dilemma: if I don't slow down to demonstrate my thinking process, we lose opportunities to train junior team members. More concerning, if I can't see how my team members approach problems—only their final outputs—I can't effectively assess their capabilities or guide their development.</p>
+<p>When team members use GitHub Copilot or similar tools, I need visibility into their thought processes, not just their code. Are they asking insightful questions? Do they understand the trade-offs they're making? Can they spot when the AI suggests something problematic? Without access to their reasoning process, I'm essentially conducting performance reviews based on AI-assisted outputs rather than human capability.</p>
+<p>This visibility gap threatens knowledge transfer and continuity. We risk training a generation of practitioners who can orchestrate AI to produce impressive results but lack the foundational understanding to innovate when the tools fail or evolve.</p>
+<h2 id="earning-the-privilege-of-automation">Earning the privilege of automation</h2><p>The solution to this assessment crisis—both educational and professional—isn't to ban AI tools or ignore their impact. Instead, we need a fundamental shift in how we think about automation access.</p>
+<p>Here's the central insight that crystallized from these conversations: <strong>people must earn the privilege to use automation</strong>.</p>
+<p>The use of large language models for coding is automated code drafting. If you lack the skills to evaluate and verify correctness, you shouldn't use LLMs for anything important. This isn't about restricting access, but rather, it's about ensuring people develop foundational competencies first, then demonstrate those competencies before gaining access to powerful automation.</p>
+<p>The principle is straightforward: <strong>demonstrate you can verify AI output before using AI for critical work.</strong> This means:</p>
+<ul>
+<li>Understanding underlying concepts well enough to spot errors</li>
+<li>Having skills to validate AI-generated solutions</li>
+<li>Developing judgment to recognize when something doesn't make sense</li>
+<li>Building fortitude to dig deeper when results seem questionable</li>
+</ul>
+<p>I'm fine with "vibe coding" in unfamiliar languages for throwaway explorations—that's valuable for learning. But for work that matters, the ability to verify correctness is non-negotiable.</p>
+<h2 id="the-path-forward">The path forward</h2><p>Lorena's lessons teach us that unrestricted AI access without foundational skills leads to degraded learning outcomes. We need systematic approaches to ensure people earn their automation privileges. These include:</p>
+<ul>
+<li><strong>Moving assessments up Bloom's taxonomy</strong> to focus on higher-order thinking skills that AI can't easily replicate</li>
+<li><strong>Evaluating process alongside product</strong> through chat transcript analysis and collaborative work</li>
+<li><strong>Encouraging creation and synthesis</strong> rather than regurgitation—have students generate exam questions, not just answer them</li>
+<li><strong>Implementing pair programming and mentoring</strong> that reveals thinking patterns and preserves knowledge transfer</li>
+<li><strong>Maintaining human elements</strong> in learning and development to counteract AI's tendency to create isolated workers</li>
+</ul>
+<p>The future belongs to those who can effectively collaborate with AI while maintaining the critical thinking skills to guide and verify that collaboration. But they must demonstrate mastery of fundamentals before earning that privilege.</p>
+<p>We're not trying to halt progress or ban useful tools. We're ensuring that powerful automation serves human capability rather than replacing it.</p>
+<p><em>With thanks to Lorena Barba (George Washington University), Daniel Chen (University of British Columbia), Ryan Cooper (University of Connecticut), and Emily Dorne (Driven Data) for sharing their experiences and insights. Their perspectives as professional educators and industry practitioners navigating AI's impact on learning, assessment, and hiring shaped these reflections.</em></p>
+<h2 id="addendum">Addendum</h2><p>Lorena Barba continued this conversation at JupyterCon, delivering a talk titled <a href="https://www.youtube.com/watch?v=g0X4f0tRTTo">"Teaching and Learning With Jupyter and AI: An Educator's Dilemma"</a>. In this follow-up presentation, she further explores the challenges educators face when students use AI as a shortcut, creating an "illusion of competence" that undermines genuine learning. The talk addresses the impasse educators face with vague university guidance and challenges to assessment validity, building on the themes she shared at SciPy 2025.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-earn-the-privilege-to-use-automation</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Earn the privilege to use automation}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{07}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{13}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/7/13/earn-the-privilege-to-use-automation}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

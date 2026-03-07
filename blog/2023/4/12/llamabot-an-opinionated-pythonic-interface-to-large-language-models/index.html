@@ -1,0 +1,700 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="LLaMaBot: An opinionated, Pythonic interface to Large Language Models">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/llamabot-an-opinionated-pythonic-interface-to-large-language-models' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>LLaMaBot: An opinionated, Pythonic interface to Large Language Models - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">LLaMaBot: An opinionated, Pythonic interface to Large Language Models</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2023-04-12</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llms/">
+        llms
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/large language models/">
+        large language models
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/chatbot/">
+        chatbot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llm/">
+        llm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/fastapi/">
+        fastapi
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/panel/">
+        panel
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/software development/">
+        software development
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>🤖 I've been playing with Large Language Models and found some common patterns.
+🧠 So, I created a new package called <code>llamabot</code>!
+😎 It lets you make your own Python LLM bot, all with just a few lines of code.
+🌬️ It should make experimenting a breeze!
+🚀 Are you curious? Read on!</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I've been experimenting with Large Language Models recently,
+and some coding patterns have emerged.
+The most common patterns I saw were:</p>
+<ul>
+<li>Single text in, single text out (STISTO):
+I prime an LLM with a system message (its task/role),
+feed in a text, and get back a text response.</li>
+<li>ChatBot: I prime an LLM with a system message and expect it to keep chat history alive.</li>
+<li>QueryBot: I give it text files and ask questions about them.</li>
+</ul>
+<p>One thing that was common in my previous experiments with all three LLM APIs was
+the amount of boilerplate code I had to write before experimenting with prompts.
+For example, suppose I wanted to "chat in my Jupyter notebook."
+I'd have to do manual chat history (memory) management in that case.
+This could have been better.
+I thus decided to see how close I could get to my perfect developer experience.</p>
+<p>While chatting with my friend and current manager, Andrew Giessel,
+we soon realized that a class-based interface may be appropriate here,
+especially with stateful chat history.
+So I put that idea into practice with a new package that I'm excited to announce:
+<code>llamabot</code>!</p>
+<p>Equipped with an OpenAI API key,
+the key idea here is that users should be able to instantiate
+an LLM bot preconditioned with a system prompt
+and then reuse that base system prompt over and over during a live Python session.
+A natural structure for this kind of program is to use a Python class.
+Those who know my penchant for functional programming should know that
+I did experiment with closures.
+Nonetheless, I still concluded that a class definition is more natural here.
+At its core, it looks something like this:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamabot</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleBot</span>
+
+<span class="n">feynman</span> <span class="o">=</span> <span class="n">SimpleBot</span><span class="p">(</span><span class="s2">&quot;You are Richard Feynman. You will be given a difficult concept, and your task is to explain it back.&quot;</span><span class="p">)</span>
+<span class="n">explained</span> <span class="o">=</span> <span class="n">feynman</span><span class="p">(</span><span class="s2">&quot;Enzyme function annotation is a fundamental challenge, and numerous computational tools have been developed...&quot;</span><span class="p">)</span>
+</pre></div>
+<p>The <code>explained</code> text will be GPT4's imitation of how Richard Feynman might explain that complicated biochemical concept.</p>
+<p>We can also create an ELI5 bot:</p>
+<div class="hll"><pre><span></span><span class="n">eli5</span> <span class="o">=</span> <span class="n">SimpleBot</span><span class="p">(</span><span class="s2">&quot;You are a bot that explains concepts the way a 5 year old would understand it. You will be given a difficult concept, and your task is to explain it back.&quot;</span><span class="p">)</span>
+<span class="n">explained</span> <span class="o">=</span> <span class="n">eli5</span><span class="p">(</span><span class="s2">&quot;Enzyme function annotation is a fundamental challenge, and numerous computational tools have been developed...&quot;</span><span class="p">)</span>
+</pre></div>
+<p>Likewise, the <code>explained</code> text will attempt to explain the difficult biochemical concept
+as a 5-year-old might understand it.
+For example, I've seen some pretty good ones
+about lipid nanoparticles being described as "bubbles."</p>
+<p>One way to think about a SimpleBot is that it is a Python callable (like a function)
+that you can configure using natural language.
+The function body is configured upon instantiation/creation.
+Post-configuration, upon receiving text as an input,
+it will treat your wish (configuration) as its command.</p>
+<p>As a result of this simplicity,
+it's surprisingly easy to build opinionated bots
+that are preconditioned to behave a certain way
+and then wrap them inside a desired endpoint
+(e.g. a FastAPI endpoint, a command-line interface, a Panel/Streamlit app, or more).
+For example, if I wanted to make a CLI out of my Feynman bot, I might use:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamabot</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleBot</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typer</span>
+
+
+<span class="n">feynman</span> <span class="o">=</span> <span class="n">SimpleBot</span><span class="p">(</span><span class="s2">&quot;You are Richard Feynman. You will be given a difficult concept, and your task is to explain it back.&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">ask_feynman</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot; Ask Feynman.&quot;&quot;&quot;</span>
+  <span class="n">result</span> <span class="o">=</span> <span class="n">feynman</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="n">typer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ask_feynman</span><span class="p">)</span>
+</pre></div>
+<h2 id="simple-chat-bots">Simple Chat Bots</h2><p>Sometimes, you might need a simple chatbot
+that you can interact with in a Jupyter notebook.
+(In this way, you could avoid exposing your potentially sensitive data
+to OpenAI's data collection efforts.)</p>
+<p>To implement a proper chatbot,
+you will need a way to keep track of chat history,
+at least within a live Python session.
+With the OpenAI native API, you'll likely need to do this manually.
+<code>ChatBot</code> implements convenience machinery
+to ensure your chat history is stored in memory
+while a live Python session runs.
+So you can do things like:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamabot</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatBot</span>
+
+<span class="n">ask_feynman</span> <span class="o">=</span> <span class="n">ChatBot</span><span class="p">(</span><span class="s2">&quot;You are Richard Feynman. You will be given a difficult concept, and your task is to explain it back.&quot;</span><span class="p">)</span>
+<span class="n">ask_feynman</span><span class="p">(</span><span class="s2">&quot;Enzyme function annotation is a fundamental challenge, and numerous computational tools have been developed...&quot;</span><span class="p">)</span>
+</pre></div>
+<p>While that might look similar to the above,
+the magical part here is when you call on <code>ask_feynman</code> once again:</p>
+<div class="hll"><pre><span></span><span class="n">ask_feynman</span><span class="p">(</span><span class="s2">&quot;Can you redo the explanation as if you were talking with a 5 year old?&quot;</span><span class="p">)</span>
+</pre></div>
+<p>Unlike SimpleBot, which will not remember previous text entries,
+Virtual Richard Feynman (or ELI5, or whatever you build...)
+has memory over what you (the user) put into the function.</p>
+<h2 id="querybot">QueryBot</h2><p>Another common use case for LLMs is to get an LLM to generate texts
+(summaries, LinkedIn posts, and more)
+based on one or more documents given to the LLM.
+To this end, we can use QueryBot.
+The QueryBot gets instantiated with document(s) to query;
+those documents are automatically embedded using LlamaIndex using its default <code>GPTSimpleIndex</code>.
+To save on costs, you can embed a collection of documents once
+(using QueryBot or LlamaIndex),
+save the index to disk as a JSON file,
+and then re-load the index into QueryBot directly.
+It looks something like this:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamabot</span><span class="w"> </span><span class="kn">import</span> <span class="n">QueryBot</span>
+<span class="n">blog_index</span> <span class="o">=</span> <span class="o">...</span> <span class="c1"># load in a JSON file with document embeddings.</span>
+<span class="n">bot</span> <span class="o">=</span> <span class="n">QueryBot</span><span class="p">(</span><span class="n">system_message</span><span class="o">=</span><span class="s2">&quot;You are a Q&amp;A bot.&quot;</span><span class="p">,</span> <span class="n">saved_index_path</span><span class="o">=</span><span class="n">blog_index</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="s2">&quot;Do you have any advice for me on career development?&quot;</span><span class="p">,</span> <span class="n">similarity_top_k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">response</span><span class="p">))</span>
+</pre></div>
+<h2 id="what-s-coming-up-next">What's coming up next?</h2><p>Another way of asking that question is,
+"What does the future hold?" LLMs are having their moment now.
+I think <code>llamabot</code> can help facilitate experimentation
+and prototyping by making some repetitive things invisible.</p>
+<p>As for things that I think could be helpful,
+sticking to the spirit of "making repetitive things invisible",
+I plan to put in opinionated UI-building functions
+that let one stand up Panel apps easily.
+That should enable rapid prototyping in front of end users.
+For each of the Bots above, adhering to good software development practice,
+the programmatic interface should effectively define the user interface.</p>
+<p>Figuring out a sane way to interface with multiple LLMs would be incredible too!
+I will need time to work on it;
+however, I would gladly accept a PR that implements the idea
+while sticking closely to good software organization practices!</p>
+<p>I'd love for you to check out Llamabot
+and tell me what is missing and what could be made better!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2023-llamabot-an-opinionated-pythonic-interface-to-large-language-models</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{LLaMaBot: An opinionated, Pythonic interface to Large Language Models}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2023}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{04}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{12}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2023/4/12/llamabot-an-opinionated-pythonic-interface-to-large-language-models}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

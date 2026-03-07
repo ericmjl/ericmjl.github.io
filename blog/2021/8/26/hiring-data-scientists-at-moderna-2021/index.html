@@ -1,0 +1,791 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Hiring data scientists at Moderna! (2021)">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/hiring-data-scientists-at-moderna-2021' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Hiring data scientists at Moderna! (2021) - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Hiring data scientists at Moderna! (2021)</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2021-08-26</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/hiring/">
+        hiring
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/moderna/">
+        moderna
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>Moderna's DSAI team, the team I'm on, is hiring! Read on to get links to the postings and get a glimpse into the inner workings of my head as I look through resumes.</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>The team I'm on is hiring!
+We are looking for three bold, curious, relentless, and collaborative data scientists
+to join Moderna's DSAI group.
+There are three specializations,
+one for public health/medical affairs,
+one for chemistry,
+and one for biological sequence modelling.
+Here are the LinkedIn links at which you can apply and learn more about the roles:</p>
+<ul>
+<li><a href="https://www.linkedin.com/jobs/view/2679291332">Commercial &amp; medical affairs role</a></li>
+<li><a href="https://www.linkedin.com/jobs/view/2686512479">Chemistry role</a></li>
+<li><a href="https://www.linkedin.com/jobs/view/2686513450">Biology role</a></li>
+</ul>
+<p>We are looking for strong model-building skills,
+prior experience handling relevant data,
+and the compassion &amp; competence to communicate with non-technical stakeholders.</p>
+<p>Historically, we are a Python + PyTorch shop.
+Bonus points for special technical skills (network science, Bayesian modelling)
+on top of a technical track record of building fit-for-purpose machine learning models.</p>
+<hr>
+<p>And now for an FAQ that disambiguates some questions that you might have.
+The answers, views, and observations listed below are my own;
+they don't represent Moderna's official hiring policies,
+which I'm striving to adhere to.
+In no order of importance,
+and basically in order of what I could think of to include in an FAQ,
+here they are.</p>
+<p><strong>Q: Is relocation necessary?</strong>
+Because of the collaborative nature with colleagues who can't work remotely,
+we expect relocation to Cambridge, MA,
+with an eventual return to campus.
+COVID times dictated a temporary change in practice,
+but in-person lubricates difficult technical discussions.
+We do have some colleagues in other states/cities,
+but they plan to move to Cambridge eventually.</p>
+<p><strong>Q: Who will the roles be reporting to?</strong>
+For the chem &amp; bio roles, yours truly.
+For commercial and medical affairs,
+my wonderful colleague Adrianna Loback.</p>
+<p><strong>Q: Who leads the broader team?</strong>
+Andrew Giessel, data scientist #1 at Moderna.
+(I am only #6!)</p>
+<p><strong>Q: Is a Ph.D. required?</strong>
+The expectation is yes,
+because of the research-y nature of the role
+and because of the level of scientific depth required.
+However, excellent MSc candidates <em>might</em> be considered
+if a publishing track record or <em>relevant</em> industry experience is present.</p>
+<p><strong>Q: How urgent is the hiring?</strong>
+For the bio and chem DS roles,
+I'm still at the point where I'm willing to wait.
+We want to consider a diverse slate of candidates before making a decision.
+For the Commercial &amp; Medical Affairs role,
+I would defer to Adrianna for her thoughts,
+but I also want to respect her time -
+she is slammed with many projects.</p>
+<p><strong>Q: What are the core skills we need to demonstrate?</strong></p>
+<p>For the BioDS role:
+solving scientific problems that rely on biological sequences
+as input to machine learning models.
+We have professional bioinformaticians,
+so traditional bioinformatics skillsets are not really what we're looking for.</p>
+<p>For the ChemDS role:
+solving scientific problems that rely on QSAR modelling
+and the extended suite of modelling tools.
+We have computational chemists,
+so traditional comp chem skillsets are not really what we're looking for either.</p>
+<p>For both roles:
+showing me that you can build custom differentiable or likelihood-based
+models and not just grab something off-the-shelf.
+Or, if you did grab something off-the-shelf,
+show me that you really have dissected the internals
+to the point that you can recreate it in a different framework.
+I only trust modellers who know the ins and outs of the models they build.</p>
+<p><strong>Q: If I work at Novartis, will I be considered?</strong>
+Unfortunately, no.
+I have a non-solicit clause that bars me from recruiting anyone from Novartis
+within a year of my last day of work, which was 30 July 2021.
+That means my colleagues cannot include me in any interview panel
+that involves a candidate currently working at Novartis.</p>
+<p><strong>Q: Is there an algorithm filtering me out?</strong>
+No. Real humans are at work.
+Trust me.
+I've once thought that way too.
+But, now that I'm on the other side, I know what it looks like.
+Our friendly talent acquisition partner in HR is helping us with the process,
+and he handles wayyyyyyy more than we see.
+So... yes, we're overwhelmed with the response
+and have been working through your resumes.
+But we definitely want to pick well.</p>
+<p><strong>Q: Is a GitHub repository required?</strong>
+Not really, but we do want to see your best work at some point, including how you code.
+All of us, including myself,
+have work that came from our early days of data science that we're not proud of,
+but don't worry about those -
+I'm only interested in knowing how what your best work looks like.
+A GitHub repo can help as a data point.
+If you do choose to highlight one, make sure it's done well -
+a README that explains why your repo exists
+and how to get started is an absolute necessity!</p>
+<p><strong>Q: What is the impact of the role to Moderna and the world?</strong>
+I can't reveal internal workings,
+but the roles I'm in charge of will involve the core platforms of mRNA,
+lipid nanoparticle delivery,
+and protein engineering.
+There are <em>so, so</em> many open scientific problems that we can solve building models.
+My friend Jon Bloom at Cellarity characterized it on Twitter this way,
+"If you’d like your sequence-to-function optimization to impact a billion people...
+this is the team to join."</p>
+<p><strong>Q: Will we get feedback?</strong>
+I did provide feedback for final round intern candidates during my time at NIBR.
+Unfortunately, I won't have the bandwidth for everyone who applies
+but will strive to do so for final-round candidates as a courtesy for your time.
+(Not a promise, though!)</p>
+<p><strong>Q: What can I do to improve my chances during resume screening?</strong></p>
+<p>I don't mind revealing how I read your resumes.</p>
+<p>I skip your education and skills and go straight to projects
+because I really don't care if you're from the so-called top-tier schools or not.
+I skip skills because they're so easy to include bullet points on.
+I'd rather have evidence of skills than a listing of them.</p>
+<p>I have a mental filter for
+"used method X to solve problem Y in language Z using packages ABC, with impact K."
+Miss out on that phrasing,
+and I'll probably skip over something important in your resume.</p>
+<p>I don't read your hobbies section either;
+historically, I have found them irrelevant
+for my ability to see whether you can fulfill the role requirements.</p>
+<p><strong>Q: What will your phone screen be like?</strong>
+I will be on the lookout for clarity in communication, depth, and breadth of knowledge,
+and I'm going to probe until I see the boundaries of your knowledge
+or I reach the boundaries of my own.
+Just so you are aware, I don't follow a standard script,
+as I prefer to follow the trajectory of your stories.
+That also means you don't have to prep for the question,
+"Tell me about yourself."
+I don't particularly appreciate hearing that question or answering it,
+and I wouldn't want to hypocritically subject you to that question too.
+Adrianna might handle things differently.</p>
+<p><strong>Q: What will the on-site look like?</strong></p>
+<p>A job talk based on your prior work or a data challenge (your choice).
+I will work with our recruiting team to ensure the prompt reflects that;
+if you make it to a virtual on-site and saw this FAQ, please hold me accountable!</p>
+<p>Following that will be a committee of colleagues,
+likely collaborators with whom you'll be interacting.
+I'm going to try to organize things
+so that each of us covers one to two aspects of the role,
+such as technical, interpersonal, drive to learn, etc.
+I will take the collaborators' viewpoints seriously;
+they sacrifice time to help with hiring,
+which is my way of respecting their time.</p>
+<p><strong>Q: Do you look at our online profiles while screening?</strong></p>
+<p>I do, but only for those whose resumes, I have been intrigued by.
+It is quite time-consuming,
+and we have other work to deliver on that pushes our scientific tech platforms further.</p>
+<p>If your digital footprint is well-curated and presented in a polished fashion, though,
+it is a good data point and might inspire me to dig further.
+I sometimes engage in nerdy things like viewing the source of your website
+to see whether you hand-crafted your theme or not because I'm a nerd like that.</p>
+<p><strong>Q: What proportion of resumes have you been impressed by?</strong>
+This is not a question I'm willing to answer,
+as it could have negative second-order effects on the hiring process.
+Probably best not to ask me other statistics about the hiring process at this point.</p>
+<p><strong>Q: What is the expected salary range?</strong>
+No idea, you would talk with HR about that question.</p>
+<p><strong>Q: What about the expected title?</strong>
+Quite likely that for these roles,
+it will be "Data Scientist" for fresh grads/post-docs
+with a shorter technical track record,
+and "Senior Data Scientist" for candidates with a stronger technical track record.</p>
+<p><strong>Q: Will Moderna survive the next 10 years?</strong>
+I made a bet on MTX and started on July 19.
+So my answer is going to be as good as yours.</p>
+<p><strong>Q: Is deep learning a necessity?</strong>
+If you look at the JD,
+it's highly preferred to have more than just feed-forward neural network experience.
+(I am also strongly considering probing for an experience
+beyond just <em>transfer learning</em> as well -
+I find transfer learning intellectually boring,
+as much as it might be practically useful.)
+I take this as an indicator of a relentless drive to learn.
+With interns at NIBR, my best ones were similarly relentless in learning,
+sometimes mastering something to the point that I would reference their work.
+So I'm looking for candidates with <em>evidence</em> of that trait.</p>
+<p><strong>Q: Can you elaborate a bit on model-building skill?</strong>
+Yes, definitely.
+I have a strong admiration for individuals whose track record of work
+reflects their ability to <em>design</em> models
+in which each component of the model is purposefully and intentionally included.
+From my perspective,
+this strongly implies thinking carefully through the data-generating process
+and translating it into equations.
+There are some pieces of work where you can <em>just tell</em> that
+the authors were trying some fancy neural network model for no substantial reason,
+good as their reasons might be --
+they were not injecting any inductive biases into their models.
+And then there are some pieces of work that combine deep probabilistic modeling
+in such a creative way
+that you can <em>just tell</em> that it was well thought through.
+I'm interested in the trait of
+<em>carefully thinking through about the model that you're building</em>.</p>
+<p><strong>Q: Will there be a take-home data challenge?</strong>
+I am still in flux on this question.
+We have to ensure that the hiring process
+is standardized so that no candidate is unfairly assessed.
+At the same time,
+we would like to have sufficient information to make an informed decision.
+I'll probably offer it as one option for you
+if it could help me assess your software skills and your relentlessness to learn.
+I want to avoid doing so, though,
+as it is extra work and is a big disadvantage
+for candidates who can't take the time out to do one.</p>
+<p><strong>Q: If I do the take-home data challenge,
+can I use the work I produce as part of my data science portfolio?</strong>
+Absolutely.
+Please show it off - curating a portfolio did many wonders for my career,
+and I believe the same will be true for you.
+(This is my way of compensating for your time spent -
+by investing in a foundational tangible output for your career development.)</p>
+<p><strong>Q: What is the stack that you all use?</strong>
+AWS + Docker.
+We have excellent in-house tooling developed on top of AWS
+that really simplifies a <em>lot</em> of infra work for data scientists.
+Two weeks in, I already helped deploy OSS tooling for colleagues.
+If you join, you'll like what you see.</p>
+<p><strong>Q: How important are software skills?</strong>
+Quite important, but you don't have to be a seasoned engineer.
+I will be looking for <em>evidence</em> of the ability
+to structure a project's source repository in a way that is reasonably organized,
+that's all.
+Most of us are very well-organized;
+as a reminder, a badly organized GH repo won't do you any favours.</p>
+<p><strong>Q: Will you review my resume before I submit my application?</strong>
+Unfortunately I won't have the time to do so.
+However, if you've read the FAQ,
+you'll know how best to structure your resume,
+and you'll have a good idea of whether you'll fit the role or not.</p>
+<p><strong>Q: Should I apply to all three roles or just one?</strong>
+I'd advise just one because Adrianna and I are looking out for candidates
+that might be suitable for each others' roles,
+and we'd like to reduce the load for our Talent Acquisition partner.
+So effectively, you'll still be entering a combined pool of candidates,
+but you'll also be indicating your preference by applying to just one.</p>
+<p><strong>Q: Can I connect with you on LinkedIn regarding the role?</strong>
+As a general rule of thumb,
+I only connect with individuals I have met in person or worked with.
+I also am notorious for not responding to LinkedIn invites until they pile up.
+Even if you include your reasons,
+I might still ignore the request if you send a connection request.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2021-hiring-data-scientists-at-moderna-2021</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Hiring data scientists at Moderna! (2021)}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2021}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{08}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{26}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2021/8/26/hiring-data-scientists-at-moderna-2021}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

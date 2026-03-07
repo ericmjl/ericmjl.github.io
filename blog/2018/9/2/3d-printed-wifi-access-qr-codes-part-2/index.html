@@ -1,0 +1,680 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="3D Printed WiFi Access QR Codes: Part 2">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/3d-printed-wifi-access-qr-codes-part-2' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>3D Printed WiFi Access QR Codes: Part 2 - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">3D Printed WiFi Access QR Codes: Part 2</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2018-09-02</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/3d printing/">
+        3d printing
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/qr code/">
+        qr code
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>Part 2 of how to create 3D-printed QR codes!</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <h2 id="summary">Summary</h2><p>In this blog post, I'll detail how to create a 3D printable QR code model using Python.</p>
+<h2 id="recap">Recap</h2><p>In the previous blog post,
+I detailed how to use <code>pyqrcode</code> to create a QR code for a WiFi string.
+The most important parts were:</p>
+<ol>
+<li>The WiFi string. It should have the following pattern:</li>
+</ol>
+<div class="hll"><pre><span></span>WIFI:S:&lt;SSID&gt;;T:&lt;WPA|WEP|&gt;;P:&lt;password&gt;;;
+</pre></div>
+<ol>
+<li>The QR code creator.</li>
+</ol>
+<div class="hll"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyqrcode</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pq</span>
+<span class="n">ssid</span> <span class="o">=</span> <span class="s2">&quot;Family Guest Network&quot;</span>
+<span class="n">security</span> <span class="o">=</span> <span class="s2">&quot;WPA&quot;</span>
+<span class="n">password</span> <span class="o">=</span> <span class="s2">&quot;vn8h2sncu093y3nd!&quot;</span>
+<span class="n">qr</span> <span class="o">=</span> <span class="n">pq</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;WIFI:S:</span><span class="si">{</span><span class="n">ssid</span><span class="si">}</span><span class="s1">;T:</span><span class="si">{</span><span class="n">security</span><span class="si">}</span><span class="s1">;P:</span><span class="si">{</span><span class="n">password</span><span class="si">}</span><span class="s1">;;&#39;</span><span class="p">)</span>
+</pre></div>
+<h2 id="creating-a-3d-printed-qr-code-with-python">Creating a 3D Printed QR Code with Python</h2><p>Now, let's see how we can create 3D models with Python code.
+We will need a package called <code>SolidPython</code>,
+and optionally <code>numpy</code> to help us with some array processing.
+(It can be done entirely using built-in lists if needed.)</p>
+<h3 id="create-qr-code-object">Create QR Code Object</h3><p>To start, I first defined a convenience function
+that let me create and return a <code>QRCode</code> object
+that can be passed around and manipulated.</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">create_wifi_qr</span><span class="p">(</span><span class="n">ssid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">security</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">qr</span> <span class="o">=</span> <span class="n">pq</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;WIFI:S:</span><span class="si">{</span><span class="n">ssid</span><span class="si">}</span><span class="s1">;T:</span><span class="si">{</span><span class="n">security</span><span class="si">}</span><span class="s1">;P:</span><span class="si">{</span><span class="n">password</span><span class="si">}</span><span class="s1">;;&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">qr</span>
+</pre></div>
+<p>Its use will become evident later.
+You'll also notice I'm using type hints inside the function.</p>
+<h3 id="create-text-representation">Create Text Representation</h3><p>Using the function, we can create a text representation of the QR code:</p>
+<div class="hll"><pre><span></span><span class="n">qr</span> <span class="o">=</span> <span class="n">create_wifi_qr</span><span class="p">(</span><span class="n">ssid</span><span class="p">,</span> <span class="n">security</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">qr</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+</pre></div>
+<p>This will give essentially a series of 1s and 0s.
+This is a string, though, not a <code>numpy</code> array.
+Hence, we may have to convert this into a list of lists,
+or a <code>numpy</code> array (as a user of the scientific Python stack,
+I prefer using arrays where possible,
+but in this case there is no real practical advantage to doing so
+because we are not doing linear algebra).</p>
+<h3 id="create-array-representation">Create Array Representation</h3><p>Let's now define a function that takes in the <code>QRCode</code> object
+and return an array version of the text rendering.</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">qr2array</span><span class="p">(</span><span class="n">qr</span><span class="p">):</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">qr</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">arr</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">bit</span><span class="p">)</span> <span class="k">for</span> <span class="n">bit</span> <span class="ow">in</span> <span class="n">line</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+</pre></div>
+<p>With that, we can create an array version of our QR code above:</p>
+<div class="hll"><pre><span></span><span class="n">arr</span> <span class="o">=</span> <span class="n">qr2array</span><span class="p">(</span><span class="n">qr</span><span class="p">)</span>
+</pre></div>
+<h3 id="create-3d-model">Create 3D Model</h3><p>Now, we're ready to play with <code>SolidPython</code>!</p>
+<p><code>SolidPython</code> is a Python package that provides an interface to the OpenSCAD language.
+The OpenSCAD language allows a programmer to programmatically define 3D models
+using the language of geometry.
+This includes the creation of cubes and other 3D objects,
+as well as object manipulations,
+such as translation,
+coloring,
+and union-ing.</p>
+<p>For brevity, I'll not introduce you to more detail on what OpenSCAD is.
+Rather, I'll recommend two readings, to be read in order:</p>
+<ol>
+<li><a href="https://www.makeuseof.com/tag/beginners-guide-openscad-programming-3d-printed-models/">Beginner's Guide to OpenSCAD</a></li>
+<li><a href="https://solidpython.readthedocs.io/en/latest/">SolidPython's Documentation</a></li>
+</ol>
+<p>Take a look at the code below for an example of how we create the 3D object.</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">solid</span><span class="w"> </span><span class="kn">import</span> <span class="n">color</span><span class="p">,</span> <span class="n">cube</span><span class="p">,</span> <span class="n">scad_render</span><span class="p">,</span> <span class="n">translate</span><span class="p">,</span> <span class="n">union</span>
+
+<span class="n">SCALE</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># output defaults to 1 mm per unit; this lets us increase the size of objects proportionally.</span>
+<span class="n">cubes</span> <span class="o">=</span> <span class="p">[</span><span class="n">translate</span><span class="p">([</span><span class="n">i</span><span class="o">*</span><span class="n">SCALE</span><span class="p">,</span> <span class="n">j</span><span class="o">*</span><span class="n">SCALE</span><span class="p">,</span> <span class="mi">0</span><span class="p">])(</span><span class="n">color</span><span class="p">(</span><span class="s1">&#39;black&#39;</span><span class="p">)(</span><span class="n">cube</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">[</span><span class="n">SCALE</span><span class="p">,</span> <span class="n">SCALE</span><span class="p">,</span> <span class="n">HEIGHT</span><span class="p">])))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="n">base_plate</span> <span class="o">=</span> <span class="n">color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)(</span><span class="n">cube</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">SCALE</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">SCALE</span><span class="p">,</span> <span class="n">HEIGHT</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)))</span>
+<span class="n">qrobj</span> <span class="o">=</span> <span class="n">union</span><span class="p">()(</span><span class="o">*</span><span class="n">cubes</span><span class="p">,</span> <span class="n">base_plate</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">scad_render</span><span class="p">(</span><span class="n">qrobj</span><span class="p">))</span>
+</pre></div>
+<p>This will give the following OpenSCAD code, which I've truncated for brevity:</p>
+<div class="hll"><pre><span></span>union() {
+    translate(v = [8, 8, 0]) {
+        color(c = &quot;black&quot;) {
+            cube(size = [2, 2, 4]);
+        }
+    }
+    translate(v = [8, 10, 0]) {
+        color(c = &quot;black&quot;) {
+            cube(size = [2, 2, 4]);
+        }
+  ...
+    translate(v = [88, 80, 0]) {
+        color(c = &quot;black&quot;) {
+            cube(size = [2, 2, 4]);
+        }
+    }
+    translate(v = [88, 82, 0]) {
+        color(c = &quot;black&quot;) {
+            cube(size = [2, 2, 4]);
+        }
+    }
+    color(c = &quot;white&quot;) {
+        cube(size = [98, 98, 2.0000000000]);
+    }
+}
+</pre></div>
+<p>What we've done here is take the 1s and created cubes where they are supposed to be,
+and leave the zeros empty.
+Then, we add a "base plate" so that everything stays nice and connected,
+and finally union all of the cubes with the base plate,
+so that we get one solid piece that is 3D printed.</p>
+<p>If you observe the output of the function <code>scad_render</code>,
+it will essentially be valid OpenSCAD text.
+With OpenSCAD text, you can paste it into OpenSCAD to render it:</p>
+<p><img src="openscad.webp" alt=""></p>
+<p>Following that, it can be exported as an STL file.
+The export process in OpenSCAD takes some time,
+but once done, it then has to be first converted into a <code>.gcode</code> file,
+which gives a 3D printer the necessary instructions
+to move its printhead around to print the QR code.</p>
+<p>In short, the flow is:</p>
+<pre><code>SolidPython -&gt; OpenSCAD -&gt; STL -&gt; .gcode
+</code></pre>
+<h2 id="conclusions">Conclusions</h2><p>The key things to take away from this blog post are:</p>
+<ol>
+<li>How to create a text representation of the QR code.</li>
+<li>How to convert the text representation into an array.</li>
+<li>How to create a 3D model of the QR code using the array.</li>
+</ol>
+<p>Now that you have an example of
+how to create an OpenSCAD file from Python using <code>SolidPython</code>,
+I hope you'll go forth and make a ton of fun stuff!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2018-3d-printed-wifi-access-qr-codes-part-2</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{3D Printed WiFi Access QR Codes: Part 2}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2018}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{09}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{02}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2018/9/2/3d-printed-wifi-access-qr-codes-part-2}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>
