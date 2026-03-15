@@ -1,0 +1,1449 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+    
+
+    
+    
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Blog - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+<div>
+
+<div class="btn-group" role="group" aria-label="pagination">
+  
+  <a href="/blog" class="btn btn-ghost disabled">&laquo;</a>
+  
+
+  
+
+  
+
+  <span class="btn btn-primary disabled">1</span>
+
+  
+  <a href="page/2/" class="btn btn-ghost">2</a>
+  
+
+  
+  <a href="/blog/page/3/" class="btn btn-ghost">3</a>
+  
+
+  
+  <a href="/blog/page/46/" class="btn btn-ghost">&raquo;</a>
+  
+</div>
+
+<br>
+</div>
+<div class="terminal-timeline">
+
+
+<div class="terminal-card">
+  <header>
+    <a href="2026/3/15/closing-air-gaps/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Closing air gaps</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-03-15</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/automation/">
+        automation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/efficiency/">
+        efficiency
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/airgaps/">
+        airgaps
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/workflow/">
+        workflow
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/processes/">
+        processes
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/agents/">
+        agents
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/imagination/">
+        imagination
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/skill/">
+        skill
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/mapping/">
+        mapping
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/labs/">
+        labs
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="2026/3/15/closing-air-gaps/" style="text-decoration: none;">
+        <img src="2026/3/15/closing-air-gaps/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I explore the concept of &#34;air gaps&#34;—those manual steps in business or scientific processes where humans bridge the gap between digital systems. I share real-world examples from labs and software workflows, discuss why these gaps matter, and offer practical advice on identifying and closing them with automation and coding agents. Curious how closing even small air gaps can transform your team&#39;s efficiency and free up mental bandwidth?</p>
+        </span>
+        <small>
+          <a href="2026/3/15/closing-air-gaps/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1971 words, approximately 10 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="2026/3/14/agent-skills-are-also-human-skills/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Agent skills are also human skills</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-03-14</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/automation/">
+        automation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/documentation/">
+        documentation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/workflow/">
+        workflow
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/context/">
+        context
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/dependencies/">
+        dependencies
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/github/">
+        github
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/obsidian/">
+        obsidian
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/productivity/">
+        productivity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/skills/">
+        skills
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/structure/">
+        structure
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/agents/">
+        agents
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="2026/3/14/agent-skills-are-also-human-skills/" style="text-decoration: none;">
+        <img src="2026/3/14/agent-skills-are-also-human-skills/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I reflect on the difference between tool-specific and workflow-specific agent skills, sharing how my own daily sign-off skill encodes not just automation, but my personal way of working. I argue that workflow skills come with implicit assumptions—about tools, file structures, and mental models—that need to be documented for others to benefit. Without this procedural context, skills are only half as useful. Curious how agent skills can become more human and helpful for everyone?</p>
+        </span>
+        <small>
+          <a href="2026/3/14/agent-skills-are-also-human-skills/">Read on...</a>
+          
+
+
+
+
+
+
+
+(689 words, approximately 4 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="2026/3/8/my-weekend-experiment-pymc-wasm/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">My weekend experiment making PyMC installable in a WASM environment</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-03-08</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/pymc/">
+        pymc
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/bayesian/">
+        bayesian
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/webassembly/">
+        webassembly
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/pyodide/">
+        pyodide
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="2026/3/8/my-weekend-experiment-pymc-wasm/" style="text-decoration: none;">
+        <img src="2026/3/8/my-weekend-experiment-pymc-wasm/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">I spent a weekend trying to make PyMC installable in WebAssembly environments via Pyodide. The journey involved making Numba optional, setting up Pixi development environments, and documenting the WASM build process. While PyMC can now technically install in WASM, the lack of WASM support in MCMC sampling backends (JAX, nutpie) means NUTS sampling remains out of reach. This represents a fundamental infrastructure gap, not just a missing dependency. Note: the Pixi-based approach described here was my weekend exploration; the actual PR to PyTensor respected their existing mamba-based toolchain.</p>
+        </span>
+        <small>
+          <a href="2026/3/8/my-weekend-experiment-pymc-wasm/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1881 words, approximately 10 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="2026/3/6/mastering-personal-knowledge-management-with-obsidian-and-ai/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Mastering Personal Knowledge Management with Obsidian and AI</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-03-06</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/agents/">
+        agents
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/obsidian/">
+        obsidian
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/knowledge management/">
+        knowledge management
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/productivity/">
+        productivity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/workflow/">
+        workflow
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="2026/3/6/mastering-personal-knowledge-management-with-obsidian-and-ai/" style="text-decoration: none;">
+        <img src="2026/3/6/mastering-personal-knowledge-management-with-obsidian-and-ai/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">I share how I use Obsidian and AI coding agents to manage personal knowledge at work. By choosing plain text, building structured note types, and encoding workflows into agent skills, I reduced knowledge management overhead from 30-40% of my time to less than 10%. The system helps me manage twelve people across two teams without losing context. This is an invitation to experiment with your own PKM system.</p>
+        </span>
+        <small>
+          <a href="2026/3/6/mastering-personal-knowledge-management-with-obsidian-and-ai/">Read on...</a>
+          
+
+
+
+
+
+
+
+(2076 words, approximately 11 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="2026/2/13/agentic-eda/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">How to stay in control when doing EDA with coding agents</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-02-13</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/agents/">
+        agents
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/exploratory data analysis/">
+        exploratory data analysis
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/workflow/">
+        workflow
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/productivity/">
+        productivity
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="2026/2/13/agentic-eda/" style="text-decoration: none;">
+        <img src="2026/2/13/agentic-eda/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I share how coding agents can supercharge data analysis, but only if we stay in control. By slowing down, asking the right questions, and structuring sessions with journals and artifact gating, we avoid chaos and keep our scientific thinking sharp. I explain the skills and patterns that help teams focus on insights rather than just generating code. Curious how you can harness agent speed without losing your scientific edge?</p>
+        </span>
+        <small>
+          <a href="2026/2/13/agentic-eda/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1266 words, approximately 7 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="2026/2/1/how-to-do-agentic-data-science/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">How to Do Agentic Data Science</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-02-01</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/agentic/">
+        agentic
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/coding/">
+        coding
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/experiments/">
+        experiments
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/logging/">
+        logging
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/reports/">
+        reports
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/journal/">
+        journal
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/plots/">
+        plots
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/iteration/">
+        iteration
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/structure/">
+        structure
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/exploration/">
+        exploration
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="2026/2/1/how-to-do-agentic-data-science/" style="text-decoration: none;">
+        <img src="2026/2/1/how-to-do-agentic-data-science/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I share ten lessons I&#39;ve learned from experimenting with agentic coding in data science, from setting clear goals and structuring projects to leveraging coding agents for faster iterations and better insights. I discuss practical tips like maintaining logs, generating diagnostic plots, and treating the agent as a partner in exploration. Curious how you can make AI your jazz partner in data science and boost your productivity?</p>
+        </span>
+        <small>
+          <a href="2026/2/1/how-to-do-agentic-data-science/">Read on...</a>
+          
+
+
+
+
+
+
+
+(2041 words, approximately 11 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="2026/1/25/model-feel-fast-tests-and-ai-coding-that-stays-in-flow/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">Model feel, fast tests, and AI coding that stays in flow</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-01-25</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/llm/">
+        llm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/autonomy/">
+        autonomy
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/supervision/">
+        supervision
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/personality/">
+        personality
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/verbosity/">
+        verbosity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/harness/">
+        harness
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/refactoring/">
+        refactoring
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/workflow/">
+        workflow
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/testing/">
+        testing
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/ergonomics/">
+        ergonomics
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="2026/1/25/model-feel-fast-tests-and-ai-coding-that-stays-in-flow/" style="text-decoration: none;">
+        <img src="2026/1/25/model-feel-fast-tests-and-ai-coding-that-stays-in-flow/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I share my hands-on experience using AI coding models, focusing less on benchmarks and more on the day-to-day feel—how model style, personality, and the right testing harness impact productivity and flow. I discuss the trade-offs between long-horizon autonomy and short-horizon iteration, and why a constructive, enthusiastic AI assistant matters as much as raw performance. Curious how the right mix of model and harness can transform your coding workflow?</p>
+        </span>
+        <small>
+          <a href="2026/1/25/model-feel-fast-tests-and-ai-coding-that-stays-in-flow/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1901 words, approximately 10 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="2026/1/19/how-to-build-self-improving-coding-agents-part-3/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">How to build self-improving coding agents - Part 3</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-01-19</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/agents/">
+        agents
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/workflows/">
+        workflows
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/productivity/">
+        productivity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/skills/">
+        skills
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="2026/1/19/how-to-build-self-improving-coding-agents-part-3/" style="text-decoration: none;">
+        <img src="2026/1/19/how-to-build-self-improving-coding-agents-part-3/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I share how to combine repo memory and reusable skills to create self-improving coding agents. I walk through a maturity model, explain when to update AGENTS.md versus creating a skill, and highlight the importance of metacognition in systematizing your workflows. I also discuss how agents are evolving beyond coding tools into general-purpose teammates. Curious how you can make your coding agents smarter and more helpful over time?</p>
+        </span>
+        <small>
+          <a href="2026/1/19/how-to-build-self-improving-coding-agents-part-3/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1129 words, approximately 6 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="2026/1/18/how-to-build-self-improving-coding-agents-part-2/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">How to build self-improving coding agents - Part 2</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-01-18</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/agents/">
+        agents
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/skills/">
+        skills
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/mcp/">
+        mcp
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/workflows/">
+        workflows
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="2026/1/18/how-to-build-self-improving-coding-agents-part-2/" style="text-decoration: none;">
+        <img src="2026/1/18/how-to-build-self-improving-coding-agents-part-2/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I dive into the concept of &#39;skills&#39; for coding agents—reusable playbooks that streamline repetitive tasks and make workflows explicit. I share real examples, from debugging to release announcements, and discuss how skills evolve through iteration and feedback. I also touch on the challenges of distributing and updating skills compared to MCP servers. Curious about how these skills can make your coding agents smarter and more efficient?</p>
+        </span>
+        <small>
+          <a href="2026/1/18/how-to-build-self-improving-coding-agents-part-2/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1154 words, approximately 6 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="terminal-card">
+  <header>
+    <a href="2026/1/17/how-to-build-self-improving-coding-agents-part-1/" style="color: white">
+<!-- Set title style -->
+<span name="title" id="title">How to build self-improving coding agents - Part 1</span>
+</a>
+  </header>
+  <div class="card-body blog-card-container">
+    <div>
+      
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-01-17</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/agents/">
+        agents
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/workflows/">
+        workflows
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/productivity/">
+        productivity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="tag/software/">
+        software
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+
+      
+      
+      <a href="2026/1/17/how-to-build-self-improving-coding-agents-part-1/" style="text-decoration: none;">
+        <img src="2026/1/17/how-to-build-self-improving-coding-agents-part-1/logo.webp" class="banner-image" >
+      </a>
+      
+
+      <!-- NOTE: I am keeping this here just for preview purposes.
+      We must rely on the webp logo for the blog post.
+      Pre-commit hooks will ensure that the png logo is converted to webp.-->
+      
+
+
+      <div class="blog-card-right">
+        
+        <span name="post_summary" id="post_summary">
+          <p class="card-text">In this blog post, I share my approach to making coding agents truly self-improving by focusing on operational feedback, not just model updates. I explain how using an AGENTS.md file as repository memory and developing reusable skills can help agents learn from mistakes and reduce repetitive guidance. My goal is to create an environment where agents get better each week without constant babysitting. Curious how these strategies can make your coding agents more effective?</p>
+        </span>
+        <small>
+          <a href="2026/1/17/how-to-build-self-improving-coding-agents-part-1/">Read on...</a>
+          
+
+
+
+
+
+
+
+(1132 words, approximately 6 minutes reading time)
+
+        </small>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+<div class="btn-group" role="group" aria-label="pagination">
+  
+  <a href="/blog" class="btn btn-ghost disabled">&laquo;</a>
+  
+
+  
+
+  
+
+  <span class="btn btn-primary disabled">1</span>
+
+  
+  <a href="page/2/" class="btn btn-ghost">2</a>
+  
+
+  
+  <a href="/blog/page/3/" class="btn btn-ghost">3</a>
+  
+
+  
+  <a href="/blog/page/46/" class="btn btn-ghost">&raquo;</a>
+  
+</div>
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

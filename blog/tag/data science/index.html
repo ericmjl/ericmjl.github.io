@@ -1,0 +1,702 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+    
+
+    
+    
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Tag: data science - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+<h1><i class="fas fa-tag"></i> data science</h1>
+<ul>
+  
+    <li><a href="../../2026/2/13/agentic-eda/">2026-02-13: How to stay in control when doing EDA with coding agents</a></li>
+  
+    <li><a href="../../2025/12/25/two-years-of-weekly-blogging-and-what-2025-taught-me/">2025-12-25: Two years of weekly blogging and what 2025 taught me</a></li>
+  
+    <li><a href="../../2025/10/28/use-coding-agents-to-write-marimo-notebooks/">2025-10-28: Use coding agents to write Marimo notebooks</a></li>
+  
+    <li><a href="../../2025/4/8/wow-marimo/">2025-04-08: Wow, Marimo!</a></li>
+  
+    <li><a href="../../2025/4/3/bayesian-superiority-estimation-with-r2d2-priors-a-practical-guide-for-protein-screening/">2025-04-03: Bayesian Superiority Estimation with R2D2 Priors: A Practical Guide for Protein Screening</a></li>
+  
+    <li><a href="../../2025/4/2/how-to-standardize-data-science-ways-of-working-to-unlock-your-teams-creativity/">2025-04-02: How to standardize Data Science ways of working to unlock your team&#39;s creativity</a></li>
+  
+    <li><a href="../../2025/3/16/the-art-of-finesse-as-a-data-scientist/">2025-03-16: The art of finesse as a data scientist</a></li>
+  
+    <li><a href="../../2025/3/6/a-blueprint-for-data-driven-molecule-engineering/">2025-03-06: A blueprint for data-driven molecule engineering</a></li>
+  
+    <li><a href="../../2025/2/23/reliable-biological-data-requires-physical-quantities-not-statistical-artifacts/">2025-02-23: Reliable biological data requires physical quantities, not statistical artifacts</a></li>
+  
+    <li><a href="../../2025/1/19/why-data-from-preclinical-biotech-lab-experiments-make-machine-learning-challenging/">2025-01-19: Why data from preclinical biotech lab experiments make machine learning challenging</a></li>
+  
+    <li><a href="../../2025/1/10/a-practical-guide-to-securing-secrets-in-data-science-projects/">2025-01-10: A practical guide to securing secrets in data science projects</a></li>
+  
+    <li><a href="../../2024/11/8/disposable-environments-for-ad-hoc-analyses/">2024-11-08: Disposable environments for ad-hoc analyses</a></li>
+  
+    <li><a href="../../2024/10/25/the-human-dimension-to-clean-distributable-and-documented-data-science-code/">2024-10-25: The Human Dimension to Clean, Distributable, and Documented Data Science Code</a></li>
+  
+    <li><a href="../../2024/10/18/keys-to-effective-collaborative-data-science/">2024-10-18: Keys to effective collaborative data science</a></li>
+  
+    <li><a href="../../2024/9/27/explain-your-jupyter-notebooks-using-llamabot/">2024-09-27: Explain your Jupyter notebooks using LlamaBot</a></li>
+  
+    <li><a href="../../2024/8/16/its-time-to-try-out-pixi/">2024-08-16: It&#39;s time to try out pixi!</a></li>
+  
+    <li><a href="../../2024/8/2/a-survey-of-how-to-use-protein-language-models-for-protein-design-part-2/">2024-08-02: A survey of how to use protein language models for protein design: Part 2</a></li>
+  
+    <li><a href="../../2024/7/14/conference-report-scipy-2024/">2024-07-14: Conference report: SciPy 2024</a></li>
+  
+    <li><a href="../../2024/7/2/use-native-formats-when-storing-data/">2024-07-02: Use native formats when storing data</a></li>
+  
+    <li><a href="../../2024/6/18/headache-free-portable-and-reproducible-handling-of-data-access-and-versioning/">2024-06-18: Headache-free, portable, and reproducible handling of data access and versioning</a></li>
+  
+    <li><a href="../../2024/5/16/how-to-control-pymol-from-jupyter-notebooks/">2024-05-16: How to control PyMOL from Jupyter notebooks</a></li>
+  
+    <li><a href="../../2024/5/12/paper-review-design-of-highly-functional-genome-editors-by-modeling-the-universe-of-crispr-cas-sequences/">2024-05-12: Paper Review: Design of highly functional genome editors by modeling the universe of CRISPR-Cas sequences</a></li>
+  
+    <li><a href="../../2024/5/5/data-science-in-the-biotech-research-organization/">2024-05-05: Data Science in the Biotech Research Organization</a></li>
+  
+    <li><a href="../../2024/4/17/how-llms-can-accelerate-data-science/">2024-04-17: How LLMs can accelerate data science</a></li>
+  
+    <li><a href="../../2024/4/7/pyds-cli-version-040-released/">2024-04-07: pyds-cli version 0.4.0 released!</a></li>
+  
+    <li><a href="../../2024/4/5/how-to-grow-software-development-skills-in-a-data-science-team/">2024-04-05: How to grow software development skills in a data science team</a></li>
+  
+    <li><a href="../../2024/3/23/how-to-organize-and-motivate-a-biotech-data-science-team/">2024-03-23: How to organize and motivate a biotech data science team</a></li>
+  
+    <li><a href="../../2024/2/25/how-to-keep-sharp-with-technical-skills-as-a-data-science-team-lead/">2024-02-25: How to keep sharp with technical skills as a data science team lead</a></li>
+  
+    <li><a href="../../2024/2/18/dashboard-ready-data-is-often-machine-learning-ready-data/">2024-02-18: Dashboard-ready data is often machine learning-ready data</a></li>
+  
+    <li><a href="../../2024/2/7/success-factors-for-data-science-teams-in-biotech/">2024-02-07: Success Factors for Data Science Teams in Biotech</a></li>
+  
+    <li><a href="../../2024/1/28/exploratory-data-analysis-isnt-open-ended/">2024-01-28: Exploratory data analysis isn’t open-ended</a></li>
+  
+    <li><a href="../../2023/12/12/classes-functions-both/">2023-12-12: Classes? Functions? Both?</a></li>
+  
+    <li><a href="../../2023/12/11/elevating-team-performance-feedback-strategies-for-data-science-leaders/">2023-12-11: Elevating Team Performance: Feedback Strategies for Data Science Leaders</a></li>
+  
+    <li><a href="../../2023/10/14/how-i-made-a-local-pre-commit-hook-to-resize-images/">2023-10-14: How I made a local pre-commit hook to resize images</a></li>
+  
+    <li><a href="../../2023/10/7/how-to-choose-a-conda-distribution-of-python/">2023-10-07: How to choose a (conda) distribution of Python</a></li>
+  
+    <li><a href="../../2023/10/5/shape-up-and-data-science-a-match-closer-to-agile-than-you-think/">2023-10-05: Shape Up and Data Science: A Match Closer to Agile Than You Think</a></li>
+  
+    <li><a href="../../2023/9/30/how-automating-git-workflows-improves-data-scientists/">2023-09-30: How automating git workflows improves data scientists</a></li>
+  
+    <li><a href="../../2023/9/23/how-to-automatically-write-git-commit-messages/">2023-09-23: How to automatically write git commit messages</a></li>
+  
+    <li><a href="../../2023/9/9/article-review-4-skills-the-next-generation-of-data-scientists-needs-to-develop/">2023-09-09: Article Review: 4 Skills the Next Generation of Data Scientists Needs to Develop</a></li>
+  
+    <li><a href="../../2023/9/6/interviewing-data-science-candidates-with-code-reviews/">2023-09-06: Interviewing Data Science Candidates with Code Reviews</a></li>
+  
+    <li><a href="../../2023/8/28/service-vs-product-oriented-data-science/">2023-08-28: Service vs. Product-Oriented Data Science</a></li>
+  
+    <li><a href="../../2023/8/4/skating-ahead-of-the-puck-a-wayne-gretzky-approach-to-tech-adoption/">2023-08-04: Skating Ahead of the Puck: A Wayne Gretzky Approach to Tech Adoption</a></li>
+  
+    <li><a href="../../2023/7/24/climbing-the-tech-ladder-or-staying-grounded-a-guide-to-navigating-data-science-innovations/">2023-07-24: Climbing the Tech Ladder or Staying Grounded? A Guide to Navigating Data Science Innovations</a></li>
+  
+    <li><a href="../../2023/5/13/how-to-craft-stellar-pull-request-summaries-with-gpt-4/">2023-05-13: How to Craft Stellar Pull Request Summaries with GPT-4</a></li>
+  
+    <li><a href="../../2023/2/5/building-a-gpt3-based-translation-app/">2023-02-05: Building a Translation App with GPT-3: The Story Behind My Creation</a></li>
+  
+    <li><a href="../../2022/9/16/coding-on-an-ipad-with-codespaces-and-blink/">2022-09-16: Coding on an iPad with Codespaces and Blink</a></li>
+  
+    <li><a href="../../2022/4/2/matrices-and-their-connection-to-graphs/">2022-04-02: Matrices and their connection to graphs</a></li>
+  
+    <li><a href="../../2022/4/1/functional-over-object-oriented-style-for-pipeline-esque-code/">2022-04-01: Functional over object-oriented style for pipeline-esque code</a></li>
+  
+    <li><a href="../../2022/3/31/everything-gets-a-package-yes-everything-gets-a-package/">2022-03-31: Everything gets a package? Yes, everything gets a package.</a></li>
+  
+    <li><a href="../../2021/11/28/what-candidates-can-and-cannot-control-in-their-job-hunt/">2021-11-28: What candidates can and cannot control in their job hunt</a></li>
+  
+    <li><a href="../../2021/9/30/career-faq/">2021-09-30: Career FAQ</a></li>
+  
+    <li><a href="../../2021/9/12/machine-directed-evolution/">2021-09-12: Machine-Directed Evolution</a></li>
+  
+    <li><a href="../../2021/8/26/hiring-data-scientists-at-moderna-2021/">2021-08-26: Hiring data scientists at Moderna! (2021)</a></li>
+  
+    <li><a href="../../2021/7/12/one-killer-way-to-burst-to-the-cloud-from-your-laptop/">2021-07-12: One killer way to burst to the cloud from your laptop</a></li>
+  
+    <li><a href="../../2021/7/10/how-to-enable-custom-source-package-installation-in-binder/">2021-07-10: How to enable custom source package installation in Binder</a></li>
+  
+    <li><a href="../../2021/5/14/set-environment-variables-inside-a-jupyter-notebook/">2021-05-14: Set environment variables inside a Jupyter notebook</a></li>
+  
+    <li><a href="../../2021/4/26/publishing-data-with-datasette/">2021-04-26: Publishing data with Datasette</a></li>
+  
+    <li><a href="../../2021/3/1/machine-learning-system-design/">2021-03-01: Machine learning system design</a></li>
+  
+    <li><a href="../../2021/1/27/experience-with-m1-macbook-air/">2021-01-27: Experience with M1 MacBook Air</a></li>
+  
+    <li><a href="../../2020/12/24/moving-my-ci-pipelines-to-github-actions/">2020-12-24: Moving my CI pipelines to GitHub Actions</a></li>
+  
+    <li><a href="../../2020/10/15/fermi-estimation-and-bayesian-priors/">2020-10-15: Fermi estimation and Bayesian priors</a></li>
+  
+    <li><a href="../../2020/10/6/why-giving-talks-is-important-for-writing/">2020-10-06: Why giving talks is important for writing</a></li>
+  
+    <li><a href="../../2020/9/30/tools-to-help-you-write-consistent-python-code/">2020-09-30: Tools to help you write consistent Python code</a></li>
+  
+    <li><a href="../../2020/9/12/add-a-direct-binder-link-for-built-html-notebooks/">2020-09-12: Add a direct Binder link for built HTML notebooks</a></li>
+  
+    <li><a href="../../2020/9/7/faster-iteration-over-dataframes/">2020-09-07: Faster iteration over dataframes</a></li>
+  
+    <li><a href="../../2020/8/30/pandera-data-validation-and-statistics/">2020-08-30: Pandera, Data Validation, and Statistics</a></li>
+  
+    <li><a href="../../2020/8/21/software-engineering-as-a-research-practice/">2020-08-21: Software Engineering as a Research Practice</a></li>
+  
+    <li><a href="../../2020/7/26/datasoftware-challenges-as-tools-for-hiring/">2020-07-26: Data/Software Challenges as Tools for Hiring</a></li>
+  
+    <li><a href="../../2020/7/11/jupyter-notebooks-as-scripts/">2020-07-11: Jupyter notebooks as scripts</a></li>
+  
+    <li><a href="../../2020/6/28/statistical-tests-are-just-fancy-model-comparisons/">2020-06-28: Statistical tests are just canned model comparisons</a></li>
+  
+    <li><a href="../../2020/6/15/whats-the-most-optimal-way-to-learn-bayesian-statistics/">2020-06-15: What&#39;s the most optimal way to learn Bayesian statistics?</a></li>
+  
+    <li><a href="../../2020/6/14/pab-to-phd/">2020-06-14: P(A,B) to P(H,D)??</a></li>
+  
+    <li><a href="../../2020/6/2/data-science-design-manual/">2020-06-02: Data Science Design Manual</a></li>
+  
+    <li><a href="../../2020/4/21/use-pyprojroot-and-pythons-pathlib-to-manage-your-data-paths/">2020-04-21: Use pyprojroot and Python’s pathlib to manage your data paths!</a></li>
+  
+    <li><a href="../../2020/4/12/introducing-a-new-essay-on-markov-models/">2020-04-12: Introducing a new essay on Markov models</a></li>
+  
+    <li><a href="../../2020/3/25/resources-for-learning-python-during-covid-19/">2020-03-25: Resources for learning Python during COVID-19</a></li>
+  
+    <li><a href="../../2020/3/15/what-can-data-scientists-do-during-covid-19/">2020-03-15: What can data scientists do during COVID-19?</a></li>
+  
+    <li><a href="../../2020/2/13/one-weird-trick-to-speed-up-your-tensorflow-model-100x/">2020-02-13: One Weird Trick to Speed Up Your TensorFlow Model 100X...</a></li>
+  
+    <li><a href="../../2020/1/18/create-your-own-auto-publishing-slides-with-reveal-md-and-travis-ci/">2020-01-18: Create your own auto-publishing slides with reveal-md and Travis CI</a></li>
+  
+    <li><a href="../../2020/1/16/pydata-ann-arbor-meetup-testing-for-data-science/">2020-01-16: PyData Ann Arbor Meetup: Testing for Data Science</a></li>
+  
+    <li><a href="../../2020/1/7/fastapi-flask-like-generator-of-web-apis/">2020-01-07: FastAPI: Flask-like generator of web APIs</a></li>
+  
+    <li><a href="../../2020/1/4/build-your-digital-profile-as-a-data-scientist/">2020-01-04: Build your digital profile as a data scientist</a></li>
+  
+    <li><a href="../../2020/1/2/on-automating-principled-statistical-analyses/">2020-01-02: On automating principled statistical analyses</a></li>
+  
+    <li><a href="../../2019/12/26/serving-multiple-panel-apps-together/">2019-12-26: Serving multiple Panel apps together</a></li>
+  
+    <li><a href="../../2019/12/19/simplifying-uncertainty-responsibly/">2019-12-19: Simplifying Uncertainty Responsibly</a></li>
+  
+    <li><a href="../../2019/12/15/a-review-of-the-python-data-science-dashboarding-landscape-in-2019/">2019-12-15: A Review of the Python Data Science Dashboarding Landscape in 2019</a></li>
+  
+    <li><a href="../../2019/11/9/principled-git-based-workflow-in-collaborative-data-science-projects/">2019-11-09: Principled Git-based Workflow in Collaborative Data Science Projects</a></li>
+  
+    <li><a href="../../2019/10/31/reimplementing-and-testing-deep-learning-models/">2019-10-31: Reimplementing and Testing Deep Learning Models</a></li>
+  
+    <li><a href="../../2019/10/30/code-review-in-data-science/">2019-10-30: Code review in data science</a></li>
+  
+    <li><a href="../../2019/10/29/ai-will-not-solve-medicine/">2019-10-29: &#34;AI will not solve medicine&#34;</a></li>
+  
+    <li><a href="../../2019/10/5/jupyter-server-with-https-on-personal-server/">2019-10-05: Jupyter Server with HTTPS on Personal Server</a></li>
+  
+    <li><a href="../../2019/9/7/dokku-building-an-internal-heroku-at-work/">2019-09-07: Dokku: Building an internal Heroku at work</a></li>
+  
+    <li><a href="../../2019/7/26/pyviz-panel-apps/">2019-07-26: PyViz Panel Apps</a></li>
+  
+    <li><a href="../../2019/7/23/t-distributed-likelihoods-are-kind-of-neat/">2019-07-23: T-distributed likelihoods are kind of neat</a></li>
+  
+    <li><a href="../../2019/7/15/scipy-2019-post-conference/">2019-07-15: SciPy 2019 Post-Conference</a></li>
+  
+    <li><a href="../../2019/7/7/order-of-magnitude-is-more-than-accurate-enough/">2019-07-07: Order of magnitude is more than accurate enough</a></li>
+  
+    <li><a href="../../2019/6/15/graphs-and-matrices/">2019-06-15: Graphs and Matrices</a></li>
+  
+    <li><a href="../../2019/5/29/reasoning-about-shapes-and-probability-distributions/">2019-05-29: Reasoning about Shapes and Probability Distributions</a></li>
+  
+    <li><a href="../../2019/5/10/context-switching/">2019-05-10: Context Switching</a></li>
+  
+    <li><a href="../../2019/5/10/pycon-2019-tutorial-and-conference-days/">2019-05-10: PyCon 2019 Tutorial and Conference Days</a></li>
+  
+    <li><a href="../../2019/4/29/pycon-2019-pre-journey/">2019-04-29: PyCon 2019 Pre-Journey</a></li>
+  
+    <li><a href="../../2019/3/24/variance-explained/">2019-03-24: Variance Explained</a></li>
+  
+    <li><a href="../../2019/3/22/functools-partial/">2019-03-22: Functools Partial</a></li>
+  
+    <li><a href="../../2019/3/20/how-i-work/">2019-03-20: How I Work</a></li>
+  
+    <li><a href="../../2019/3/1/pair-coding-why-and-how-for-data-scientists/">2019-03-01: Pair Coding: Why and How for Data Scientists</a></li>
+  
+    <li><a href="../../2019/1/28/minimum-viable-products-matter/">2019-01-28: Minimum Viable Products (MVPs) Matter</a></li>
+  
+    <li><a href="../../2018/12/25/conda-hacks-for-data-science-efficiency/">2018-12-25: Conda hacks for data science efficiency</a></li>
+  
+    <li><a href="../../2018/12/16/gaussian-process-notes/">2018-12-16: Gaussian Process Notes</a></li>
+  
+    <li><a href="../../2018/12/9/mathematical-intuition/">2018-12-09: Mathematical Intuition</a></li>
+  
+    <li><a href="../../2018/11/13/solving-problems-actionably/">2018-11-13: Solving Problems Actionably</a></li>
+  
+    <li><a href="../../2018/11/7/bayesian-modelling-is-hard-work/">2018-11-07: Bayesian Modelling is Hard Work!</a></li>
+  
+    <li><a href="../../2018/10/26/more-dask-pre-scattering-data/">2018-10-26: More Dask: Pre-Scattering Data</a></li>
+  
+    <li><a href="../../2018/10/11/parallel-processing-with-dask-on-gridengine-clusters/">2018-10-11: Parallel Processing with Dask on GridEngine Clusters</a></li>
+  
+    <li><a href="../../2018/9/4/optimizing-block-sparse-matrix-creation-with-python/">2018-09-04: Optimizing Block Sparse Matrix Creation with Python</a></li>
+  
+    <li><a href="../../2018/8/7/joint-conditional-and-marginal-probability-distributions/">2018-08-07: Joint, conditional, and marginal probability distributions</a></li>
+  
+    <li><a href="../../2018/8/6/d-separation-in-causal-inference/">2018-08-06: d-separation in causal inference</a></li>
+  
+    <li><a href="../../2018/8/1/nxviz-05-released/">2018-08-01: nxviz 0.5 released!</a></li>
+  
+    <li><a href="../../2018/7/27/pyjanitor-0-3-released/">2018-07-27: pyjanitor 0.3 released!</a></li>
+  
+    <li><a href="../../2018/7/16/bayesian-estimation-group-comparison-and-workflow/">2018-07-16: Bayesian Estimation, Group Comparison, and Workflow</a></li>
+  
+    <li><a href="../../2018/7/14/ecdfs/">2018-07-14: ECDFs</a></li>
+  
+    <li><a href="../../2018/6/5/my-latent-dissatisfaction-with-modern-ml/">2018-06-05: My Latent Dissatisfaction with Modern ML</a></li>
+  
+    <li><a href="../../2018/5/6/model-baselines-are-important/">2018-05-06: Model Baselines Are Important</a></li>
+  
+    <li><a href="../../2018/3/30/consolidate-your-scripts-using-click/">2018-03-30: Consolidate your scripts using click</a></li>
+  
+    <li><a href="../../2018/2/28/lessons-learned-and-reinforced-from-writing-my-own-deep-learning-package/">2018-02-28: Lessons learned and reinforced from writing my own deep learning package</a></li>
+  
+    <li><a href="../../2018/2/21/nxviz-first-pr-merged/">2018-02-21: nxviz first PR merged!</a></li>
+  
+    <li><a href="../../2018/2/20/deep-learning-and-the-importance-of-a-good-teacher/">2018-02-20: Deep Learning and the Importance of a Good Teacher</a></li>
+  
+    <li><a href="../../2018/2/13/data-scientists-need-to-write-good-apis/">2018-02-13: Data scientists need to write good APIs</a></li>
+  
+    <li><a href="../../2018/2/7/bayesian-inference-and-testing-sets/">2018-02-07: Bayesian Inference &amp; Testing Sets</a></li>
+  
+    <li><a href="../../2018/1/29/refactor-notebook-code/">2018-01-29: Refactor Notebook Code</a></li>
+  
+    <li><a href="../../2018/1/18/pymc3-docs-weibull-patches-merged/">2018-01-18: PyMC3 docs + Weibull patches merged!</a></li>
+  
+    <li><a href="../../2018/1/8/bayesian-uncertainty-a-more-nuanced-view/">2018-01-08: Bayesian Uncertainty: A More Nuanced View</a></li>
+  
+    <li><a href="../../2017/12/13/visual-studio-code-a-new-microsoft/">2017-12-13: Visual Studio Code: A New Microsoft?</a></li>
+  
+    <li><a href="../../2017/11/3/boston-bayesians-talk-an-attempt-at-demystifying-bayesian-deep-learning/">2017-11-03: Boston Bayesians Talk: An Attempt at Demystifying Bayesian Deep Learning</a></li>
+  
+    <li><a href="../../2017/10/31/always-check-your-data/">2017-10-31: Always Check Your Data</a></li>
+  
+    <li><a href="../../2017/10/27/random-forests-a-good-default-model/">2017-10-27: Random Forests: A Good Default Model?</a></li>
+  
+    <li><a href="../../2017/10/22/network-propagation/">2017-10-22: Network Propagation</a></li>
+  
+    <li><a href="../../2017/10/7/a-data-scientists-guide-to-environment-variables/">2017-10-07: A Data Scientist&#39;s Guide to Environment Variables</a></li>
+  
+    <li><a href="../../2017/8/31/what-would-be-useful-for-aspiring-data-scientists-to-know/">2017-08-31: What would be useful for aspiring data scientists to know?</a></li>
+  
+    <li><a href="../../2017/8/10/next-steps/">2017-08-10: Next Steps</a></li>
+  
+    <li><a href="../../2017/8/2/open-source-software/">2017-08-02: Open Source Software</a></li>
+  
+    <li><a href="../../2017/7/22/bayesian-neural-networks/">2017-07-22: Bayesian Neural Networks</a></li>
+  
+    <li><a href="../../2017/7/15/insight-week-7/">2017-07-15: Insight Week 7</a></li>
+  
+    <li><a href="../../2017/7/8/insight-week-6/">2017-07-08: Insight Week 6</a></li>
+  
+    <li><a href="../../2017/7/1/insight-week-5/">2017-07-01: Insight Week 5</a></li>
+  
+    <li><a href="../../2017/6/30/using-bokeh-in-fluforecaster/">2017-06-30: Using Bokeh in FluForecaster</a></li>
+  
+    <li><a href="../../2017/6/24/insight-week-4/">2017-06-24: Insight Week 4</a></li>
+  
+    <li><a href="../../2017/6/17/insight-week-3/">2017-06-17: Insight Week 3</a></li>
+  
+    <li><a href="../../2017/6/10/insight-week-2/">2017-06-10: Insight Week 2</a></li>
+  
+    <li><a href="../../2017/6/2/insight-week-1/">2017-06-02: Insight Week 1</a></li>
+  
+    <li><a href="../../2017/5/13/why-i-teach-coding-tutorials/">2017-05-13: Why I Teach Coding Tutorials</a></li>
+  
+    <li><a href="../../2017/4/21/moving-on-from-mit/">2017-04-21: Moving on from MIT</a></li>
+  
+    <li><a href="../../2017/2/8/numba-my-first-attempt-at-being-serious-with-it/">2017-02-08: Numba: My first attempt at being serious with it</a></li>
+  
+    <li><a href="../../2017/1/5/on-learning-math/">2017-01-05: On Learning Math</a></li>
+  
+    <li><a href="../../2016/12/20/female-doctors-are-better-than-male-doctors-for-real/">2016-12-20: Female Doctors are Better than Male Doctors - For Real?</a></li>
+  
+    <li><a href="../../2016/10/23/reinventing-statistical-language-in-science/">2016-10-23: Reinventing Statistical Language in Science</a></li>
+  
+    <li><a href="../../2016/10/9/reproducible-pi-manifesto/">2016-10-09: Reproducible PI Manifesto</a></li>
+  
+    <li><a href="../../2016/9/27/boxplot-or-violin-plot/">2016-09-27: Boxplot or Violin Plot?</a></li>
+  
+    <li><a href="../../2016/9/16/why-uncertainty-matters/">2016-09-16: Why Uncertainty Matters</a></li>
+  
+    <li><a href="../../2016/8/16/the-problem-of-too-many-splits/">2016-08-16: The problem of too many splits?</a></li>
+  
+    <li><a href="../../2016/8/6/variational-inference-with-pymc3-a-lightweight-demo/">2016-08-06: Variational Inference With PyMC3: A Lightweight Demo</a></li>
+  
+    <li><a href="../../2016/7/24/sparse-matrix-multiplication-in-python-3/">2016-07-24: Sparse Matrix Multiplication in Python 3</a></li>
+  
+    <li><a href="../../2016/7/16/nxviz-a-networkx-visualization-package/">2016-07-16: nxviz: A NetworkX Visualization Package</a></li>
+  
+    <li><a href="../../2016/7/16/principles-of-network-visualization/">2016-07-16: Principles of Network Visualization</a></li>
+  
+    <li><a href="../../2016/6/22/in-defence-of-extreme-openness/">2016-06-22: In Defence of Extreme Openness</a></li>
+  
+    <li><a href="../../2016/6/10/abstractions/">2016-06-10: Abstractions</a></li>
+  
+    <li><a href="../../2016/6/9/network-science-and-statistics-applications-and-fundamentals/">2016-06-09: Network Science and Statistics: Applications and Fundamentals</a></li>
+  
+    <li><a href="../../2016/5/22/odsc-east/">2016-05-22: ODSC East</a></li>
+  
+    <li><a href="../../2016/3/13/r-for-statistics-python-for-data-processing/">2016-03-13: R for Statistics, Python for Data Processing?</a></li>
+  
+    <li><a href="../../2016/2/9/scikit-learn-tutorial/">2016-02-09: scikit-learn tutorial</a></li>
+  
+    <li><a href="../../2015/12/3/reticulate-evolution-and-microbial-ecology/">2015-12-03: Reticulate Evolution and Microbial Ecology</a></li>
+  
+    <li><a href="../../2015/9/28/predicting-hiv-drug-resistance-phenotype-from-genotype/">2015-09-28: Predicting HIV Drug Resistance Phenotype from Genotype</a></li>
+  
+    <li><a href="../../2015/9/3/in-which-i-trained-a-neural-network/">2015-09-03: In Which I Trained A Neural Network :)</a></li>
+  
+    <li><a href="../../2015/6/2/thoughts-on-open-data-science-conference/">2015-06-02: Thoughts on Open Data Science Conference</a></li>
+  
+    <li><a href="../../2015/5/30/how-to-do-testing-as-a-practice-in-data-analysis/">2015-05-30: How to do Testing as a Practice in Data Analysis</a></li>
+  
+    <li><a href="../../2015/4/3/semantic-versioning-for-papers-a-manifesto/">2015-04-03: Semantic Versioning for Papers: A Manifesto</a></li>
+  
+</ul>
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>
