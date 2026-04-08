@@ -1,0 +1,889 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="A modest proposal for data catalogues at biotechs">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/a-modest-proposal-for-data-catalogues-at-biotechs' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>A modest proposal for data catalogues at biotechs - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">A modest proposal for data catalogues at biotechs</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-11-22</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/strategy/">
+        strategy
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/cloud adoption/">
+        cloud adoption
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data catalog/">
+        data catalog
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data discovery/">
+        data discovery
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data scientist/">
+        data scientist
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/biotech/">
+        biotech
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data governance/">
+        data governance
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/social graph/">
+        social graph
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>Building data platforms at biotechs often fails
+because we ask scientists to change their workflow and manually catalog data.
+This leads to poor adoption, wasted engineering effort,
+and continued data accessibility problems.
+Instead of building new systems,
+I propose automatically capturing data sharing patterns that already exist.
+This approach:</p>
+<ul>
+<li>Reduces implementation costs by 60-80% compared to traditional platforms</li>
+<li>Requires zero change in scientist behavior</li>
+<li>Creates an automatically-maintained data catalog</li>
+<li>Enables rapid data discovery through social connections</li>
+<li>Can be implemented incrementally, showing value within 3-6 months</li>
+</ul>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <h2 id="the-fatal-flaw">The fatal flaw</h2><p>Having now worked at two companies (Moderna and Novartis)
+and discussed the matter with friends across the industry,
+I have noticed a fatal flaw in data platform strategy
+that I believe makes adoption very challenging from the beginning.</p>
+<p>Here's the flaw:
+asking people to invest additional time in submitting data,
+managing permissions to it,
+cataloguing it,
+and discovering it on a newly built system
+<em>instead of leveraging the existing ways of working that people already have</em>.</p>
+<p>The build-out invariably looks like this:
+a data platform team builds new software that sits in the cloud.
+The product team, being product-driven, starts asking for "use cases".
+The identified customers, i.e. the bench scientists, aren't exactly thrilled,
+even if they understand the importance.
+There's an eye of skepticism.
+Your PhD-trained scientists, who may or may not necessarily be computationally-savvy,
+give you that look that communicates one or more of the following questions:</p>
+<ul>
+<li><strong>Storage:</strong> Now where do I actually store my data? Do I still get to keep it in SharePoint/OneDrive/Dropbox? Or is it now on your platform, in AWS/S3, where I don't get to have control over it?</li>
+<li><strong>Permissions:</strong> Where do I manage permissions? On your new data platform? Why do I need to learn how to do that, when I can just use SharePoint/OneDrive/Dropbox? Do I really have to learn AWS?</li>
+<li><strong>Cataloguing:</strong> Sure, I get the idea of "discoverability" and "reuse" and "FAIR" principles, but what benefit does it give me today? If someone else needs to ask me for data, won't it just increase my burden as an access gatekeeper?</li>
+<li><strong>Discovering:</strong> Yeah, okay, so I can go to your platform, or I can just ask my social network of people at the company, right? Are you saying you're building a search engine for data across the company?</li>
+</ul>
+<p>The team looks at those questions,
+but being digital folks with an incentive to build a product,
+they don't exactly have a satisfactory answer for each question.
+The team instead sets success criteria that doesn't exactly resonate with the customers:
+data are migrated from existing system to shiny new data platform,
+and computational scientists can access it.
+The team then does a lift and shift of some bulk RNAseq data
+from three experiments that were run before.
+Metrics are calculated:
+"We moved hundreds of gigabytes of data off of on-prem storage into the cloud,
+saving the company $X amount over three years!"
+The data platform team calls this a success and moves onto the next use case.
+No new RNAseq data are uploaded to the shiny new data platform because,
+well, the sequencing core was just overwhelmed with other work
+and didn't want the additional burden of cataloging and tracing where data came from,
+and just wanted to have automation that piped RNAseq data back to their collaborators
+for downstream analyses.</p>
+<p>So herein lies a massive problem with this approach:
+How are you going to get buy-in for data cataloguing
+if the data catalogue you build doesn't actually benefit your customer?
+Your "buy-in" is going to be half-baked.
+Focusing on the laboratory scientist as the customer,
+but asking them to do additional work,
+is laying the groundwork for building a product that allows individuals to fail upwards.
+And that's just a waste of money.</p>
+<h2 id="my-modest-proposal">My modest proposal</h2><p>My proposal starts with this:
+your data platform should start as
+<em>the exhaust pipe of data sharing interactions throughout the company</em>.</p>
+<p>The files that are actively being shared
+are probably the ones that need storage, cataloguing, and permissions the most.
+These are also the ones with the highest amount of current institutional knowledge present.
+Backing up, cataloguing, and maintaining a record of data production and consumption,
+should be done in the background with zero intervention from anyone.</p>
+<p>My proposal continues with a different definition of the customer:
+Start with your computational &amp; data scientists!
+They are the ones who are wrangling, well, <em>data</em>.
+Build tooling for them
+that makes it easier for people to access files directly
+on the platforms that are <em>already</em> being used,
+so they never need to ask collaborators to send files over.
+Make it easy for them to write code like this:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">data_platform</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_onedrive</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="n">filepath</span> <span class="o">=</span> <span class="n">read_onedrive</span><span class="p">(</span><span class="s2">&quot;https://onedrive.share.url-goes.here/...&quot;</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+</pre></div>
+<p>Then, use that same toolset
+to ensure that those files are being version controlled
+in a backup location on the cloud.
+Within that toolset,
+inject the code necessary
+to log the fact that:</p>
+<ul>
+<li>Amy Landry, the computational scientist, asked Brendan Lee, the laboratory scientist, for access to</li>
+<li><code>$ONEDRIVE_PATH/data/immunotherapy/ITX_47213/results.xlsx</code>,</li>
+<li>with SHA256 hash <code>3191vh9ifsodi6gr2p498qvfn5y082gjcn</code> (for versioning purposes)</li>
+<li>on date <code>2024-11-03 19:25:39</code>,</li>
+</ul>
+<p>Here, the source of <code>read_onedrive</code> would have the following signature, with an emphasis on the <code>autolog</code> decorator:</p>
+<div class="hll"><pre><span></span><span class="nd">@autolog</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_onedrive</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="n">filepath</span>
+</pre></div>
+<p>Along the way, within the data access tooling,
+<code>autolog</code> can trigger an automatic backup of that file
+to a centralized buckets in the cloud,
+and create or update a catalogue entry
+based on the hash of the file and the filename,
+with known access permissions accurately logged.
+Your data catalogue now has automatic entries being generated
+with no effort on anybody's part whatsoever.
+And the implementation sketch of <code>autolog</code> may look like this:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">data_platform</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_or_update_catalogue</span><span class="p">,</span> <span class="n">log_permission</span><span class="p">,</span> <span class="n">get_producer_consumers</span><span class="p">,</span> <span class="n">trigger_backup</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">autolog</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">)</span>
+        <span class="n">create_or_update_catalogue</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="c1"># &lt;- triggers async job in cloud, doesn&#39;t actually run on machine</span>
+        <span class="n">trigger_backup</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="c1"># &lt;- triggers async job in cloud, doesn&#39;t actually run on machine</span>
+        <span class="k">return</span> <span class="n">filepath</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+</pre></div>
+<p>Behind-the-scenes,
+the cloud function that <code>create_or_update_catalogue</code> triggers is managing a lot.
+It has knowledge of your internal roster of people through ActiveDirectory or equivalent.
+It as scoped read-only permissions to pull in the file (or folder)
+and will automatically back it up in the cloud,
+through a <a href="https://en.wikipedia.org/wiki/Content-addressable_storage">content-addressed storage</a> system.
+It also keeps track of file versions through file and file set versioning,
+keeping up-to-date the lineage of a file
+each time the <code>data_platform</code> package interacts with it.</p>
+<p>Under this circumstance,
+the data catalogue is no longer a table:
+it is a social graph!</p>
+<h3 id="benefits">Benefits</h3><p>In doing so,
+we start by automatically cataloging
+the most actively shared data that exists.
+Your data access tooling eliminates the need
+for people to think about
+"which exact copy of my data did Brendan share with me?"
+It also eliminates the need
+for computational and data scientists
+to think about how they will manage their data locally;
+it's always pulled in fresh from their colleagues' OneDrive.
+Your use of content-addressed storage
+allows you to identify duplicates floating around the company,
+enabling one to flag such files and query the file owners for a resolution.
+You've solved a computational/data scientist's data access problem
+by making it more seamless than they would otherwise have to
+(i.e. sharing files over MS Teams, downloading copies,
+and storing them on their own filesystem).</p>
+<p>I can imagine more tooling built around this concept
+of logging interactions as a side effect.</p>
+<ul>
+<li>Was there a programmatic access of that data?
+If so, log that interaction with a counter on the data catalogue!</li>
+<li>Was there a new sharing event that happened via OneDrive?
+Log that event!</li>
+<li>Was the data programmatically accessed within a scalable computation platform?
+Log the service account!
+Also, auto log the execution run, source code, git commit hash, source repo, etc.,
+and use an LLM to generate a plain text description of what's going on,
+and make that generated description searchable on the platform.</li>
+</ul>
+<p>A side effect is that we can also map interactions between colleagues
+based on sharing of data files between one another --
+and use that to identify potential data silos between departments that are showing up.
+The network of data sharing interactions also provides a new opportunity for finding data:
+"whom should I ask to get access to {{ this kind of data }}?"
+Imagine the following case:
+Colin finds out that Bob has access to Amy's <code>results.xlsx</code> data,
+and can now ping Amy directly on MS Teams for access.
+Upon Amy sharing that data with Colin and Colin accessing the data via <code>read_sharepoint()</code>,
+the catalogue entry gets automatically updated as well
+with Bob and Colin being known users with permission to access that file.
+No new systems for Amy and Colin to deal with,
+but the new permissions associated with that data
+are automatically reflected in the catalog.</p>
+<h2 id="implementation-and-cost-considerations">Implementation and Cost Considerations</h2><p>Building this kind of data cataloguing system
+is surprisingly lightweight
+compared to traditional data platforms.
+The initial implementation would require a small, focused team:
+a couple of backend engineers with system administration privileges
+who understand cloud infrastructure
+and can use LLMs to quickly parse vendor API documentation,
+one Python developer to build the data access tooling rapidly with Cursor/Copilot Edits,
+and a part-time product manager to gather user feedback.
+With this lean team,
+an MVP could be deployed within 1-3 months
+targeting the most-used platform within the company.</p>
+<p>From a cost perspective,
+this approach offers several compelling advantages.
+Since we're building on top of existing storage infrastructure
+rather than creating new systems,
+we eliminate a major cost center right from the start.
+Training costs are minimal
+because users continue working with their familiar tools and workflows.
+The maintenance burden is significantly reduced
+by leveraging existing enterprise systems
+rather than maintaining new infrastructure.
+We also avoid the substantial costs
+typically associated with data migration projects.
+Support costs stay low
+since users are working with tools they already know.</p>
+<p>The expected benefits of this approach are substantial!</p>
+<ul>
+<li>100% automatic cataloging of shared data</li>
+<li>100% automated backups of files</li>
+<li>Improved data governance through automatic logging of ownership, sharing, and permissions</li>
+<li>Better collaboration through social graph discovery</li>
+<li>Automated file de-duplication</li>
+<li>Reduced risk of data silos</li>
+</ul>
+<p>Success can be measured through several key metrics.
+We track the number of automatic catalog entries generated
+to measure system adoption.
+User surveys help quantify time saved in data discovery.
+We monitor the number of unique users accessing data through the platform
+to gauge reach.
+The reduction in duplicate data storage shows improved efficiency.
+Finally, we measure increases in cross-department data sharing
+to evaluate improved collaboration.</p>
+<h2 id="security-and-compliance-considerations">Security and Compliance Considerations</h2><p>This approach actually enhances security and compliance
+compared to traditional methods.</p>
+<p>From a data governance perspective,
+the system automatically logs all data access,
+creating a comprehensive audit trail.
+Permissions continue to be managed through existing enterprise systems
+like OneDrive and SharePoint,
+while data sharing is tracked through the social graph of interactions.
+Version control is handled automatically through file hashing.</p>
+<p>When it comes to regulatory compliance,
+we benefit from the fact that existing enterprise storage systems
+like OneDrive and SharePoint
+are typically already validated for regulatory compliance.
+Our platform simply adds an additional layer of tracking
+without disrupting these validated systems.
+The automatic backup capabilities ensure
+that data preservation requirements are consistently met.</p>
+<p>The approach also provides strong risk mitigation.
+Since data is never manually moved outside of approved systems,
+we significantly reduce security risks.
+Centralized automatic backups minimizes the risk of data loss,
+while the use of familiar tools for scientists
+reduces the likelihood of shadow IT emerging.
+Additionally, by clearly tracking who has access to what data,
+we decrease the likelihood of data access issues arising.</p>
+<h2 id="caveats">Caveats</h2><p>There are caveats to this solution:
+we clearly aren't going to capture every single data file through this mechanism.
+(At least we start somewhere though!)</p>
+<p>And of course,
+something that may be mission critical might not have been shared.</p>
+<p>Also, this focus on interactions means there's a lot more work to be done on the data platform builders' side:
+the team will end up needing to ask every data storage platform
+(e.g. Benchling, OneDrive, Signals, Google Drive, internally built apps etc.)
+for information about who is sharing what.
+Before a vendor system can be onboarded,
+they must have the ability to provide direct URIs
+to <em>any</em> resource within their system via API calls.</p>
+<p>People have to get used to not schlepping files around by email and chat,
+and instead sharing direct links instead.
+There will always be some kind of behaviour change needed.</p>
+<p>But my proposal here asks us to start with mapping interactions between people first.
+And instead of asking people to take on the additional burden of being a data producer of a data product,
+we just ask them to continue what they're doing anyways
+and not have to interact with yet another system.</p>
+<h2 id="change-management-strategy">Change Management Strategy</h2><p>Implementing this approach requires thoughtful change management,
+even though we're minimizing disruption to existing workflows.
+Here is how I would propose to move forward with this.</p>
+<p><strong>Phased Rollout</strong>: We start with a single high-value team of computational scientists,
+then expand to their immediate collaborators.
+From there, we gradually roll out to other computational teams,
+and finally provide optional tools for laboratory scientists.</p>
+<p><strong>Handling Resistance</strong>: When dealing with existing data platform teams,
+we position this as complementary to their work, not a replacement.
+For IT teams,
+we emphasize our use of existing validated systems and security controls.</p>
+<p>With scientists,
+we focus on the social value that emerges from understanding data flow.
+When they can see who else works with similar data,
+they discover potential collaborators naturally.
+The system helps them understand data provenance
+by showing the chain of sharing that led to their current analysis.
+Most importantly,
+they can avoid duplicating work
+by seeing who has already performed similar analyses.</p>
+<p>For management,
+we demonstrate improved compliance
+and provide insights into how data actually flows through the organization.
+This visibility helps identify both successful collaboration patterns
+and potential data silos that need addressing.</p>
+<p><strong>Communication Strategy</strong>: Our communication strategy involves regular demos of successful data discovery
+and monthly metrics on automatic cataloging.
+We maintain clear documentation of benefits realized
+and keep open feedback channels for improvement.</p>
+<p>The key is positioning this as an enhancement layer
+that makes existing tools work better together,
+rather than a new system that replaces current workflows.</p>
+<h2 id="conclusion">Conclusion</h2><p>The path to better data management in biotech doesn't require massive infrastructure changes or behavioral shifts. Instead, by:</p>
+<ol>
+<li><strong>Starting Small</strong>: Focus on computational scientists first</li>
+<li><strong>Leveraging Existing Systems</strong>: Build on top of current tools</li>
+<li><strong>Automating Everything</strong>: No manual cataloging required</li>
+<li><strong>Following Social Patterns</strong>: Let natural data sharing guide the system</li>
+</ol>
+<p>We can create a data platform that actually works, costs less, and delivers immediate value. The key insight is treating data cataloging as an interaction logging problem rather than a data product problem.</p>
+<p>For biotech leadership considering this approach:</p>
+<ul>
+<li>Start with a small pilot team</li>
+<li>Measure success through automatic catalog growth</li>
+<li>Scale based on demonstrated value</li>
+<li>Keep the focus on enhancing, not replacing, existing workflows</li>
+</ul>
+<p>The result?
+A data platform that grows organically with your organization,
+supports compliance requirements,
+and most importantly -
+one that people will actually use.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-a-modest-proposal-for-data-catalogues-at-biotechs</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{A modest proposal for data catalogues at biotechs}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{11}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{22}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/11/22/a-modest-proposal-for-data-catalogues-at-biotechs}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

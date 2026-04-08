@@ -1,0 +1,645 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Closing air gaps">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/closing-air-gaps' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Closing air gaps - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Closing air gaps</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-03-15</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/automation/">
+        automation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/efficiency/">
+        efficiency
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/airgaps/">
+        airgaps
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workflow/">
+        workflow
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/processes/">
+        processes
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/agents/">
+        agents
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/imagination/">
+        imagination
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/skill/">
+        skill
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/mapping/">
+        mapping
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/labs/">
+        labs
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I explore the concept of "air gaps"—those manual steps in business or scientific processes where humans bridge the gap between digital systems. I share real-world examples from labs and software workflows, discuss why these gaps matter, and offer practical advice on identifying and closing them with automation and coding agents. Curious how closing even small air gaps can transform your team's efficiency and free up mental bandwidth?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I owe this term to my colleague <a href="https://www.linkedin.com/in/wenhao-liu-1b85177/">Wenhao Liu</a>. He was the first one I saw at work who clearly articulated about air gaps and how they relate to building agents for work.</p>
+<p>So what exactly is an air gap? It is any point in a business or scientific process where a human has to intervene and perform manual work before a digital system can continue. The system cannot go end to end on its own; the human is the bridge.</p>
+<p>Air gaps are everywhere. Here are a few examples: A laboratory machine exports a file to a local hard disk. A human copies that file and pastes it into an S3 bucket. That handoff is an air gap. The system stops at the hard disk and waits for a person.</p>
+<p>In wet lab science, air gaps take physical form. A scientist designs an experiment, walks into the lab, and executes it by hand. In this state, the company/team/org has an air gap in its scientific process. No robotic system can take over from design to execution.</p>
+<p>Both of these examples share a common pattern. The definition I have settled on is this: an air gap is any place where rote manual work is performed by a human that could have been done by a computer. (Robots are computers with sensors and actuators for the physical world.)</p>
+<h2 id="why-air-gaps-matter">Why air gaps matter</h2><p>Think of your processes as pipes. Air gaps are bubbles trapped in those pipes. They slow the flow. They disrupt continuity. They introduce delays and errors.</p>
+<p>The costs compound over time. A five-minute manual handoff, repeated daily across a team of twenty, adds up to real hours. A week-long delay because someone was on vacation and could not move the file. A transcription error because a human typed a number wrong. A lost opportunity because the data sat in a local folder instead of flowing into the analysis pipeline.</p>
+<p>Air gaps also create cognitive overhead. Every time a human has to remember to perform a manual step, that is mental bandwidth not spent on creative work. The air gap is a tax on attention.</p>
+<p>Now, a clarification. The goal here is not to eliminate humans from everything. The goal is to eliminate humans from the rote and routine. Creative work, judgment, and decision making stay with us. Copying files, transferring plates, and typing data into forms do not.</p>
+<h2 id="how-to-find-air-gaps">How to find air gaps</h2><p>You cannot close an air gap until you see it. And you cannot see it until you sit down and map out exactly how your process works. In other words, <strong>process mapping</strong>.</p>
+<p>This mapping exercise is the unsexy work that precedes automation. Most teams skip it. They jump to solutions before understanding the problem. But you need the map.</p>
+<p>Here is how to do it.</p>
+<p>Pick one process. It could be a data pipeline, a lab workflow, or a business approval chain. Walk through it step by step. Ask these questions at each step:</p>
+<ul>
+<li>Where is a human manually copying and pasting?</li>
+<li>Where is a human manually entering data?</li>
+<li>Where is a human dragging and dropping files?</li>
+<li>Where is a human making a decision that follows a fixed rule?</li>
+<li>Where is a human waiting for another human to take action?</li>
+<li>Where is a human physically moving something from one place to another?</li>
+</ul>
+<p>Each answer points to a potential air gap.</p>
+<p>Write it down. Draw it out. Make the process visible. Once the map exists, the air gaps reveal themselves. The next step is prioritization. Which air gaps cause the most pain? Which ones are easiest to close? Start there.</p>
+<h2 id="air-gaps-in-the-wild">Air gaps in the wild</h2><p>Enough abstraction. Let me show you what air gaps look like in practice, from my own work and from the broader landscape.</p>
+<h3 id="file-schlepping-in-the-lab">File schlepping in the lab</h3><p>A sequencing machine finishes a run. It writes the data to a local drive. A technician notices the run is complete, navigates to the folder, selects the files, copies them, navigates to the shared storage system, and pastes. Minutes pass. Sometimes hours, if the technician is busy.</p>
+<p>This is an air gap. The machine knows when the run finishes. The machine has network access. The destination storage has an API. Automation can close this gap with a simple script that watches for new files and uploads them.</p>
+<p>The fix is not technically difficult; it is, conceptually, a <code>cron</code> job with <code>rsync</code>. What makes it hard is that the air gap is invisible until someone maps the process and asks why a human is doing this work.</p>
+<h3 id="github-activity-tracking">GitHub activity tracking</h3><p>I used to manually check GitHub to track my daily work. I would open my profile page, scroll through recent commits, open the pull requests tab, check which ones I had opened or reviewed, and then type notes into a document. This took maybe ten minutes per day.</p>
+<p>Then I remembered the GitHub CLI exists. I also remembered that coding agents can run CLI commands.</p>
+<p>I built a skill that pulls four categories of activity automatically: my opened pull requests, pull requests I reviewed or commented on, my commits, and issues I created. The agent runs this skill as part of my daily sign-off routine. The air gap closed.</p>
+<p>The time savings are modest. But the mental overhead vanished. I no longer need to remember to check GitHub. The information flows to me.</p>
+<h3 id="autonomous-laboratories">Autonomous laboratories</h3><p>The autonomous lab, sometimes called a lights-out lab, is the ultimate expression of closing air gaps. The vision is a laboratory that runs itself: experiments are designed, executed, analyzed, and iterated without human intervention.</p>
+<p>In practice, autonomous labs are full of micro air gaps. Each one must be identified and closed.</p>
+<p><strong>Plate transfers.</strong> A protocol requires moving a plate from one instrument to another. Does a human do this? If so, that is an air gap. Robotic arms and conveyor systems can close it.</p>
+<p><strong>Master reagent prep.</strong> Someone mixes buffers and reagents by hand at the start of each week. Could a liquid handling robot do this instead? Probably. That is an air gap.</p>
+<p><strong>File movement.</strong> Instruments write data locally. Humans move data to shared storage. This is the file schlepping problem again, repeated across every machine in the lab.</p>
+<p><strong>Standardized analyses.</strong> As a data scientist, this one is close to my heart. Most labs have a set of standard analyses they run on every dataset. Quality control plots, basic statistics, alignment checks. A human opens a notebook, loads the data, runs the cells, and exports results.</p>
+<p>This is an air gap. Standardized analyses can be automated. They can also be made adaptable. An LLM-powered coding agent can take a standard analysis template and adjust parameters within a confined range of design choices. The human specifies the intent. The agent handles the implementation.</p>
+<p><strong>Closing the loop.</strong> The ultimate air gap in scientific research is the gap between analysis and experiment design. A human looks at results, draws conclusions, and designs the next experiment. What if the results could flow back into experiment design automatically? What if an agent could propose the next experiment based on what the data showed?</p>
+<p>This is the direction autonomous labs are moving. But getting there requires closing every air gap along the chain.</p>
+<h2 id="the-blockers-imagination-and-skill">The blockers: imagination and skill</h2><p>I wrote about this in a <a href="https://ericmjl.github.io/blog/2026/3/6/mastering-personal-knowledge-management-with-obsidian-and-ai/">previous post</a>. The biggest blockers to closing air gaps are technical skill and imagination.</p>
+<h3 id="imagination">Imagination</h3><p>If you cannot imagine a future state where your tedious work is performed by a coding agent, you will not see the possibility. The air gap remains invisible.</p>
+<p>This is a failure of imagination, not a failure of technology. The tools exist. The APIs exist. The agents exist. What is missing is the mental leap from "this is how we have always done it" to "this is how we could do it."</p>
+<p>Imagination grows from exposure. The more you see what is possible, the more you can imagine for your own work. Watch what other teams are doing. Read about automation in adjacent fields. Talk to people who have closed similar gaps.</p>
+<h3 id="skill">Skill</h3><p>Imagination alone is not enough. You also need the skill to build the automation.</p>
+<p>That skill, at some level, means knowing how to program. It means understanding APIs, scripting, and how systems talk to each other. It means knowing that cron jobs and web hooks can be configured.</p>
+<p>The good news is that the barrier to entry is lower than ever. Coding agents can help you write the code. The skill you need is not deep software engineering. It is enough programming literacy to describe what you want and recognize whether the output is correct.</p>
+<h3 id="programmatic-access">Programmatic access</h3><p>Sometimes the blocker is not you. Sometimes it is the system.</p>
+<p>Some organizations block programmatic access to their tools. It may be that a SaaS application has no API, or the API is disabled for security reasons, or that a legacy database has no query interface, only a web portal. A legacy laboratory information management system may require a human to click through screens instead of secured APIs.</p>
+<p>These are also air gaps. The system itself prevents automation.</p>
+<p>If the blocker is cybersecurity concerns, push for scoped, tracked access. You do not need full API permissions to close a specific air gap. You need enough access to move the data that belongs in your pipeline. That access can be limited, logged, and auditable.</p>
+<p>If the system truly has no programmatic interface, browser or desktop automation agents can close the gap. A headless browser can log in, navigate, click, and extract. It is slower and more fragile than an API, but it works.</p>
+<h2 id="closing-air-gaps-with-agents">Closing air gaps with agents</h2><p>But here is the good news. The rise of coding agents changes the calculus for closing air gaps.</p>
+<p>Before, you needed a software engineer to write the automation script. Now, you can describe what you want in plain language and let the agent write the code.</p>
+<p>This does not mean you can ignore technical literacy. You still need to verify the output, debug when things break, and understand enough to specify the problem clearly. But the implementation barrier is lower.</p>
+<p>Browser agents extend this further. If a system has no API, a browser agent can act as the interface. Log in, click the buttons, extract the data, and feed it into your pipeline.</p>
+<p>The key insight is that agents are not a replacement for mapping your processes. They are a tool for closing the air gaps you have already identified. The mapping still matters. The imagination still matters. The skill to recognize whether the agent's output is correct still matters.</p>
+<p>What changes is the speed of iteration. You can try closing an air gap in an afternoon instead of a sprint. You can experiment with different approaches quickly. The feedback loop tightens.</p>
+<p>Here is the right question to ask when you find yourself being asked to do something repeatedly: "Can I remove this bottleneck for you? Is there a way I can make it so that you never have to ask me this again?" The goal is to build systems that use agents to not need human intervention as much as possible, not to create systems that depend on humans more and more. As one person put it, "the more I have asked myself that question, the more capable he has become." (<a href="https://www.youtube.com/watch?v=nSBKCZQkmYw">source</a>)</p>
+<h2 id="the-principle">The principle</h2><p>The guiding principle is simple. To butcher the Biblical phrase, "Give unto robots what belongs to robots, and have humans do what humans can do." Or to paraphrase another person, use robots for the dull, dirty, and dangerous work.</p>
+<p>Keep the human in the loop for creative, judgment-heavy work. The rote and routine should flow through pipes without bubbles.</p>
+<p>Start mapping. Find the air gaps. Close them one by one. The compounding effect over time is enormous once micro-efficiencies become part of your work.</p>
+<p>What looks like a small efficiency gain today becomes a transformed process tomorrow. The lab that closed its file schlepping air gaps is one step closer to autonomous operation. The team that automated their daily reporting has mental bandwidth for harder problems.</p>
+<p>Close every air gap you can see!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-closing-air-gaps</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Closing air gaps}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{03}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{15}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/3/15/closing-air-gaps}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

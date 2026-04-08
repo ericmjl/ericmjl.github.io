@@ -1,0 +1,931 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="PyData Boston/Cambridge Talk @ Moderna: What makes an agent?">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/pydata-bostoncambridge-talk-moderna-what-makes-an-agent' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>PyData Boston/Cambridge Talk @ Moderna: What makes an agent? - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">PyData Boston/Cambridge Talk @ Moderna: What makes an agent?</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-01-31</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/large language models/">
+        large language models
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/pydantic/">
+        pydantic
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/structuredbot/">
+        structuredbot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/agentbot/">
+        agentbot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/talks/">
+        talks
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/meetups/">
+        meetups
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I explore the concept of 'what makes an agent' by discussing various implementations of LlamaBot, a Python package for LLM exploration. I dissect the differences between SimpleBots, StructuredBots, and AgentBots, highlighting their capabilities and limitations in terms of agency and decision-making. Through audience discussions and examples, I aimed to provoke thought on the definition and design of agents, and together, we had an engaging discussion. Can we truly define an agent, or is it like the Turing Test, a concept that evolves with our understanding and technological advancements?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p><em>This is a written and edited version of a talk I gave at PyData Boston/Cambridge on 29 Jan 2025, hosted at Moderna's new office buildings for the first time ever.</em>  This talk will likely leave us with more questions than answers about "what makes an agent." But I hope it also leaves us with more focused questions and frameworks for thinking about "what makes an agent".</p>
+<p>It is based loosely on <a href="https://ericmjl.github.io/blog/2025/1/4/what-makes-an-agent/">my blog post</a>. The original notebook that I presented is available <a href="https://github.com/ericmjl/llamabot/blob/main/talks/pydata-boston-2025/what-makes-an-agent.py">within the LlamaBot repo</a>.</p>
+<div class="hll"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">llamabot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">lmb</span>
+</pre></div>
+<h2 id="let-s-start-with-llm-bots">Let's start with LLM bots</h2><p>This is a helpful framing to anchor our discussion of agents.</p>
+<p>LlamaBot is a Python package that I made to pedagogically explore the landscape of LLMs as the field evolves. Intentionally designed to lag 1-2 steps behind innovations and incorporate only what turns out to be robust. LlamaBot implements a variety of LLM bots, the simplest being the <code>SimpleBot</code>.</p>
+<p><code>SimpleBot</code> makes clear the basic anatomy of an LLM API call:</p>
+<p><strong>1️⃣ A system prompt:</strong> maintained over all calls.</p>
+<p><strong>2️⃣ A model name:</strong> specifying which model to chat with.</p>
+<p><strong>3️⃣ A user's prompt:</strong> your input into the LLM's internals.</p>
+<p><strong>4️⃣ The response:</strong> returned by autoregressive next-token prediction.</p>
+<p>In <code>SimpleBot</code>, that looks like this:</p>
+<div class="hll"><pre><span></span><span class="n">flight_bot</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">SimpleBot</span><span class="p">(</span>
+    <span class="n">system_prompt</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;You are a helpful travel assistant.</span>
+<span class="s2">    You provide information about flights between cities.&quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;ollama_chat/llama3.2:3b&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Simple interaction</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">flight_bot</span><span class="p">(</span><span class="s2">&quot;Find me the prices for flights from San Francisco to Tokyo.&quot;</span><span class="p">)</span>
+</pre></div>
+<p>And the response looks like this:</p>
+<pre><code>I'd be happy to help you find flight prices from San Francisco (SFO) to Tokyo.
+
+Please note that flight prices can vary depending on several factors such as the time of year, demand, airline, and availability. I'll provide you with some general price ranges for flights from SFO to Tokyo, but keep in mind that these may not be exact prices for your specific travel dates.
+
+Here are some approximate price ranges for flights from San Francisco (SFO) to Tokyo:
+
+**Economy Class:**
+
+* Low-cost carriers like ANA, Japan Airlines, and All Nippon Airways: $500-$800 USD
+* Mid-range airlines like United Airlines, Delta Air Lines, and American Airlines: $700-$1,200 USD
+* Premium economy or business class: $1,200-$2,500 USD
+
+**Premium Economy Class:**
+
+* Low-cost carriers: $900-$1,400 USD
+* Mid-range airlines: $1,200-$1,800 USD
+* Premium economy or business class: $1,800-$3,000 USD
+
+**Business Class:**
+
+* Low-cost carriers: Not available
+* Mid-range airlines: $2,500-$4,000 USD
+* Premium business class: $4,000-$6,000 USD
+
+To get a more accurate estimate of flight prices from SFO to Tokyo, I recommend checking with the following airlines or online travel agencies:
+
+1. Expedia
+2. Kayak
+3. Skyscanner
+4. Google Flights
+5. ANA (All Nippon Airways)
+6. Japan Airlines
+
+Please enter your specific travel dates and preferred airline to get a more accurate quote.
+</code></pre>
+<p>Together with the audience, we evaluate that response together. <em>Is this an agent?</em></p>
+<p><strong>Audience commentary:</strong></p>
+<ul>
+<li>Not an agent: didn't take action apart from introspection of weights.</li>
+<li>Not an agent: no external APIs called.</li>
+<li>Yes: agent doesn't mean it has to have a tool, anything that gives usable information is an agent.</li>
+<li>Yes (to an extent): Follows up with a question/prompt back to the human.</li>
+<li>No: agent should make decisions. This LLM call did not make any decisions. Decision-making outsourced to user.</li>
+</ul>
+<p>My thoughts are as follows: <code>SimpleBot</code>s are heavily reliant on what's in the training data; they are just calling the LLM directly, with no memory of historical chat information. Given the range of regular human experiences in North America, I would venture to guess that it is rare for us to go outside of any base LLM's training data, unless we hit very specialized and niche topics not covered on the internet. (Try thinking of some!) It's hard to argue that this would have the properties of agency, which we would associate with an agent.</p>
+<h2 id="agents-that-give-us-structure">Agents that give us structure?</h2><p>Let's try a different view of agents. What if we said, "Agents give you information structured the way you wanted it?" Let's start with that as a working definition.</p>
+<p>LlamaBot implements structured generation. To use it, you need to provide a Pydantic model, effectively a form that you want the bot to fill, and pair it with a <code>StructuredBot</code>. <code>StructuredBot</code>s have the same basic requirements as <code>SimpleBot</code>s, which are a system prompt and model name, but also need to have a Pydantic model passed in. When called, it will return an instance of that Pydantic model.</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">FlightInfo</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">origin</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">destination</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Duration in hours&quot;</span><span class="p">)</span>
+    <span class="n">price</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Price in USD&quot;</span><span class="p">)</span>
+    <span class="n">recommended_arrival</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Recommended time to arrive at airport before flight, in hours&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="n">flight_bot_structured</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">StructuredBot</span><span class="p">(</span>
+    <span class="n">system_prompt</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;You are a helpful travel assistant that provides</span>
+<span class="s2">    structured information about flights.&quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;ollama_chat/llama3.2:3b&quot;</span><span class="p">,</span>
+    <span class="n">pydantic_model</span><span class="o">=</span><span class="n">FlightInfo</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Now we get structured data</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">flight_bot_structured</span><span class="p">(</span>
+    <span class="s2">&quot;Find me the prices for flights from San Francisco to Tokyo.&quot;</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;##########&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">&quot;The price of the flight is $</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">price</span><span class="si">}</span><span class="s2">. We recommend that you arrive at the airport </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">recommended_arrival</span><span class="si">}</span><span class="s2"> hours before the flight.&quot;</span>
+<span class="p">)</span>
+</pre></div>
+<p>Its response looks like this:</p>
+<pre><code>{ "origin": "San Francisco", "destination": "Tokyo", "duration": 11, "price": 550, "recommended_arrival": 12 }
+##########
+The price of the flight is $550.0. We recommend that you arrive at the airport 12.0 hours before the flight.
+</code></pre>
+<h3 id="audience-discussion-is-this-an-agent">Audience discussion: Is this an agent?</h3><p>I specifically asked, where does this fall short of an agent's definition?</p>
+<ul>
+<li>No: still like RAG. Doesn't read the situation, is this a good time to buy? Still a simple answer.</li>
+<li>No: it would independently decide what to look at, where to look.</li>
+<li>Yes: Based on the working definition, yes, and the nature of decision-making means the LLM is doing rapid-fire retrieval from memorized data. Recommended arrival time <strong>is</strong> an added recommendation that was not part of the original query intent.</li>
+<li>No: Is the definition even correct? Why isn't a SQL query an agent, under that definition?</li>
+<li>No: within this context, the <strong>latent</strong> query intent might be to buy tix, but this bot doesn't help me do it.</li>
+</ul>
+<p>In summary, this bot still misses the crucial elements of (a) autonomy/agency, and (b) intent guessing.</p>
+<h3 id="structured-generation-gets-us-midway">Structured generation gets us midway</h3><p>It affords us more <strong>control</strong> over what we are asking an LLM to generate. The response is constrained.</p>
+<p>But it seems like it may still lack a crucial element of an "agent". I'm glad the audience shred up this definition! 🤗</p>
+<h2 id="what-if-we-said-an-agent-needed-to-interact-externally">What if we said, "An agent needed to interact externally"?</h2><p>Here is my attempt, within LlamaBot, to try to nail down what an agent actually is. This flight agent-like bot helps me plan out trips, using one tool, the <code>search_internet</code> tool.</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamabot.bot.agentbot</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_internet</span>
+
+<span class="n">travel_agent</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">AgentBot</span><span class="p">(</span>
+    <span class="n">system_prompt</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;You are a travel planning assistant. Help users plan their trips</span>
+<span class="s2">    by searching flights, hotels, and checking weather.&quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="n">functions</span><span class="o">=</span><span class="p">[</span><span class="n">search_internet</span><span class="p">],</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Now we can handle complex queries</span>
+<span class="n">travel_response</span> <span class="o">=</span> <span class="n">travel_agent</span><span class="p">(</span>
+    <span class="s2">&quot;What&#39;s the flight time from San Francisco to Tokyo?&quot;</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">##########&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">travel_response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</pre></div>
+<p>Its response looks like this:</p>
+<pre><code>{"tool_name":"search_internet","tool_args":[{"name":"search_term","value":"flight time from San Francisco to Tokyo"}],"use_cached_results":[]}
+search_internet({'search_term': 'flight time from San Francisco to Tokyo'}) -&gt; 3394908c, {'https://www.flightsfrom.com/SFO-HND': '�(�\x00 ~������\x17\x1e�\x02�.IwѕZ\x0c�\x1cI\\S\x1c\x1d9��d���7aZ��Dٚݝ\x14�R~ ...(truncated)...'}
+{"tool_name":"agent_finish","tool_args":[{"name":"message","value":"The flight time from San Francisco to Tokyo is approximately 10 hours and 48 minutes to 11 hours and 10 minutes for a non-stop flight. This duration can vary slightly depending on the specific flight path and weather conditions."}],"use_cached_results":[]}
+agent_finish({'message': 'The flight time from San Francisco to Tokyo is approximately 10 hours and 48 minutes to 11 hours and 10 minutes for a non-stop flight. This duration can vary slightly depending on the specific flight path and weather conditions.'}) -&gt; a106bcaa, The flight time from San Francisco to Tokyo is approximately 10 hours and 48 minutes to 11 hours and 10 minutes for a non-stop flight. This duration can vary slightly depending on the specific flight path and weather conditions.
+
+##########
+The flight time from San Francisco to Tokyo is approximately 10 hours and 48 minutes to 11 hours and 10 minutes for a non-stop flight. This duration can vary slightly depending on the specific flight path and weather conditions.
+</code></pre>
+<p>Looks like this could be an agent, but let's see what the audience said.</p>
+<h3 id="audience-discussion-is-this-really-an-agent">Audience discussion: is this really an agent?</h3><p>I asked the audience to disregard the fact that I called this an <code>AgentBot</code>. Just because I said so doesn't make it so!</p>
+<p>Where are the holes in this definition of an agent?</p>
+<ul>
+<li>Getting closer: agent will do research, in this example, it is the use of a search tool, and processing the text to give a response; the task could have been clearer for end user.</li>
+<li>Yes: it has introduced a new error mode. A new way to be wrong, need someone to blame for this.</li>
+<li>New component here: this bot has agency, decides "do I call this function or not".</li>
+<li>Principal-Agent problem: agent does something that may not be what the Principal wanted it to do.</li>
+</ul>
+<p>The audience also had more questions raised:</p>
+<ul>
+<li>Q: Is part of the definition of an agent the fact that it is going to interact with a human?</li>
+<li>Q: In this implementation of search, is the LLM always going to do the function call?</li>
+</ul>
+<p>It's at this point that I knew that we had more focused questions from the audience, and that my first goal was accomplished: to get the audience to think more critically about the definition of an agent.</p>
+<hr>
+<h2 id="design-patterns-should-this-be-an-agent">Design patterns: should this be an agent?</h2><p>We discussed what an agent is. Now, let's assume that we know what an agent is. (This is an assumption!) If so, how should we design agents, and even then, should it be an agent?</p>
+<p>I presented to the audience a minimally complex example: a restaurant bill calculator. It's got a few key characteristics:</p>
+<ol>
+<li>l calculation is computable (and hence easily verifiable).</li>
+<li>There is sufficient variation in the kinds of questions we can ask.</li>
+<li>We can easily implement multiple designs.</li>
+</ol>
+<h3 id="agentbot-implementation">AgentBot implementation</h3><p>Let's start with an implementation based on AgentBot.</p>
+<p>We have two tools, which are nothing more than Python functions that are decorated with a <code>@tool</code>  decorator. They are, namely, <code>calculate_total_with_tip</code> and <code>split_bill</code>.</p>
+<div class="hll"><pre><span></span><span class="c1"># Define the tools</span>
+<span class="nd">@lmb</span><span class="o">.</span><span class="n">tool</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_total_with_tip</span><span class="p">(</span><span class="n">bill_amount</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">tip_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">tip_rate</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">tip_rate</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Tip rate must be between 0 and 1.0&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">bill_amount</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">tip_rate</span><span class="p">)</span>
+
+<span class="nd">@lmb</span><span class="o">.</span><span class="n">tool</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">split_bill</span><span class="p">(</span><span class="n">total_amount</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">num_people</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">total_amount</span> <span class="o">/</span> <span class="n">num_people</span>
+</pre></div>
+<p>Then, we create the AgentBot:</p>
+<div class="hll"><pre><span></span><span class="c1"># Create the bot</span>
+<span class="n">bot</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">AgentBot</span><span class="p">(</span>
+    <span class="n">system_prompt</span><span class="o">=</span><span class="n">lmb</span><span class="o">.</span><span class="n">system</span><span class="p">(</span>
+        <span class="s2">&quot;You are my assistant with respect to restaurant bills.&quot;</span>
+    <span class="p">),</span>
+    <span class="n">functions</span><span class="o">=</span><span class="p">[</span><span class="n">calculate_total_with_tip</span><span class="p">,</span> <span class="n">split_bill</span><span class="p">],</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+<p>Now, let's try a few calculations, the first one being just calculating the total with tip:</p>
+<div class="hll"><pre><span></span><span class="c1"># Calculate total with tip</span>
+<span class="n">calculate_total_only_prompt</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;My dinner was $2300 without tips. Calculate my total with an 18% tip.&quot;</span>
+<span class="p">)</span>
+<span class="n">resp</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="n">calculate_total_only_prompt</span><span class="p">)</span>
+</pre></div>
+<p>We get this output:</p>
+<pre><code>{"tool_name":"calculate_total_with_tip","tool_args":[{"name":"bill_amount","value":2300},{"name":"tip_rate","value":0.18}],"use_cached_results":[]}
+calculate_total_with_tip({'bill_amount': 2300, 'tip_rate': 0.18}) -&gt; bdc66afd, 2714.0
+{"tool_name":"agent_finish","tool_args":[{"name":"message","value":"The total amount for your dinner, including an 18% tip, is $2714.00."}],"use_cached_results":[]}
+agent_finish({'message': 'The total amount for your dinner, including an 18% tip, is $2714.00.'}) -&gt; 73ec736f, The total amount for your dinner, including an 18% tip, is $2714.00.
+The total amount for your dinner, including an 18% tip, is $2714.00.
+</code></pre>
+<p>This looks right! And if we try another:</p>
+<div class="hll"><pre><span></span><span class="c1"># Split the bill</span>
+
+<span class="n">split_bill_only_prompt</span> <span class="o">=</span> <span class="s2">&quot;My dinner was $2300 in total, I added an 18</span><span class="si">% g</span><span class="s2">ratuity, split the bill between 20 people.&quot;</span>
+
+<span class="n">resp2</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="n">split_bill_only_prompt</span><span class="p">)</span>
+</pre></div>
+<p>We get this:</p>
+<pre><code>{"tool_name":"calculate_total_with_tip","tool_args":[{"name":"bill_amount","value":2300},{"name":"tip_rate","value":0.18}],"use_cached_results":[]}
+calculate_total_with_tip({'bill_amount': 2300, 'tip_rate': 0.18}) -&gt; bdc66afd, 2714.0
+{"tool_name":"split_bill","tool_args":[{"name":"total_amount","value":null},{"name":"num_people","value":20}],"use_cached_results":[{"arg_name":"total_amount","hash_key":"bdc66afd"}]}
+split_bill({'num_people': 20, 'total_amount': 2714.0}) -&gt; 2a75a8f8, 135.7
+{"tool_name":"agent_finish","tool_args":[{"name":"message","value":"The total bill including an 18% gratuity is $2714. When split between 20 people, each person needs to pay $135.70."}],"use_cached_results":[]}
+agent_finish({'message': 'The total bill including an 18% gratuity is $2714. When split between 20 people, each person needs to pay $135.70.'}) -&gt; f92ef2d0, The total bill including an 18% gratuity is $2714. When split between 20 people, each person needs to pay $135.70.
+The total bill including an 18% gratuity is $2714. When split between 20 people, each person needs to pay $135.70.
+</code></pre>
+<h3 id="couldn-t-it-have-been-a-python-function">Couldn't it have been a Python function?</h3><p>Should this have been an agent? After all, we very well could have done this instead:</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">calculate_bill</span><span class="p">(</span>
+    <span class="n">total_amount</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">tip_percentage</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_people</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">total_amount</span> <span class="o">*</span> <span class="p">(</span><span class="mi">100</span> <span class="o">+</span> <span class="n">tip_percentage</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_people</span>
+
+<span class="n">calculate_bill</span><span class="p">(</span><span class="mi">2300</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span> <span class="c1"># gives us 135.7</span>
+</pre></div>
+<h3 id="is-there-a-way-to-make-that-python-function-more-flexible">Is there a way to make that Python function more flexible?</h3><p>But this is a very restrictive implementation. What if we didn't have any division to do?</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">calculate_bill_v2</span><span class="p">(</span>
+    <span class="n">total_amount</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">tip_percentage</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">num_people</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">tip_percentage</span><span class="p">:</span>
+        <span class="n">total_amount</span> <span class="o">=</span> <span class="n">total_amount</span> <span class="o">*</span> <span class="p">(</span><span class="mi">100</span> <span class="o">+</span> <span class="n">tip_percentage</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span>
+    <span class="k">if</span> <span class="n">num_people</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">total_amount</span> <span class="o">/</span> <span class="n">num_people</span>
+    <span class="k">return</span> <span class="n">total_amount</span>
+
+<span class="n">calculate_bill_v2</span><span class="p">(</span><span class="mi">2714</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span> <span class="c1"># also gives us 135.7</span>
+</pre></div>
+<p>Some commentary from me: it's the same functionality, but with more flexibility. The scope of inputs is more variable, in the form of almost anything you want... but not with natural language. And this point, by the way, seems to distinguish between an LLM agent and a Python program.</p>
+<h3 id="but-couldn-t-reasoning-models-do-this">But couldn't reasoning models do this?</h3><p>What if we did this instead?</p>
+<div class="hll"><pre><span></span><span class="n">r1_bot</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">SimpleBot</span><span class="p">(</span>
+    <span class="s2">&quot;You are a smart bill calculator.&quot;</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;ollama_chat/deepseek-r1:latest&quot;</span>
+<span class="p">)</span>
+<span class="n">r1_bot</span><span class="p">(</span>
+    <span class="s2">&quot;My dinner was $2300 in total, with 18% tip. Split the bill between 20 people. Respond with only the number.&quot;</span>
+<span class="p">)</span>
+</pre></div>
+<p>We get this:</p>
+<pre><code>&lt;think&gt;
+First, I need to calculate the total amount of the dinner including an 18% tip.
+
+The original cost is \$2300. To find the tip, I'll multiply this by 18%.
+
+\$2300 × 0.18 = \$414
+
+Adding the tip to the original cost gives:
+
+\$2300 + \$414 = \$2714
+
+Next, I need to split this total amount equally among 20 people.
+
+So, I'll divide \$2714 by 20.
+
+\$2714 ÷ 20 = \$135.70
+
+Therefore, each person should contribute \$135.70.
+&lt;/think&gt;
+
+Sure! Let's break down the calculation step by step:
+
+**Step 1: Calculate the Total with Tip**
+
+- **Original Cost:** \$2,300
+- **Tip Percentage:** 18%
+
+\[
+\text{Tip} = 2,\!300 \times 0.18 = 414
+\]
+
+\[
+\text{Total with Tip} = 2,\!300 + 414 = 2,\!714
+\]
+</code></pre>
+<p>This didn't involve any tools that the agent had to interact with, so it seems like problems that only involve reasoning don't necessitate building an agent.</p>
+<h3 id="what-if-we-didn-t-have-to-provide-any-tools-instead">What if we didn't have to provide any tools instead?</h3><p>Or what if, we asked the agent to write and execute its own code? (This follows HuggingFace's definition of an agent.)</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamabot.bot.agentbot</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_and_execute_script</span>
+
+<span class="c1"># Create the bot</span>
+<span class="n">autonomous_code_bot</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">AgentBot</span><span class="p">(</span>
+    <span class="n">system_prompt</span><span class="o">=</span><span class="n">lmb</span><span class="o">.</span><span class="n">system</span><span class="p">(</span>
+        <span class="s2">&quot;You are my assistant with respect to restaurant bills.&quot;</span>
+    <span class="p">),</span>
+    <span class="n">functions</span><span class="o">=</span><span class="p">[</span><span class="n">write_and_execute_script</span><span class="p">],</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Split the bill</span>
+<span class="n">autonomous_code_bot</span><span class="p">(</span><span class="n">split_bill_only_prompt</span><span class="p">)</span>
+</pre></div>
+<p>And with this implementation, we get:</p>
+<pre><code>{"tool_name":"write_and_execute_script","tool_args":[{"name":"code","value":"# Calculate the total bill including gratuity and then split it among 20 people\n\ntotal_bill = 2300\n\ngratitude_percentage = 18\n\n# Calculate the total amount including gratuity\ntotal_with_gratuity = total_bill + (total_bill * gratitude_percentage / 100)\n\n# Split the total amount among 20 people\namount_per_person = total_with_gratuity / 20\n\nprint(amount_per_person)"}],"use_cached_results":[]}---SCRIPT EXECUTION RESULT---
+135.7
+---SCRIPT EXECUTION RESULT---
+
+write_and_execute_script({'code': '# Calculate the total bill including gratuity and then split it among 20 people\n\ntotal_bill = 2300\n\ngratitude_percentage = 18\n\n# Calculate the total amount including gratuity\ntotal_with_gratuity = total_bill + (total_bill * gratitude_percentage / 100)\n\n# Split the total amount among 20 people\namount_per_person = total_with_gratuity / 20\n\nprint(amount_per_person)'}) -&gt; 18b90e4d, 135.7
+{"tool_name":"agent_finish","tool_args":[{"name":"message","value":"The total dinner bill was $2300, and with an 18% gratuity added, the total becomes $2714. When this total is split between 20 people, each person needs to pay $135.70."}],"use_cached_results":[]}
+agent_finish({'message': 'The total dinner bill was $2300, and with an 18% gratuity added, the total becomes $2714. When this total is split between 20 people, each person needs to pay $135.70.'}) -&gt; 0cfe8442, The total dinner bill was $2300, and with an 18% gratuity added, the total becomes $2714. When this total is split between 20 people, each person needs to pay $135.70.
+</code></pre>
+<p>In all cases above, our bots are able to answer the question. But they all approached the question in different ways. It seems like the problems in which we would want an agent aren't the kinds that can be solved by SimpleBots (of various models) alone.</p>
+<h3 id="dissection">Dissection</h3><p>If we think carefully about the distinction between a Python function, its stochastic variant, and an LLM agent, we might make the following observations:</p>
+<h4 id="functions">Functions</h4><ol>
+<li>Functions are written to accomplish a goal.</li>
+<li>Functions have an input signature, a body, and a return.</li>
+<li>Function inputs are constrained to the types that are accepted; they cannot be natural language.</li>
+<li>Function program flow is deterministic.</li>
+</ol>
+<h4 id="stochastic-functions">Stochastic Functions</h4><ol>
+<li>Stochastic functions have non-deterministic flow control, resulting in a distribution of possible outputs.</li>
+</ol>
+<h4 id="llm-agents">LLM Agents</h4><ol>
+<li>Are non-deterministic in flow control.</li>
+<li>Rely on structured outputs internally.</li>
+<li>Allow for natural language inputs.</li>
+<li>Nonetheless accomplish a goal.</li>
+</ol>
+<h3 id="what-should-be-an-agent">What should be an agent?</h3><p>Anthropic has <a href="https://www.anthropic.com/research/building-effective-agents">guidance</a>.</p>
+<blockquote><p>When building applications with LLMs, we recommend finding the simplest solution possible, and only increasing complexity when needed. <strong>This might mean not building agentic systems at all.</strong> Agentic systems often trade latency and cost for better task performance, and you should consider when this tradeoff makes sense.</p>
+<p>When more complexity is warranted, workflows offer predictability and consistency for well-defined tasks, whereas agents are the better option when flexibility and model-driven decision-making are needed at scale. For many applications, however, optimizing single LLM calls with retrieval and in-context examples is usually enough.</p>
+</blockquote>
+<p>In other words, can you build it with a regular Python program first? If so, maybe just start there.</p>
+<p>And from my own blog:</p>
+<blockquote><h2 id="a-roadmap-for-designing-agent-applications">A roadmap for designing agent applications</h2><p>I've found that the most effective way to design agent applications is to progressively relax constraints on inputs and execution order.</p>
+<h3 id="start-with-a-deterministic-program">Start with a deterministic program</h3><ul>
+<li>Design your application as you would with regular API calls</li>
+<li>Define clear input/output specifications</li>
+<li>Implement core functionality with standard programming patterns</li>
+</ul>
+<h3 id="relax-input-constraints">Relax input constraints</h3><ul>
+<li>Accept natural language input and convert it to structured parameters for function calls</li>
+<li>Enable autonomous function calling based on natural language understanding</li>
+</ul>
+<h3 id="relax-execution-order-constraints">Relax execution order constraints</h3><ul>
+<li>Only necessary when natural language inputs are varied enough to require different execution paths</li>
+<li>Allow flexible ordering of operations when needed</li>
+<li>Enable dynamic selection of which functions to call</li>
+<li>Maintain boundaries around available actions while allowing flexibility in their use</li>
+</ul>
+<p>This progressive relaxation approach helps us transition from traditional deterministic programming to an agent-driven paradigm where execution order is non-deterministic and inputs are natural language.</p>
+</blockquote>
+<h2 id="more-perspectives">More perspectives</h2><p>Finally, I concluded with a few more perspectives for others to consider.</p>
+<ul>
+<li><a href="https://www.linkedin.com/posts/philipp-schmid-a6a2bb196_function-calling-is-not-solved-yet-a-new-activity-7288821311613591552-i5dH">Function calling is not solved</a></li>
+<li><a href="https://drive.google.com/file/d/1oEjiRCTbd54aSdB_eEe3UShxLBWK9xkt/view">Google's definition of agents</a></li>
+<li><a href="https://x.com/AymericRoucher/status/1874116324898598934">HuggingFace's definition of agents</a></li>
+<li><a href="https://ericmjl.github.io/blog/2025/1/4/what-makes-an-agent/">My previous blog post on What makes an Agent</a></li>
+</ul>
+<h2 id="conclusion">Conclusion</h2><p>In this talk, we went through two main questions:</p>
+<ol>
+<li>What makes an agent?</li>
+<li>What should be an agent?</li>
+</ol>
+<p>I am pretty confident that I left the audience with more questions than answers. But I also am confident that those questions were more focused and specific than they were before the talk. I hope that's the same for you, the reader of this blog!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-pydata-bostoncambridge-talk-moderna-what-makes-an-agent</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{PyData Boston/Cambridge Talk @ Moderna: What makes an agent?}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{01}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{31}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/1/31/pydata-bostoncambridge-talk-moderna-what-makes-an-agent}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

@@ -1,0 +1,1209 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="How I Replaced 307 Lines of Agent Code with 4 Lines">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/how-i-replaced-307-lines-of-agent-code-with-4-lines' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>How I Replaced 307 Lines of Agent Code with 4 Lines - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">How I Replaced 307 Lines of Agent Code with 4 Lines</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-11-16</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llm/">
+        llm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/graphs/">
+        graphs
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/agents/">
+        agents
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/automation/">
+        automation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/pocketflow/">
+        pocketflow
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workflows/">
+        workflows
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/abstractions/">
+        abstractions
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/state/">
+        state
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share how I discovered PocketFlow, a minimalist framework for building LLM-powered programs using graph-based flows instead of complex loops. By rethinking my approach, I replaced 307 lines of agent orchestration code with just 4 lines, making my agents more modular, clear, and easy to visualize. I walk through practical examples, show how to build and visualize agent architectures, and reflect on the benefits of graph-based thinking for LLM applications. Curious how this shift can simplify your own AI projects?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I recently discovered <a href="https://github.com/The-Pocket/PocketFlow?tab=readme-ov-file">PocketFlow</a>, a framework for building LLM-enabled programs created by <a href="https://zachary62.github.io/zach_public_material/">Zachary Huang</a>. The entire framework is tiny—only 100 lines of code. What caught my attention is that PocketFlow takes a fundamentally different approach to LLM-powered programs, including Anthropic's <a href="https://www.anthropic.com/engineering/building-effective-agents">workflows and agents</a>, by structuring them as graphs.</p>
+<p>As someone who used graphs in my thesis work, <a href="https://ericmjl.github.io/Network-Analysis-Made-Simple/">taught tutorials on applied graph theory</a>, and <a href="https://github.com/ericmjl/llamabot">builds my own agent frameworks</a>, my curiosity was piqued. I wanted to see two things: whether I could learn enough of the framework to build something useful, and whether LlamaBot's abstractions could complement PocketFlow's approach.</p>
+<p>To explore this, I fired up a <a href="https://marimo.io/">Marimo notebook</a>. (You can fire it up too by running: <code>uvx marimo edit --sandbox &lt;put URL here to notebook here&gt;</code>)</p>
+<h2 id="understanding-the-core-nodes-and-flows">Understanding the Core - Nodes and Flows</h2><p>I started by building what I consider a "Hello World" program: a text topic extractor and question generator. This let me familiarize myself with PocketFlow's two core abstractions: <code>Nodes</code> and <code>Flows</code>.</p>
+<p>A <code>Node</code> is a unit of execution structured like this:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">SummarizeFile</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">):</span>
+        <span class="c1"># ...do stuff...</span>
+        <span class="k">return</span> <span class="n">stuff_that_gets_passed_to_exec</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prep_res</span><span class="p">):</span>
+        <span class="c1"># ...do stuff...</span>
+        <span class="k">return</span> <span class="n">stuff_that_gets_passed_to_post</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">,</span> <span class="n">prep_res</span><span class="p">,</span> <span class="n">exec_res</span><span class="p">):</span>
+        <span class="c1"># ...do stuff...</span>
+        <span class="k">return</span> <span class="n">string_indicator_what_to_do_next</span>
+</pre></div>
+<p>There's one more concept to introduce: <code>shared</code>. In PocketFlow, <code>shared</code> is like a big workspace that all <code>Node</code>s can read and write from. Think of it as a kitchen island where chefs and cooks can grab ingredients and leave finished dishes. In computing terms, it's global state that programs can access. In practice, it's simply a dictionary that lives in memory, which any node can manipulate. For example, program <code>memory</code> might be a key in there, implemented as a list.</p>
+<p>The <code>prep -&gt; exec -&gt; post</code> design within a node is intentional. In theory, you could do everything in one step—there are no hooks that inject stuff between, say, <code>prep</code> and <code>exec</code>. In practice, doing everything in one step muddies the program and makes it harder to reason about. I'll show you why later in this post.</p>
+<p>Here's what each step is designed to do:</p>
+<ul>
+<li><p><strong><code>prep</code></strong> takes stuff from the <code>shared</code> dictionary, does any preprocessing, and passes it to <code>exec</code>. This could include grabbing stuff from memory, interpolating it into a prompt, and returning it for execution with the LLM.</p>
+</li>
+<li><p><strong><code>exec</code></strong> is where the bulk of heavy computation happens. We put API calls to LLM providers (Ollama, OpenAI, Anthropic, etc.) here. What gets returned is passed to the <code>post</code> method.</p>
+</li>
+<li><p><strong><code>post</code></strong> handles any post-processing. It receives <code>shared</code>, <code>prep_res</code> (the result of <code>prep</code>), and <code>exec_res</code> (result of <code>exec</code>). The pattern I've settled on is archiving results in <code>shared</code>—for example, storing execution results in memory. What gets returned by <code>post</code> should be a string indicating which downstream path to follow. If nothing specific is needed, it returns <code>default</code>.</p>
+</li>
+</ul>
+<p>A <code>Flow</code> is declared with a starting <code>Node</code> and follows the program until completion.</p>
+<p>With this abstraction, multiple LLM-powered abstractions and design patterns can be designed:</p>
+<p><img src="https://github.com/the-pocket/.github/raw/main/assets/design.png" alt=""></p>
+<p>(Image from the PocketFlow official documentation.)</p>
+<h2 id="example-1-topic-extractor-and-question-generator">Example 1 - Topic Extractor and Question Generator</h2><p>Here's how I built the two-step/node topic extractor + question generator. First, I declared the nodes:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ExtractTopics</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;First node: Extract key topics from input text&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">prep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">):</span>
+        <span class="n">text_to_analyze</span> <span class="o">=</span> <span class="n">shared</span><span class="p">[</span><span class="s2">&quot;txt&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">text_to_analyze</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prep_result</span><span class="p">):</span>
+        <span class="n">text_to_analyze</span> <span class="o">=</span> <span class="n">prep_result</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">text_to_analyze</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;No content to analyze&quot;</span>
+
+        <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Extract 3-5 key topics from this text. Return only the topics as a comma-separated list:</span><span class="se">\n\n</span><span class="si">{</span><span class="n">text_to_analyze</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">bot</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">SimpleBot</span><span class="p">(</span>
+            <span class="n">system_prompt</span><span class="o">=</span><span class="s2">&quot;You are a helpful assistant that extracts key topics.&quot;</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;ollama_chat/qwen3:30b&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">,</span> <span class="n">prep_result</span><span class="p">,</span> <span class="n">exec_res</span><span class="p">):</span>
+        <span class="n">shared</span><span class="p">[</span><span class="s2">&quot;topics&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exec_res</span>
+        <span class="k">return</span> <span class="s2">&quot;default&quot;</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">GenerateQuestions</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Second node: Generate questions based on topics&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">prep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">):</span>
+        <span class="n">topics</span> <span class="o">=</span> <span class="n">shared</span><span class="p">[</span><span class="s2">&quot;topics&quot;</span><span class="p">]</span>
+        <span class="n">txt</span> <span class="o">=</span> <span class="n">shared</span><span class="p">[</span><span class="s2">&quot;txt&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">topics</span><span class="p">,</span> <span class="n">txt</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prep_result</span><span class="p">):</span>
+        <span class="n">topics</span><span class="p">,</span> <span class="n">txt</span> <span class="o">=</span> <span class="n">prep_result</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">topics</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;Cannot generate questions without valid topics&quot;</span>
+
+        <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Given these topics: </span><span class="si">{</span><span class="n">topics</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">and the original text: </span><span class="si">{</span><span class="n">txt</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">Generate 2 interesting questions for each topic.&quot;</span>
+        <span class="n">bot</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">SimpleBot</span><span class="p">(</span>
+            <span class="n">system_prompt</span><span class="o">=</span><span class="s2">&quot;You are a helpful assistant that generates thought-provoking questions.&quot;</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;ollama_chat/qwen3:30b&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">,</span> <span class="n">prep_result</span><span class="p">,</span> <span class="n">exec_res</span><span class="p">):</span>
+        <span class="n">shared</span><span class="p">[</span><span class="s2">&quot;questions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exec_res</span>
+        <span class="c1"># No return statement since this is a terminal node.</span>
+</pre></div>
+<p>Then, I declared the graph:</p>
+<div class="hll"><pre><span></span><span class="n">extract_topics</span> <span class="o">=</span> <span class="n">ExtractTopics</span><span class="p">()</span>
+<span class="n">generate_questions</span> <span class="o">=</span> <span class="n">GenerateQuestions</span><span class="p">()</span>
+
+<span class="n">extract_topics</span> <span class="o">-</span> <span class="s2">&quot;default&quot;</span> <span class="o">&gt;&gt;</span> <span class="n">generate_questions</span>
+</pre></div>
+<p>The magic happens in this line:</p>
+<div class="hll"><pre><span></span><span class="n">extract_topics</span> <span class="o">-</span> <span class="s2">&quot;default&quot;</span> <span class="o">&gt;&gt;</span> <span class="n">generate_questions</span>
+</pre></div>
+<p>This tells the flow that once the <code>extract_topics</code> node emits <code>"default"</code>, it should proceed to the <code>generate_questions</code> node. The syntax is compact and looks exactly like an edge specification between two nodes.</p>
+<p>At this point, I deeply appreciate the clarity this approach forces upfront. When thinking about the flow as a graph, I'm forced to think about each node as a function that accepts inputs from shared state and returns a decision about what to do next. That decision can be deterministic (as above) or data-dependent (as we'll see below).</p>
+<p>Since GenAI can be viewed through the lens of automation, <a href="https://ericmjl.github.io/blog/2025/7/13/earn-the-privilege-to-use-automation/">we should earn the privilege to use it</a>. Automation requires a well-established process to be most effective. Framing a process in the language of graphs, inputs, and outputs—defining the process as a graph with carefully specified inputs and outputs, just like writing a computer program—is the clearest path to making automation work.</p>
+<p>Running the Flow looks like this:</p>
+<div class="hll"><pre><span></span><span class="n">shared_topics</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">txt</span><span class="o">=</span><span class="n">txt</span><span class="p">)</span>
+
+<span class="n">two_node_flow</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">extract_topics</span><span class="p">)</span>
+<span class="n">two_node_flow</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">shared_topics</span><span class="p">)</span>
+</pre></div>
+<p>After running, we can inspect the <code>shared_topics</code> dictionary to see our results:</p>
+<div class="hll"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;txt&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>
+    <span class="s2">&quot;topics&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>      <span class="c1"># added by ExtractTopics</span>
+    <span class="s2">&quot;questions&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>   <span class="c1"># added by GenerateQuestions</span>
+<span class="p">}</span>
+</pre></div>
+<p>One thing missing from PocketFlow is the ability to visualize the graph directly. Since the codebase was new to me, I sent a Cursor agent in the background to research and propose a solution. It came back with <a href="https://github.com/ericmjl/llamabot/pull/279">this PR</a>. Impressive!</p>
+<p>The Mermaid diagram for this workflow is:</p>
+<pre class="mermaid">
+graph LR
+N1["ExtractTopics"]
+N2["GenerateQuestions"]
+N1 --> N2
+style N1 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N2 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+
+</pre><h2 id="example-2-building-an-agent">Example 2 - Building an Agent</h2><p>Now, what if we want to build an agent?</p>
+<p>I'm going to work backwards here. My "hello world" test for agentic systems is making them tell me today's date. This works because an LLM will always hallucinate a date on its own, and that hallucination may or may not be correct. An agent that works properly should call a tool to get the actual date. The agent's graph should look like this:</p>
+<pre class="mermaid">
+graph LR
+    N1["Decide"]
+    N2["TodayDate"]
+    N3["RespondToUser"]
+    N1 -->|"today_date"| N2
+    N2 -->|"decide"| N1
+    N1 -->|"respond_to_user"| N3
+    style N1 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+    style N2 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+    style N3 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+
+</pre><p>I consider this a "Hello World" agent because a failing agent will skip straight to <code>respond_to_user</code> when asked for today's date, without first calling <code>today_date</code> to get the actual information.</p>
+<p>To build this agent, I need three nodes:</p>
+<ul>
+<li><strong><code>Decide</code></strong>: Uses an LLM to decide which tool to call next, given the prompt</li>
+<li><strong><code>TodayDate</code></strong>: Executes without LLMs and returns today's date in the current timezone</li>
+<li><strong><code>RespondToUser</code></strong>: Responds to the user with the appropriate context</li>
+</ul>
+<p>Here's how I wrote them. First, the <code>Decide</code> node:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamabot.components.tools</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">respond_to_user</span><span class="p">,</span>
+    <span class="n">search_internet</span><span class="p">,</span>
+    <span class="n">today_date</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="n">search_internet</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">tool</span><span class="p">(</span><span class="n">search_internet</span><span class="p">)</span>
+
+<span class="n">tools</span> <span class="o">=</span> <span class="p">[</span><span class="n">respond_to_user</span><span class="p">,</span> <span class="n">today_date</span><span class="p">]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ToolChoice</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">content</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="o">*</span><span class="p">[</span><span class="n">tool</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="n">tools</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the tool to use&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="nd">@lmb</span><span class="o">.</span><span class="n">prompt</span><span class="p">(</span><span class="s2">&quot;system&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">decision_bot_system_prompt</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Given the chat history, pick for me one or more tools to execute</span>
+<span class="sd">    in order to satisfy the user&#39;s query.</span>
+
+<span class="sd">    Give me just the tool name to pick.</span>
+<span class="sd">    Use the tools judiciously to help answer the user&#39;s query.</span>
+<span class="sd">    Query is always related to one of the tools.</span>
+<span class="sd">    Use respond_to_user if you have enough information to answer the original query.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Decide</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">shared</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Query: </span><span class="si">{</span><span class="n">shared</span><span class="p">[</span><span class="s1">&#39;query&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">shared</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prep_result</span><span class="p">):</span>
+        <span class="n">bot</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">StructuredBot</span><span class="p">(</span>
+            <span class="n">pydantic_model</span><span class="o">=</span><span class="n">ToolChoice</span><span class="p">,</span>
+            <span class="n">system_prompt</span><span class="o">=</span><span class="n">decision_bot_system_prompt</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">prep_result</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">])</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="o">*</span><span class="n">prep_result</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">,</span> <span class="n">prep_result</span><span class="p">,</span> <span class="n">exec_result</span><span class="p">):</span>
+        <span class="n">shared</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Chosen Tool: </span><span class="si">{</span><span class="n">exec_result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">exec_result</span>
+</pre></div>
+<p>The key thing to note is that we inject the available tools into the system prompt of the tool-selecting agent.</p>
+<p>Next, the <code>TodayDate</code> node:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">TodayDate</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">shared</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prep_result</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">today_date</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">,</span> <span class="n">prep_result</span><span class="p">,</span> <span class="n">exec_result</span><span class="p">):</span>
+        <span class="n">shared</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Today&#39;s date: </span><span class="si">{</span><span class="n">exec_result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;decide&quot;</span>
+</pre></div>
+<p>And finally, the <code>RespondToUser</code> node:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">RespondToUser</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">shared</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prep_result</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">Response</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+            <span class="n">content</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The response to the user.&quot;</span><span class="p">)</span>
+
+        <span class="n">bot</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">StructuredBot</span><span class="p">(</span>
+            <span class="s2">&quot;You are a helpful assistant.&quot;</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;ollama_chat/gemma3n:latest&quot;</span><span class="p">,</span>
+            <span class="n">pydantic_model</span><span class="o">=</span><span class="n">Response</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="o">*</span><span class="n">prep_result</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">,</span> <span class="n">prep_result</span><span class="p">,</span> <span class="n">exec_result</span><span class="p">):</span>
+        <span class="n">shared</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exec_result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">exec_result</span>
+</pre></div>
+<p>Finally, we set up the graph:</p>
+<div class="hll"><pre><span></span><span class="c1"># Set up the graph</span>
+<span class="n">today__date</span> <span class="o">=</span> <span class="n">TodayDate</span><span class="p">()</span>
+<span class="n">respond__to__user</span> <span class="o">=</span> <span class="n">RespondToUser</span><span class="p">()</span>
+<span class="n">decide</span> <span class="o">=</span> <span class="n">Decide</span><span class="p">()</span>
+
+<span class="n">shared</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="n">shared</span><span class="p">[</span><span class="s2">&quot;query&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;What is the date today?&quot;</span>
+<span class="n">shared</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">decide</span> <span class="o">-</span> <span class="s2">&quot;today_date&quot;</span> <span class="o">&gt;&gt;</span> <span class="n">today__date</span>
+<span class="n">today__date</span> <span class="o">-</span> <span class="s2">&quot;decide&quot;</span> <span class="o">&gt;&gt;</span> <span class="n">decide</span>
+<span class="n">decide</span> <span class="o">-</span> <span class="s2">&quot;respond_to_user&quot;</span> <span class="o">&gt;&gt;</span> <span class="n">respond__to__user</span>
+</pre></div>
+<p>I used <code>__</code> in the node names to avoid clashing with the original functions.</p>
+<p>Then we run it:</p>
+<div class="hll"><pre><span></span><span class="n">flow2</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">decide</span><span class="p">)</span>
+<span class="n">flow2</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">shared</span><span class="p">)</span>
+</pre></div>
+<p>Take my word for it (or check out the notebook yourself)—it reliably gives me today's date.</p>
+<h2 id="example-3-agent-with-shell-commands">Example 3 - Agent with Shell Commands</h2><p>To push things further, I tried a tool that needs arguments. A good "hello world" for this is executing shell commands in response to questions like, "What's in this folder?"</p>
+<p>For this, I created a second version of the <code>Decide</code> node called <code>Decide2</code>, where I instantiate and execute the <code>ToolChoice</code> and tool selection <code>StructuredBot</code> within <code>exec</code>:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Decide2</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">shared</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prep_result</span><span class="p">):</span>
+        <span class="n">sysprompt</span> <span class="o">=</span> <span class="n">decision_bot_system_prompt</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">sysprompt</span><span class="p">)</span>
+
+        <span class="k">class</span><span class="w"> </span><span class="nc">ToolChoice</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+            <span class="n">content</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="o">*</span><span class="p">[</span><span class="n">tool</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="n">prep_result</span><span class="p">[</span><span class="s2">&quot;tools&quot;</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the tool to use&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">justification</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Why this tool was chosen.&quot;</span><span class="p">)</span>
+
+        <span class="n">bot</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">StructuredBot</span><span class="p">(</span>
+            <span class="n">pydantic_model</span><span class="o">=</span><span class="n">ToolChoice</span><span class="p">,</span>
+            <span class="n">system_prompt</span><span class="o">=</span><span class="n">decision_bot_system_prompt</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">prep_result</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">]:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="o">*</span><span class="n">prep_result</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="n">prep_result</span><span class="p">[</span><span class="s2">&quot;query&quot;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">,</span> <span class="n">prep_result</span><span class="p">,</span> <span class="n">exec_result</span><span class="p">):</span>
+        <span class="n">shared</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Query: </span><span class="si">{</span><span class="n">shared</span><span class="p">[</span><span class="s2">&quot;query&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">shared</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Chosen Tool: </span><span class="si">{</span><span class="n">exec_result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">exec_result</span>
+</pre></div>
+<p>I then created a <code>ShellCommand</code> node that uses the same pattern—leveraging <code>StructuredBot</code> for structured generation to constrain the LLM's output to exactly what I need:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ShellCommand</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">shared</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prep_result</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">Cmd</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+            <span class="n">content</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+                <span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The shell command to execute&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">bot</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">StructuredBot</span><span class="p">(</span>
+            <span class="n">system_prompt</span><span class="o">=</span><span class="s2">&quot;You are an expert at writing shell commands. For the chat trace that you will be given, write a shell command that accomplishes the user&#39;s request. Only output the command, nothing else.&quot;</span><span class="p">,</span>
+            <span class="n">pydantic_model</span><span class="o">=</span><span class="n">Cmd</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;ollama_chat/gemma3n:latest&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="o">*</span><span class="n">prep_result</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">execute_shell_command</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">,</span> <span class="n">prep_result</span><span class="p">,</span> <span class="n">exec_result</span><span class="p">):</span>
+        <span class="n">shared</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output: </span><span class="si">{</span><span class="n">exec_result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">shared</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="s2">&quot;decide&quot;</span>
+</pre></div>
+<p>Finally, we set up the graph:</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_</span><span class="p">():</span>
+    <span class="c1"># Set up the graph</span>
+    <span class="n">today_date</span> <span class="o">=</span> <span class="n">TodayDate</span><span class="p">()</span>
+    <span class="n">respond_to_user</span> <span class="o">=</span> <span class="n">RespondToUser</span><span class="p">()</span>
+    <span class="n">decide</span> <span class="o">=</span> <span class="n">Decide2</span><span class="p">()</span>
+    <span class="n">shell_command</span> <span class="o">=</span> <span class="n">ShellCommand</span><span class="p">()</span>
+
+    <span class="n">decide</span> <span class="o">-</span> <span class="s2">&quot;today_date&quot;</span> <span class="o">&gt;&gt;</span> <span class="n">today_date</span>
+    <span class="n">today_date</span> <span class="o">-</span> <span class="s2">&quot;decide&quot;</span> <span class="o">&gt;&gt;</span> <span class="n">decide</span>
+    <span class="n">decide</span> <span class="o">-</span> <span class="s2">&quot;execute_shell_command&quot;</span> <span class="o">&gt;&gt;</span> <span class="n">shell_command</span>
+    <span class="n">shell_command</span> <span class="o">-</span> <span class="s2">&quot;decide&quot;</span> <span class="o">&gt;&gt;</span> <span class="n">decide</span>
+    <span class="n">decide</span> <span class="o">-</span> <span class="s2">&quot;respond_to_user&quot;</span> <span class="o">&gt;&gt;</span> <span class="n">respond_to_user</span>
+
+    <span class="n">flow</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">decide</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">flow</span>
+
+
+<span class="n">flow3</span> <span class="o">=</span> <span class="n">_</span><span class="p">()</span>
+</pre></div>
+<p>The graph would look like this:</p>
+<pre class="mermaid">
+graph LR
+N1["Decide2"]
+N2["TodayDate"]
+N3["ShellCommand"]
+N4["RespondToUser"]
+N1 -->|"today_date"| N2
+N2 -->|"decide"| N1
+N1 -->|"execute_shell_command"| N3
+N3 -->|"decide"| N1
+N1 -->|"respond_to_user"| N4
+style N1 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N2 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N3 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N4 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+
+</pre><p>I wrapped it in a <code>_()</code> function to protect the globally scoped variables in the Marimo notebook. Note that I included <code>today_date</code> as well, just to "pollute" the namespace and make it more challenging when asking shell-related questions. When we interact with the agent:</p>
+<div class="hll"><pre><span></span><span class="n">shared3</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="n">shared3</span><span class="p">[</span><span class="s2">&quot;query&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;What in my current working directory?&quot;</span>
+<span class="n">shared3</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">shared3</span><span class="p">[</span><span class="s2">&quot;tools&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">respond_to_user</span><span class="p">,</span> <span class="n">today_date</span><span class="p">,</span> <span class="n">execute_shell_command</span><span class="p">]</span>
+<span class="n">flow3</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">shared3</span><span class="p">)</span>
+</pre></div>
+<p>It calls on <code>shell_command</code>, and gives me back this response:</p>
+<div class="hll"><pre><span></span>Okay, here&#39;s a list of the files and directories in your current working directory:
+
+*   **Directories:**
+    *   `__marimo__`
+    *   `.` (current directory)
+    *   `..` (parent directory)
+
+*   **Files:**
+    *   `agentbot_build.py`
+    *   `agents.py`
+    *   `chatbot_as_agent.py`
+    *   `conversation-threads.py`
+    *   `data.csv`
+    *   `ic50_data_with_confounders.csv`
+    *   `intro.py`
+    *   `lancedb_docstore.py`
+    *   `pocketflow_testdrive.py`
+    *   `react-agentbot-demo.py`
+    *   `README.md`
+    *   `toolbot_chatdata.py`
+    *   `tools.py`
+
+That&#39;s a total of 17 files and directories. Let me know if you&#39;d like more details about any of them!
+</pre></div>
+<p>I was also able to ask "Hey, what files have been modified today?" and the agent successfully executed the appropriate shell command.</p>
+<p>Effectively, this pattern is nothing more than a coordinating agent/LLM delegating work to specialized tools.</p>
+<h2 id="rewriting-agentbot-with-pocketflow">Rewriting AgentBot with PocketFlow</h2><p>Finally, I decided to take what I'd learned and redo the <code>AgentBot</code> implementation in LlamaBot. My previous implementation (version 0.16.3) was messy—the <code>__call__</code> method alone was 307 lines with a while-loop, maximum tries, ThreadPoolExecutor for parallel tool execution, tool call caching, and extensive metadata tracking. PocketFlow had a better abstraction for the agentic loop: a <code>Flow</code> state machine following edges on a graph. I thought I could redesign <code>AgentBot</code> to take advantage of this pattern.</p>
+<p>The rewrite involved some really interesting patterns. I completely replaced the ReAct (Reasoning and Acting) loop with PocketFlow's graph-based tool orchestration. This shifts from an iterative loop-based approach to a declarative graph-based one, where tool execution flows through a directed graph rather than a sequential loop.</p>
+<p>The implementation centers on three key abstractions:</p>
+<p><strong>1. The <code>@nodeify</code> decorator</strong> transforms any callable function into a PocketFlow Node. It wraps functions with PocketFlow's Node interface, implementing the required <code>prep</code>, <code>exec</code>, and <code>post</code> methods. The tricky part is that <code>@nodeify</code> needs to preserve access to the underlying function's metadata—particularly the <code>json_schema</code> attribute added by the <code>@tool</code> decorator—through attribute proxying, so ToolBot can discover and use tools even after they've been wrapped as nodes.</p>
+<p><strong>2. The <code>DecideNode</code></strong> encapsulates the decision-making logic. This node uses ToolBot internally to analyze the conversation history stored in shared state and select which tool to execute next. It expects a shared state dictionary with a <code>"memory"</code> key containing the conversation history as a list of strings. When executed, it calls ToolBot with this memory, extracts the first tool call from ToolBot's response, parses the JSON-formatted arguments, and stores them in <code>shared["func_call"]</code> for the next node. The node then returns the tool name as a routing action, which PocketFlow uses to navigate the graph.</p>
+<p><strong>3. Flow graph construction</strong> happens at initialization time. AgentBot automatically wraps all provided tools (plus default tools like <code>today_date</code> and <code>respond_to_user</code>) with both <code>@tool</code> and <code>@nodeify</code> decorators, then builds bidirectional connections: from the decide node to each tool node (using the tool's function name as the action), and from each tool node back to the decide node (except for terminal tools like <code>respond_to_user</code> that have <code>loopback_name=None</code>). This creates a graph where execution can flow from decision to tool and back to decision, enabling multi-step reasoning.</p>
+<p>A few technical requirements make this work: tools need type annotations (for JSON schema generation), the shared state needs a <code>"memory"</code> list for conversation history, and tool arguments are passed through <code>shared["func_call"]</code>. The DecideNode selects one tool at a time, and tools are stateless—they get fresh arguments each call and communicate through memory.</p>
+<p>What's remarkable about this implementation is how compact it is. The <code>@nodeify</code> decorator is just 100 lines, and most of that is documentation. The core logic is elegant:</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">nodeify</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">loopback_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;decide&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">FuncNode</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">loopback_name</span> <span class="o">=</span> <span class="n">loopback_name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
+
+            <span class="k">def</span><span class="w"> </span><span class="nf">prep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">shared</span>
+
+            <span class="k">def</span><span class="w"> </span><span class="nf">exec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prep_result</span><span class="p">):</span>
+                <span class="n">func_call</span> <span class="o">=</span> <span class="n">prep_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;func_call&quot;</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">**</span><span class="n">func_call</span><span class="p">)</span>
+
+            <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shared</span><span class="p">,</span> <span class="n">prep_result</span><span class="p">,</span> <span class="n">exec_res</span><span class="p">):</span>
+                <span class="n">shared</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exec_res</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loopback_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">exec_res</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">loopback_name</span>
+
+            <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+                <span class="c1"># Proxy to original function for json_schema access</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;func&quot;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">FuncNode</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">decorator</span>
+</pre></div>
+<p>The entire AgentBot class is similarly compact—about 100 lines total. Compare this to the previous implementation where the <code>__call__</code> method alone was 307 lines, with complex while loop logic, tool call caching, parallel execution via ThreadPoolExecutor, and extensive state management:</p>
+<div class="hll"><pre><span></span><span class="c1"># Old implementation (v0.16.3): 307-line __call__ method</span>
+<span class="c1"># Plus 50-line caching wrapper, 21-line execution helper</span>
+<span class="c1"># Total: 378 lines of orchestration code</span>
+
+<span class="k">for</span> <span class="n">iteration</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iterations</span><span class="p">):</span>
+    <span class="c1"># Call model with tools</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">completion</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span>
+        <span class="n">messages</span><span class="o">=</span><span class="n">raw_messages</span><span class="p">,</span>
+        <span class="n">tools</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="p">,</span>
+        <span class="n">tool_choice</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">tool_calls</span> <span class="o">=</span> <span class="n">extract_tool_calls</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">tool_calls</span><span class="p">:</span>
+        <span class="c1"># Execute tools in parallel with caching</span>
+        <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">()</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+            <span class="n">futures</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_execute_tool_with_cache</span><span class="p">,</span> <span class="n">call</span><span class="p">):</span> <span class="n">call</span>
+                <span class="k">for</span> <span class="n">call</span> <span class="ow">in</span> <span class="n">tool_calls</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">as_completed</span><span class="p">(</span><span class="n">futures</span><span class="p">):</span>
+                <span class="c1"># Handle results, update messages, manage cache,</span>
+                <span class="c1"># track metadata, handle errors...</span>
+                <span class="o">...</span>
+        <span class="k">continue</span>
+
+    <span class="c1"># Handle finalization, memory updates, logging, metrics...</span>
+</pre></div>
+<p>The new implementation replaces all of that with a simple graph construction:</p>
+<div class="hll"><pre><span></span><span class="c1"># New implementation: ~100 lines total, declarative graph</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentBot</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">decide_node</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;gpt-4.1&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">):</span>
+        <span class="c1"># ... validation and setup ...</span>
+
+        <span class="c1"># Build PocketFlow graph: connect tools to decide node</span>
+        <span class="k">for</span> <span class="n">tool_node</span> <span class="ow">in</span> <span class="n">all_tools</span><span class="p">:</span>
+            <span class="n">tool_name</span> <span class="o">=</span> <span class="n">tool_node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">decide_node</span> <span class="o">-</span> <span class="n">tool_name</span> <span class="o">&gt;&gt;</span> <span class="n">tool_node</span>
+            <span class="k">if</span> <span class="n">tool_node</span><span class="o">.</span><span class="n">loopback_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">tool_node</span> <span class="o">-</span> <span class="n">tool_node</span><span class="o">.</span><span class="n">loopback_name</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">decide_node</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">flow</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">decide_node</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s2">&quot;memory&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;result&quot;</span><span class="p">)</span>
+</pre></div>
+<p>Full implementation includes validation, tool wrapping, and state management—about 100 lines total vs 307+ for the old <code>__call__</code> method alone.</p>
+<h3 id="the-magic-of-building-an-agent-in-just-4-lines">The Magic of Building an Agent in Just 4 Lines</h3><p>The most remarkable part of this implementation is how the entire agent graph is constructed. Look at these four lines carefully:</p>
+<div class="hll"><pre><span></span><span class="k">for</span> <span class="n">tool_node</span> <span class="ow">in</span> <span class="n">all_tools</span><span class="p">:</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">decide_node</span> <span class="o">-</span> <span class="n">tool_name</span> <span class="o">&gt;&gt;</span> <span class="n">tool_node</span>
+    <span class="k">if</span> <span class="n">tool_node</span><span class="o">.</span><span class="n">loopback_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tool_node</span> <span class="o">-</span> <span class="n">tool_node</span><span class="o">.</span><span class="n">loopback_name</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">decide_node</span>
+</pre></div>
+<p><strong>This is it.</strong> This is the entire graph construction that turns a collection of tools into a working agent. Let me break down what's happening:</p>
+<ol>
+<li><strong>Line 1</strong>: Loop through each tool</li>
+<li><strong>Line 2</strong>: Connect the decide node to the tool node—when the LLM chooses this tool, execution flows to it</li>
+<li><strong>Line 3</strong>: Check if this tool should loop back (terminal tools like <code>respond_to_user</code> have <code>loopback_name=None</code>)</li>
+<li><strong>Line 4</strong>: Connect the tool back to the decide node—after execution, control returns to decision-making</li>
+</ol>
+<p>That's the entire agent architecture. Four lines. The <code>- "action" &gt;&gt;</code> syntax creates directed edges in the graph, and PocketFlow handles all the state management, routing, and execution orchestration. Compare this to the 307-line <code>__call__</code> method in the previous implementation (version 0.16.3) with its complex loop-based logic, thread pools, state tracking, and termination conditions.</p>
+<p>This is what I mean by "graph-based thinking" being clearer—the entire execution flow is explicit and declarative. You can see at a glance how decisions flow to tools and back to decisions, enabling multi-step reasoning.</p>
+<p>The difference is striking. The old implementation required manual loop management, explicit state tracking, parallel execution coordination, and complex termination logic. The new implementation declares the graph structure once, and PocketFlow handles all the execution details.</p>
+<p>This graph-based approach provides several advantages. The flow graph is constructed once at initialization, making the execution path explicit and visualizable—you can render the agent's decision flow as a Mermaid diagram using the visualization feature I added to LlamaBot. The separation of concerns is clearer: decision-making lives in <code>DecideNode</code>, tool execution in wrapped function nodes, and orchestration in PocketFlow's flow engine. The implementation is also more modular—you can swap out the decision node or customize tool wrapping behavior without rewriting the core agent logic. Finally, by leveraging PocketFlow's graph execution model, we gain access to its execution capabilities and potential future extensions for parallel execution or conditional routing.</p>
+<h2 id="visualizing-different-agent-architectures">Visualizing Different Agent Architectures</h2><p>One really cool feature I added to LlamaBot is the ability to visualize any agent's graph structure using Mermaid diagrams. The <code>AgentBot._display_()</code> method automatically renders the flow graph, making it easy to see how different tool configurations create different architectures.</p>
+<p>Here's a simple agent with just two tools:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamabot</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentBot</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">llamabot.components.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">tool</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">llamabot.components.pocketflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">nodeify</span>
+
+<span class="nd">@nodeify</span><span class="p">(</span><span class="n">loopback_name</span><span class="o">=</span><span class="s2">&quot;decide&quot;</span><span class="p">)</span>
+<span class="nd">@tool</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">search_web</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search the web for information.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">web_search</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+<span class="n">agent</span> <span class="o">=</span> <span class="n">AgentBot</span><span class="p">(</span><span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_web</span><span class="p">])</span>
+<span class="n">agent</span><span class="o">.</span><span class="n">_display_</span><span class="p">()</span>  <span class="c1"># Renders Mermaid diagram in Marimo</span>
+</pre></div>
+<p>The resulting graph shows the decision node connected to <code>today_date</code>, <code>search_web</code>, and <code>respond_to_user</code>:</p>
+<pre class="mermaid">
+graph LR
+N1["DecideNode"]
+N2["today_date"]
+N3["search_web"]
+N4["respond_to_user"]
+N1 -->|"today_date"| N2
+N2 -->|"decide"| N1
+N1 -->|"search_web"| N3
+N3 -->|"decide"| N1
+N1 -->|"respond_to_user"| N4
+style N1 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N2 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N3 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N4 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+</pre><p>Add more tools, and the graph automatically expands. Here's an agent with code execution and file operations:</p>
+<div class="hll"><pre><span></span><span class="nd">@nodeify</span><span class="p">(</span><span class="n">loopback_name</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="nd">@tool</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_and_execute_script</span><span class="p">(</span>
+    <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">dependencies_str</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">python_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&gt;=3.11&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write and execute a Python script in a secure Docker sandbox.</span>
+
+<span class="sd">    :param code: The Python code to execute</span>
+<span class="sd">    :param dependencies_str: Comma-separated pip dependencies</span>
+<span class="sd">    :param python_version: Python version requirement</span>
+<span class="sd">    :return: Dictionary with stdout, stderr, and status</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Uses ScriptExecutor to run code in isolated Docker container</span>
+    <span class="n">executor</span> <span class="o">=</span> <span class="n">ScriptExecutor</span><span class="p">()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">run_script</span><span class="p">(</span><span class="n">script_path</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;stdout&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;stdout&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;stderr&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;stderr&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">],</span>
+    <span class="p">}</span>
+
+<span class="nd">@nodeify</span><span class="p">(</span><span class="n">loopback_name</span><span class="o">=</span><span class="s2">&quot;decide&quot;</span><span class="p">)</span>
+<span class="nd">@tool</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read and return file contents.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+<span class="n">agent</span> <span class="o">=</span> <span class="n">AgentBot</span><span class="p">(</span><span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_web</span><span class="p">,</span> <span class="n">write_and_execute_script</span><span class="p">,</span> <span class="n">read_file</span><span class="p">])</span>
+</pre></div>
+<p>The graph now shows six tool nodes all connected bidirectionally to the decision node (except terminal tools):</p>
+<pre class="mermaid">
+graph LR
+N1["DecideNode"]
+N2["today_date"]
+N3["search_web"]
+N4["write_and_execute_script"]
+N5["read_file"]
+N6["respond_to_user"]
+N7["return_object_to_user"]
+N1 -->|"today_date"| N2
+N2 -->|"decide"| N1
+N1 -->|"search_web"| N3
+N3 -->|"decide"| N1
+N1 -->|"write_and_execute_script"| N4
+N4 -->|"decide"| N1
+N1 -->|"read_file"| N5
+N5 -->|"decide"| N1
+N1 -->|"respond_to_user"| N6
+N1 -->|"return_object_to_user"| N7
+style N1 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N2 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N3 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N4 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N5 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N6 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N7 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+</pre><p>What I love about this is how the graph makes it immediately obvious what capabilities an agent has. You can see at a glance which tools are available, understand the control flow, and reason about how the agent will behave. The visualization transforms the abstract "agent with tools" into a concrete, inspectable structure.</p>
+<p>Here's a real-world example—an experiment design agent I built for critiquing statistical experiment designs:</p>
+<div class="hll"><pre><span></span><span class="nd">@nodeify</span><span class="p">(</span><span class="n">loopback_name</span><span class="o">=</span><span class="s2">&quot;decide&quot;</span><span class="p">)</span>
+<span class="nd">@tool</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">critique_experiment_design</span><span class="p">(</span><span class="n">design</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Critique an experiment design and identify potential flaws,</span>
+<span class="sd">    biases, or weaknesses.</span>
+
+<span class="sd">    :param design: Description of the proposed experiment design</span>
+<span class="sd">    :return: Critique with identified issues and suggestions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bot</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">SimpleBot</span><span class="p">(</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="n">experiment_design_critique_sysprompt</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">bot</span><span class="p">(</span><span class="n">design</span><span class="p">)</span>
+
+<span class="n">agent</span> <span class="o">=</span> <span class="n">AgentBot</span><span class="p">(</span>
+    <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">critique_experiment_design</span><span class="p">,</span> <span class="n">write_and_execute_code</span><span class="p">(</span><span class="nb">globals</span><span class="p">())]</span>
+<span class="p">)</span>
+</pre></div>
+<p>This agent has a specialized domain focus. The graph shows all its capabilities, including the default tools that every <code>AgentBot</code> gets automatically:</p>
+<pre class="mermaid">
+graph LR
+N1["DecideNode"]
+N2["today_date"]
+N3["critique_experiment_design"]
+N4["write_and_execute_code"]
+N5["respond_to_user"]
+N6["return_object_to_user"]
+N1 -->|"today_date"| N2
+N2 -->|"decide"| N1
+N1 -->|"critique_experiment_design"| N3
+N3 -->|"decide"| N1
+N1 -->|"write_and_execute_code"| N4
+N4 -->|"decide"| N1
+N1 -->|"respond_to_user"| N5
+N1 -->|"return_object_to_user"| N6
+style N1 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N2 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N3 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N4 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N5 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+style N6 fill:#e1f5ff,stroke:#01579b,stroke-width:2px;
+</pre><p>Notice that <code>today_date</code>, <code>respond_to_user</code>, and <code>return_object_to_user</code> are included by default in every <code>AgentBot</code>. The graph immediately tells you this agent can critique designs, execute code to analyze data, and return Python objects directly to the user—but it's not a general-purpose assistant. It's specialized for experiment design evaluation. The visual structure encodes the agent's purpose.</p>
+<p>This is only possible because of the graph-based architecture. With the old loop-based implementation, there was no clean way to visualize the execution flow—it was hidden inside imperative control logic.</p>
+<h2 id="what-i-learned">What I Learned</h2><p><strong>Externalize memory as shared state</strong>. Memory lives in the <code>shared</code> dictionary that all nodes can access, rather than being intrinsic to each bot. We just feed memory context in each time a node executes. This has good economics—if you have prompt caching on the API provider's side, simply appending to an ever-growing memory is a great way to take advantage of pre-computed neural network outputs from previous runs. I used to think of memory as <em>intrinsic</em> to a bot, but I've changed my mind: allowing multiple bots to share access to the same memory is a useful simplification, even if it's not suitable for every circumstance.</p>
+<p><strong>The <code>prep -&gt; exec -&gt; post</code> pattern</strong> is worth adhering to. I found myself appending to memory in <code>post</code> after doing the <code>exec</code>ution. <code>prep</code> turns out to be useful for preprocessing user inputs or manipulating memory as needed. The overall effect is that it's much easier to <strong>unit test or set up evals</strong> for individual nodes.</p>
+<p><strong>PocketFlow's graph abstraction brings clarity</strong>. The analogy of LLM agents (<code>Node</code>s) as chefs/cooks accessing a kitchen island's worth of things (<code>shared</code>) is a powerful contrast to my previous loop-based approach in LlamaBot, where I manually tracked state, managed iterations, and coordinated tool execution. This insight is exactly why I rewrote AgentBot to use this graph-based architecture.</p>
+<p><strong>A wide variety of LLM-powered architectures</strong> can be built with just <code>Node</code>s and <code>Flow</code>s. Most LLM applications I've built—whether for myself or for others—have not been "agentic" but more like "workflows." These are what some might consider boring. Yet they are high ROI precisely because they take repetitive and boring work out of our hands! PocketFlow gives us a way to express flows as graphs, effectively state machines whose actions are either fully deterministic or determined by an LLM's choice.</p>
+<p><strong>PocketFlow is minimalistic</strong>, which offloads a lot of heavy lifting when working with LLMs. The flexibility is both a strength and a weakness: great for power users, but potentially intimidating for newcomers. I found it easiest to rely heavily on <code>StructuredBot</code> to output decisions made by the LLM. Structured generation is, generally speaking, the most useful abstraction in the LLM world that I keep turning back to.</p>
+<p><strong>The agent pattern is everywhere once you recognize it</strong>. While writing this post, I realized that the agentic coding IDEs we've gotten used to—tools like Cursor, GitHub Copilot, and others—follow the exact same pattern I've been describing. They have a decision node that analyzes your code and context, tool nodes for reading files, searching codebases, editing code, and responding to you. The flow is the same: decide what to do, execute a tool, update context, decide again. Understanding this pattern in PocketFlow helped me see it operating in the tools I use every day. The abstraction is the mental model that makes sense of how modern AI-powered tools work.</p>
+<p>The biggest lesson? <strong>Thinking in graphs transforms how you build LLM programs</strong>. The shift from imperative loops to declarative graphs means you declare <em>what</em> should happen instead of specifying <em>how</em> to execute step-by-step. This brings clarity, modularity, and makes your execution flow explicit. Whether you're building simple workflows or complex agents, representing them as graphs forces you to think clearly about state, decisions, and flow. That mental model shift has changed how I approach every LLM application I build.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-how-i-replaced-307-lines-of-agent-code-with-4-lines</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{How I Replaced 307 Lines of Agent Code with 4 Lines}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{11}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{16}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/11/16/how-i-replaced-307-lines-of-agent-code-with-4-lines}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

@@ -1,0 +1,739 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="My weekend experiment making PyMC installable in a WASM environment">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/my-weekend-experiment-pymc-wasm' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>My weekend experiment making PyMC installable in a WASM environment - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">My weekend experiment making PyMC installable in a WASM environment</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-03-08</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/pymc/">
+        pymc
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/bayesian/">
+        bayesian
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/webassembly/">
+        webassembly
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/pyodide/">
+        pyodide
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>I spent a weekend trying to make PyMC installable in WebAssembly environments via Pyodide. The journey involved making Numba optional, setting up Pixi development environments, and documenting the WASM build process. While PyMC can now technically install in WASM, the lack of WASM support in MCMC sampling backends (JAX, nutpie) means NUTS sampling remains out of reach. This represents a fundamental infrastructure gap, not just a missing dependency. Note: the Pixi-based approach described here was my weekend exploration; the actual PR to PyTensor respected their existing mamba-based toolchain.</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>This past weekend, I found myself revisiting a blog post from PyMC Labs titled <a href="https://www.pymc-labs.com/blog-posts/pymc-in-browser">"Running PyMC in the Browser with PyScript"</a>. Published in 2022, it demonstrated something magical: running full Bayesian inference with PyMC entirely in the browser—no server, no installation, no data leaving your device. Users could define models, run NUTS sampling, and visualize posteriors, all client-side.</p>
+<p>I was excited to try it out. But when I attempted to run the examples, I discovered they no longer worked. The Python package ecosystem had evolved, dependencies had shifted, and the Pyodide environment had changed. What was once a breakthrough demo had quietly broken.</p>
+<p>So I did what any curious engineer would do on a weekend: I dove down the rabbit hole to figure out how to make it work again.</p>
+<h2 id="the-core-challenge-getting-pytensor-to-build-for-webassembly">The core challenge: getting PyTensor to build for WebAssembly</h2><p>PyMC depends on PyTensor, its computational backend. PyTensor is where the heavy lifting happens: it compiles mathematical expressions into optimized code (usually C or JAX) and executes them efficiently. To run PyMC in a browser via Pyodide, I first needed to make PyTensor installable in a WebAssembly environment.</p>
+<p>This wasn't just a matter of <code>pip install</code>. PyTensor contains C and Cython extensions that must be compiled for the target platform. For WebAssembly, that means using Emscripten and the Pyodide build tooling.</p>
+<h2 id="the-code-changes-what-i-modified-in-pytensor">The code changes: what I modified in PyTensor</h2><p>Working on my fork of PyTensor (<a href="https://github.com/ericmjl/pytensor">ericmjl/pytensor</a>), I made targeted modifications to enable WASM builds. Here's the complete diff:</p>
+<h3 id="change-1-making-numba-optional-on-webassembly">Change 1: making Numba optional on WebAssembly</h3><p><strong>File:</strong> <code>pyproject.toml</code></p>
+<div class="hll"><pre><span></span><span class="gd">-    &quot;numba&gt;0.57,&lt;1&quot;,</span>
+<span class="gi">+    &quot;numba&gt;0.57,&lt;1; platform_machine != &#39;wasm32&#39; and sys_platform != &#39;emscripten&#39;&quot;,</span>
+</pre></div>
+<p>This single line change is the critical enabler. Numba, PyTensor's JIT compiler for numerical code, is not available in WebAssembly environments. There's no way to install it—it simply doesn't exist for this platform.</p>
+<p>The fix uses PEP 508 environment markers to make Numba a conditional dependency:</p>
+<ul>
+<li><code>platform_machine != 'wasm32'</code> excludes WASM architectures</li>
+<li><code>sys_platform != 'emscripten'</code> adds an extra safety check for Emscripten-based builds</li>
+</ul>
+<p>Without this change, attempting to install PyTensor in Pyodide would fail immediately with a dependency resolution error. Pyodide would try to find a Numba wheel for WASM, fail, and abort the entire installation.</p>
+<p><strong>The tradeoff, however, is that PyTensor loses its JIT compilation capabilities on WASM.</strong> Operations that would be compiled to optimized native code fall back to pure Python execution. This means slower performance, and critically, PyMC's NUTS sampler won't work.</p>
+<h3 id="change-2-adding-pixi-development-environment-configuration">Change 2: adding Pixi development environment configuration</h3><p><strong>File:</strong> <code>pyproject.toml</code></p>
+<p>I added a complete Pixi workspace configuration to <code>pyproject.toml</code>. This provides a reproducible development environment and includes the tooling needed to build WASM wheels:</p>
+<div class="hll"><pre><span></span><span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="c1"># Pixi (pixi.prefix.dev): development environment from environment.yml</span>
+<span class="c1"># Use: pixi install &amp;&amp; pixi run pytest   or   pixi shell</span>
+<span class="c1"># -----------------------------------------------------------------------------</span>
+<span class="k">[tool.pixi.workspace]</span>
+<span class="n">channels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;conda-forge&quot;</span><span class="p">]</span>
+<span class="n">platforms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;linux-64&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;osx-64&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;osx-arm64&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;win-64&quot;</span><span class="p">]</span>
+
+<span class="k">[tool.pixi.pypi-dependencies]</span>
+<span class="n">pytensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">editable</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
+<span class="n">types-setuptools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">build</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">pyodide-build</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=0.29.2&quot;</span>
+
+<span class="k">[tool.pixi.dependencies]</span>
+<span class="n">python</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=3.11,&lt;3.14&quot;</span>
+<span class="n">compilers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">numpy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=2.0.0&quot;</span>
+<span class="n">scipy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=1,&lt;2&quot;</span>
+<span class="n">filelock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=3.15&quot;</span>
+<span class="n">etuples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">logical-unification</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">miniKanren</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">cons</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">pydeprecate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">numba</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=0.57&quot;</span>
+<span class="n">coveralls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">diff-cover</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">mypy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">pytest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">pytest-cov</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">pytest-xdist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">pytest-benchmark</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">pytest-mock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">pytest-sphinx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">sphinx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=5.1.0,&lt;6&quot;</span>
+<span class="n">sphinx_rtd_theme</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">pygments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">pydot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">ipython</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">pymc-sphinx-theme</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">sphinx-design</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">myst-nb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">matplotlib</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">watermark</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">ruff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">pandas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">pre-commit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">packaging</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">cython</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">graphviz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+
+<span class="k">[tool.pixi.target.linux-64.dependencies]</span>
+<span class="n">mkl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">mkl-service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">libblas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">build</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;*mkl&quot;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="k">[tool.pixi.target.win-64.dependencies]</span>
+<span class="n">mkl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">mkl-service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">libblas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">build</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;*mkl&quot;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="k">[tool.pixi.target.osx-64.dependencies]</span>
+<span class="n">libblas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">build</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;*accelerate&quot;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="k">[tool.pixi.target.osx-arm64.dependencies]</span>
+<span class="n">libblas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">build</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;*accelerate&quot;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="k">[tool.pixi.tasks]</span>
+<span class="n">test</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pytest&quot;</span>
+<span class="n">lint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ruff check .&quot;</span>
+<span class="n">format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ruff format .&quot;</span>
+<span class="n">docs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;python -m sphinx -b html ./doc ./html&quot;</span>
+<span class="n">wheel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;python -m build --wheel&quot;</span>
+<span class="n">sdist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;python -m build --sdist&quot;</span>
+<span class="n">wheel-wasm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyodide build&quot;</span>
+</pre></div>
+<p>Here are the key design decisions in this configuration:</p>
+<p><strong>Python version pinning:</strong></p>
+<div class="hll"><pre><span></span><span class="n">python</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=3.11,&lt;3.14&quot;</span>
+</pre></div>
+<p>Pyodide only supports up to Python 3.13. Without this constraint, the environment might resolve to Python 3.14+, causing the WASM build to fail with: <code>ValueError: Python version 3.14 is not yet supported.</code></p>
+<p><strong>PyPI dependencies for building:</strong></p>
+<div class="hll"><pre><span></span><span class="k">[tool.pixi.pypi-dependencies]</span>
+<span class="n">pytensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">editable</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
+<span class="n">types-setuptools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">build</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">pyodide-build</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=0.29.2&quot;</span>
+</pre></div>
+<p>This installs PyTensor in editable mode for development, includes type stubs for mypy, and adds both <code>build</code> (standard wheel building) and <code>pyodide-build</code> (WASM wheel building).</p>
+<p><strong>Platform-specific BLAS:</strong></p>
+<div class="hll"><pre><span></span><span class="k">[tool.pixi.target.linux-64.dependencies]</span>
+<span class="n">mkl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">mkl-service</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span>
+<span class="n">libblas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">build</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;*mkl&quot;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="k">[tool.pixi.target.osx-arm64.dependencies]</span>
+<span class="n">libblas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;*&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">build</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;*accelerate&quot;</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+<p>Different platforms use different BLAS implementations. Linux and Windows use Intel MKL, while macOS uses Apple's Accelerate framework. These ensure the correct linear algebra library is installed.</p>
+<p><strong>Build task:</strong></p>
+<div class="hll"><pre><span></span><span class="n">wheel-wasm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pyodide build&quot;</span>
+</pre></div>
+<p>This task runs <code>pyodide build</code>, which compiles PyTensor for WebAssembly using Emscripten.</p>
+<h3 id="change-3-documenting-the-wasm-build-process">Change 3: documenting the WASM build process</h3><p><strong>File:</strong> <code>doc/dev_start_guide.rst</code></p>
+<p>I added documentation explaining how to build WASM wheels:</p>
+<div class="hll"><pre><span></span><span class="gh">Building a WebAssembly (Pyodide) wheel</span>
+<span class="gh">-------------------------------------</span>
+
+To build a wheel targeting WebAssembly for use with <span class="s">`Pyodide </span><span class="si">&lt;https://pyodide.org/&gt;</span><span class="s">`_</span> (e.g. for the browser or JupyterLite), use the Pyodide build tooling. This produces a wheel in <span class="s">``dist/``</span> with a name like <span class="s">``*-cpXXX-cpXXX-pyodide_*_wasm32.whl``</span>.
+
+<span class="gs">**One-time setup: Emscripten**</span>
+
+<span class="m">1.</span> Install <span class="nv">`pyodide-build`</span> (included in the Pixi dev env, or <span class="s">``pip install pyodide-build&gt;=0.29.2``</span>).
+<span class="m">2.</span> Get the Emscripten version required by your pyodide-build: <span class="s">``pyodide config get emscripten_version``</span>.
+<span class="m">3.</span> Install and activate that Emscripten version using the <span class="s">`Emscripten SDK (emsdk) </span><span class="si">&lt;https://emscripten.org/docs/getting_started/downloads.html&gt;</span><span class="s">`_</span>:
+
+<span class="p">   ..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">bash</span>
+
+      git<span class="w"> </span>clone<span class="w"> </span>https://github.com/emscripten-core/emsdk.git
+      <span class="nb">cd</span><span class="w"> </span>emsdk
+      ./emsdk<span class="w"> </span>install<span class="w"> </span>&lt;version&gt;<span class="w">   </span><span class="c1"># use the version from step 2</span>
+      ./emsdk<span class="w"> </span>activate<span class="w"> </span>&lt;version&gt;
+      <span class="nb">source</span><span class="w"> </span>emsdk_env.sh
+
+<span class="m">4.</span> In any shell where you want to build the wasm wheel, ensure Emscripten is on <span class="s">``PATH``</span> (e.g. run <span class="s">``source /path/to/emsdk/emsdk_env.sh``</span>).
+
+<span class="gs">**Build the wheel**</span>
+
+From the project root, with Emscripten activated and your dev environment active (e.g. <span class="s">``pixi shell``</span>):
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> <span class="k">bash</span>
+
+   pyodide<span class="w"> </span>build
+
+Or with Pixi: <span class="s">``pixi run wheel-wasm``</span>.
+
+The wheel will appear in <span class="s">``dist/``</span>. PyPI does not yet accept emscripten/wasm32 wheels; host the file elsewhere (e.g. GitHub Releases) and install in Pyodide with <span class="s">``micropip.install(url)``</span>. See <span class="s">`Pyodide: building packages </span><span class="si">&lt;https://pyodide.org/en/stable/development/building-packages-from-source.html&gt;</span><span class="s">`_</span> for details.
+</pre></div>
+<p>This documentation walks through the Emscripten setup, the build command, and importantly, notes that PyPI doesn't accept WASM wheels yet—you need to distribute them via GitHub Releases or similar and install with <code>micropip.install(url)</code>.</p>
+<h2 id="what-i-actually-pr-d-to-pytensor">What I actually PR'd to PyTensor</h2><p>The changes above represent my weekend exploration, but they weren't what I ultimately contributed back to PyTensor. The Pixi configuration, in particular, was too large of a departure from PyTensor's existing toolchain. PyTensor uses mamba (via <code>environment.yml</code>) for its development environment, and switching to Pixi would have been a significant change to impose on a project I don't maintain.</p>
+<p>Instead, I re-did the infrastructure changes using <code>pyodide-build</code> while respecting PyTensor's existing mamba-based workflow. The core change (making Numba optional on WebAssembly) remained, but the development environment configuration was adapted to work with what PyTensor already had in place.</p>
+<p>This is a common lesson in open-source contribution: meeting maintainers where they are matters more than introducing your preferred tooling. The weekend experiment taught me what was needed; the PR reflected what was appropriate. You can see the actual PR here: <a href="https://github.com/pymc-devs/pytensor/pull/1960">pytensor #1960</a>.</p>
+<h2 id="unfortunately-for-now-nuts-is-gone">Unfortunately (for now), NUTS is gone</h2><p>Unfortunately, <strong>NUTS (No-U-Turn Sampler) doesn't work in WASM</strong>. 😭</p>
+<p>NUTS is the crown jewel of PyMC. It's the adaptive Hamiltonian Monte Carlo sampler that makes Bayesian inference efficient and robust. The 2022 PyMC Labs demo used NUTS to sample from posteriors in real-time in the browser.</p>
+<p>But here's the thing: this isn't just about Numba being unavailable. The real issue is that none of the modern MCMC sampling backends have WASM support:</p>
+<ul>
+<li><strong>JAX</strong> (used by NumPyro and BlackJAX) has an open GitHub issue <a href="https://github.com/jax-ml/jax/issues/1472">#1472</a> from 2019 titled "Jax for Web? (JS api or web assembly guide)" that's still open with no official WASM support</li>
+<li><strong>nutpie</strong> (the Rust-based NUTS implementation) doesn't have a WASM build readily available</li>
+<li>The computational demands of Hamiltonian dynamics—computing gradients, simulating trajectories, adapting step sizes—require optimized backends that don't exist in WASM environments</li>
+</ul>
+<p>This weekend's exploration shows the path to install PyMC in WASM, but you can't use its best sampler. It's like getting a Ferrari delivered to your house, but the dealer forgot to include the keys. You can sit in it, admire the leather seats, and maybe even turn on the radio. But you're not going anywhere fast.</p>
+<p>This represents a fundamental infrastructure gap, not just a missing dependency. Getting NUTS in the browser will require either WASM ports of JAX or nutpie, or entirely new sampling backends designed for browser environments.</p>
+<h2 id="what-does-work">What does work?</h2><p>Despite the NUTS heartbreak, this wasn't a failed experiment:</p>
+<ol>
+<li><strong>PyTensor now installs in WASM environments.</strong> This is non-trivial. PyTensor has C and Cython extensions that need to compile for WebAssembly. Getting that build pipeline working required understanding Pyodide's build system, setting up Emscripten correctly, and making Numba optional.</li>
+<li><strong>PyMC can technically be imported.</strong> Once PyTensor was installable, PyMC followed. You can define models, create random variables, and work with the API. The foundation is there.</li>
+<li><strong>Alternative samplers might still work.</strong> While NUTS is off the table, other samplers—like Metropolis-Hastings or Slice sampling—might be viable for small models. They're slower and less robust than NUTS, but they don't require JIT compilation. I didn't test, but I think this will hold true!</li>
+<li><strong>The roadmap is clearer.</strong> If someone wants to bring full PyMC to the browser, the path forward is documented. It requires either (a) building WASM support into JAX (a massive undertaking that's been an open request since 2019), (b) creating WASM builds for nutpie, or (c) building entirely new sampling backends designed for browser environments (also non-trivial, but potentially more feasible).</li>
+</ol>
+<h2 id="a-weekend-well-spent">A weekend well spent</h2><p>Did I achieve my original goal of running PyMC in the browser with NUTS sampling? No. The technical limitations of WASM environments made that impossible with the current architecture.</p>
+<p>But that's the nature of weekend experiments. You explore, you hit walls, you learn. I now understand PyTensor's dependency structure at a deeper level. I've learned how Pyodide builds work and the constraints they impose. I've identified the broader infrastructure gap (MCMC sampling backends lacking WASM support) that needs solving for true browser-based Bayesian inference.</p>
+<p>The dream of running PyMC entirely in the browser isn't dead—it's just waiting for the right infrastructure. Until JAX or nutpie (or something else) supports WASM, we'll keep pushing that car downhill.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-my-weekend-experiment-pymc-wasm</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{My weekend experiment making PyMC installable in a WASM environment}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{03}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{08}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/3/8/my-weekend-experiment-pymc-wasm}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>
