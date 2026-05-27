@@ -1,0 +1,727 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Headache-free, portable, and reproducible handling of data access and versioning">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/headache-free-portable-and-reproducible-handling-of-data-access-and-versioning' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Headache-free, portable, and reproducible handling of data access and versioning - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Headache-free, portable, and reproducible handling of data access and versioning</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-06-18</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/reproducibility/">
+        reproducibility
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/portability/">
+        portability
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/open source/">
+        open source
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data management/">
+        data management
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/software skills/">
+        software skills
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data access/">
+        data access
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/version control/">
+        version control
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data patterns/">
+        data patterns
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/technology guardrails/">
+        technology guardrails
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post,
+I explore the importance of reproducibility and portability in data science,
+focusing on data access patterns.
+I introduce <code>pins</code>,
+an open-source tool that enables data scientists to reference data
+from a central source of truth and manage data versions explicitly.
+By using <code>pins</code>, we can avoid common pitfalls like non-reproducible analyses
+and streamline the process of accessing and versioning data.
+This approach not only enhances productivity
+but also ensures that data is accessed in a consistent and error-free manner.
+Curious about how <code>pins</code> and analogous tools can robustify your data science workflow?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Recently, I discussed the following question with colleagues:
+"How do we ensure that data scientists work in a reproducible fashion?"
+It turns out that related to reproducibility is being able to work portably.
+Some tools provide what I call "technological guardrails"
+to ensure that one's work doesn't fall into bad patterns,
+but those can only go so far.
+Adopting and, more importantly, learning a certain way of working
+is the long-term sustainable way of ensuring that
+a data scientist's work is portable and reproducible.</p>
+<p>Software skills help,
+and I have written <a href="https://ericmjl.github.io/blog/2024/4/5/how-to-grow-software-development-skills-in-a-data-science-team/">multiple</a>
+<a href="https://ericmjl.github.io/blog/2022/3/31/everything-gets-a-package-yes-everything-gets-a-package/">blog</a>
+<a href="https://ericmjl.github.io/blog/2024/4/17/how-llms-can-accelerate-data-science/">posts</a>
+<a href="https://ericmjl.github.io/blog/2022/4/1/functional-over-object-oriented-style-for-pipeline-esque-code/">about</a>
+<a href="https://ericmjl.github.io/blog/2023/7/21/behind-the-scenes-developing-llamabot/">them</a>,
+but today, points about software skills are adjacent to my main point;
+this article is primarily about <em>data</em>.
+In the open source world, a tool from <a href="https://posit.co/">Posit PBC</a> called <a href="https://rstudio.github.io/pins-python/"><code>pins</code></a>
+provides tooling that supports a superbly ergonomic pattern of interacting with data,
+one that mirrors the way we do so at Moderna.
+I want to highlight these data access patterns through examples that use <code>pins</code>.</p>
+<p>Here are the key ideas that I'd like to highlight:</p>
+<ol>
+<li>Always reference data from a centrally accessible source of truth.</li>
+<li>Reference data versions explicitly rather than implicitly.</li>
+</ol>
+<p>Let's explore them in detail below.</p>
+<h2 id="idea-1-reference-data-from-an-accessible-source-of-truth">Idea 1: Reference data from an accessible source of truth</h2><p>Because of its convenience,
+it is tempting to reference files on one's local filesystem.
+Example code that one ends up writing might look like this:</p>
+<div class="hll"><pre><span></span><span class="c1"># within notebooks/your_name/analysis.ipynb</span>
+<span class="n">data_path</span> <span class="o">=</span> <span class="s2">&quot;../../data/finances.csv&quot;</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+<p>This is a guaranteed recipe for non-reproducibile disaster.
+If your colleague clones the repository after you've pushed up your changes,
+chances are they won't have access to <code>finances.csv</code>,
+allowing them to re-run your notebook to reproduce your data.
+They will need to ask you for your copy of the data,
+which comes with its own boatload of problems that I discuss later.</p>
+<p>A better solution would be to use <code>pins</code>,
+which lets one reference data from an authenticated source of truth,
+such as Google Cloud Storage, AWS S3, or Dropbox.
+With <code>pins</code>, what one would do is the following:</p>
+<div class="hll"><pre><span></span><span class="c1"># within notebooks/your_name/analysis.ipynb</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pins</span>
+
+<span class="c1"># assumes that AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_REGION environment variables are set</span>
+<span class="n">board</span> <span class="o">=</span> <span class="n">pins</span><span class="o">.</span><span class="n">board_s3</span><span class="p">(</span><span class="s2">&quot;bucket_name/optional/subdirectory&quot;</span><span class="p">)</span>
+
+<span class="c1"># read dataframe directly</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">board</span><span class="o">.</span><span class="n">pin_read</span><span class="p">(</span><span class="s2">&quot;em.finances&quot;</span><span class="p">)</span>
+</pre></div>
+<p>(If you need a refresher on environment variables,
+<a href="https://ericmjl.github.io/essays-on-data-science/software-skills/environment-variables/">this article</a> may help.)</p>
+<p>Alternatively, if one wants to work with file paths (my preferred way, <a href="https://peps.python.org/pep-0020/">more explicit</a>)
+rather than objects in memory with magical read/write methods (less preferred, less explicit),
+one can use the <code>pin_upload/download</code> API:</p>
+<div class="hll"><pre><span></span><span class="c1"># one-time:</span>
+<span class="n">board</span><span class="o">.</span><span class="n">pin_upload</span><span class="p">(</span><span class="n">paths</span><span class="o">=</span><span class="s2">&quot;finances.csv&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;em.finances&quot;</span><span class="p">)</span>
+
+<span class="c1"># then in your code:</span>
+<span class="n">fpath</span> <span class="o">=</span> <span class="n">board</span><span class="o">.</span><span class="n">pin_download</span><span class="p">(</span><span class="s2">&quot;em.finances&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
+</pre></div>
+<p>Using file paths is more flexible.
+It allows us to pull in any data to and from the pin board
+before deciding how to load it into memory.</p>
+<p><code>pins</code> is not the only tool available for defined access to data;
+<a href="https://intake.readthedocs.io/en/latest/quickstart.html">Intake</a> by Anaconda
+is another framework that can accomplish similar goals.</p>
+<h2 id="idea-2-reference-data-versions-explicitly">Idea 2: Reference data versions explicitly</h2><p>In an ideal world, data would never be committed to source code version control systems.
+Instead, they would be treated as separate entities and version-controlled separately.
+Doing so allows us to cleanly separate the major entities comprising a project:
+code and data.</p>
+<p>If we treat data as immutable and versioned in the same way as code within a <code>git</code> repository,
+we can reference data by explicit version numbers.
+<code>pins</code> provides such a facility;
+specific versions of a file can be pulled in and referenced by a particular version hash:</p>
+<div class="hll"><pre><span></span><span class="n">fpath</span> <span class="o">=</span> <span class="n">board</span><span class="o">.</span><span class="n">pin_download</span><span class="p">(</span><span class="s2">&quot;em.finances&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;20240618T161609Z-7f10d&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
+</pre></div>
+<p>Using this pattern, we can avoid the pathologies of "versioning by filename",
+such as that illustrated by
+<a href="https://isabelizimm.me/talks/pydataglobal2022/">slide 14 of Isabel Zimmerman's PyData Global 2022 talk</a>,
+copied and modified shamelessly below:</p>
+<div class="hll"><pre><span></span>finances.csv
+finances_final.csv
+finances_final_final.csv
+finances_final_final_actually.csv
+finances_final_final_actually (1).csv
+</pre></div>
+<h2 id="benefits">Benefits</h2><p>What are the benefits of thinking about and accessing data in this fashion?
+What's wrong with <code>../../data/em/finances.csv</code>?
+The biggest problem is the <em>ease of portability</em>.
+In the absence of data versions accessed by code,
+for the next person to access data, they need to
+(a) manually request a teammate to provide them with the data file and
+(b) ensure that the data file is placed in the same directory
+as specified by the relevant relative path.</p>
+<p>Point (a) means additional viscosity in requesting access:
+imagine pinging a teammate for data only to find out she is busy in back-to-back meetings
+and hasn't responded all morning.
+Regardless, you've just lost an entire morning of potential productivity.
+Additionally, point (a) means that you have <em>absolutely zero guarantees</em>
+that the file your colleague sends to you
+will be the exact file that has been distributed to everyone else.
+Any changes in the input data can introduce insidious bugs in the downstream analysis code.</p>
+<p>Point (b) introduces further viscosity in the form of <em>confusion</em>
+when running code that depends on data.
+What if another colleague, operating in a separate notebook,
+placed the same data file in a different directory (<code>../../data/finances.csv</code>)
+and referenced it there?
+Now, you have two code files referencing
+what <em>should</em> be the same data source but with different file paths.</p>
+<p>By referencing data from an immutable source of truth and pulling it in via code, we get around the aforementioned problems:</p>
+<ul>
+<li>we no longer need to ask someone else for a file,</li>
+<li>we can guarantee that we will access the exact that is intended, and</li>
+<li>we will never encounter the issue of the same file being referenced in two different paths.</li>
+</ul>
+<p>The only major obstacle left is data access permissions, which is easily solvable:
+Data access permissions can be automated during colleagues' onboarding,
+especially if one's entire stack is in the cloud.</p>
+<h2 id="summary">Summary</h2><p>While I've highlighted one tool (<code>pins</code>)
+for accessing data headache-free, portably, and reproducibly,
+it isn't the only feasible tool.
+More important than the tool is the data access pattern for data scientists.
+As I see it, because of a mixture of business necessity, economics, and ego,
+almost every company will build custom data infrastructure
+through a mix of commercial (vendor) products and in-house efforts.
+The data science team lead, if not the whole team, is guaranteed to be involved.
+What I hope to accomplish with this blog post
+is to provide a sense of "good taste" to you, the reader,
+so that you can bring the ideas back to your organization's data engineering teams.
+Happy building and happy coding!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-headache-free-portable-and-reproducible-handling-of-data-access-and-versioning</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Headache-free, portable, and reproducible handling of data access and versioning}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{06}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{18}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/6/18/headache-free-portable-and-reproducible-handling-of-data-access-and-versioning}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

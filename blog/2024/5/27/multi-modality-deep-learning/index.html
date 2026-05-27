@@ -1,0 +1,667 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Multi-modality Deep Learning">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/multi-modality-deep-learning' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Multi-modality Deep Learning - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Multi-modality Deep Learning</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-05-27</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/deep learning/">
+        deep learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/multi-modal learning/">
+        multi-modal learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data fusion/">
+        data fusion
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/protein sequences/">
+        protein sequences
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/biomedical texts/">
+        biomedical texts
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/gradient descent/">
+        gradient descent
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/semantic alignment/">
+        semantic alignment
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/masked language modelling/">
+        masked language modelling
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/model architecture/">
+        model architecture
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/embedding conversion/">
+        embedding conversion
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I explore multi-modality deep learning based on two papers from the biomedical world, in which we explore the definition of data modalities, what fusion is and how it takes place within a model, and possible training objectives. In this post, I also considers how to utilize these models with only one input modality available, highlighting the potential for protein function prediction and sequence generation. How can multi-modal deep learning transform our approach to complex data analysis?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>What is multi-modal deep learning? It is perhaps better named "multi-modality" deep learning to help distinguish it from probability distributions with multiple modes. <em>(This is both the statistician and deep learning personalities in me speaking simultaneously.)</em> Modality refers to data modalities like text, video, and audio. However, if we go into the subfields of application, multi-modality can refer to granular data types. For example, within biology, we may call an ATAC-Seq dataset to be one data modality, functional assay data from a high throughput screen another, and multiple sequence alignments yet another, even though they strictly speaking are tabular, tabular, and string data.</p>
+<p>To understand what multi-modality deep learning is, I am going to review and summarize content from two papers:</p>
+<ul>
+<li><a href="https://www.nature.com/articles/s41746-020-00341-z">Fusion of medical imaging and electronic health records using deep learning: a systematic review and implementation guidelines</a> by Huang et al., 2020</li>
+<li><a href="https://arxiv.org/abs/2301.12040">ProtST: Multi-Modality Learning of Protein Sequences and Biomedical Texts</a> by Xu et al., 2023</li>
+</ul>
+<h2 id="fusion-the-key-to-multi-modality-models-is-how-data-comes-together">Fusion: the key to multi-modality models is how data comes together</h2><p>When training a multi-modality deep learning model, a critical point is how to <em>fuse</em> the various modalities. Here, there are multiple ways of doing so, with the best review coming from Huang et al. (2020):</p>
+<p><img src="huang-et-al-fusion-ontology.webp" alt=""></p>
+<p>We see the major fusion types:</p>
+<ol>
+<li>Early fusion</li>
+<li>Joint fusion</li>
+<li>Late fusion</li>
+</ol>
+<p>Early fusion is when data modalities are fused early on. Type I early fusion is where we directly fuse (concatenate, add, multiply, or whatever operation is chosen) modalities together before being input into the model. Type II early fusion instead takes extracted features for one or more data modalities as the input to the neural network model. A distinction can be made between <em>extracted features</em> and <em>calculated features</em>. For example, with two distinct imaging modalities, one may calculate a Fourier transform (calculated feature) of the first imaging modality and flatten it into a vector while passing the second image through the CLIP model to obtain an extracted feature instead. Both become vectors that can be concatenated and fed into a downstream model. As another example, one can pre-train encoder-only models for protein sequences and biomedical texts through masked language modelling and then use extracted features from those pre-trained encoder-only models as embeddings for downstream usage.</p>
+<p>Joint fusion is when two or more data modalities are fused at the level of extracted features. Here, a distinction is made between early fusion and joint fusion. In early fusion, the output is compared to ground truth and a loss score is calculated, from which we tweak the model's (say, a neural network) parameters to minimize the loss. The loss does not affect how the calculated or extracted features are generated. With joint fusion, the loss function affects how the feature extractor performs by back-propagating the gradient of the loss function w.r.t. the neural network's parameters.</p>
+<p>Late fusion, however, is distinguished by having individual models perform a prediction, on which an aggregation model then combines them. This can be compared to model stacking in Kaggle competitions, where one trains a Random Forest, a Logistic Regression, an XGBoost, and an SVM model to produce a prediction. Then, a final model is trained on top of the individual model's predictions to produce a final model prediction.</p>
+<h2 id="training-objectives">Training Objectives</h2><p>How do we train a multimodality model? The most obvious answer is "gradient descent!" But that would be facetious. Instead, we must ask, "What are you trying to make the model do?" To answer that question, we must first understand the model's training objectives. I will focus on how Xu et al. did so in the ProST paper.</p>
+<h3 id="objective-1-unimodal-mask-prediction">Objective 1: Unimodal Mask Prediction</h3><p>The ProST paper's first objective is masked language modelling on a single data modality. Specifically, the authors randomly mask 15% of residues and predict each masked token, using cross-entropy as the loss function. The loss function at the end compares the masked positions' probabilities against the ground truth (which might be one-hot encoded). In code, it'd probably look like this:</p>
+<div class="hll"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">binary_cross_entropy</span><span class="p">(</span><span class="n">predicted</span><span class="p">,</span> <span class="n">actual</span><span class="p">):</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="mf">1e-7</span>
+    <span class="n">predicted</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">predicted</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">epsilon</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">actual</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">predicted</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">actual</span><span class="p">)</span> <span class="o">*</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">predicted</span><span class="p">))</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">unimodal_mask_loss</span><span class="p">(</span><span class="n">predicted</span><span class="p">,</span> <span class="n">actual</span><span class="p">,</span> <span class="n">masked_positions</span><span class="p">):</span>
+    <span class="c1"># predicted is of the shape (protein_length, alphabet_size)</span>
+    <span class="c1"># actual is of the same shape</span>
+    <span class="c1"># masked positions is an indicator tensor of shape (protein_length), used to ensure that only masked positions are what loss is calculated on</span>
+
+    <span class="c1"># Mask the predictions and actuals</span>
+    <span class="n">predicted_masked</span> <span class="o">=</span> <span class="n">predicted</span> <span class="o">*</span> <span class="n">masked_positions</span>
+    <span class="n">actual_masked</span> <span class="o">=</span> <span class="n">actual</span> <span class="o">*</span> <span class="n">masked_positions</span>
+
+    <span class="c1"># Compute the binary cross-entropy loss on the masked positions</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">binary_cross_entropy</span><span class="p">(</span><span class="n">predicted_masked</span><span class="p">,</span> <span class="n">actual_masked</span><span class="p">)</span>
+
+    <span class="c1"># Normalize the loss by the number of masked positions</span>
+    <span class="n">num_masked_positions</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">masked_positions</span><span class="p">)</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span> <span class="o">/</span> <span class="n">num_masked_positions</span>
+
+    <span class="k">return</span> <span class="n">loss</span>
+</pre></div>
+<p>This standard learning objective ensures that the protein language model "learns" the presumed complex grammar associated with evolutionarily generated sequences.</p>
+<h3 id="objective-2-semantic-alignment-of-embeddings">Objective 2: Semantic Alignment of Embeddings</h3><p>At the same time, to ensure that embeddings between pairs were semantically aligned, the authors of the ProST paper use a contrastive loss as well. Focusing on the specific loss function that the authors use - the InfoNCE (Info Noise Contrastive Estimation) loss - which has several key features:</p>
+<ul>
+<li>It requires the use of a similarity function, <code>sim(modality1_embedding, modality2_embedding)</code>, that calculates the similarity between the embeddings of pairs of samples (whether it is a "positive" (paired) or "negative" (non-paired) set). This is a generic function that requires that the two embeddings be of the same size.</li>
+<li>It has a <code>temperature</code> parameter which controls the sharpness of the similarity scores. The higher the temperature, the less sharp the score will be, meaning that the difference between positive and negative pairs will be less pronounced, so there'll be less <em>contrast</em>.</li>
+</ul>
+<p>In JAX code, here's an example of what InfoNCE might look like:</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">info_nce_loss</span><span class="p">(</span><span class="n">image_embeddings</span><span class="p">,</span> <span class="n">text_embeddings</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">0.07</span><span class="p">):</span>
+    <span class="c1"># Compute similarity matrix</span>
+    <span class="c1"># This should be a square matrix of shape (batch, batch)</span>
+    <span class="n">sim_matrix</span> <span class="o">=</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">image_embeddings</span><span class="p">,</span> <span class="n">text_embeddings</span><span class="p">)</span> <span class="o">/</span> <span class="n">temperature</span>
+
+    <span class="c1"># Positive samples are on the diagonal of the similarity matrix</span>
+    <span class="n">positive_samples</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">sim_matrix</span><span class="p">))</span>
+
+    <span class="c1"># Calculate the denominator of the InfoNCE loss</span>
+    <span class="n">sim_matrix_exp</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">sim_matrix</span><span class="p">)</span>
+    <span class="n">denominators</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sim_matrix_exp</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Calculate the InfoNCE loss</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">positive_samples</span> <span class="o">/</span> <span class="n">denominators</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">loss</span>
+</pre></div>
+<p>And in pictorial form, using a batch size of 3 for illustration purposes:</p>
+<iframe src="https://link.excalidraw.com/readonly/Ts99jTtb4S4rcCu3huv7" width="100%" height="400px" style="border: none;"></iframe><p>This objective is presumably important because aligning embeddings ensures semantic similarity in embedding space for pairs of input data.</p>
+<h3 id="objective-3-cross-modality-masked-modeling">Objective 3: Cross-Modality Masked Modeling</h3><p>The third loss function that the ProST authors use is a cross-modality masked modelling loss function. This one is similar to the single-modality masked modelling task, except that now, this involves two sub-models: a protein language model for extracting protein sequence representations and a natural language model for extracting representations of textual descriptions of a protein. These two are then fused through a self-attention module followed by a cross-attention module, which then updates the protein and textual representations. Through checking Appendix A, we can see that the author's definition of self-attention and cross-attention refer to how the input representations are used:</p>
+<p><img src="xu-et-al-fusion-module.webp" alt=""></p>
+<p>As seen in the figure, within self-attention, the individual representations are used as the query vector for their respective multi-headed attention module, while in cross-attention, the text representation is used as the query for the protein sequence multi-headed attention module and vice versa. Each attention module's output is then combined (through addition at an equal weight of 0.5 each) to produce an updated representation vector for each modality.</p>
+<p>This objective is important because it produces embeddings of the protein sequence and text embeddings that are cross-modality aware.</p>
+<h2 id="model-architecture">Model Architecture</h2><p>Having studied the learning objectives in detail, the final ingredient that interests me is the actual model architecture. Unfortunately, no figure is provided here, so I had to dig through the Appendix to figure it out. Based on the textual description in Appendix A of the paper, here is my best guess representation of what the model looks like.</p>
+<iframe src="https://link.excalidraw.com/readonly/hQVib4XpGpAO1TLwag48" width="100%" height="400px" style="border: none;"></iframe><p>In the diagram, arrays have no box around them, models have a blue box around them, and loss functions have a red box around them. For the arrays, I have annotated in small text what is the array shape. For the models, small text annotations outline the essential architectural gist of the model. Small text annotations name the specific loss function used for the loss functions.</p>
+<p>If this model architecture accurately represents the ProST model, it is a Joint Fusion (Type I) model based on the Huang et al. ontology of models. That said, its model architecture does break the Type I classification ontology as the fusion of embeddings does not happen explicitly; instead, it is implicit in the fusion module through cross-attention, producing two separate embeddings rather than a joint (concatenated, summed, or multiplied) embedding.</p>
+<p><img src="huang-et-al-fusion-ontology.webp" alt=""></p>
+<h2 id="further-thoughts">Further thoughts</h2><h3 id="how-do-we-use-the-model-when-we-only-have-one-input-modality">How do we use the model when we only have one input modality?</h3><p>First, we must identify what we mean by "use the model." Let's consider a few use cases.</p>
+<h4 id="use-case-1-protein-function-prediction">Use case 1: protein function prediction</h4><p>In this use case, the available modality is the protein sequence, and the absent modality is the textual description. One could add to the model a training objective that reconstructs a protein's natural language description of function from the protein sequence, in which the PLM embedding is used to decode the natural language description autoregressively. This is the Function Prediction arm of the model outlined in the image below.</p>
+<iframe src="https://link.excalidraw.com/readonly/FIKiAzcxX7vflJi6fU4i" width="100%" height="600px" style="border: none;"></iframe><h4 id="use-case-2-protein-sequence-generation-from-functional-description">Use case 2: protein sequence generation from functional description</h4><p>In this use case, the available modality is the textual description, and the absent modality is the protein sequence. To satisfy this use case, just like the previous one, one could add a training objective that mirrors the previous one: reconstructing a protein's sequence from the natural language description of the function. Here, we may auto-regressively decode a protein sequence or use encoder-only architectures to produce a positional sequence weight matrix from which we sample protein sequences. This is the Protein Design arm of the model outlined in orange in the image above.</p>
+<h4 id="a-simpler-alternative-convert-between-embeddings">A simpler alternative: convert between embeddings</h4><p>There may be another way out of the fundamental problem we're encountering. The main problem is that submodules of our models fundamentally <em>require</em> two inputs, given the way they are trained. With the two proposed training objectives above, we are skirting around the problem by adding more complexity in the form of new neural networks that interconvert between the two. Moreover, we already have the respective modules available in the original model!</p>
+<p>What if we added only one objective: a neural network that converts between the embeddings, using mean squared error as the loss function? Then, if we had a single data modality as input, we could convert between the two embeddings, effectively giving us a way to construct the input to, say, the fusion module for decoding a protein sequence. In this way, we get around the missing data problem by effectively imputing the embedding, even if we don't know how to impute the original data. This is the Embedding Conversion Module outlined in green in the image above. I am unsure whether it would be better to co-train the module with other objectives or do it after pre-training, though I would lean towards the latter for simplicity in training dynamics.</p>
+<h3 id="masked-infilling-v-s-auto-regressive-decoding">Masked infilling v.s. auto-regressive decoding</h3><p>When thinking about the ProST model and how to modify it, I also had a chance to think more critically about the difference between masked language modelling and auto-regressive text generation. Thanks to my teammates at Moderna, I’ve realized that masked language modelling is a more natural fit for small-scale edits (in-filling) conditioned on the rest of the sequence context. At the same time, auto-regressive text generation is a more natural fit for de novo generation.</p>
+<iframe src="https://link.excalidraw.com/readonly/R2m0k7rF5LjtWjJqqoOX" width="100%" height="200px" style="border: none;"></iframe><p>Nonetheless, it should be clear that both model classes are usable for both applications; it’s just that they have more naturally fitting applications, respectively.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-multi-modality-deep-learning</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Multi-modality Deep Learning}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{05}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{27}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/5/27/multi-modality-deep-learning}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

@@ -1,0 +1,827 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="What makes an agent?">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/what-makes-an-agent' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>What makes an agent? - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">What makes an agent?</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-01-04</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llms/">
+        llms
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/automation/">
+        automation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workflows/">
+        workflows
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/tools/">
+        tools
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/agents/">
+        agents
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I explore what defines an LLM agent, highlighting its goal-oriented non-determinism, decision-making flow control, and natural language interfaces. I also discuss when to use agents, emphasizing the importance of variable scope inputs and constrained actions. By examining industry perspectives from Anthropic and Google, I also explore how agents can effectively handle diverse inputs while maintaining defined action boundaries. Real-world examples, like a bill calculation bot and a literature research assistant, illustrate these principles. How can these insights transform your approach to designing agent applications?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>In <a href="https://ericmjl.github.io/blog/2024/12/15/how-llamabots-new-agent-features-simplify-complex-task-automation/">a previous blog post</a>,
+I explored how LlamaBot's agent features can simplify complex task automation.
+Here, I'd like to explore what exactly makes an agent.</p>
+<h2 id="my-working-definition">My working definition</h2><p>In my view, an LLM agent is a system that demonstrates
+the appearance of making goal-directed decisions autonomously.
+It operates within a scoped set of tasks it can perform,
+without requiring pre-specification of the order in which these tasks are executed.
+Three key attributes set it apart:</p>
+<ol>
+<li><strong>Goal-oriented non-determinism</strong>: The agent makes decisions dynamically rather than following a pre-defined sequence of actions.</li>
+<li><strong>Decision-making flow control</strong>: Decisions adapt based on context, resembling a "thinking" process.</li>
+<li><strong>Natural language interfaces</strong>: Inputs and outputs are in plain language, making interactions feel intuitive.</li>
+</ol>
+<p>A familiar way to understand these attributes
+is to think about a flight booking agent you might call on the phone.
+They handle diverse requests
+("I want to fly to Tokyo next month" or
+"I need the cheapest flight to London this weekend"),
+make decisions based on context
+(checking different airlines, considering your preferences),
+and communicate naturally.
+The parallel helps clarify what we mean by agent-like behavior -
+though with one key distinction.
+While a human agent exercises genuine autonomy in their decision-making,
+our LLM agents create the <em>appearance</em> of autonomy and flexibility
+through careful engineering of their design and tools.</p>
+<p>These attributes combine to give agents their apparent autonomy
+and their flexibility in handling diverse inputs.
+With these principles in mind,
+I designed <a href="https://ericmjl.github.io/llamabot/tutorials/agentbot/">LlamaBot's AgentBot</a>
+to make creating and deploying agents simple, flexible, and powerful.</p>
+<h2 id="a-key-insight-the-guiding-principle">A key insight: The guiding principle</h2><p>Through my experience with website scraping and other projects,
+I've developed what I believe is a crucial principle for when to use agents:
+You really don't want to use agents
+until you have <em>variable scope input</em>
+paired with a <em>constrained scope of actions</em> that could be taken.</p>
+<p>This principle really emerged from my observations
+of what makes for successful applications of agents.
+In fact, I've noticed that an agent's effectiveness -
+that is, the probability it chooses the correct action -
+appears to be highly dependent on two key factors:</p>
+<ol>
+<li>The number of options available to it (the more constrained, the better)</li>
+<li>The vagueness of the incoming instructions (the clearer, the better)</li>
+</ol>
+<p>This relationship between input clarity and action constraints isn't just theoretical.
+I've also observed that an agent's ability to clarify these actions when needed
+plays a significant role in its success.
+When an agent can effectively navigate between understanding variable inputs
+and selecting from constrained actions,
+it performs at its best.</p>
+<h2 id="industry-perspectives-on-agents">Industry perspectives on agents</h2><p>While my observations come from hands-on experience
+building and deploying agents,
+it's worth examining how others in the field think about agents.
+These diverse perspectives
+help contextualize the practical principles I've discovered
+and offer additional frameworks for thinking about agent design.</p>
+<h3 id="anthropic-s-architectural-distinction">Anthropic's architectural distinction</h3><p><a href="https://www.anthropic.com/research/building-effective-agents">Anthropic's perspective on agents</a>
+particularly resonates with my thinking
+about variable scope inputs and constrained actions.</p>
+<p>They make an important architectural distinction
+in how they categorize agent systems:</p>
+<ol>
+<li><strong>Workflows</strong>: Systems where LLMs and tools are orchestrated through predefined code paths</li>
+<li><strong>Agents</strong>: Systems where LLMs dynamically direct their own processes and tool usage, maintaining control over how they accomplish tasks</li>
+</ol>
+<p>What's particularly compelling about their approach
+is how they emphasize finding the simplest solution possible.
+They explicitly note that agent systems often trade latency and cost
+for better task performance -
+a tradeoff that needs careful consideration.
+This aligns perfectly with my observations:
+simple scales, while complexity doesn't.
+Building a Rube Goldberg machine
+is a recipe for long-term disaster.</p>
+<p>Their framework suggests using workflows
+for predictability and consistency in well-defined tasks,
+while reserving agents for situations
+where flexibility and model-driven decision-making are needed at scale.
+This maps well to my principle about variable scope inputs -
+workflows for fixed patterns,
+agents for variable ones.</p>
+<h3 id="google-s-comprehensive-framework">Google's comprehensive framework</h3><p>Google's definition,
+outlined in their <a href="https://drive.google.com/file/d/1oEjiRCTbd54aSdB_eEe3UShxLBWK9xkt/view?usp=sharing">whitepaper</a>,
+takes a more expansive view
+while still complementing these ideas.
+They define a generative AI agent
+as an application that attempts to achieve goals
+by observing and acting upon the world
+using available tools.
+Their framework emphasizes several key characteristics
+that help clarify when to use agents:</p>
+<ul>
+<li><strong>Autonomy</strong>: Agents can act independently of human intervention when provided with proper goals or objectives</li>
+<li><strong>Proactive Planning</strong>: They can reason about next steps even without explicit instruction sets</li>
+<li><strong>Tool Integration</strong>: They emphasize how agents extend beyond standalone models by interfacing with external tools and systems</li>
+<li><strong>Observation and Action</strong>: Agents operate in a cycle of observing their environment, making decisions, and taking actions</li>
+</ul>
+<p>This aligns with my observations about constrained action spaces -
+Google's framework suggests that
+while agents should be autonomous in their decision-making,
+they still operate within a defined set of tools and capabilities.
+Their emphasis on the observation-action cycle
+particularly resonates with how I've seen agents succeed in practice:
+they need clear feedback loops
+between their actions and their environment
+to make effective decisions.</p>
+<h3 id="huggingface-s-paradigm">HuggingFace's paradigm</h3><p>An intriguing new perspective in the field,
+<a href="https://x.com/AymericRoucher/status/1874116324898598934">announced by Aymeric Roucher</a> from HuggingFace,
+proposes having the agent write the code it needs to execute
+before actually executing it.
+This approach introduces flexibility to the agent compared to my own definition,
+and should theoretically be much more powerful.
+As with anything that executes code,
+it also requires careful consideration of security implications.
+If an agent can write and execute its own code,
+it becomes vulnerable to prompt injection attacks
+that could lead to malicious code written
+that gets executed with potentially disastrous consequences.
+The ideal implementation would run such code in isolated environments
+that can't affect the host system -
+similar to how we use containers and sandboxes in other contexts.</p>
+<p>It's important to distinguish this paradigm
+from agents that help us write prototype applications or production code.
+Here, we're talking about agents writing throwaway code -
+small, single-use scripts that the agent uses to process data or perform calculations,
+get the output, and then decide on its next action.
+This is fundamentally different from code generation for applications;
+it's about giving agents the ability
+to dynamically create and execute computational tools
+as part of their reasoning process.</p>
+<h2 id="real-world-applications">Real-world applications</h2><p>Let's look at some examples
+of how agents might work.
+Being someone from the life sciences,
+I have a little bit of a bias,
+so that's where my line of thinking is.
+Before we go to the vaccines examples,
+I think it's important
+to think about what a minimally complex example
+might look like.</p>
+<h3 id="a-minimal-example-bill-calculation-bot">A minimal example: Bill calculation bot</h3><p>Let's look at a concrete example:
+a bill calculation bot.
+This is a minimally complex,
+easily understandable example of variable scope input with constrained actions.
+The bot might:</p>
+<ul>
+<li>Calculate tips</li>
+<li>Split bills among people</li>
+<li>Provide itemized breakdowns in table format
+What makes this a good use case for agents
+is that we're not limiting ourselves
+to a single input (total amount)
+and single output (split amount per person).
+Instead,
+users might want different combinations of actions.
+Some might want to calculate the total and split it,
+others might want to add a tip first, then split,
+and some might just want the total.</li>
+</ul>
+<h3 id="life-sciences-example-literature-research-assistant">Life sciences example: Literature research assistant</h3><p>For a more sophisticated real-world example,
+consider a literature research assistant agent
+in the life sciences.
+This kind of agent perfectly embodies the principle
+of variable scope input
+with constrained actions:</p>
+<p>The agent might handle research queries like:</p>
+<ul>
+<li>"Find recent papers about CRISPR in cancer therapy"</li>
+<li>"What's the latest on protein folding algorithms?"</li>
+<li>"Who else is citing this methodology paper?"</li>
+</ul>
+<p>Each query could trigger different combinations of constrained actions:</p>
+<ul>
+<li>Searching multiple databases (PubMed, bioRxiv, etc.)</li>
+<li>Filtering by publication date, citation count, or journal impact factor</li>
+<li>Cross-referencing author networks</li>
+<li>Extracting methodology sections</li>
+<li>Generating citation summaries</li>
+<li>Identifying key figures</li>
+</ul>
+<p>What makes this a compelling use case for agents
+is how the inputs can vary wildly
+(from broad research questions to specific citation queries)
+while the actions remain constrained
+to a well-defined set of database operations and text analysis tools.
+The agent needs to dynamically choose
+which combination of these actions
+will best serve the researcher's intent.</p>
+<h3 id="life-sciences-example-protocol-optimization-assistant">Life sciences example: Protocol optimization assistant</h3><p>Another life sciences example
+would be a protocol optimization agent
+that assists with experimental design.
+Researchers might input anything
+from "How should I modify this Western blot protocol
+for a very low-abundance protein?"
+to "What's the best transfection method
+for these primary neurons?"
+The agent would work with a constrained set of actions like:</p>
+<ul>
+<li>Searching and comparing protocols from methods sections in published papers</li>
+<li>Identifying key differences between similar protocols across labs</li>
+<li>Extracting specific modifications for edge cases (e.g., low abundance proteins, difficult-to-transfect cells)</li>
+<li>Compiling troubleshooting notes from supplementary materials</li>
+<li>Cross-referencing protocol modifications with success rates reported in papers</li>
+<li>Aggregating user experiences from protocol repositories like protocols.io</li>
+</ul>
+<p>What makes this realistic
+is that it mirrors what scientists actually do -
+we spend hours scouring papers and supplements,
+comparing different labs' approaches,
+and piecing together what modifications
+might work for our specific case.
+The agent operates within the constrained action space
+of literature analysis and comparison,
+but can handle the variable scope of input questions
+that arise during protocol optimization.</p>
+<p>These examples from life sciences highlight
+how agents can handle complex, variable inputs
+while working within carefully defined action constraints.</p>
+<h3 id="a-roadmap-for-designing-agent-applications">A roadmap for designing agent applications</h3><p>I've found that the most effective way
+to design agent applications
+is to progressively relax constraints
+on inputs and execution order.</p>
+<p><strong>Start with a deterministic program</strong></p>
+<ol>
+<li>Design your application as you would with regular API calls</li>
+<li>Define clear input/output specifications</li>
+<li>Implement core functionality with standard programming patterns</li>
+</ol>
+<p><strong>Relax input constraints</strong></p>
+<ol>
+<li>Accept natural language input and convert it to structured parameters for function calls</li>
+<li>Enable autonomous function calling based on natural language understanding</li>
+</ol>
+<p><strong>Relax execution order constraints</strong></p>
+<ol>
+<li>Only necessary when natural language inputs are varied enough to require different execution paths</li>
+<li>Allow flexible ordering of operations when needed</li>
+<li>Enable dynamic selection of which functions to call</li>
+<li>Maintain boundaries around available actions while allowing flexibility in their use</li>
+</ol>
+<p>This progressive relaxation approach
+helps us transition
+from traditional deterministic programming
+to an agent-driven paradigm
+where execution order is non-deterministic
+and inputs are natural language.</p>
+<h2 id="looking-forward">Looking forward</h2><p>After diving into all these different perspectives on agents,
+I keep coming back to a key insight:
+the real power of agents
+isn't about making them completely autonomous.
+It's about finding that sweet spot
+where they can handle all sorts of different inputs
+while working with a well-defined set of actions.</p>
+<p>Think about the examples we've looked at -
+from simple bill-splitting
+to complex protocol optimization.
+In each case,
+the agent's effectiveness comes
+from having clear boundaries around what it can do,
+paired with the flexibility to handle a limited scope of questions or requests.
+This is what makes agents genuinely useful
+in real-world contexts.</p>
+<p>I believe this is the direction
+we should be pushing in:
+not trying to make agents do everything,
+but rather getting really good
+at defining the right scope and tools
+for specific use cases.
+After all, the most successful applications of agents
+will be the ones
+that solve real problems really well.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-what-makes-an-agent</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{What makes an agent?}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{01}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{04}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/1/4/what-makes-an-agent}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

@@ -1,0 +1,631 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Practical tips for staying focused at work as a data scientist">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/practical-tips-for-staying-focused-at-work-as-a-data-scientist' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Practical tips for staying focused at work as a data scientist - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Practical tips for staying focused at work as a data scientist</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2022-08-06</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/productivity/">
+        productivity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/tips/">
+        tips
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/work/">
+        work
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/focus/">
+        focus
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/focus time/">
+        focus time
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>For us data scientists, whose work is what Cal Newport calls "deep work",
+staying focused amongst a barrage of distractions is a challenge.
+In this post,
+I outline several tips that data scientists can use to stay focused at work.</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>One of my new PyData friends whom I met at PyCon, Sophia Yang,
+asked this question on Twitter:</p>
+<p><blockquote class="twitter-tweet"><p lang="en" dir="ltr">How do people deal with meetings and slack messages interrupting work? I mean they are part of the work, but so very much distracting. Sometimes I just want to log off and work... Anyone has good recommendations?</p>&mdash; Sophia Yang (@sophiamyang) <a href="https://twitter.com/sophiamyang/status/1555300297249067008?ref_src=twsrc%5Etfw">August 4, 2022</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+<p>Her predicament is one I share;
+it's a classic one plaguing every modern knowledge worker.
+I would like to share some of the ways I've been able
+to help myself and my teammates stay calm.</p>
+<h2 id="calendaring-tips">Calendaring Tips</h2><h3 id="time-blocking-for-focus-time">Time Blocking for Focus Time</h3><p>The first tip I have is to do Time Blocking on my calendar.
+Microsoft has an excellent " My Analytics " feature,
+which lets me set "Focus Time" blocks on my work calendar.
+Focus Time will automagically attempt to block off 2 hr chunks of time on my calendar
+on Tuesdays to Fridays (the exact days of the week are configurable).
+During those times, I will appear "Busy" to colleagues;
+rarely will I get scheduled meetings.</p>
+<p>Another benefit of Focus Time is that
+all Microsoft Teams and Outlook notifications will be silenced!
+This is undoubtedly the killer feature of Focus Time.
+For example, suppose I get distracted by messages during Focus Time.
+In that case, it'd be because I checked Outlook and Teams,
+not because Outlook and Teams sent me a notification.
+This notification silencing feature makes it much easier for me
+to accomplish work during my Focus Time sessions.</p>
+<p>If this feature extended deep into macOS,
+such that all notifications on macOS could be disabled during Focus Time,
+that would be amazeballer!</p>
+<h3 id="office-hours">Office Hours</h3><p>Our work is never done in isolation;
+there will always be some degree of coordination needed with colleagues.
+For these, I open up Office Hours for my colleagues.
+To remind myself of them,
+I have a "Free" block on my calendar explicitly labelled Office Hours,
+and I avoid scheduling anything recurring in those slots.</p>
+<h3 id="regular-meetings-on-mondays">Regular meetings on Mondays</h3><p>I have six teammates with whom I have regular 1:1 meetings,
+five in the Research team and my manager Andrew Giessel.
+I try to schedule my weekly check-in sessions with them on Mondays
+(with only one exception due to historical reasons)
+so that we kick off the week with direction and focus.
+This usually means I have six hours of meetings on Mondays,
+but that is a tradeoff I am willing to make
+to have uninterrupted time throughout the week.</p>
+<h3 id="schedule-catch-ups">Schedule catch-ups</h3><p>To prioritize Focus Time,
+that <em>sometimes</em> necessarily means de-prioritizing spontaneous catch-up time.
+To get around this,
+schedule time to catch up with colleagues with whom you don't have regular 1:1 meetings.
+For this introvert,
+meetings scheduled this way are particularly rejuvenating.
+They are intentional,
+have a purpose,
+and aren't just about having people get together to chit-chat.</p>
+<h2 id="software-tips">Software Tips</h2><p>Apart from calendar tactics, some software hygiene tips can help.
+With chat programs, you have the option of muting them globally,
+on a per-channel basis, and (for some) on a per-person basis.
+Take advantage of the ability to mute channels!
+Not every channel with a ton of activity
+is something you need to be informed of on a blow-by-blow basis.
+Ask yourself, "Do I really need to read <em>every</em> last message on this channel right away?"
+Leave them unread until you have a chunk of downtime.</p>
+<h2 id="prioritize-the-most-critical-work-for-your-best-energy-levels">Prioritize the most critical work for your best energy levels</h2><p>Every person is different and will need to make differing compromises on different teams.
+Regardless, you should know how your energy levels trend over the day and after certain events.
+You'll want to use those trends to better plan out your day.
+Prioritize the most critical work to be done during your peak energy levels
+and leave everything else for the rest of the day.
+My energy levels have seasonally changed over the years.
+There are some months when I am best in the morning,
+and others when I am best after finally downing the 3rd cup of coffee :-).
+I also generally can handle 4 hours of intense, focused work before needing a break.
+Therefore, as much as possible, I will plan for about two good 2-hour blocks of deep work each day,
+leaving the rest to meetings and coordination with colleagues.
+(Reality is always more complicated than I described above, but at least it's a starting point!)</p>
+<h2 id="conclusion">Conclusion</h2><p>In summary, I've shared calendaring, software hygiene,
+and prioritization as tips for staying focused at work.
+The struggle is real!
+I hope they help you stay focused and energized throughout the day.
+What other tips do you have to stay focused?
+Let me know by sharing the post on Twitter and commenting there,
+or leaving a comment below!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2022-practical-tips-for-staying-focused-at-work-as-a-data-scientist</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Practical tips for staying focused at work as a data scientist}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2022}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{08}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{06}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2022/8/6/practical-tips-for-staying-focused-at-work-as-a-data-scientist}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

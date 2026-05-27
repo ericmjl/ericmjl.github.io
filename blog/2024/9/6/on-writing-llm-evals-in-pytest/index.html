@@ -1,0 +1,687 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="On writing LLM evals in pytest">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/on-writing-llm-evals-in-pytest' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>On writing LLM evals in pytest - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">On writing LLM evals in pytest</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-09-06</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/evaluations/">
+        evaluations
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/pytest/">
+        pytest
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/documentation/">
+        documentation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/automation/">
+        automation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/testing/">
+        testing
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/validation/">
+        validation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/changes/">
+        changes
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/criteria/">
+        criteria
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/staleness/">
+        staleness
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I explore the process of writing evaluations for LLM systems using pytest, aiming to move beyond subjective assessments to more structured testing. I detail the creation of specific tests to assess if LLMs can accurately determine documentation staleness, using various models and criteria. The challenges and insights gained from setting up these evaluations reveal the complexities involved in ensuring that LLMs perform as expected. Could this method enhance the reliability of your LLM evaluations?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>This long weekend, I tried my hand at writing evaluations for my LLM doc writing system, not unlike what we might do with software tests, so that I could move beyond the "vibe test" in my work. My experiment this time round was to see whether we could write an LLM evaluation in pytest without relying on any other frameworks but pytest. Turns out this is doable!</p>
+<p>Evals (short for evaluations) check that an LLM system is doing what we want. In the vast majority of applications I've seen, human checks are the most important, but, with a little critical thought, other validity checks on an LLM system can be designed too!</p>
+<p>Continuing what I was building <a href="https://ericmjl.github.io/blog/2024/8/31/llamabot-now-has-structuredbot/">in my last post</a>, I wanted to check that my prompts for doc checking "worked" across different LLMs. If I were to do this manually, it would be challenging to stay disciplined, especially since I experienced <a href="https://twitter.com/sh_reya/status/1782425962246033436">criteria drift</a> while observing the behaviour of my doc writing system. Using automated software testing systems gives me a more structured and disciplined approach to writing LLM evals.</p>
+<h2 id="implementing-evals-in-pytest">Implementing evals in pytest</h2><p>Here's the reveal: one of the tests I wrote illustrates the pattern for writing LLM evals as Python software tests.</p>
+<div class="hll"><pre><span></span><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">llm_evals</span>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;original_docs,new_source_code,system_prompt,pydantic_model,expected_status&quot;</span><span class="p">,</span> <span class="p">[(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">case</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span> <span class="k">for</span> <span class="n">case</span> <span class="ow">in</span> <span class="n">test_cases</span><span class="p">])</span>
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;model_name&quot;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="s2">&quot;ollama_chat/gemma2:2b&quot;</span><span class="p">,</span>  <span class="c1"># passes all tests</span>
+    <span class="c1"># &quot;gpt-4-turbo&quot;, # passes all tests, but costs $$ to run</span>
+    <span class="c1"># ollama_chat/phi3&quot;, # garbage model, doesn&#39;t pass any tests.</span>
+    <span class="c1"># &quot;gpt-4o-mini&quot;, # passes all tests, but costs $$ to run</span>
+<span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_out_of_date_when_source_changes</span><span class="p">(</span>
+    <span class="n">original_docs</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_source_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">system_prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pydantic_model</span><span class="p">,</span> <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">expected_status</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test out-of-date checker when source changes.</span>
+
+<span class="sd">    This test assumes that any model specified by `model_name`</span>
+<span class="sd">    will correctly identify the out-of-date status of documentation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">source_file</span> <span class="o">=</span> <span class="n">MarkdownSourceFile</span><span class="p">(</span>
+        <span class="n">here</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;tests&quot;</span> <span class="o">/</span> <span class="s2">&quot;cli&quot;</span> <span class="o">/</span> <span class="s2">&quot;assets&quot;</span> <span class="o">/</span> <span class="s2">&quot;next_prime&quot;</span> <span class="o">/</span> <span class="s2">&quot;docs.md&quot;</span>
+    <span class="p">)</span>
+    <span class="n">source_file</span><span class="o">.</span><span class="n">post</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">original_docs</span>
+    <span class="n">source_file</span><span class="o">.</span><span class="n">linked_files</span><span class="p">[</span><span class="s2">&quot;tests/cli/assets/next_prime/source.py&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_source_code</span>
+
+    <span class="n">doc_issue_checker</span> <span class="o">=</span> <span class="n">StructuredBot</span><span class="p">(</span>
+        <span class="n">system_prompt</span><span class="o">=</span><span class="n">system_prompt</span><span class="p">,</span> <span class="n">pydantic_model</span><span class="o">=</span><span class="n">pydantic_model</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span> <span class="n">stream_target</span><span class="o">=</span><span class="s2">&quot;none&quot;</span>
+    <span class="p">)</span>
+    <span class="n">doc_issue</span> <span class="o">=</span> <span class="n">doc_issue_checker</span><span class="p">(</span><span class="n">documentation_information</span><span class="p">(</span><span class="n">source_file</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="n">doc_issue</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">expected_status</span>
+    <span class="k">if</span> <span class="n">doc_issue</span><span class="o">.</span><span class="n">status</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">doc_issue</span><span class="o">.</span><span class="n">reasons</span>
+</pre></div>
+<p>To arrive at this test, I went through a winding and twisted process -- driven mainly by a need for more clarity about what I wanted to test. But things became much clearer once I quieted my head and treated this task like an experiment. I sketched out the axes of variation that were all possible in this system:</p>
+<ul>
+<li>The prompts in my documentation intent list,</li>
+<li>The system prompt for the judge bot,</li>
+<li>The prompt phrasing in <code>documentation_information</code>, which formats a prompt that effectively serves as the human message sent to the bot,</li>
+<li>The LLM model used -- admittedly, the easiest to vary.</li>
+</ul>
+<p>Since the last bullet point was the easiest to set up, I went with it for this test. However, varying the prompts (the other three bullet points) would have allowed me to be more rigorous, even though it would have been a messier and more laborious task. (For example, I'd have to develop reasonable variations of documentation intents.)</p>
+<h2 id="the-biggest-challenge-eval-criteria">The biggest challenge: eval criteria</h2><p>Thinking about the evaluation criteria was the hardest part. The goal was to evaluate whether an LLM could provide a way of judging that the documentation needed to be updated as a human would without me going into excessive text parsing detail. Intuitively, this was the right scope of work for an LLM to handle, but it could have been better. This seemed okay until I did some ad-hoc testing in a notebook with my source files... which was slow, cumbersome, and laborious. (This pain motivated me to try doing this automatically and systematically.) Eventually, I settled on three sub-criteria to test:</p>
+<ol>
+<li>Source files contain content not covered in the documentation.</li>
+<li>Documentation contains factually incorrect material that contradicts the source code.</li>
+<li>Documentation fails to cover the content as specified by the intents.</li>
+</ol>
+<p>Each of them would be a boolean (<code>True</code> vs. <code>False</code>) check, and we could measure the performance of an LLM by providing an example of stale documentation that a human (at least myself) would rate as stale under source code changes. For each sub-criteria, I had to provide an example of a change that should prompt the model to return a boolean <code>True</code>, and I would also ask the LLM to give reasons. Once I had this level of clarity, I could construct a plausible example for each criterion that illustrated the kind of issue an LLM should be able to catch.</p>
+<h2 id="criteria-drift-isn-t-a-bad-thing-but-it-is-real">Criteria drift isn't a bad thing, but it is real</h2><p>But let's first talk about criteria drift. As I mentioned above, I experienced it myself. When I first built the documentation staleness evaluator, my goal was to produce an "out-of-date" evaluator -- one that said, "Is the documentation out of date for the source code file(s) specified?" This is effectively using LLMs as a judge. I implemented this as a Pydantic model that was provided to StructuredBot:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">DocumentationOutOfDate</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Status indicating whether a documentation is out of date.&quot;&quot;&quot;</span>
+
+    <span class="n">is_out_of_date</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether the documentation is out of date.&quot;</span>
+    <span class="p">)</span>
+</pre></div>
+<p>This is a hugely simplistic way of looking at documentation staleness.</p>
+<p>To evaluate the behaviour of the out-of-date judge, I created a synthetic example of a 'next prime number' finder using ChatGPT and then asked ChatGPT for an alternative implementation. Then, I did the following:</p>
+<ol>
+<li>Asked a docwriter bot (using <code>gpt-4-turbo</code>) to generate documentation based on the intended goals in the documentation,</li>
+<li>Swapped the source code implementation for a new one, and</li>
+<li>Asked the LLM judge (using <code>gpt-4-turbo</code> with a different prompt) to independently evaluate whether the docs were out-of-date.</li>
+</ol>
+<p>To my surprise, the LLM judge would return <code>False</code> most of the time! Upon deeper inspection, it was because the generated docs were written at a high level and did not reference a particular detail in the source code. I injected into the generated docs a reference to that specific detail in the source code that changed in the new implementation and fundamentally changed what I was evaluating; only then would the LLM judge get the "staleness" evaluation correct.</p>
+<p>However, what happened between me figuring out the system's behaviour led me to think more carefully about the implicit criteria in my head, which inevitably led to criteria drift, leading me to rethink the automatic documentation system.</p>
+<p>I initially thought an LLM could judge whether the docs needed to be updated (in a generic sense). But this was a vague instruction to a human, no less an LLM. (This is a general rule of thumb: if a criterion is unclear to another person, it will likely be an unclear criterion to an LLM.) Under the test I ran, the out-of-date judge should have recognized that the docs needed updating. With this realization, I set out to (a) create a more granular set of instructions and (b) determine staleness in a deterministic fashion.</p>
+<p>As mentioned above, here are the more granular criteria that I came up with:</p>
+<ol>
+<li>Source files contain content not covered in the documentation.</li>
+<li>Documentation contains factually incorrect material that contradicts the source code.</li>
+<li>Documentation fails to cover the content as specified by the intents.</li>
+</ol>
+<p>I implemented them as Pydantic models to be passed into a StructuredBot.</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">SourceContainsContentNotCoveredInDocs</span><span class="p">(</span><span class="n">ModelValidatorWrapper</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Status indicating whether the source contains content not covered in the documentation.&quot;&quot;&quot;</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether the source contains content not covered in the documentation.&quot;</span><span class="p">)</span>
+    <span class="n">reasons</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Reasons why the source contains content not covered in the documentation.&quot;</span>
+    <span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">DocsContainFatuallyIncorrectMaterial</span><span class="p">(</span><span class="n">ModelValidatorWrapper</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Status indicating whether docs contain factually incorrect material that contradicts the source code.&quot;&quot;&quot;</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether the documentation contains factually incorrect material that contradicts the source code.&quot;</span><span class="p">)</span>
+    <span class="n">reasons</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The factually incorrect material that contradicts the source code.&quot;</span>
+    <span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">DocDoesNotCoverIntendedMaterial</span><span class="p">(</span><span class="n">ModelValidatorWrapper</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Status indicating whether or not the documentation does not cover the intended material.&quot;&quot;&quot;</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether the intents of the documentation are not covered by the source.&quot;</span><span class="p">)</span>
+    <span class="n">reasons</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Reasons why the intents of the documentation are not covered by the source.&quot;</span>
+    <span class="p">)</span>
+</pre></div>
+<h2 id="test-cases">Test cases</h2><p>Once I had that done, I could set up test cases. These test cases involved were rather laborious to set up, but I finally settled on the following:</p>
+<ul>
+<li>One set of prompts,</li>
+<li>A before and after for one chunk of code (ChatGPT generated this)</li>
+<li>Four models to test (<code>gpt-4o-mini</code>, <code>gpt-4-turbo</code>, <code>ollama_chat/gemma2:2b</code>, <code>ollama_chat/phi3</code>),</li>
+<li>Three criteria for being out-of-date</li>
+<li>LLM-generated documentation for the next prime number calculations <em>in which I also spiked in a particular detail</em> -- incrementing by two from an odd number to avoid prime checking on even numbers (it took me time to get this right!), and</li>
+<li>Two test expectations:<ul>
+<li>When new source code is provided, each of the out-of-date criteria is labelled as True (which is my expectation)</li>
+<li>When the <em>original</em> source code is provided as the "changed code", the out-of-date criteria is labelled as False (which is also within expectation)</li>
+</ul>
+</li>
+</ul>
+<p>With that done, I executed the test as described using pytest. Within two minutes, I could see the results -- not surprisingly, the <code>gpt</code> family of models passed all tests, while <code>gemma</code> passed 5 out of 6, and <code>phi3</code> passed 3 out of 6.</p>
+<h2 id="lessons-learned">Lessons learned</h2><p>I will admit that running the test felt a bit underwhelming. Given the amount of up-front prep work I did, I was psychologically primed for an hour-long experiment with rich information being returned on how I could improve the prompts. But I also got the information I needed. The more significant lesson here was how to set up the evaluation system - making sure it was at a granular level that made sense for the application. Setting up evals will take effort, and making sure the evals measured what I wanted them to measure is where the bulk of effort will take. This is not easily automatable!</p>
+<p>Apart from that, once we know the behaviour of an LLM version within the confines of well-defined examples, it's worth our time to encode them as part of software tests. These can serve as longer-term guardrails against model performance degradation, such as if a new model version was released under the same model name.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-on-writing-llm-evals-in-pytest</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{On writing LLM evals in pytest}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{09}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{06}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/9/6/on-writing-llm-evals-in-pytest}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

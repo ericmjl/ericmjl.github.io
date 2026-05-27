@@ -1,0 +1,657 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Calibration Is Synchronizing Feedback Loops With Neural Throughput">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/calibration-is-synchronizing-feedback-loops-with-neural-throughput' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Calibration Is Synchronizing Feedback Loops With Neural Throughput - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Calibration Is Synchronizing Feedback Loops With Neural Throughput</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-04-04</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/productivity/">
+        productivity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/burnout/">
+        burnout
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/attention/">
+        attention
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/feedback/">
+        feedback
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/calibration/">
+        calibration
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/multitasking/">
+        multitasking
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/exhaustion/">
+        exhaustion
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/kanban/">
+        kanban
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workflow/">
+        workflow
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I reflect on how AI tools have accelerated my coding workflow but also made it more exhausting by collapsing my attention span and pushing me to juggle too many tasks at once. I explore why our brains are now the bottleneck, and share strategies for calibrating our work pace to match our neural capacity for sustainable productivity. How can we harness AI's power without burning out or losing focus?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Since the beginning of the year, as I've been really maxing out on agentic coding and trying to explore the patterns and figure out what's working and what's not, one particular thing has been sticking out: I'm paralleling so much of my work. I'm frequently doing five or six different open pull requests, and it's become frankly really exhausting.</p>
+<p>I've been trying to figure out why this feels so different from pre-AI days, when I'd work on one thing at a time and feel productive but not overwhelmed. What changed?</p>
+<p>Tools haven't gotten worse—they've gotten dramatically faster. And when everything moves faster, the gaps between tasks become more expensive.</p>
+<p>Last month, a <a href="https://www.reddit.com/r/ClaudeAI/comments/1s08r1c/karpathy_says_he_hasnt_written_a_line_of_code/">Reddit thread</a> sparked a discussion about what some are calling "AI psychosis" or "cyber psychosis": Andrej Karpathy reportedly went from 80% writing his own code to 0%, spending 16 hours a day directing AI agents. Garry Tan described similar feelings of burning through 4 hours of sleep, unable to stop building.</p>
+<p>The debate that followed went beyond executives; it revealed a community-wide phenomenon: people running multiple Claude Code sessions in parallel, hitting rate limits daily, feeling like idle tokens were wasted tokens.</p>
+<p>The consensus across replies was clear: <em>AI psychosis</em> is real, but it's less about excitement and more about a draining, addictive pressure to constantly build. The fear is missing out on the next big thing; it's the ground shifting beneath our feet, and stopping means getting left behind.</p>
+<p>Here's what I've found hard to articulate: AI tools have expanded possibility faster than ever; their real danger lies in how they collapse our attention span. Before AI, we operated on a fairly flat productivity curve: more effort meant more output, slowly but sustainably. Now we're running on a different kind of curve altogether—one that's getting steeper in both directions.</p>
+<h2 id="the-accelerating-landscape-of-possibility">The Accelerating Landscape of Possibility</h2><p>In his book <a href="https://libro.fm/audiobooks/9781101403860-where-good-ideas-come-from">Where Good Ideas Come From</a>, Steven Johnson described what he called the <em>adjacent possible</em>: the set of next-step ideas that are just beyond our current reality but still reachable. At any moment, only a limited set of next moves are accessible.</p>
+<p>Here's what makes this concept critical for understanding our current moment: as you explore the adjacent possible (through moves that seem natural in the moment) the boundary itself expands. Each discovery opens doors that weren't accessible before, creating an accelerating landscape where what's possible keeps growing faster and faster.</p>
+<p>I've seen this pattern play out: It explains why breakthroughs often happen when they do: the preconditions have finally assembled, and only then can you see the next move. But in an accelerating landscape, those preconditions assemble more quickly, and with them, the next set of possibilities.</p>
+<h2 id="why-ai-feels-different-now">Why AI Feels Different Now</h2><p>Before AI, the adjacent possible was bounded by what a single person could manually assemble: write code, test it, debug it, repeat. The feedback loop, prompt, think, interpret, iterate, took time.</p>
+<p>AI tools changed that calculus. They transformed the feedback loop, making it exponentially faster. Each new capability doesn't just add possibility; it reconfigures what's adjacent.</p>
+<p>Once you see Claude Code as an <em>idea multiplier</em>, the pattern is clear. The Garry Tan/Karpathy effect kicks in: possibility grows faster than effort.</p>
+<h2 id="here-s-why-it-feels-different">Here's Why It Feels Different</h2><p>This is where it gets subtle: AI has shifted the inverted U curve of productivity and changed its shape.</p>
+<p>Here's what that looks like, the gray curve shows pre-AI productivity, and the red curve shows post-AI:</p>
+<svg width="500" height="300" viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Axes -->
+  <line x1="50" y1="250" x2="450" y2="250" stroke="#333" stroke-width="2"/>
+  <line x1="50" y1="50" x2="50" y2="250" stroke="#333" stroke-width="2"/>
+
+  <!-- Labels -->
+  <text x="450" y="270" font-size="14" fill="#333">Effort</text>
+  <text x="25" y="45" font-size="14" fill="#333">Output</text>
+
+  <!-- Pre-AI curve (flatter, broader) -->
+  <path d="M 80 230 Q 150 220 250 200 T 420 230" stroke="#888" stroke-width="3" fill="none"/>
+  <text x="410" y="210" font-size="12" fill="#666" text-anchor="start">Pre-AI</text>
+
+  <!-- Post-AI curve (steeper, narrower) -->
+  <path d="M 80 230 Q 150 40 320 230" stroke="#e74c3c" stroke-width="3" fill="none"/>
+  <text x="110" y="150" font-size="12" fill="#e74c3c" text-anchor="end">Post-AI</text>
+</svg><p><strong>Pre-AI: flatter curve</strong>. Effort mapped to output roughly proportionally. You could invest effort and see gains compound slowly, sustainably, with exhaustion coming only after sustained periods.</p>
+<p><strong>Post-AI: taller, narrower curve</strong>. Less effort gets you more output initially; the left slope is steeper, giving an astonishing return on initial investment. The right-side drop-off is sharper—exhaustion hits earlier, harder.</p>
+<p>The peak represents the optimal effort level where output maximizes. Beyond that point, additional effort produces diminishing returns and exhaustion sets in faster than you can recover.</p>
+<p>I wrote about this in a previous post on closing air gaps: the problem is that things are faster; it's that the <em>gaps</em> between tasks: those moments where attention bleeds out, are more expensive when everything moves faster.</p>
+<h2 id="our-brain-is-the-bottleneck-now">Our Brain Is the Bottleneck Now</h2><p>AI gives us 10X faster feedback loops: code spits out, prompts happen in seconds. Neural processing remains capped at biological speeds.</p>
+<p>When loop cadence exceeds brain throughput, the cognitive queue overflows. Working memory saturates. Attention bleeds out. Exhaustion sets in, from the constant context switching, the constant need to <em>scan</em> multiple sessions for "what was done."</p>
+<p>The optimal zone is when loop speed equals brain processing speed, not running tools as fast as possible.</p>
+<h3 id="two-calibration-strategies">Two Calibration Strategies</h3><p>Here's what I believe we need to be able to do in order to calibrate properly.</p>
+<p><strong>First, tighten feedback loops.</strong> The goal is closing the loop properly on one task before opening another—I used to think juggling multiple Claude Code sessions was productivity; turns out it's just context switching masquerading as output. The trick is simple: run one session, close the loop completely, review what you got, then decide if your next move should be a new loop or something else entirely. Fast loops create natural pacing, which means you don't need to check tabs constantly because each cycle finishes with closure.</p>
+<p><strong>Second, build queue and notification systems—especially when you genuinely need multitasking.</strong> Most of us reach for multiple agents because we're solving the wrong problem: juggling open sessions creates overhead your tools cannot absorb. The Kanban approach works well: externalize context switching onto a board where agents update their status automatically. The system notifies you only when human judgment is required, so your job shifts from scanning to assessing—much lower overhead for neural throughput.</p>
+<h2 id="calibration-is-not-optimization">Calibration Is Not Optimization</h2><p>This is the crucial distinction.</p>
+<p><strong>Pre-AI</strong>, you could coast for years on the left slope. Effort and reward grew linearly, so you just needed to work consistently.</p>
+<p><strong>Post-AI</strong>, the left slope is steeper, so you ascend faster; but also fall faster. AI-assisted tools don't eliminate the inverted U curve; they sharpen its peak and drop-off.</p>
+<ul>
+<li>$\frac{d(\text{output})}{d(\text{effort})}$ is higher initially (good)</li>
+<li>$\frac{d^2(\text{output})}{d(\text{effort}^2)}$ is more negative; the curve drops off faster (bad)</li>
+</ul>
+<p>Calibration recognizes that more effort does not equal more output. Instead, there exists an optimal effort level where output peaks. Beyond that point, additional effort produces diminishing returns, and rest becomes the superior strategy.</p>
+<h2 id="what-calibration-actually-looks-like">What Calibration Actually Looks Like</h2><p>The bottleneck is neural throughput—not tokens or API calls.</p>
+<p>Ask yourself: Is my feedback loop faster than I can process?</p>
+<ul>
+<li>If yes: slow down, close loops properly, resist the urge to open more tabs</li>
+<li>If no: optimize the tool, not your attention (this is where most of us are wrong)</li>
+</ul>
+<p><strong>Practical heuristic</strong>: When you start scanning multiple AI threads for "what was done," you've exceeded your bandwidth. That's the signal that your loop cadence outruns your neural capacity.</p>
+<p>Ask, "What is the maximum rate at which my brain can consume and act on output?" This question defines calibration—when work aligns with your neural capacity.</p>
+<h2 id="calibration-something-you-do-daily-not-something-you-learn-once">Calibration: Something You Do Daily, Not Something You Learn Once</h2><p>AI has revealed our limits: the inverted U curve has become more visible, accelerated. Our brain is the rate limiter, and rightly so! We now need to learn to brake before you hit the wall.</p>
+<p>The tools are powerful, but they don't change human neurology. No amount of prompt engineering can compress the time it takes for our brains to reason about things. If we try to go beyond our natural limits, dangerous things happen.</p>
+<p>Calibration is the new baseline practice: a discipline you maintain daily, adjusting your loop cadence to match neural throughput, closing gaps before they become exhaustions.</p>
+<p>The goal is sustainable access to the adjacent possible, rather than simply 10X-ing our output. And the goal is to do it for the long run, not just this week.</p>
+<h3 id="what-this-looks-like-in-practice">What This Looks Like in Practice</h3><p>The goal is to work at the optimal effort level where output peaks. Beyond that point, additional effort produces diminishing returns and exhaustion sets in.</p>
+<p><strong>The default workflow:</strong></p>
+<ul>
+<li><strong>One task at a time</strong>: Start with <em>one</em> focused task. Close the loop completely before moving to the next.</li>
+<li><strong>Close the loop fully</strong>: Review output, make notes, then decide on the next step only when you're ready.</li>
+<li><strong>Eliminate scanning</strong>: If you catch yourself flipping between tabs or sessions to check status, that's your signal that you've exceeded your neural throughput.</li>
+</ul>
+<p><strong>When multiple agents must run simultaneously:</strong></p>
+<ul>
+<li><strong>Use a Kanban board</strong>: A visual task queue where agents update their status automatically.</li>
+<li><strong>Agents update the board, not you</strong>: The system should notify only when human intervention is needed.</li>
+<li><strong>You check the board, not the sessions</strong>: Remove the need to scan through terminal windows or tool interfaces.</li>
+</ul>
+<p>You synchronize to stay on the left slope of your productivity curve, where effort yields return without triggering burnout. When tools run faster than your brain can process status updates, exhaustion sets in.</p>
+<p>The rhythm shifts from "hustle harder" to <em>synchronize</em>—matching your brain's processing speed to the tools' output rate. When the signal outruns neural processing, interference replaces insight. You tune the system to keep your brain in phase on the left slope of your productivity curve, where effort produces sustainable output.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-calibration-is-synchronizing-feedback-loops-with-neural-throughput</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Calibration Is Synchronizing Feedback Loops With Neural Throughput}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{04}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{04}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/4/4/calibration-is-synchronizing-feedback-loops-with-neural-throughput}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

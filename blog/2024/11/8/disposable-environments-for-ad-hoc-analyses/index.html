@@ -1,0 +1,829 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Disposable environments for ad-hoc analyses">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/disposable-environments-for-ad-hoc-analyses' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Disposable environments for ad-hoc analyses - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Disposable environments for ad-hoc analyses</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-11-08</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/tooling/">
+        tooling
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/notebook/">
+        notebook
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/reproducibility/">
+        reproducibility
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/juv/">
+        juv
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/uv/">
+        uv
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/environment management/">
+        environment management
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/scripts/">
+        scripts
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/analysis/">
+        analysis
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post,
+I explore the innovative 'juv' package,
+which simplifies Python environment management for Jupyter notebooks
+by embedding dependencies directly within the notebook file.
+This approach eliminates the need for separate environment files,
+making notebooks easily shareable
+and reducing setup complexity.
+I also discuss integrating 'juv' with 'pyds-cli'
+to streamline ad-hoc data analyses within organizations,
+enhancing reproducibility
+and reducing environment conflicts.
+Curious about how this could change your data science workflow?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I recently learned about <code>juv</code>,
+a package by my SciPy friend Trevor Manz.
+It builds upon <code>uv</code>,
+which, alongside <code>pixi</code>,
+are the hottest things in Python (and more broadly, Data Science) tooling
+since <code>pip</code> officially replaced <code>easy_install</code>
+as the <em>de facto</em> way to install Python packages.
+<code>uv</code> supports <a href="https://peps.python.org/pep-0723/">PEP723</a>,
+which is a Python enhancement proposal (PEP) that</p>
+<blockquote><p>specifies a metadata format
+that can be embedded in single-file Python scripts
+to assist launchers, IDEs and other external tools
+which may need to interact with such scripts.</p>
+</blockquote>
+<p>Made more concretely for the purposes of this post,
+this enables us to specify the Python version
+that is supposed to be used to execute a script,
+and, more importantly,
+the dependencies that are needed!</p>
+<p>It basically looks like this,
+as the first cell in your notebook,
+say, <code>notebook.ipynb</code></p>
+<div class="hll"><pre><span></span><span class="c1"># /// script</span>
+<span class="c1"># requires-python = &quot;&gt;=3.10&quot;</span>
+<span class="c1"># dependencies = [</span>
+<span class="c1">#     &quot;pandas==2.0&quot;,</span>
+<span class="c1">#     &quot;numpy&gt;=2.0&quot;,</span>
+<span class="c1">#     &quot;matplotlib==3.1&quot;,</span>
+<span class="c1">#     &quot;scikit-learn&quot;,</span>
+<span class="c1">#     ...</span>
+<span class="c1"># ]</span>
+<span class="c1"># ///</span>
+</pre></div>
+<p>The following cells are the notebook code that you write in a normal fashion.</p>
+<p>One can then use <code>juv</code> to run a notebook server with that auto-created Python environment:</p>
+<div class="hll"><pre><span></span>juv<span class="w"> </span>run<span class="w"> </span>notebook.ipynb
+</pre></div>
+<p>And <code>juv</code> will auto-install the dependencies:</p>
+<div class="hll"><pre><span></span>❯<span class="w"> </span>juv<span class="w"> </span>run<span class="w"> </span>notebook.ipynb
+Reading<span class="w"> </span>inline<span class="w"> </span>script<span class="w"> </span>metadata<span class="w"> </span>from<span class="w"> </span><span class="sb">`</span>stdin<span class="sb">`</span>
+<span class="w">   </span>Built<span class="w"> </span><span class="nv">minikanren</span><span class="o">==</span><span class="m">1</span>.0.3
+<span class="w">   </span>Built<span class="w"> </span><span class="nv">etuples</span><span class="o">==</span><span class="m">0</span>.3.9
+<span class="w">   </span>Built<span class="w"> </span><span class="nv">cons</span><span class="o">==</span><span class="m">0</span>.4.6
+<span class="w">   </span>Built<span class="w"> </span>logical-unification<span class="o">==</span><span class="m">0</span>.4.6
+Installed<span class="w"> </span><span class="m">60</span><span class="w"> </span>packages<span class="w"> </span><span class="k">in</span><span class="w"> </span>329ms
+</pre></div>
+<p>You'll get this notebook server,
+in which you can run the code,
+just like in regular JupyterLab.</p>
+<p><img src="juv-launched-jupyter.webp" alt="Jupyter session launched by `juv`."></p>
+<p>Compared to writing out a full <code>pyproject.toml</code>, <code>requirements.txt</code>, or <code>environment.yml</code> file,
+this reduces the burden of distributing code + environments to a single file,
+your notebook.
+In terms of mental overload,
+for an ad-hoc analysis conducted within a single notebook,
+this is much better than needing to work within, say,
+a <code>scratch</code> environment that is maintained to support multiple notebooks.
+In <a href="https://marimo.io/blog/sandboxed-notebooks">the words of the <code>marimo</code> folks</a>:</p>
+<blockquote><p><strong>In other words, marimo makes it possible to create and share standalone notebooks,
+without shipping <code>requirements.txt</code> files alongside them</strong>.
+This provides two key benefits:</p>
+<ol>
+<li>Notebooks that carry their own dependencies are easy to share —
+just send the <code>.py</code> file!</li>
+<li>Isolating a notebook from other installed packages prevents obscure bugs
+arising from environment pollution,
+while also hardening reproducibility.</li>
+</ol>
+</blockquote>
+<p>To paraphrase <code>juv</code>'s <a href="https://github.com/manzt/juv">README</a>
+(which is accurate as of 5 Nov 2024),
+this is the equivalent of having a fully-specified but also disposable environment,
+in which the notebook itself specifies its own environment.</p>
+<p>(I'll note that the <code>marimo</code> notebook also supports PEP723 as well!)</p>
+<h2 id="incorporating-this-into-pyds-cli">Incorporating this into pyds-cli</h2><p>As a prototype of how this would work within company-internal tooling, I wrapped <code>juv</code> inside <code>pyds-cli</code> as part of a new <code>pyds analysis init</code> and <code>pyds analysis run</code> set of commands.</p>
+<p><code>pyds analysis init</code> does what my friend Logan Thomas gave as early feedback for <code>pyds-cli</code>'s when I put together an initial project structure scaffold -- he wanted to see a "minimal initialization". Until PEP723 became a reality, I didn't have a good story for that. Now we do! To use <code>pyds-cli</code> to initialize a repo that contains only ad-hoc notebooks, we do:</p>
+<div class="hll"><pre><span></span>pipx<span class="w"> </span>upgrade<span class="w"> </span>pyds-cli<span class="w"> </span><span class="c1"># upgrade pyds-cli using pipx, or else do `pip install -U pyds-cli`</span>
+pyds<span class="w"> </span>analysis<span class="w"> </span>init
+</pre></div>
+<p>This will trigger a form that asks you for some information:</p>
+<div class="hll"><pre><span></span>/tmp<span class="w"> </span>via<span class="w"> </span>🅒<span class="w"> </span>pyds-cli<span class="w"> </span>on<span class="w"> </span>☁️
+❯<span class="w"> </span>pyds<span class="w"> </span>analysis<span class="w"> </span>init
+<span class="w">  </span><span class="o">[</span><span class="m">1</span>/5<span class="o">]</span><span class="w"> </span>project_name<span class="w"> </span><span class="o">(</span>Name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>Project<span class="o">)</span>:<span class="w"> </span>dummy
+<span class="w">  </span><span class="o">[</span><span class="m">2</span>/5<span class="o">]</span><span class="w"> </span>short_description<span class="w"> </span><span class="o">(</span>A<span class="w"> </span>short<span class="w"> </span>description<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>project<span class="o">)</span>:<span class="w"> </span>a<span class="w"> </span><span class="nb">test</span><span class="w"> </span>project
+<span class="w">  </span><span class="o">[</span><span class="m">3</span>/5<span class="o">]</span><span class="w"> </span>github_username<span class="w"> </span><span class="o">(</span>Your<span class="w"> </span>GitHub<span class="w"> </span>username<span class="o">)</span>:<span class="w"> </span>ericmjl
+<span class="w">  </span><span class="o">[</span><span class="m">4</span>/5<span class="o">]</span><span class="w"> </span>full_name<span class="w"> </span><span class="o">(</span>Your<span class="w"> </span>full<span class="w"> </span>name<span class="o">)</span>:<span class="w"> </span>Eric<span class="w"> </span>Ma
+<span class="w">  </span><span class="o">[</span><span class="m">5</span>/5<span class="o">]</span><span class="w"> </span>email<span class="w"> </span><span class="o">(</span>Your<span class="w"> </span>email<span class="w"> </span>address<span class="o">)</span>:<span class="w"> </span>e@ma
+🎉Your<span class="w"> </span>analysis<span class="w"> </span>project<span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>created!
+Run<span class="w"> </span><span class="s1">&#39;pyds analysis add &lt;package&gt;&#39;</span><span class="w"> </span>to<span class="w"> </span>add<span class="w"> </span>dependencies<span class="w"> </span>to<span class="w"> </span>your<span class="w"> </span>notebook
+Run<span class="w"> </span><span class="s1">&#39;pyds analysis run&#39;</span><span class="w"> </span>to<span class="w"> </span>start<span class="w"> </span>working<span class="w"> </span>on<span class="w"> </span>your<span class="w"> </span>analysis
+</pre></div>
+<p>With the <code>project_name</code> being the name of the folder,
+you can see that it is initialized with a <code>notebooks/</code> directory
+and a <code>pyproject.toml</code></p>
+<div class="hll"><pre><span></span>/tmp<span class="w"> </span>via<span class="w"> </span>🅒<span class="w"> </span>pyds-cli<span class="w"> </span>on<span class="w"> </span>☁️
+❯<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>dummy
+<span class="o">(</span>pyds-cli<span class="o">)</span>
+dummy<span class="w"> </span>on<span class="w"> </span><span class="w"> </span>main<span class="w"> </span>is<span class="w"> </span>📦<span class="w"> </span>v0.0.1<span class="w"> </span>via<span class="w"> </span>🐍<span class="w"> </span>v3.13.0<span class="w"> </span>via<span class="w"> </span>🅒<span class="w"> </span>pyds-cli<span class="w"> </span>on<span class="w"> </span>☁️<span class="w">  </span>ericmajinglong@gmail.com
+❯<span class="w"> </span>ls
+Permissions<span class="w"> </span>Size<span class="w"> </span>User<span class="w">    </span>Group<span class="w"> </span>Date<span class="w"> </span>Modified<span class="w"> </span>Git<span class="w"> </span>Name
+.rw-r--r--<span class="w">   </span><span class="m">314</span><span class="w"> </span>ericmjl<span class="w"> </span>wheel<span class="w">  </span><span class="m">5</span><span class="w"> </span>Nov<span class="w"> </span><span class="m">08</span>:09<span class="w">   </span>-I<span class="w"> </span>.env
+drwxr-xr-x<span class="w">     </span>-<span class="w"> </span>ericmjl<span class="w"> </span>wheel<span class="w">  </span><span class="m">5</span><span class="w"> </span>Nov<span class="w"> </span><span class="m">08</span>:09<span class="w">   </span>--<span class="w"> </span>.git
+drwxr-xr-x<span class="w">     </span>-<span class="w"> </span>ericmjl<span class="w"> </span>wheel<span class="w">  </span><span class="m">5</span><span class="w"> </span>Nov<span class="w"> </span><span class="m">08</span>:09<span class="w">   </span>--<span class="w"> </span>.github
+.rw-r--r--<span class="w">     </span><span class="m">5</span><span class="w"> </span>ericmjl<span class="w"> </span>wheel<span class="w">  </span><span class="m">5</span><span class="w"> </span>Nov<span class="w"> </span><span class="m">08</span>:09<span class="w">   </span>--<span class="w"> </span>.gitignore
+.rw-r--r--<span class="w">     </span><span class="m">0</span><span class="w"> </span>ericmjl<span class="w"> </span>wheel<span class="w">  </span><span class="m">5</span><span class="w"> </span>Nov<span class="w"> </span><span class="m">08</span>:09<span class="w">   </span>--<span class="w"> </span>.pre-commit-config.yaml
+drwxr-xr-x<span class="w">     </span>-<span class="w"> </span>ericmjl<span class="w"> </span>wheel<span class="w">  </span><span class="m">5</span><span class="w"> </span>Nov<span class="w"> </span><span class="m">08</span>:09<span class="w">   </span>--<span class="w"> </span>notebooks
+.rw-r--r--<span class="w">   </span><span class="m">311</span><span class="w"> </span>ericmjl<span class="w"> </span>wheel<span class="w">  </span><span class="m">5</span><span class="w"> </span>Nov<span class="w"> </span><span class="m">08</span>:09<span class="w">   </span>--<span class="w"> </span>pyproject.toml
+.rw-r--r--<span class="w">   </span><span class="m">325</span><span class="w"> </span>ericmjl<span class="w"> </span>wheel<span class="w">  </span><span class="m">5</span><span class="w"> </span>Nov<span class="w"> </span><span class="m">08</span>:09<span class="w">   </span>--<span class="w"> </span>README.md
+</pre></div>
+<p><code>pyproject.toml</code> contains a section for configuring <code>pyds-cli</code>
+with <em>default packages</em>
+that should be specified in every new notebook
+created using <code>pyds analysis</code> commands:</p>
+<div class="hll"><pre><span></span>dummy<span class="w"> </span>on<span class="w"> </span><span class="w"> </span>main<span class="w"> </span>is<span class="w"> </span>📦<span class="w"> </span>v0.0.1<span class="w"> </span>via<span class="w"> </span>🐍<span class="w"> </span>v3.13.0<span class="w"> </span>via<span class="w"> </span>🅒<span class="w"> </span>pyds-cli<span class="w"> </span>on<span class="w"> </span>☁️
+❯<span class="w"> </span>cat<span class="w"> </span>pyproject.toml
+───────┬────────────────────────────────────────────────────────────────────────────────
+<span class="w">       </span>│<span class="w"> </span>File:<span class="w"> </span>pyproject.toml
+<span class="w">       </span>│<span class="w"> </span>Size:<span class="w"> </span><span class="m">311</span><span class="w"> </span>B
+───────┼────────────────────────────────────────────────────────────────────────────────
+<span class="w">   </span><span class="m">1</span><span class="w">   </span>│<span class="w"> </span><span class="o">[</span>project<span class="o">]</span>
+<span class="w">   </span><span class="m">2</span><span class="w">   </span>│<span class="w"> </span><span class="nv">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;dummy&quot;</span>
+<span class="w">   </span><span class="m">3</span><span class="w">   </span>│<span class="w"> </span><span class="nv">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0.0.1&quot;</span>
+<span class="w">   </span><span class="m">4</span><span class="w">   </span>│<span class="w"> </span><span class="nv">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span>
+<span class="w">   </span><span class="m">5</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;juv&quot;</span>,
+<span class="w">   </span><span class="m">6</span><span class="w">   </span>│<span class="w"> </span><span class="o">]</span>
+<span class="w">   </span><span class="m">7</span><span class="w">   </span>│<span class="w"> </span><span class="nv">readme</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;README.md&quot;</span>
+<span class="w">   </span><span class="m">8</span><span class="w">   </span>│
+<span class="w">   </span><span class="m">9</span><span class="w">   </span>│<span class="w"> </span><span class="c1"># Default packages and python versions for new notebooks.</span>
+<span class="w">  </span><span class="m">10</span><span class="w">   </span>│<span class="w"> </span><span class="o">[</span>tool.pyds-cli<span class="o">]</span>
+<span class="w">  </span><span class="m">11</span><span class="w">   </span>│<span class="w"> </span><span class="nv">default_packages</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span>
+<span class="w">  </span><span class="m">12</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;pandas&quot;</span>,
+<span class="w">  </span><span class="m">13</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;polars&quot;</span>,
+<span class="w">  </span><span class="m">14</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;matplotlib&quot;</span>,
+<span class="w">  </span><span class="m">15</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;numpy&quot;</span>,
+<span class="w">  </span><span class="m">16</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;seaborn&quot;</span>,
+<span class="w">  </span><span class="m">17</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;scikit-learn&quot;</span>
+<span class="w">  </span><span class="m">18</span><span class="w">   </span>│<span class="w"> </span><span class="o">]</span>
+<span class="w">  </span><span class="m">19</span><span class="w">   </span>│<span class="w"> </span><span class="nv">python_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=3.10&quot;</span>
+───────┴────────────────────────────────────────────────────────────────────────────────
+</pre></div>
+<p>Using <code>pyds analysis</code>,
+we can use the <code>create</code> command,
+which basically creates a new notebook in the <code>notebooks/</code> directory
+with the name that you specify,
+and additional packages
+on top of the default packages:</p>
+<div class="hll"><pre><span></span>dummy<span class="w"> </span>on<span class="w"> </span><span class="w"> </span>main<span class="w"> </span>is<span class="w"> </span>📦<span class="w"> </span>v0.0.1<span class="w"> </span>via<span class="w"> </span>🐍<span class="w"> </span>v3.13.0<span class="w"> </span>via<span class="w"> </span>🅒<span class="w"> </span>pyds-cli<span class="w"> </span>on<span class="w"> </span>☁️<span class="w">  </span>ericmajinglong@gmail.com
+❯<span class="w"> </span>pyds<span class="w"> </span>analysis<span class="w"> </span>create<span class="w"> </span>--help
+
+<span class="w"> </span>Usage:<span class="w"> </span>pyds<span class="w"> </span>analysis<span class="w"> </span>create<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>NAME
+
+<span class="w"> </span>Create<span class="w"> </span>a<span class="w"> </span>new<span class="w"> </span>notebook<span class="w"> </span><span class="k">in</span><span class="w"> </span>the<span class="w"> </span>notebooks<span class="w"> </span>directory<span class="w"> </span>with<span class="w"> </span>default<span class="w"> </span>dependencies.
+╭─<span class="w"> </span>Arguments<span class="w"> </span>──────────────-----------──────────────────────────────────────────╮
+│<span class="w"> </span>*<span class="w">    </span>name<span class="w">      </span>TEXT<span class="w">  </span>Name<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>notebook<span class="w"> </span>to<span class="w"> </span>create<span class="w"> </span><span class="o">[</span>default:<span class="w"> </span>None<span class="o">]</span><span class="w"> </span><span class="o">[</span>required<span class="o">]</span>│
+╰───────────────────────────────────────────────────────────────────────────────╯
+╭─<span class="w"> </span>Options<span class="w"> </span>─────────────────────────────────────────────────────────────────────╮
+│<span class="w"> </span>--package<span class="w">  </span>-p<span class="w">      </span>TEXT<span class="w">  </span>Additional<span class="w"> </span>packages<span class="w"> </span>to<span class="w"> </span>include<span class="w"> </span><span class="o">[</span>default:<span class="w"> </span>None<span class="o">]</span><span class="w">       </span>│
+│<span class="w"> </span>--help<span class="w">                   </span>Show<span class="w"> </span>this<span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span>exit.<span class="w">                          </span>│
+╰───────────────────────────────────────────────────────────────────────────────╯
+</pre></div>
+<p>Actually running it as an example:</p>
+<div class="hll"><pre><span></span>dummy<span class="w"> </span>on<span class="w"> </span><span class="w"> </span>main<span class="w"> </span>is<span class="w"> </span>📦<span class="w"> </span>v0.0.1<span class="w"> </span>via<span class="w"> </span>🐍<span class="w"> </span>v3.13.0<span class="w"> </span>via<span class="w"> </span>🅒<span class="w"> </span>pyds-cli<span class="w"> </span>on<span class="w"> </span>☁️<span class="w">  </span>ericmajinglong@gmail.com
+❯<span class="w"> </span>pyds<span class="w"> </span>analysis<span class="w"> </span>create<span class="w"> </span>test.ipynb<span class="w"> </span>-p<span class="w"> </span>numba<span class="w"> </span>-p<span class="w"> </span>pymc<span class="w"> </span>-p<span class="w"> </span>arviz
+Created<span class="w"> </span>notebook<span class="w"> </span>test.ipynb<span class="w"> </span><span class="k">in</span><span class="w"> </span>notebooks<span class="w"> </span>directory
+Added<span class="w"> </span><span class="m">9</span><span class="w"> </span>default<span class="w"> </span>packages
+Run<span class="w"> </span><span class="s1">&#39;pyds analysis run --notebook notebooks/test.ipynb&#39;</span><span class="w"> </span>to<span class="w"> </span>start<span class="w"> </span>working
+</pre></div>
+<p>We get a new notebook that I can preview:</p>
+<div class="hll"><pre><span></span>dummy<span class="w"> </span>on<span class="w"> </span><span class="w"> </span>main<span class="w"> </span><span class="o">[</span>?<span class="o">]</span><span class="w"> </span>is<span class="w"> </span>📦<span class="w"> </span>v0.0.1<span class="w"> </span>via<span class="w"> </span>🐍<span class="w"> </span>v3.13.0<span class="w"> </span>via<span class="w"> </span>🅒<span class="w"> </span>pyds-cli<span class="w"> </span>on<span class="w"> </span>☁️<span class="w">  </span>ericmajinglong@gmail.com
+❯<span class="w"> </span>cat<span class="w"> </span>notebooks/test.ipynb
+───────┬────────────────────────────────────────────────────────────────────────────────
+<span class="w">       </span>│<span class="w"> </span>File:<span class="w"> </span>notebooks/test.ipynb
+<span class="w">       </span>│<span class="w"> </span>Size:<span class="w"> </span><span class="m">764</span><span class="w"> </span>B
+───────┼────────────────────────────────────────────────────────────────────────────────
+<span class="w">   </span><span class="m">1</span><span class="w">   </span>│<span class="w"> </span><span class="o">{</span>
+<span class="w">   </span><span class="m">2</span><span class="w">   </span>│<span class="w">  </span><span class="s2">&quot;cells&quot;</span>:<span class="w"> </span><span class="o">[</span>
+<span class="w">   </span><span class="m">3</span><span class="w">   </span>│<span class="w">   </span><span class="o">{</span>
+<span class="w">   </span><span class="m">4</span><span class="w">   </span>│<span class="w">    </span><span class="s2">&quot;cell_type&quot;</span>:<span class="w"> </span><span class="s2">&quot;code&quot;</span>,
+<span class="w">   </span><span class="m">5</span><span class="w">   </span>│<span class="w">    </span><span class="s2">&quot;execution_count&quot;</span>:<span class="w"> </span>null,
+<span class="w">   </span><span class="m">6</span><span class="w">   </span>│<span class="w">    </span><span class="s2">&quot;id&quot;</span>:<span class="w"> </span><span class="s2">&quot;6f788e3b&quot;</span>,
+<span class="w">   </span><span class="m">7</span><span class="w">   </span>│<span class="w">    </span><span class="s2">&quot;metadata&quot;</span>:<span class="w"> </span><span class="o">{</span>
+<span class="w">   </span><span class="m">8</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;jupyter&quot;</span>:<span class="w"> </span><span class="o">{</span>
+<span class="w">   </span><span class="m">9</span><span class="w">   </span>│<span class="w">      </span><span class="s2">&quot;source_hidden&quot;</span>:<span class="w"> </span><span class="nb">true</span>
+<span class="w">  </span><span class="m">10</span><span class="w">   </span>│<span class="w">     </span><span class="o">}</span>
+<span class="w">  </span><span class="m">11</span><span class="w">   </span>│<span class="w">    </span><span class="o">}</span>,
+<span class="w">  </span><span class="m">12</span><span class="w">   </span>│<span class="w">    </span><span class="s2">&quot;outputs&quot;</span>:<span class="w"> </span><span class="o">[]</span>,
+<span class="w">  </span><span class="m">13</span><span class="w">   </span>│<span class="w">    </span><span class="s2">&quot;source&quot;</span>:<span class="w"> </span><span class="o">[</span>
+<span class="w">  </span><span class="m">14</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;# /// script\n&quot;</span>,
+<span class="w">  </span><span class="m">15</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;# requires-python = \&quot;&gt;=3.13\&quot;\n&quot;</span>,
+<span class="w">  </span><span class="m">16</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;# dependencies = [\n&quot;</span>,
+<span class="w">  </span><span class="m">17</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;#     \&quot;arviz\&quot;,\n&quot;</span>,
+<span class="w">  </span><span class="m">18</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;#     \&quot;matplotlib\&quot;,\n&quot;</span>,
+<span class="w">  </span><span class="m">19</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;#     \&quot;numba\&quot;,\n&quot;</span>,
+<span class="w">  </span><span class="m">20</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;#     \&quot;numpy\&quot;,\n&quot;</span>,
+<span class="w">  </span><span class="m">21</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;#     \&quot;pandas\&quot;,\n&quot;</span>,
+<span class="w">  </span><span class="m">22</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;#     \&quot;polars\&quot;,\n&quot;</span>,
+<span class="w">  </span><span class="m">23</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;#     \&quot;pymc\&quot;,\n&quot;</span>,
+<span class="w">  </span><span class="m">24</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;#     \&quot;scikit-learn\&quot;,\n&quot;</span>,
+<span class="w">  </span><span class="m">25</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;#     \&quot;seaborn\&quot;,\n&quot;</span>,
+<span class="w">  </span><span class="m">26</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;# ]\n&quot;</span>,
+<span class="w">  </span><span class="m">27</span><span class="w">   </span>│<span class="w">     </span><span class="s2">&quot;# ///&quot;</span>
+<span class="w">  </span><span class="m">28</span><span class="w">   </span>│<span class="w">    </span><span class="o">]</span>
+<span class="w">  </span><span class="m">29</span><span class="w">   </span>│<span class="w">   </span><span class="o">}</span>,
+<span class="w">  </span><span class="m">30</span><span class="w">   </span>│<span class="w">   </span><span class="o">{</span>
+<span class="w">  </span><span class="m">31</span><span class="w">   </span>│<span class="w">    </span><span class="s2">&quot;cell_type&quot;</span>:<span class="w"> </span><span class="s2">&quot;code&quot;</span>,
+<span class="w">  </span><span class="m">32</span><span class="w">   </span>│<span class="w">    </span><span class="s2">&quot;execution_count&quot;</span>:<span class="w"> </span>null,
+<span class="w">  </span><span class="m">33</span><span class="w">   </span>│<span class="w">    </span><span class="s2">&quot;id&quot;</span>:<span class="w"> </span><span class="s2">&quot;dec2d058&quot;</span>,
+<span class="w">  </span><span class="m">34</span><span class="w">   </span>│<span class="w">    </span><span class="s2">&quot;metadata&quot;</span>:<span class="w"> </span><span class="o">{}</span>,
+<span class="w">  </span><span class="m">35</span><span class="w">   </span>│<span class="w">    </span><span class="s2">&quot;outputs&quot;</span>:<span class="w"> </span><span class="o">[]</span>,
+<span class="w">  </span><span class="m">36</span><span class="w">   </span>│<span class="w">    </span><span class="s2">&quot;source&quot;</span>:<span class="w"> </span><span class="o">[]</span>
+<span class="w">  </span><span class="m">37</span><span class="w">   </span>│<span class="w">   </span><span class="o">}</span>
+<span class="w">  </span><span class="m">38</span><span class="w">   </span>│<span class="w">  </span><span class="o">]</span>,
+<span class="w">  </span><span class="m">39</span><span class="w">   </span>│<span class="w">  </span><span class="s2">&quot;metadata&quot;</span>:<span class="w"> </span><span class="o">{}</span>,
+<span class="w">  </span><span class="m">40</span><span class="w">   </span>│<span class="w">  </span><span class="s2">&quot;nbformat&quot;</span>:<span class="w"> </span><span class="m">4</span>,
+<span class="w">  </span><span class="m">41</span><span class="w">   </span>│<span class="w">  </span><span class="s2">&quot;nbformat_minor&quot;</span>:<span class="w"> </span><span class="m">5</span>
+<span class="w">  </span><span class="m">42</span><span class="w">   </span>│<span class="w"> </span><span class="o">}</span>
+───────┴────────────────────────────────────────────────────────────────────────────────
+</pre></div>
+<p>As you can see,
+we have the default packages
+but also <code>pymc</code>, <code>arviz</code>, and <code>numba</code> installed.
+Underneath the hood,
+<code>juv</code> is doing most of the magic of adding dependencies,
+but <code>pyds-cli</code> simply composes in the ability to read from <code>pyproject.toml</code>.
+In a world where company-specific tooling were built,
+such tooling might also include <a href="https://ericmjl.github.io/blog/2024/9/19/how-to-set-up-pixi-with-codeartifacts/">automatically configuring keyrings for authentication on every call</a>.</p>
+<p>All in all,
+I very much like the idea of <em>configurable and disposable</em> (but nonetheless configurable) environments.
+<code>juv</code> helps support this idea!
+It essentially takes what <code>uv</code> would do
+and apply it to Jupyter notebooks,
+auto-creating the necessary kernel behind-the-scenes.
+My wrapping of <code>juv</code> within <code>pyds-cli</code>
+merely has to add in opinionated configuration;
+the rest of it is a near one-to-one mapping.
+I like where the Python tooling ecosystem is headed,
+the future is exciting!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-disposable-environments-for-ad-hoc-analyses</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Disposable environments for ad-hoc analyses}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{11}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{08}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/11/8/disposable-environments-for-ad-hoc-analyses}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

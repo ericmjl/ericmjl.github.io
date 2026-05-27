@@ -1,0 +1,1047 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="The Human Dimension to Clean, Distributable, and Documented Data Science Code">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/the-human-dimension-to-clean-distributable-and-documented-data-science-code' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>The Human Dimension to Clean, Distributable, and Documented Data Science Code - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">The Human Dimension to Clean, Distributable, and Documented Data Science Code</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-10-25</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/coding/">
+        coding
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/documentation/">
+        documentation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/readability/">
+        readability
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/distribution/">
+        distribution
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/best practices/">
+        best practices
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/cognition/">
+        cognition
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/tool making/">
+        tool making
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>This blog post, which is my pyOpenSci Fall Training keynote,
+explores the importance of creating clean, distributable, and well-documented data science code,
+emphasizing the human dimension of coding practices.
+In it, I discuss key concepts such as readability, cognitive load, and the toolmaker's mindset,
+and provide practical insights on
+how to make code more accessible and impactful for both the creator and other users.
+I also touch on the role of AI in coding and documentation.</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p><strong>Note:</strong> This blog post is my keynote talk for the pyOpenSci Fall Festival keynote.
+In lieu of making slides and presenting that way,
+I decided to write a blog post to
+(a) leave attendees with an artifact that can be referenced,
+(b) provide pyOpenSci with content that can be hosted on their blog,
+(c) leave myself an artifact for my own blog, and
+(d) do it in a way that is more fleshed out than a presentation deck.</p>
+<h2 id="introduction">Introduction</h2><p>Since 2016 (8 years now!),
+I've been advocating for data scientists
+to apply basic software development practices in their work.
+This means making sure that one's work is well-documented -- and thus easily understandable,
+working in a way that is portable across machines -- and thus easily accessible,
+making sure that one's code is modular -- and thus easy to reuse,
+and ensuring that one's code is well-tested -- and thus reliable. (Table 1)
+In this post,
+we'll dive deeper into why it is crucial for making your work impactful
+to consider the psychology of people
+who read, install, and use your work.
+We'll explore the "why" behind the "what"
+that will be covered in the upcoming pyOpenSci training course.
+This training course will be teaching you a lot of valuable skills - the "what to do" -
+and I'd like to help reinforce the "why" behind all of these.
+By understanding the reasoning and motivation behind these practices,
+you'll be better equipped to apply them effectively
+and adapt them to your specific needs in data science projects.</p>
+<table>
+<thead><tr>
+<th>Practice</th>
+<th>Benefit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Well-documented</td>
+<td>Easily understandable</td>
+</tr>
+<tr>
+<td>Portable across machines</td>
+<td>Easily accessible</td>
+</tr>
+<tr>
+<td>Modular code</td>
+<td>Easy to reuse</td>
+</tr>
+<tr>
+<td>Well-tested code</td>
+<td>Reliable</td>
+</tr>
+</tbody>
+</table>
+<p><em>Table 1: Key practices and their benefits in data science code development.</em></p>
+<h2 id="key-concept-1-readability-and-cognitive-load">Key concept 1: readability and cognitive load</h2><p>When we write code,
+it's easy to forget that we're not just communicating with machines,
+but with other humans as well - including our future selves.
+This principle is deeply ingrained in Python's philosophy,
+as expressed in "The Zen of Python" which states,
+"Readability counts."
+Python's emphasis on readability over performance
+underscores the importance of human-friendly code.
+Readability is crucial because it directly impacts the cognitive load
+placed on anyone trying to understand or use your code.</p>
+<h3 id="the-importance-of-readability">The importance of readability</h3><p>Readable code offers several significant benefits.</p>
+<p>First and foremost, it enables faster comprehension.
+When code is clean and well-structured,
+readers can quickly grasp its purpose and functionality,
+allowing them to understand the logic and flow more efficiently.</p>
+<p>This leads to the second advantage: easier maintenance.
+Code that is easy to read is also easier to debug, update, and extend,
+saving valuable time and resources in the long run.</p>
+<p>Furthermore, readable code greatly improves collaboration!
+When team members can easily understand each other's code,
+it fosters better teamwork and enables them to build upon each other's work more effectively.
+This synergy can lead to more innovative solutions and faster project completion.</p>
+<p>Lastly, clear and readable code reduces the likelihood of errors.
+When code is easy to interpret,
+there's less chance of misunderstanding its intent or functionality.
+This clarity minimizes the risk of introducing bugs during modifications
+or when integrating with other parts of the system,
+ultimately leading to more robust and reliable software.</p>
+<h3 id="a-cautionary-tale-from-my-graduate-school-days">A cautionary tale from my graduate school days</h3><p>During my graduate studies,
+I developed a complex data analysis project
+for identifying putative reassortant influenza viruses
+from the Influenza Research Database (IRD).
+While the algorithm was scientifically sound and potentially valuable,
+its implementation left much to be desired
+from a software engineering perspective.</p>
+<p>The project consisted of more than 10 separate Python scripts
+that had to be executed in a specific order.
+There was little to no documentation,
+and the code itself was not written with readability or maintainability in mind.
+You can find the original code repository <a href="https://github.com/ericmjl/influenza-reassortment-detector">here</a>
+to see an example of what <strong>not</strong> to do.</p>
+<p>The project had several significant drawbacks:</p>
+<ul>
+<li><strong>Lack of modularity</strong>: The scripts were tightly coupled, making it difficult to reuse or modify individual components.</li>
+<li><strong>Poor documentation</strong>: Without clear documentation, understanding the purpose and workflow of each script was challenging.</li>
+<li><strong>Difficult deployment</strong>: The complex execution order and tight coupling to a GridEngine HPC cluster made it nearly impossible for others to deploy or use the tool effectively.</li>
+</ul>
+<p>The consequences of this poor code quality
+became apparent when the IRD team
+expressed interest in incorporating my algorithm into their database.
+I remember being engaged with them in discussion,
+and was excited to see my work potentially being used
+by researchers around the world.
+However, the barrier to deployment was immense
+due to the scrappy implementation and lack of documentation.
+While I never knew what the real reasons were behind-the-scenes,
+I can only imagine that the lack of a well-documented,
+modular, and easily deployable solution
+was a major barrier to the adoption of my work.</p>
+<p>This experience taught me a valuable lesson
+about the importance of writing clean, well-documented, and easily deployable code,
+even in academic settings.
+Had I invested more time in proper software development practices,
+my work could have had a much broader impact
+and been more easily adopted by the scientific community.</p>
+<h3 id="the-impact-of-readability">The impact of readability</h3><p>By prioritizing readability,
+we can significantly enhance the overall quality and impact of our data science projects.
+Readable code:</p>
+<ol>
+<li>Reduces the cognitive load on users, making it easier for them to understand and use your code.</li>
+<li>Encourages collaboration and knowledge sharing within the data science community.</li>
+<li>Improves the maintainability and longevity of your codebase.</li>
+<li>Enhances the overall credibility and professionalism of your work.</li>
+</ol>
+<p>Remember, the goal is to create tools and analyses
+that others can easily access, understand, and build upon.
+By embracing the human dimension of our code,
+we not only improve our individual projects
+but also contribute to the growth and accessibility
+of the entire field of data science.</p>
+<h2 id="key-concept-2-user-friendly-installation-and-setup">Key concept 2: User-friendly installation and setup</h2><p>The ease of installation and setup
+can make or break the adoption of your data science package.
+Even the most brilliant code is useless
+if users can't get it running on their systems.
+Let's explore the psychological barriers users face
+and how to overcome them.</p>
+<h3 id="the-psychology-of-installation-friction">The psychology of installation friction</h3><p>When users encounter complex installation processes,
+they often face several psychological barriers.</p>
+<p><strong>Barrier 1 - Complexity</strong>:
+First, the sheer complexity can be overwhelming,
+causing users to abandon the installation before they even begin.
+This initial hurdle can be particularly daunting
+for those who are less technically inclined
+or new to the field.</p>
+<p><strong>Barrier 2 - Frustration</strong>:
+Secondly,
+users may experience frustration when installations fail
+or when they encounter unclear error messages.
+These setbacks can be discouraging,
+potentially leading users to give up on further attempts to install and use the software.
+I remember the early days of installing SciPy!
+Nowadays, it's so easy:
+<code>pip install scipy</code> or <code>conda install scipy</code> and you've got it installed.
+But back then, I was wrangling C compilers and linker flags at the terminal...
+as a 3 month old programmer!
+Anyways, the negative emotions associated with these experiences
+can create a lasting impression,
+deterring users from trying again in the future.</p>
+<p><strong>Barrier 3 - Time Pressure</strong>:
+Many users, particularly those in professional settings,
+have limited time to experiment with new tools.
+If the installation process is time-consuming or requires multiple attempts,
+your potential users may decide that the potential benefits of the tool
+are not worth the time investment required to get it up and running.
+Your impact, as a result, is diminished --
+especially because your users missed the opportunity
+to leverage what you've built!</p>
+<p><strong>Barrier 4 - Imposter Syndrome</strong>:
+Difficulties in the setup process
+can trigger feelings of imposter syndrome.
+When users struggle to install or configure a tool
+that they believe should be straightforward,
+they may begin to question their own competence.
+This self-doubt can be a powerful deterrent to adoption,
+as users may avoid tools
+that make them feel inadequate or out of their depth.</p>
+<h3 id="two-perspectives-on-setup-user-vs-developer">Two perspectives on setup: User vs. Developer</h3><p>When we talk about "getting set up" with a data science package or project,
+it's important to recognize that this can mean two distinct things,
+depending on the user's intentions:</p>
+<p><strong>Installing a tool for use</strong>:
+This is the perspective of an end-user who wants to leverage your package as a tool in their own work.
+They're primarily concerned with getting the package installed and running quickly,
+without needing to understand or modify the underlying code.</p>
+<p><strong>Installing to contribute</strong>:
+This is the perspective of a developer or contributor
+who wants to explore, modify, or contribute to your project's code.
+They need to set up a full development environment,
+which often involves more steps and a deeper understanding of the project structure.</p>
+<p>Each of these scenarios presents its own set of challenges and psychological barriers:</p>
+<p>For tool users, the focus is on simplicity and speed.
+They want a straightforward installation process,
+ideally with a single command like <code>pip install your-package</code>.
+Complex dependencies or platform-specific instructions can be major deterrents.</p>
+<p>For developers, the process is inherently more involved.
+They need to clone the repository,
+set up a virtual environment,
+install development dependencies,
+and possibly configure additional tools like linters or test runners.
+While they may be more technically inclined,
+a clear and well-documented setup process is still crucial to encourage contributions.</p>
+<p>By recognizing and addressing both of these perspectives in your documentation and setup process,
+you can create a more inclusive and user-friendly experience for all potential users of your project,
+whether they're simply using it as a tool or diving deep into the code.</p>
+<h3 id="the-impact-of-user-friendly-setup">The impact of user-friendly setup</h3><p>By prioritizing a smooth installation and setup process:</p>
+<ol>
+<li>You lower the barrier to entry for potential users.</li>
+<li>You increase the likelihood of adoption and continued use.</li>
+<li>You create a positive first impression, encouraging users to explore your package further.</li>
+<li>You reduce the support burden, as fewer users encounter installation issues.</li>
+</ol>
+<p>Think back to the moment that you picked up someone else's Python package
+and it <em>just worked</em>... wasn't that a magical feeling?
+When you build a tool, you'll want to get users to the "aha!" moment
+of using your package as quickly and painlessly as possible.
+Every step you can eliminate or simplify in the setup process
+is a win for user adoption and satisfaction.</p>
+<h2 id="key-concept-3-documentation-as-a-bridge-to-understanding">Key concept 3: Documentation as a bridge to understanding</h2><p>Documentation is often treated as an afterthought in data science projects,
+but it's a crucial bridge between your code and its users.
+Good documentation can make the difference
+between a project that gathers dust
+and one that becomes widely adopted and built upon.
+The Diataxis framework,
+developed by Daniele Procida,
+provides an excellent structure
+for thinking about and organizing documentation.</p>
+<h3 id="the-role-of-documentation">The role of documentation</h3><p>The Diataxis framework identifies four distinct types of documentation, each serving a specific purpose:</p>
+<ol>
+<li><strong>Tutorials</strong>: Learning-oriented guides that help new users get started quickly.</li>
+<li><strong>How-To Guides</strong>: Problem-oriented instructions for completing specific tasks.</li>
+<li><strong>Explanation</strong>: Understanding-oriented discussions that provide background and context.</li>
+<li><strong>Reference</strong>: Information-oriented technical descriptions of the code.</li>
+</ol>
+<p>These four types of documentation serve different roles in a user's journey:</p>
+<ol>
+<li><strong>Onboarding</strong>: Tutorials help new users quickly understand and start using your code.</li>
+<li><strong>Problem-Solving</strong>: How-To Guides assist users in accomplishing specific tasks.</li>
+<li><strong>Deep Understanding</strong>: Explanation sections provide insight into the why and how of your project.</li>
+<li><strong>Detailed Information</strong>: Reference documentation offers a reliable source of information for all features and functions.</li>
+</ol>
+<h3 id="types-of-documentation-artifacts">Types of documentation artifacts</h3><p>Within these four categories, you might create various documentation artifacts:</p>
+<ol>
+<li><strong>README</strong>: The first point of contact for users, providing an overview and quick start guide.</li>
+<li><strong>API Documentation</strong>: Detailed explanations of functions, classes, and modules (part of the Reference quadrant).</li>
+<li><strong>Tutorials</strong>: Step-by-step guides for common use cases (part of the Tutorials quadrant).</li>
+<li><strong>Examples</strong>: Practical demonstrations of how to use the code in real-world scenarios (often part of How-To Guides).</li>
+<li><strong>Inline Comments</strong>: Explanations within the code itself for complex logic or algorithms (can feed into Reference documentation).</li>
+</ol>
+<p>By structuring your documentation according to the Diataxis framework,
+you can ensure that you're meeting the diverse needs of your users,
+from newcomers to experienced developers looking for specific information.</p>
+<h3 id="best-practices-for-effective-documentation">Best practices for effective documentation</h3><p>When it comes to creating effective documentation,
+there are several key practices to keep in mind.</p>
+<p><strong>Contemporaneous documentation</strong>:
+First and foremost,
+it's crucial to write documentation as you code,
+rather than leaving it as an afterthought!
+Leaving just-in-time comments
+can help you preserve critical details that may be handy
+for future readers of your code.
+This approach ensures that your documentation remains accurate and complete,
+reflecting the most up-to-date state of your project.</p>
+<p><strong>Clear language</strong>:
+Clear language is paramount in documentation.
+Avoid using jargon or overly technical terms without explanation.
+Instead, strive to explain complex concepts in simple, accessible language
+that a wide range of users can understand.
+This clarity helps reduce the learning curve for new users
+and makes your project more approachable.
+If you use tools like Quarto or MyST,
+you can use pop-ups, sidebars, and callouts
+to help <del>disambiguate</del> explain terms.</p>
+<p><strong>Examples</strong>:
+Examples are a powerful tool in documentation.
+Whenever possible,
+include code snippets and use cases
+that illustrate how to use your package.
+These practical demonstrations can help users
+quickly grasp how to apply your code to real-world scenarios,
+bridging the gap between theory and practice.</p>
+<p><strong>Regular updates</strong>:
+As your project evolves,
+so should your documentation.
+Regularly reviewing and updating your documentation
+is essential to ensure it remains relevant and accurate.
+This ongoing maintenance helps prevent confusion and frustration
+that can arise from outdated or incorrect information.</p>
+<p>Personally,
+I've been building GenAI tooling
+to help me identify out-of-date documentation
+as my codebase evolves,
+as well as update the documentation directly.
+I've been prototyping this in LlamaBot,
+and if you're interested in talking about it,
+I'm more than happy to chat!</p>
+<p><strong>Tooling</strong>:
+Finally, consider leveraging documentation tools
+to enhance the presentation and organization of your content.
+Documentation systems, such as Quarto and MkDocs
+can help you create professional-looking documentation
+that's easy to navigate and visually appealing.
+These tools can significantly improve the user experience,
+making your documentation more engaging and effective.
+Additionally, use LLMs to help you draft documentation!
+It'll help you get over writer's block.</p>
+<h3 id="the-impact-of-good-documentation">The impact of good documentation</h3><p>Investing in quality documentation yields far-reaching benefits for your data science project:</p>
+<ol>
+<li>It increases user adoption and satisfaction</li>
+<li>It reduces support burden on maintainers</li>
+<li>It fosters a vibrant community by encouraging contributions</li>
+<li>It enhances project credibility and professionalism</li>
+<li>It maximizes code's potential and impact</li>
+</ol>
+<p>Remember, even the most brilliant code
+is only as valuable as users' ability to understand and implement it.
+High-quality documentation is the key that unlocks your code's full potential,
+amplifying its reach and influence in the field.
+By creating and maintaining excellent documentation,
+you're not just explaining your code –
+you're expanding its impact within the data science community and beyond.</p>
+<h2 id="how-we-operationalize-these-ideas-at-work">How we operationalize these ideas at work</h2><p>At Moderna, where I work,
+I've been fortunate to be an early member of
+the Data Science and Artificial Intelligence teams.
+This gave me the opportunity to influence the ways of working
+of a team that was still figuring out how to operationalize these ideas in practice.
+We've implemented several concrete practices
+that bring these concepts to life in our daily work.</p>
+<h3 id="code-reviews">Code reviews</h3><p>One of our key practices is the consistent use of code reviews.
+Except for rapid prototyping that needs to be completed within an afternoon,
+we always conduct code reviews.
+While this process may slow us down in the short term,
+typically adding a day or two of waiting for colleagues to review,
+it pays off significantly in the long run.
+(Moreover, we use AI-assisted coding to speed up our code writing anyway,
+so not much is lost!)
+We move faster overall because of the growing shared knowledge across the team.
+Code reviews are particularly crucial
+for ensuring both the correctness and maintainability of our code.
+They also serve as an excellent way for team members
+to learn coding patterns from each other and maintain high code quality.
+It's worth noting that a hallmark of an experienced programmer
+is their ability to deploy effective patterns in their codebase.</p>
+<h3 id="docathons-and-ai-assisted-documentation">Docathons and AI-assisted documentation</h3><p>We also emphasize the habit of writing documentation through regular "docathons."
+Every quarter, we set aside two days specifically for working on documentation.
+During these events, we focus on updating documentation for our various projects.
+These docathons serve a dual purpose:
+they are not only productive work sessions but also great team-building exercises.
+We find that newcomers to the team are particularly helpful during these events,
+as they assist in keeping our onboarding documentation up to date,
+providing fresh perspectives on what new team members need to know.</p>
+<p>In addition, we use AI to help us draft documentation.
+Modeling after <a href="https://github.com/ericmjl/llamabot/blob/main/docs/cli/docs.md">documentation tooling that I built for LlamaBot</a>,
+we use the same pattern at work to help us draft documentation,
+especially for routine, templated, and tedious-to-write documentation.
+Humans are still responsible for checking the drafted documentation,
+but at least we use AI tools to help us get started.</p>
+<h3 id="standard-project-templates-and-automation">Standard project templates and automation</h3><p>To streamline our development process,
+we have implemented standard project templates and automation tools.
+Our approach is similar to Cookiecutter Data Science-templated projects,
+but with additional automation and customization specific to Moderna's needs.
+We make extensive use of pre-commit hooks and GitHub Actions
+to automatically check our code with every commit.
+This automation significantly alleviates
+the mental burden associated with manual checking.
+By leveraging these tools,
+we have effectively removed much of the human burden
+typically associated with nitpicking another person's code.
+Instead, we let the automated systems handle these checks,
+and we simply respond to what the "robots" tell us needs attention.</p>
+<h3 id="the-impact-of-these-practices">The impact of these practices</h3><p>Through these practices,
+we have created an environment where clean, distributable,
+and well-documented code is not just an ideal,
+but a daily reality.
+This approach has significantly enhanced our team's efficiency,
+collaboration, and the overall quality of our data science projects at Moderna.
+We engage in long-term research partnerships with our colleagues
+and can reliably take code from prototype to production with minimal overhead.
+We easily onboard new people onto projects
+thanks to the high-quality documentation provided.</p>
+<h2 id="conclusion">Conclusion</h2><p>Throughout this keynote blog post,
+we've explored the critical human dimension of data science code,
+focusing on three key concepts:
+readability, user-friendly installation, and documentation.
+These elements,
+often overlooked in favor of algorithmic efficiency or cutting-edge techniques,
+are fundamental to the success and impact of your data science projects.</p>
+<p><strong>Readability</strong> reduces cognitive load and fosters collaboration,
+inviting others to build upon our work.
+This openness drives scientific progress in data science.</p>
+<p><strong>User-friendly installation</strong> lowers barriers to entry,
+encouraging wider adoption and increasing impact.
+A brilliant but unusable algorithm is effectively useless.</p>
+<p><strong>Documentation</strong> bridges code and users,
+serving as a form of communication and teaching.
+Good documentation can transform users into contributors,
+fostering a community around your project.</p>
+<p>These practices are fundamental to open science and reproducible research.
+By making our code accessible and understandable,
+we enable verification, replication, and advancement of scientific work.
+This approach addresses the reproducibility crisis in many fields.
+Ultimately, we contribute to a more transparent and robust scientific ecosystem,
+not just improving individual projects.</p>
+<p>As data scientists, our goals are to create tools and analyses that make a real-world impact.
+By considering the human dimension to how our code gets used,
+we dramatically increase the chances of our work being used,
+understood, and built upon by others.
+As you go forward, be other-centered in your work,
+and treat your customers as you would want them to treat you!</p>
+<h3 id="call-to-action">Call to action</h3><p>As you embark on your next data science project, challenge yourself to:</p>
+<ol>
+<li>Prioritize readability from the start.</li>
+<li>Create a smooth installation process.</li>
+<li>Document as you go, not as an afterthought.</li>
+<li>Seek early user feedback.</li>
+<li>Contribute to open-source projects, focusing on documentation and user experience.</li>
+</ol>
+<p>Impactful data science isn't just about clever algorithms or big data.
+By adopting a toolmaker's mindset,
+we create knowledge that others can easily access, understand, and build upon.
+This approach enhances our ability to solve real-world problems creatively.</p>
+<p>Let's commit to writing code that's both computationally efficient and human-friendly.
+In doing so, we'll foster a more collaborative, innovative, and impactful data science community.
+Thank you for reading!</p>
+<h2 id="additional-resources">Additional Resources</h2><table>
+<thead><tr>
+<th>Resource</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://docs.python-guide.org/">The Hitchhiker's Guide to Python</a></td>
+<td>An excellent resource for Python best practices, including code style and project structure.</td>
+</tr>
+<tr>
+<td><a href="https://packaging.python.org/">Python Packaging User Guide</a></td>
+<td>Comprehensive guide on distributing Python packages.</td>
+</tr>
+<tr>
+<td><a href="https://www.writethedocs.org/">Write the Docs</a></td>
+<td>A global community of people who care about documentation, with many resources and guides.</td>
+</tr>
+<tr>
+<td><a href="https://diataxis.fr/">Diataxis Framework</a></td>
+<td>Detailed explanation of the documentation framework mentioned in this post.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="faq">FAQ</h2><p><strong>Should I be using AI tools to help me code?</strong>
+Yes! And make sure you are ready to defend every line of code that is produced by an AI tool.
+My personal conviction is that humans who write with AI assistance
+will be the ones who are able to turbocharge their effectiveness.
+At the same time, humans are the ones who are responsible for the end product.
+So, let AI assist you, but don't relinquish your responsibility!</p>
+<p><strong>Should I be using AI tools to help me write my documentation?</strong>
+Yes! And just like with code,
+make sure you are ready to defend every line of documentation that is produced by an AI tool.
+In fact, I wrote this blog post with the help of Claude 3.5 Sonnet,
+in which I drafted out my ideas in bullet point format
+and then asked Claude to help me flesh out each section one at a time
+into a cohesive written piece.
+And I'm ready to defend every line that's in this blog post
+or else be willingly corrected!</p>
+<p><strong>What if I don't have time to write documentation?</strong>
+Use AI tools to help!
+But if you're in an airgapped environment with no access to AI tools over an API,
+see if you're able to procure hardware to run local LLMs on your own machine.
+It turns out that we have supercomputers (by 1980s standards) in our pockets,
+on our laps, and on our desks,
+and the total amount of compute capacity that just runs idle is staggering.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-the-human-dimension-to-clean-distributable-and-documented-data-science-code</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{The Human Dimension to Clean, Distributable, and Documented Data Science Code}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{10}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{25}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/10/25/the-human-dimension-to-clean-distributable-and-documented-data-science-code}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

@@ -1,0 +1,655 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="How to expose any documentation to any LLM agent">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/how-to-expose-any-documentation-to-any-llm-agent' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>How to expose any documentation to any LLM agent - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">How to expose any documentation to any LLM agent</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-10-19</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llm/">
+        llm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/documentation/">
+        documentation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/mcp/">
+        mcp
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workflow/">
+        workflow
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/context/">
+        context
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/search/">
+        search
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/knowledge/">
+        knowledge
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/development/">
+        development
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/automation/">
+        automation
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share what I learned building LlamaBot: the real challenge in AI-assisted development is keeping AI agents up-to-date with evolving documentation. I explain how the Model Context Protocol (MCP) lets LLMs access dynamic, queryable knowledge bases, solving the obsolescence problem and enabling smarter, context-aware AI assistants. Curious how you can make your documentation instantly accessible to any AI agent?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Like cars that lose value as soon as they roll off the lot, LLMs become outdated as soon as their training sets are fixed. Software documentation evolves constantly—new features, API changes, bug fixes, and best practices emerge daily. Yet AI agents are stuck with whatever knowledge was captured in their training data, creating a fundamental mismatch between what they know and what developers actually need in real-time.</p>
+<p>Building LlamaBot taught me something unexpected: the hardest part of AI-assisted development isn't writing better prompts or designing cleaner abstractions. It's equipping AI agents with up-to-date information in a stable, standardized fashion.</p>
+<p>Most developers know the frustration of context-switching between code and documentation. You're deep in a coding session, need to check how a specific function works, and suddenly you're hunting through static documentation files. AI agents face this same problem, but with an added layer of complexity—they need structured, queryable access to documentation that can be searched semantically.</p>
+<p>I discovered that web searches by coding agents were less reliable than manually adding context, but manual approaches don't scale. The solution emerged through the Model Context Protocol (MCP), a standard that enables LLMs to interact with external tools and data sources. In LlamaBot v0.13.10, I introduced a documentation MCP server that automatically equips AI agents with current information. This enables AI agents to access organizational knowledge, process documentation, and domain expertise in structured ways.</p>
+<h2 id="the-obsolescence-problem-in-ai-assisted-development">The obsolescence problem in AI-assisted development</h2><p>The core issue more than mere documentation access, it's about obsolescence. LLMs are trained on data that becomes outdated the moment it's fixed in their training sets. Meanwhile, software documentation evolves constantly. New features are added, APIs change, bugs are fixed, and best practices emerge. Yet AI agents remain frozen in time, working with knowledge that may be months or years out of date.</p>
+<p>Consider a typical data science workflow: you're building an AI pipeline and need to understand how LlamaBot's StructuredBot handles data validation. The AI agent might reference documentation from six months ago, missing critical updates or new features that could solve your problem more elegantly. This creates a fundamental mismatch between what the agent knows and what's actually available.</p>
+<p>The deeper problem is that AI agents need structured, queryable access to documentation that can be searched semantically and updated automatically. They need to understand not just what functions exist, but how they relate to each other, what patterns they follow, and how they fit into broader workflows. Static documentation simply cannot provide this level of contextual understanding, particularly in data science environments where teams maintain scattered knowledge across wikis, Slack threads, and onboarding documents.</p>
+<h2 id="building-a-semantic-documentation-layer">Building a semantic documentation layer</h2><p>LlamaBot's MCP server demonstrates how to give AI agents structured access to its documentation by creating a dynamic, queryable knowledge base that agents can search semantically. The <a href="https://github.com/ericmjl/llamabot/blob/main/llamabot/mcp_server.py">implementation</a> centers around a single tool:</p>
+<div class="hll"><pre><span></span><span class="nd">@mcp</span><span class="o">.</span><span class="n">tool</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">docs_search</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search through LlamaBot documentation and source code.&quot;&quot;&quot;</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">docstore</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">n_results</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="n">query</span><span class="p">,</span> <span class="s2">&quot;results&quot;</span><span class="p">:</span> <span class="n">results</span><span class="p">}</span>
+</pre></div>
+<p>This interface sits in front of a data pipeline that builds a vector database for the documentation. The server fetches the latest documentation from GitHub, extracts Python module docstrings from source code, and constructs a LanceDB vector database optimized for semantic search. The database is built during CI/CD and packaged directly with the wheel distribution, giving users instant access without setup while staying current with each release.</p>
+<p>This approach works with any AI agent system through the MCP protocol, providing a standardized way to keep AI agents current with documentation.</p>
+<h2 id="the-architecture-behind-semantic-documentation">The architecture behind semantic documentation</h2><p>The MCP server combines several technologies to create a robust documentation system. FastMCP handles the protocol implementation, enabling seamless communication between AI agents and the documentation database. LanceDB powers the semantic search capabilities, leveraging LlamaBot's existing <code>LanceDBDocStore</code> class with hybrid search and reranking for optimal results.</p>
+<p>The system uses the checked-out documentation from the repository during the CI/CD build process, ensuring the packaged database contains current information. The build script first attempts to fetch docs from GitHub, but falls back to the local <code>docs/</code> directory when available, making it work seamlessly in both CI/CD and development environments. The build process runs the <code>scripts/build_mcp_docs.py</code> script during CI/CD, which creates the LanceDB database and copies it to <code>llamabot/data/mcp_docs/</code> for packaging.</p>
+<p>I believe this architecture represents a fundamental shift in how we think about documentation for AI systems. Instead of treating documentation as static reference material, we're creating dynamic, queryable knowledge bases that AI agents can interact with directly.</p>
+<h2 id="the-core-pattern-to-replicate">The core pattern to replicate</h2><p>The LlamaBot MCP server follows a straightforward pattern that any package or documentation source can replicate. Here's the essential blueprint:</p>
+<p><strong>1. Build a semantic database during CI/CD</strong></p>
+<ul>
+<li>Extract documentation from your source (GitHub, local docs, API references)</li>
+<li>Parse and chunk the content appropriately for your domain</li>
+<li>Create a vector database (LanceDB, Chroma, or similar) with semantic search capabilities</li>
+<li>Package the database with your distribution</li>
+</ul>
+<p><strong>2. Create an MCP server with a search tool</strong></p>
+<div class="hll"><pre><span></span><span class="nd">@mcp</span><span class="o">.</span><span class="n">tool</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">docs_search</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search through your documentation and source code.&quot;&quot;&quot;</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">docstore</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">n_results</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="n">query</span><span class="p">,</span> <span class="s2">&quot;results&quot;</span><span class="p">:</span> <span class="n">results</span><span class="p">}</span>
+</pre></div>
+<p><strong>3. Make it discoverable and configurable</strong></p>
+<ul>
+<li>Provide a simple launch command (like <code>yourpackage mcp launch</code>)</li>
+<li>Include clear setup instructions for MCP-compatible tools</li>
+<li>Ensure the database updates automatically with each release</li>
+</ul>
+<p><strong>4. Design for your specific knowledge domain</strong></p>
+<ul>
+<li>Include not just API docs, but process documentation, examples, and institutional knowledge</li>
+<li>Structure the content for semantic search rather than keyword matching</li>
+<li>Consider what context your users need most when working with AI agents</li>
+</ul>
+<h2 id="seamless-integration-with-modern-development-tools">Seamless integration with modern development tools</h2><p>The MCP server works with any MCP-compatible coding environment, including Cursor, VSCode, and other modern development tools. Configuration requires a single command in your MCP settings:</p>
+<div class="hll"><pre><span></span>uvx<span class="w"> </span>--with<span class="w"> </span>llamabot<span class="o">[</span>all<span class="o">]</span><span class="w"> </span>llamabot<span class="w"> </span>mcp<span class="w"> </span>launch
+</pre></div>
+<p>Once configured, AI agents can query LlamaBot documentation using natural language queries. Ask "How do I use StructuredBot for data extraction?" and the agent receives structured results with content, relevance scores, and metadata. This contextual information enables agents to provide accurate, up-to-date assistance without manual documentation lookup.</p>
+<p>This reduces context-switching between code and documentation. AI agents can access relevant information and provide suggestions based on current code patterns and usage examples. This approach is particularly valuable for data science teams who need to maintain consistency across experiments while leveraging the latest library capabilities.</p>
+<h2 id="comparing-documentation-approaches-for-ai-agents">Comparing documentation approaches for AI agents</h2><p>There are several ways to provide documentation to AI agents, each with distinct trade-offs. Understanding these approaches helps clarify why the MCP server approach represents a significant improvement.</p>
+<p><strong>Native tool documentation</strong> (like Cursor's built-in docs capabilities) offers seamless integration and can fetch docs from online sources, but you're limited to how the tool fetches those docs. It may not be able to access certain systems gated behind access controls or include custom organizational knowledge and process documentation.</p>
+<p><strong>Manual repository inclusion</strong> works well for users familiar with IDEs, workspaces, and development concepts, but it requires familiarity with these practices that are unfamiliar to non-technical users or individual developers. It also doesn't scale beyond individual developers. The documentation becomes part of the context window, consuming valuable tokens and potentially overwhelming the agent with irrelevant information.</p>
+<p><strong>Copy-paste or file upload</strong> (like Claude Projects) provides flexibility for non-technical users but creates maintenance overhead. You must manually update documentation when it changes, and there's no semantic search capability—agents can only work with what you explicitly provide.</p>
+<p><strong>Web search by agents</strong> seems convenient but creates inefficiency in the development workflow. If the documentation is up-to-date, the LLM will find it eventually, but it requires multiple iterations of web searches to locate the right information. I discovered this firsthand when building LlamaBot—web searches by coding agents required more iterations than directly providing context, but manual approaches don't scale.</p>
+<p>The MCP server approach provides automatic updates, semantic search, system-agnostic compatibility, and organizational knowledge integration. It offers a standardized way to keep AI agents current with evolving documentation. The trade-off is initial setup complexity, but this is mitigated by the pre-built databases that ship with packages.</p>
+<h2 id="beyond-software-documentation-surfacing-any-process-knowledge">Beyond software documentation - surfacing any process knowledge</h2><p>The MCP approach extends beyond software documentation. The LlamaBot server gives an example of how organizations can surface their process documentation, institutional knowledge, and domain expertise.</p>
+<p>I believe that data science teams could transform their workflow documentation—experimental protocols, data validation procedures, model evaluation criteria, or deployment checklists—from scattered wikis, Slack threads, and buried onboarding documents into structured, queryable knowledge bases that AI agents can access and reference during development.</p>
+<p>I can see this approach scaling beyond individual libraries to entire organizational knowledge. We have all imagined AI agents that can query your team's coding standards, understand your deployment procedures, or reference your data governance policies—all without leaving their development environment. Each organization would maintain their own specialized knowledge base, creating networks of interconnected AI-accessible process documentation. How would one implement this? A documentation MCP server may be a great way to start.</p>
+<p>This approach isn't just for software docs. Imagine surfacing your team's process knowledge, onboarding guides, or even those golden nuggets buried in Slack threads. The MCP server pattern can turn scattered, informal knowledge into a living, searchable resource for both humans and AI agents, especially if you treat your processes as versioned software to be exposed to AI agents!</p>
+<p>In my experience, the most valuable knowledge in organizations often exists in informal channels—Slack conversations, email threads, or tribal knowledge that never gets documented. I believe the MCP approach provides a framework for capturing and surfacing this knowledge in ways that AI agents can understand and reference.</p>
+<h2 id="the-future-of-ai-assisted-development">The future of AI-assisted development</h2><p>Future iterations could include real-time updates that rebuild databases when documentation changes, cross-organizational knowledge graphs, and usage pattern analysis that learns from how teams implement processes.</p>
+<p>The goal is to make AI agents active participants in organizational processes, capable of understanding team workflows and providing context-aware recommendations.</p>
+<p>This vision requires rethinking how we structure and maintain organizational knowledge. Instead of writing documentation solely for human consumption, we need to design knowledge systems that serve both human team members and AI agents, creating a symbiotic relationship between human creativity and AI capability while preserving institutional knowledge in accessible, queryable formats.</p>
+<h2 id="getting-started-with-semantic-documentation">Getting started with semantic documentation</h2><p>The MCP server is available in LlamaBot v0.13.10 and later. Getting started requires minimal setup:</p>
+<ol>
+<li>Install LlamaBot with MCP support: <code>pip install llamabot[all]</code></li>
+<li>Configure your coding tool to use the MCP server</li>
+<li>Begin coding with AI agents that understand LlamaBot's capabilities</li>
+</ol>
+<p>The documentation database ships pre-built with the package, eliminating setup friction. The server exposes a single <code>docs_search</code> tool that agents can use to find relevant documentation and source code information, creating a seamless development experience.</p>
+<p>This approach makes documentation an integral part of the AI agent's toolkit, resulting in more capable assistants that can help developers work more effectively.</p>
+<p>The future of AI-assisted development involves better integration between AI agents and the tools they need. LlamaBot's MCP server demonstrates how this integration can work in practice.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-how-to-expose-any-documentation-to-any-llm-agent</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{How to expose any documentation to any LLM agent}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{10}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{19}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/10/19/how-to-expose-any-documentation-to-any-llm-agent}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

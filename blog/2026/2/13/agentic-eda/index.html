@@ -1,0 +1,601 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="How to stay in control when doing EDA with coding agents">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/agentic-eda' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>How to stay in control when doing EDA with coding agents - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">How to stay in control when doing EDA with coding agents</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-02-13</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/agents/">
+        agents
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/exploratory data analysis/">
+        exploratory data analysis
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workflow/">
+        workflow
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/productivity/">
+        productivity
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share how coding agents can supercharge data analysis, but only if we stay in control. By slowing down, asking the right questions, and structuring sessions with journals and artifact gating, we avoid chaos and keep our scientific thinking sharp. I explain the skills and patterns that help teams focus on insights rather than just generating code. Curious how you can harness agent speed without losing your scientific edge?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Speed without control is just chaos.</p>
+<p>I've seen teammates compress a week and a half of analysis work into half a day using coding agents. That's a 5-10x speedup. But here's the thing: that speed only matters if you stay in the driver's seat. Otherwise you're not doing data science, you're just generating artifacts.</p>
+<p>The real unlock isn't that agents write code fast. It's that they can be guided through a structure that keeps you in control of the analysis.</p>
+<h2 id="the-problem-isn-t-speed-it-s-agency">The problem isn't speed, it's agency</h2><p>Coding agents are eager. Give them a CSV file and they'll open it, generate a dozen plots, and dump a wall of code before you've finished describing what you're actually looking for. That feels productive. It isn't.</p>
+<p>The problem is that you've lost the thread. You didn't formulate a clear question. You didn't think through what the x-axis and y-axis should be. You're now reacting to whatever the agent produced, rather than steering toward an answer.</p>
+<p>I've developed a different approach, codified in two skills I use with my coding agents: <a href="https://github.com/ericmjl/skills/tree/main/skills/scientific-eda">scientific-eda</a> for exploratory data analysis and <a href="https://github.com/ericmjl/skills/tree/main/skills/ml-experimentation">ml-experimentation</a> for machine learning experiments. The pattern is the same in both: slow down first, gate on artifacts (plots, tables, etc.), and structure the session so both you and the agent can follow what happened.</p>
+<h2 id="slow-down-first-the-socratic-opening">Slow down first: the Socratic opening</h2><p>The first design principle is counterintuitive: slow down before you speed up.</p>
+<p>When you invoke the scientific-eda skill, the agent does not immediately load your data and start plotting. Instead, it asks you questions. What's the problem context? What are you hoping to learn or decide? What constraints matter?</p>
+<p>From the skill definition:</p>
+<blockquote><p>Do not open the data file and start coding or plotting. Ask for or confirm: the problem context—biological, chemical, or data-science question; what the user hopes to learn or decide; and any constraints.</p>
+</blockquote>
+<p>There's also an explicit guardrail: "ask 'why' before executing." When you request a specific plot or table, the agent briefly asks what question or decision it serves. This isn't bureaucracy. It's alignment. The agent is checking that you've thought through the request before it spends your time executing it.</p>
+<p>This Socratic opening feels slower. But it prevents the far more common waste: generating plots you didn't need, going down rabbit holes you can't explain, and ending up with a folder full of artifacts and no clear answer.</p>
+<h2 id="gate-everything-on-artifacts">Gate everything on artifacts</h2><p>The second design principle is more specific: one artifact at a time.</p>
+<p>If you can't describe what you want, you're not ready to execute. The agent waits. You think. You describe. Then the agent generates exactly what you asked for.</p>
+<p>For a plot, this means articulating the x-axis, the y-axis, and what pattern you're looking for. What would confirm or refute your hypothesis? If you can't answer, the analysis isn't ready to run.</p>
+<p>For a table, this means specifying the columns, rows, and aggregation level. What comparison are you trying to make? What decision will this table inform? A vague request like "show me the data" isn't actionable. "Show me the mean expression level by treatment group" is.</p>
+<p>This is a forcing function for clarity. Describing an artifact precisely forces you to articulate the question you're actually asking. The tradeoff is worth it. You give up a bit of speed up front for precision in execution. And because the agent can generate code in seconds rather than minutes, the net result is still a massive speedup. My teammates went from 1.5-2 weeks to half a day. The precision tax is negligible compared to the execution dividend.</p>
+<h2 id="the-session-structure">The session structure</h2><p>Here's where structure becomes a feature, not overhead.</p>
+<p>Each analysis session is a timestamped folder. The naming convention is ISO datetime plus a descriptive slug:</p>
+<pre><code>analysis/
+  2025-02-05T14-30-00-protein-binding/
+    journal.md      # append-only; shape, actions, findings
+    plots/          # WebP figures only
+    scripts/        # disposable PEP723 scripts; uv run
+</code></pre>
+<p>Let's walk through what each piece does.</p>
+<p><strong>journal.md</strong> is the memory. Before each action, the agent reads the journal. After each action, it appends what happened. Entries get timestamped and tagged: <code>[SHAPE]</code> for data structure discoveries, <code>[PLOT]</code> for visualizations, <code>[FINDING]</code> for observations, <code>[NEXT]</code> for suggested next steps. The journal is scannable. It's also the entry point for anyone (including future you) who wants to understand what happened without reading the code.</p>
+<p><strong>plots/</strong> holds all figures from the session. The skill specifies WebP format for smaller file sizes, though that's a minor detail.</p>
+<p><strong>scripts/</strong> contains disposable Python scripts. Each script has PEP723 inline metadata at the top, declaring its own dependencies. You run them with <code>uv run script.py</code> from the session folder. No environment wrangling. No "which virtualenv am I in?" confusion. One script, one plot.</p>
+<p>The structure serves two purposes. First, it gives the agent a clear protocol to follow: read journal, execute, append to journal, suggest next step. Second, it leaves a trace that any human can follow. You can read the plan, then the journal, then the report, and understand the entire analysis without touching the code.</p>
+<h2 id="what-changes-in-team-conversations">What changes in team conversations</h2><p>Something unexpected happened when I started using this approach with teammates.</p>
+<p>The conversations changed. We stopped asking "why did you write it that way?" and started asking "why did the agent write it that way?" The ego attached to code ownership evaporated. We could critique the work without critiquing each other.</p>
+<p>This matters more than I expected. In the pre-agent world, I'd invest 50-70% of my mental energy on implementation details: wrangling data frames, handling edge cases, debugging syntax errors. That labor created attachment. When someone questioned my code, it felt like they were questioning my thinking.</p>
+<p>Now the agent writes the code. I focus on the questions and verify the work. My teammates and I have more productive scientific conversations because we're discussing the analysis, not defending the implementation. We check the agent's work together, and if something's wrong, we just ask the agent to fix it.</p>
+<h2 id="design-for-the-human">Design for the human</h2><p>The pattern that emerged is simple: if you design for the human, the agent follows.</p>
+<p>The structure that makes your analysis traceable is the same structure that keeps the agent aligned. The journal that helps future-you understand what happened also helps the agent decide what to do next. The artifact-gating that forces you to think clearly also gives the agent precise instructions to execute.</p>
+<p>You stay in control by slowing down at the decision points, describing what you want before you get it, and keeping a running record of what happened. The agent becomes a force multiplier rather than a loose cannon.</p>
+<p>The skills I've linked here are just text files. They're prompts, structured in a way that an LLM-based coding agent can follow. You can copy them, modify them, or write your own. The key insight isn't in any particular skill, it's in the design pattern: gate analysis on artifacts, structure sessions with journals, and make the human's job explicit before the agent's job begins.</p>
+<p>The 5-10x speedup is real. But the real win is that you get to stay the scientist.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-agentic-eda</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{How to stay in control when doing EDA with coding agents}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{02}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{13}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/2/13/agentic-eda}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

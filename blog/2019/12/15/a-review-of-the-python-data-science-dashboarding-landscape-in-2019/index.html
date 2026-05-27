@@ -1,0 +1,736 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="A Review of the Python Data Science Dashboarding Landscape in 2019">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/a-review-of-the-python-data-science-dashboarding-landscape-in-2019' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>A Review of the Python Data Science Dashboarding Landscape in 2019 - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">A Review of the Python Data Science Dashboarding Landscape in 2019</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2019-12-15</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/dashboarding/">
+        dashboarding
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data visualization/">
+        data visualization
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/software development/">
+        software development
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>My reflection on the Python dashboarding landscape. There's been a lot of activity, and I provide some recommendations on how we as data scientists can choose between tools.</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p><em>This blog post is also available on <a href="https://ericmjl.github.io/essays-on-data-science/">my collection of essays</a>.</em></p>
+<h2 id="introduction">Introduction</h2><p>As Pythonista data scientists,
+we are spoiled for choice when it comes to developing front-ends
+for our data apps.
+We used to have to fiddle with HTML in Flask (or Plotly's Dash),
+but now, there are tools in which
+"someone wrote the HTML/JS so I didn't have to".</p>
+<p>Let me give a quick tour of the landscape of tools
+as I've experienced it in 2019.</p>
+<h3 id="beginnings-voila">Beginnings: Voila</h3><p>Previously, I had test-driven
+<a href="https://voila.readthedocs.io/en/latest/">Voila</a>.
+The key advantage I saw back then was that in my workflow,
+once I had the makings of a UI present in the Jupyter notebook,
+and just needed a way to serve it up
+independent of having my end-users run a Jupyter server,
+then Voila helped solve that use case.
+By taking advantage of existing the <code>ipywidgets</code> ecosystem
+and adding on a way to run and serve the HTML output of a notebook,
+Voila solved that part of the dashboarding story quite nicely.
+In many respects,
+I regard Voila as the first proper dashboarding tool for Pythonistas.</p>
+<p>That said, development in a Jupyter notebook
+didn't necessarily foster best practices
+(such as refactoring and testing code).
+When my first project at work ended,
+and I didn't have a need for further dashboarding,
+I didn't touch Voila for a long time.</p>
+<h3 id="another-player-panel">Another player: Panel</h3><p>Later, <a href="http://panel.pyviz.org/">Panel</a> showed up.
+Panel's development model allowed a more modular app setup,
+including importing of plotting functions defined inside <code>.py</code> files
+that returned individual plots.
+Panel also allowed me to prototype in a notebook and see the output live
+before moving the dashboard code into a source <code>.py</code> file.</p>
+<p>At work, we based a one-stop shop dashboard for a project on Panel,
+and in my personal life,
+I also built a
+<a href="https://github.com/ericmjl/minimal-panel-app">minimal panel app</a>
+that I also
+<a href="https://minimal-panel-app.herokuapp.com/">deployed to Heroku</a>.
+Panel was definitely developed
+targeting notebook and source file use cases in mind,
+and this shows through in its source development model.</p>
+<p>That said, panel apps could be slow to load,
+and without having a "spinner" solution in place
+(i.e. something to show the user
+that the app is "doing something" in the background),
+it sometimes made apps <em>feel</em> slow
+even though the slowness was not Panel's fault really.
+(My colleagues and I pulled out all the tricks in our bag to speed things up.)</p>
+<p>Additionally, any errors that show up don't get surfaced to the app's UI,
+where developer eyeballs are on -
+instead, they get buried in the browser's JavaScript console
+or in the Python terminal where the app is being served.
+When deployed, this makes it difficult to see where errors show up
+and debug errors.</p>
+<h3 id="enter-streamlit">Enter Streamlit</h3><p>Now, Streamlit comes along, and some of its initial demos are pretty rad.
+In order to test-drive it,
+I put together this <a href="https://minimal-streamlit.herokuapp.com/">little tutorial</a>
+on the Beta probability distribution for my colleagues.</p>
+<p>Streamlit definitely solves some of the pain points
+that I've observed with Panel and Voila.</p>
+<p>The most important one that I see is that errors are captured by Streamlit
+and bubbled up to the UI,
+where our eyeballs are going to be when developing the app.
+For me, this is a very sensible decision to make, for two reasons:</p>
+<p>Firstly, it makes debugging interactions that much easier.
+Instead of needing to have two interfaces open,
+the error message shows up right where the interaction fails,
+in the same browser window as the UI elements.</p>
+<p>Secondly, it makes it possible for us
+to use the error messages as a UI "hack" to inform users
+where their inputs (e.g. free text) might be invalid,
+thereby giving them <em>informative error messages</em>.
+(Try it out in the Beta distribution app:
+it'll give you an error message right below
+if you try to type something that cant be converted into a float!)</p>
+<p>The other key thing that Streamlit provides as a UI nice-ity
+is the ability to signal to end-users that a computation is happening.
+Streamlit does this in three ways, two of which always come for free.
+<strong>Firstly</strong>, if something is "running",
+then in the top-right hand corner of the page,
+the "Running" spinner will animate.
+<strong>Secondly</strong>, anything that is re-rendering will automatically be greyed out.
+<strong>Finally</strong>, we can use a special context manager
+to provide a custom message on the front-end:</p>
+<div class="hll"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">streamlit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">st</span>
+<span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">spinner</span><span class="p">(</span><span class="s2">&quot;Message goes here...&quot;</span><span class="p">):</span>
+    <span class="c1"># stuff happens</span>
+</pre></div>
+<p>So all-in-all, Streamlit seems to have a solution of some kind
+for the friction points that I have observed with Panel and Voila.</p>
+<p>Besides that, Streamlit, I think, uses a procedural paradigm,
+rather than a callback paradigm, for app construction.
+We just have to think of the app as a linear sequence of actions
+that happen from top to bottom.
+State is never really an issue, because every code change
+and interaction re-runs the source file from top to bottom, from scratch.
+When building quick apps,
+this paradigm really simplifies things compared to a callback-based paradigm.</p>
+<p>Finally, Streamlit also provides a convenient way to add text to the UI
+by automatically parsing as Markdown any raw strings unassigned to a variable
+in a <code>.py</code> file and rendering them as HTML.
+This opens the door to treating a <code>.py</code> file as a
+<a href="https://en.wikipedia.org/wiki/Literate_programming">literate programming document</a>,
+hosted by a Python-based server in the backend.
+It'd be useful especially in teaching scenarios.
+(With <code>pyiodide</code> bringing the PyData stack to the browser,
+I can't wait to see standalone <code>.py</code> files rendered to the DOM!)</p>
+<p>Now, this isn't to say that Streamlit is problem-free.
+There are still rough edges,
+the most glaring (as of today) in the current release
+is the inability to upload a file and operate on it.
+This has been fixed in <a href="https://github.com/streamlit/streamlit/pull/488">a recent pull request</a>,
+so I'm expecting this should show up in a new release any time soon.</p>
+<p>The other not-so-big-problem that I see with Streamlit at the moment
+is the procedural paradigm -
+by always re-running code from top-to-bottom afresh on every single change,
+apps that rely on long compute may need a bit more thought to construct,
+including the use of Streamlit's caching mechanism.
+Being procedural does make things easier for development though,
+and on balance, I would not discount Streamlit's simplicity here.</p>
+<h2 id="where-does-streamlit-fit">Where does Streamlit fit?</h2><p>As I see it, Streamlit's devs are laser-focused on enabling devs
+to <em>very quickly</em> get to a somewhat good-looking app prototype.
+In my experience, the development time for the Beta distribution app
+took about 3 hours, 2.5 of which were spent on composing prose.
+So effectively, I only used half an hour doing code writing,
+with a live and auto-reloading preview
+greatly simplifying the development process.
+(I conservatively estimate that this is about 1.5 times
+as fast as I would be using Panel.)</p>
+<p>Given Streamlit, I would use it to develop two classes of apps:
+(1) very tightly-focused utility apps that do one lightweight thing well, and
+(2) bespoke, single-document literate programming education material.</p>
+<p>I would be quite hesitant to build more complex things;
+then again, for me, that statement would be true more generally anyways
+with whatever tool.
+In any case, I think bringing UNIX-like thinking to the web
+is probably a good idea:
+we make little utilities/functional tools
+that can pipe standard data formats from to another.</p>
+<h2 id="common-pain-points-across-all-three-dashboarding-tools">Common pain points across all three dashboarding tools</h2><p>A design pattern I have desired is to be able to serve up a fleet of small,
+individual utilities served up from the same codebase,
+served up by individual server processes,
+but all packaged within the same container.
+The only way I can think of at the moment
+is to build a custom Flask-based gateway
+to redirect properly to each utility's process.
+That said, I think this is probably out of scope
+for the individual dashboarding projects.</p>
+<h2 id="how-do-we-go-forward">How do we go forward?</h2><p>The ecosystem is ever-evolving, and,
+rather than being left confused by the multitude of options available to us,
+I find myself actually being very encouraged
+at the development that has been happening.
+There's competing ideas with friendly competition between the developers,
+but they are also simultaneously listening to each other and their users
+and converging on similar things in the end.</p>
+<p>That said, I think it would be premature to go "all-in" on a single solution
+at this moment.
+For the individual data scientist,
+I would advise to be able to build something
+using each of the dashboarding frameworks.
+My personal recommendations are to know how to use:</p>
+<ul>
+<li>Voila + <code>ipywidgets</code> in a Jupyter notebook</li>
+<li>Panel in Jupyter notebooks and standalone <code>.py</code> files</li>
+<li>Streamlit in <code>.py</code> files.</li>
+</ul>
+<p>These recommendations stem mainly from
+the ability to style and layout content without needing much knowledge of HTML.
+In terms of roughly when to use what,
+my prior experience has been that
+Voila and Streamlit are pretty good for quicker prototypes,
+while Panel has been good for more complex ones,
+though in all cases, we have to worry about speed impacting user experience.</p>
+<p>From my experience at work,
+being able to quickly hash out key visual elements in a front-end prototype
+gives us the ability to better communicate with UI/UX designers and developers
+on what we're trying to accomplish.
+Knowing how to build front-ends ourselves
+lowers the communication and engineering barrier
+when taking a project to production.
+It's a worthwhile skill to have;
+be sure to have it in your toolbox!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2019-a-review-of-the-python-data-science-dashboarding-landscape-in-2019</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{A Review of the Python Data Science Dashboarding Landscape in 2019}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2019}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{12}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{15}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2019/12/15/a-review-of-the-python-data-science-dashboarding-landscape-in-2019}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

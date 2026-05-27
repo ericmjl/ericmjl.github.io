@@ -1,0 +1,579 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Predicting HIV Drug Resistance Phenotype from Genotype">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/predicting-hiv-drug-resistance-phenotype-from-genotype' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Predicting HIV Drug Resistance Phenotype from Genotype - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Predicting HIV Drug Resistance Phenotype from Genotype</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2015-09-28</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/drug resistance/">
+        drug resistance
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/academia/">
+        academia
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/grad school/">
+        grad school
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>A blog post detailing how I built a model to predict drug resistance from HIV protease sequence.</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p><strong>Note to Reader:</strong> I’d highly suggest reading this blog post on the left half of your screen, and have the <a href="https://github.com/ericmjl/hiv-resistance-prediction/blob/master/Predict%20HIV%20Genotype%20from%20Phenotype%20-%20Custom%20Funcs.ipynb">Jupyter notebook</a> on the right half of your screen. Makes things a bit easier to follow.</p>
+<p>I recently have been writing a proposal to conduct some experiments to predict viral RNA polymerase activity, in some standardized unit, from protein genotype. The main application of this would be to be able to conduct quantitative surveillance in a precise fashion. For example, with HIV, as treatment progresses, the virus accumulates mutations that confer resistance. For a physician treating a patient infected with HIV, would it be possible to determine, from sequence data alone, what would be the degree of predicted viral resistance for that patient’s virus?</p>
+<p>Knowing fully that this problem has been tackled many times in the past from multiple angles, I wanted to know how easily I could set up an ML workflow to go from sequence to predicted drug resistance. The goal of this blog post is to document how easy it was for me to get up and running, using Python packages really well-written Python packages.</p>
+<h2 id="raw-code">Raw Code</h2><p>All of my code can be found on my Github <a href="https://github.com/ericmjl/hiv-resistance-prediction">repository</a>. You can also jump directly to the <a href="https://github.com/ericmjl/hiv-resistance-prediction/blob/master/Predict%20HIV%20Genotype%20from%20Phenotype%20-%20Custom%20Funcs.ipynb">Jupyter notebook</a> that I reference code from in this article.</p>
+<h2 id="data-source-and-preprocessing">Data Source and Preprocessing</h2><p>I sourced the data from the <a href="http://hivdb.stanford.edu">Stanford HIV Drug Resistance Database</a>. Specifically, I downloaded the <a href="http://hivdb.stanford.edu/pages/genopheno.dataset.html">high quality, filtered set</a> of Genotype-to-Phenotype mappings, for protease inhibitors, nucleoside reverse transcriptase inhibitors, and non-nucleoside reverse transcriptase inhibitors. I wrote a few custom functions to preprocess the data, including the following steps:</p>
+<ol>
+<li>Replacing all "<code>-</code>" characters with the consensus sequences. I am guessing that they use the "<code>-</code>" character in place to help highlight where the mutations are; much more human readable.</li>
+<li>Removing sequences that had more than one mutation present. Mostly a function of being lazy than anything else.</li>
+<li>Removing sequences with ambiguous amino acids. These are a bit harder to deal with down the road. From biological background knowledge, it’s unlikely that excluding them would be detrmimental.</li>
+<li>Dropping all conserved amino acid positions. They add nothing to the analysis.</li>
+<li>Binarizing the columns. This transforms the letters of the amino acid into a first-pass feature set, in which the binarized columns indicate whether or not an amino acid is present at a given position or not.</li>
+</ol>
+<p>These are found in my <a href="https://github.com/ericmjl/hiv-resistance-prediction/blob/master/custom_funcs.py">custom_funcs.py</a> module, which I imported into the Jupyter notebooks. Having futzed around for about a day copying/pasting blocks of code, I refactored the code into separate functions for readability, so that only the "business logic" is shown in the notebook.</p>
+<h2 id="train/test-split">Train/Test Split</h2><p>It is a standard practice to split the dataset into a training and test set. K-fold cross-validation is quite easy to do using <code>scikit-learn</code>. Given an <code>X</code> and a <code>Y</code> matrix, to split it into <code>X_train</code>, <code>X_test</code>, <code>Y_train</code>, and <code>Y_test</code>, simply do the function call:</p>
+<p><code>X_train, X_test, Y_train, Y_test = train_test_split(X_binarized, Y)</code></p>
+<h2 id="model-training">Model Training</h2><p>To train models, I used the <a href="http://scikit-learn.org/stable/">scikit-learn</a> package to help. It’s useful to note that <code>scikit-learn</code> has a consistent API - every regressor model has a <code>MODEL.fit()</code> and a <code>MODEL.predict()</code> function. This ‘modular’ style allowed me to wrap the series of function calls into single-line functions, and thus quickly try out a variety of models to see what out-of-box predictive power would be. Using the Random Forest Regressor as an example, I wrapped up the training and plotting phases:</p>
+<p><code># Model Training</code>
+<code>kwargs = {'n_jobs':-1, 'n_estimators':1000}</code>
+<code>rfr, rfr_preds, rfr_mse, rfr_r2 = cf.train_model(*tts_data, model=RandomForestRegressor, modelargs=kwargs)</code></p>
+<p><code># Plotting</code>
+<code>cf.scatterplot_results(rfr_preds, Y_test, rfr_mse, rfr_r2, DRUG, 'Rand. Forest', figsize=std)</code></p>
+<p>Here, <code>cf</code> simply refers to the <code>custom_funcs.py</code> module I wrote to refactor out the repetitive boilerplate code needed.</p>
+<p>The ensemble learners also include feature importances, i.e. an identification of the columns in the data that best predict the outcome of interest. I wrapped the feature importances code to make it easy to plot:</p>
+<p><code>cf.barplot_feature_importances(rfr, DRUG, 'Rand. Forest', figsize=std)</code></p>
+<p>In particular, I used the ensemble learners, which are known to be pretty powerful for learning tasks. And for comparison, I pitted them against a number of linear models as well. As you can see in the notebooks, the ensemble learners outperformed the linear models, at least for a binarized amino acid feature set. This makes intuitive sense - protein sequence to function is non-linear, and highly contextual.</p>
+<h2 id="neural-networks">Neural Networks!</h2><p>One of the things I wanted to highlight here was how <a href="http://danielnouri.org">Daniel Nouri’s</a> <a href="https://github.com/dnouri/nolearn">nolearn</a> package made it easy for me to start experimenting with neural networks. By no means am I a deep learning expert - I consider myself too algebra-blind (but by no means code-blind!) to learn the math behind it all. However, I know that my learning style of diving into the deep end and doing a lot of hands-on trials would help me get a fairly good intuitive grasp of how to do it. So after futzing around on a GPU cluster for a few days trying to get it configured right, I got <code>theano</code>, <code>lasagne</code> and <code>nolearn</code> up and running. (Note: A GPU makes light(er) work of training artificial neural nets. CPUs take around 5-10x more time. Highly recommended to use a GPU with neural nets. Shout-out to my PhD thesis committee member, Mark Bathe, for giving me access to his lab's GPU machine!)</p>
+<p><code>nolearn</code>’s API is, by design, really close to the <code>scikit-learn</code> API. I find this to be a great thing - since neural networks are basically ML models, we get the familiar <code>neural_net.fit()</code> and <code>neural_net.predict()</code> function calls. (The importance of great APIs! Thank you, @dnouri!) The API also makes specifying a neural network architecture quite easy. For example, in the simple feed-forward network architecture that I show in the Jupyter notebook, network layers are specified as a list of parameters, and each layer’s properties can be specified by using named parameters that sync up with the specified names. The comments in my Jupyter notebook in some of the layers show my (rather simple) efforts in experimenting with different architectures. To note, the original structure of the feed-forward network is directly lifted from <a href="http://danielnouri.org/notes/2014/12/17/using-convolutional-neural-nets-to-detect-facial-keypoints-tutorial/">Daniel Nouri's tutorial</a>, so big thanks to him for publishing it!</p>
+<p>FWIW, I also learned from other experienced Pythonistas (shout out to Rick Landau!) for teaching me <em>not</em> to use binary features on neural networks, something I happily disregarded for this first pass. But I’ve nonetheless still remembered that lesson! And in future iterations, probably I will try to change to non-binary features.</p>
+<h2 id="summary-future-work">Summary &amp; Future Work</h2><p>So to summarize, the <code>scikit-learn</code> API makes it pretty easy to get my hands dirty doing machine learning. By keeping a <code>scikit-learn</code>-like API, <code>nolearn</code> also does a great job of keeping neural nets accessible.</p>
+<p>What else do I think can be done? Well, there’s one idea I’ve been thinking about, to improve the regression score beyond what experimental error in the dataset may limit us to. Think convolutional networks (convnets) and their data input requirements. Basically, most image recognition convnets need a 2D image. But what if I used a convnet that can take in a 3D image instead? Calculating a numerical value, such as the electrostatic charge at every grid point in a static, modelled 3D protein structure, may be much more informative than simply using binarized amino acid columns. A recent paper that I read in <a href="http://www.biomedcentral.com/1471-2164/15/S5/S1">BMC genomics</a> (say "yay" for open access!) uses a computationally efficient shortcut representation to get structural features encoded as well, with great success; I would definitely be game for implementing their version as a first pass as well.</p>
+<p>Apart from that, it's insufficient to run only on a single train/test split. There will always be unavoidable biases in the trained model. Training <code>k</code>-fold splits <code>k</code> times is a common practice I've heard. In papers I've read, usually k-fold splits are trained k times, and the standard deviation reported. I can imagine also doing it n times, to get a better feel for the generalization error (assuming the data are representative of the population).</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2015-predicting-hiv-drug-resistance-phenotype-from-genotype</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Predicting HIV Drug Resistance Phenotype from Genotype}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2015}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{09}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{28}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2015/9/28/predicting-hiv-drug-resistance-phenotype-from-genotype}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

@@ -1,0 +1,637 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Tooling up for Plain Text Academic Writing in Markdown">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/tooling-up-for-plain-text-academic-writing-in-markdown' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Tooling up for Plain Text Academic Writing in Markdown - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Tooling up for Plain Text Academic Writing in Markdown</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2016-06-22</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/academia/">
+        academia
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/writing/">
+        writing
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/grad school/">
+        grad school
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>My tooling I used for academic plain-text writing. Mostly done for my paper, also for my thesis.</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I finally got down to doing it! Here's my brief notes on how I set it up; it may change a bit later on, as my needs evolve, but it should be enough instructions for others to get setup.</p>
+<h3 id="motivation">Motivation</h3><p>I'm writing a <a href="https://github.com/ericmjl/genomic-surveillance-whitepaper">white paper on genomic surveillance</a>, so I thought I'd experiment with something new. By switching over to writing in plain text, I can ignore all distractions by other word processors. I'm looking at you, Word, Google Docs and others.</p>
+<p>Because I get to write in plain text, I also get to version control the text. By selectively committing logical blocks, I can also easily selectively revert unwanted commits; it's rare, but once in a while it's saved my work.</p>
+<p>Because it's plain text, I can export to anywhere with a bit of configuration.</p>
+<p>Because it's written publicly, it's <a href="https://speakerdeck.com/jakevdp/in-defense-of-extreme-openness">great</a>.</p>
+<h3 id="overview">Overview</h3><p>What I do here is basically use Sublime Text 3 (ST3) as a word processor. BibTex libraries are used for keeping track of papers, but I like Papers for organizing more than BibDesk - automatic downloading of PDFs is the best part. My compromise, then, is to export my Papers library to a master BibTex library prior to compiling everything into a single PDF. Papers can also add in Pandoc-style citations, which Pandoc can then parse to make an automatic bibliography. Everything is kept under version control, for reasons stated above.</p>
+<p>It basically took me one morning's worth of time invested in tooling this up, but I can already imagine the amount of time saved by minimizing the time spent on formatting references, figure numbers, versioning, and (most of all) being able to write without being distracted.</p>
+<h3 id="tools">Tools</h3><ol>
+<li>Papers for Mac (paid)</li>
+<li>Pandoc (free)</li>
+<li>Sublime Text (free/paid) - you can use it for free, but I decided to fess up and pay for it, the text editor is that good, that powerful, that I would encourage you to do the same too.</li>
+<li>Git and GitHub (free)</li>
+</ol>
+<h3 id="setup">Setup</h3><h4 id="central-bibliography">Central Bibliography</h4><ol>
+<li>Set up a version controlled GitHub repository for the master bibliography file.</li>
+<li>In Papers, export the library to that repository's directory. Take note of the <code>/path/to/master/library.bib</code>.</li>
+</ol>
+<h4 id="general-tooling">General Tooling</h4><ol>
+<li>Install Pandoc, either using <code>homebrew</code>, or download a fresh copy of the installer binary. Note the <code>/path/to/pandoc</code>.</li>
+<li>Install the LaTeX distribution, make sure that <code>pdflatex</code> is bundled. Note the <code>/path/to/pdflatex</code>.</li>
+<li>Fork the <a href="https://github.com/citation-style-language/styles">Citation Styles repository</a>, and clone it to disk.</li>
+<li>Install the <code>pandoc-fignos</code> plugin, to enable automatic figure numbering. Again, take note of the <code>/path/to/pandoc-fignos</code>.</li>
+</ol>
+<h4 id="sublime-text-tooling">Sublime Text Tooling</h4><p><strong>Install:</strong></p>
+<ol>
+<li><a href="https://packagecontrol.io/installation">Package Control</a></li>
+<li><a href="https://packagecontrol.io/packages/Pandoc">Pandoc</a></li>
+<li><a href="https://packagecontrol.io/packages/CiteBibtex">CiteBibTex</a></li>
+<li><a href="https://packagecontrol.io/packages/AcademicMarkdown">AcademicMarkdown</a></li>
+<li><a href="https://packagecontrol.io/packages/Git">Git</a></li>
+<li><a href="https://packagecontrol.io/packages/GitGutter">GitGutter</a></li>
+<li><a href="https://packagecontrol.io/packages/PackageSync">PackageSync</a></li>
+<li><a href="https://packagecontrol.io/packages/BracketHighlighter">BracketHighlighter</a></li>
+<li><a href="https://packagecontrol.io/packages/WordCount">WordCount</a></li>
+</ol>
+<p><strong>Configure:</strong></p>
+<p><em>Pandoc</em></p>
+<div class="hll"><pre><span></span><span class="w">    </span><span class="nt">&quot;pandoc-path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/path/to/pandoc&quot;</span><span class="p">,</span>
+</pre></div>
+<div class="hll"><pre><span></span><span class="w">      </span><span class="nt">&quot;PDF&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;text.html&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;html&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;text.html.markdown&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;markdown&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;pandoc-arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="s2">&quot;-t&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;pdf&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="s2">&quot;--latex-engine=/path/to/pdflatex&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="s2">&quot;-o&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;/path/to/output.pdf&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="s2">&quot;--filter&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;/path/to/pandoc-fignos&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="s2">&quot;--filter=/path/to/pandoc-citeproc&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="s2">&quot;--bibliography=/path/to/master/library.bib&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">      </span><span class="p">}</span>
+</pre></div>
+<p>Apart from placing these <code>pandoc-arguments</code> under the <code>PDF</code> section, you may want to do the same for the <code>HTML</code> and <code>Word</code> sections.</p>
+<p><em>CiteBibTex</em></p>
+<p>Find the corresponding configuration fields, and change them to the following (making appropriate changes):</p>
+<div class="hll"><pre><span></span><span class="w">    </span><span class="nt">&quot;bibtex_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/path/to/master/library.bib&quot;</span><span class="p">,</span>
+</pre></div>
+<div class="hll"><pre><span></span><span class="w">    </span><span class="nt">&quot;autodetect_citation_style&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</pre></div>
+<h3 id="user-interface">User Interface</h3><p>Today I learned that ST3 has a "Distraction Free Writing Mode", under the <code>View</code> menu. Earlier on, I also learned that it has a pane view mode, also under <code>View --&gt;Layout</code>. Both have associated shortcut keys. My writing interface ended up looking something like what's in Figure {@fig:two-pane}.</p>
+<p><img src="two-pane.webp" alt="Two pane view.">{#fig:two-pane}</p>
+<p>My outline is on the right, and the main text is on the left, and there's no distracting tabs, sliding preview, or directory structure (as is what I'm used to for coding).</p>
+<h3 id="writing">Writing</h3><p>Get started by adding the YAML headers in the document (Figure {@fig:yaml-header}).</p>
+<p><img src="yaml-header.webp" alt="YAML Headers.">{#fig:yaml-header}</p>
+<p>Specifically, the format of what I have above is:</p>
+<div class="hll"><pre><span></span>---
+title: &quot;My Title Here&quot;
+author:
+<span class="k">-</span><span class="w"> </span>&quot;Author 1 (Affiliation)&quot;
+<span class="k">-</span><span class="w"> </span>&quot;Author 2 (Affiliation)&quot;
+date: 22 June 2016
+<span class="gu">csl: nature.csl</span>
+<span class="gu">---</span>
+</pre></div>
+<p>More details on what metadata can be stored in the headers can be found on the <a href="http://pandoc.org/README.html">Pandoc README</a>.</p>
+<h3 id="citations">Citations</h3><p>Citations are done in Markdown by inserting:</p>
+<div class="hll"><pre><span></span>   [@citekey]
+</pre></div>
+<p>where the <code>citekey</code> is automatically generated by Papers, usually in the form of <code>LastName:YYYY[2- or 3-letter hash]</code>. An example of what gets inserted is <code>[@Young:2013px]</code>. I was reading through Papers' <a href="http://support.mekentosj.com/kb/cite-write-your-manuscripts-and-essays-with-citations/universal-citekey">documentation on the generation of a "universal" citekey</a>, and I quite like the idea. I think the specification is worth a read, and is an idea worth spreading (sorry, I like TED talks).</p>
+<p>I intentionally configured my ST3 Pandoc package settings to use a global master library, rather than a project-specific one. I think it stemmed more from laziness than anything else; one less thing to manage is a better thing.</p>
+<h3 id="generating-outputs">Generating Outputs</h3><p>Note that the way I had configured Pandoc (above) for PDF outputs was to use the master <code>.bib</code> library for matching up references. An additional thing I did was to keep a copy of the citation style language (CSL) markup file in the same directory as the Markdown document.</p>
+<p>Within ST3, we can use the Command Palette to quickly generate the PDF output desired. Steps are:</p>
+<p>Select Pandoc</p>
+<p><img src="cmd-01-pandoc.webp" alt="Command Palette: Select Pandoc."></p>
+<p>Select PDF as the output</p>
+<p><img src="cmd-02-pdf.webp" alt="Command Palette: Select PDF."></p>
+<p>Inspect that gorgeous PDF!</p>
+<p><img src="cmd-03-output.webp" alt="Look at this gorgeous output!"></p>
+<p>Check your references!</p>
+<p><img src="cmd-04-references.webp" alt="Look at those perfectly Nature-formatted references!"></p>
+<p>Just to show how the figures get numbered correctly (I don't have any in the draft whitepaper I'm writing), you can inspect the <a href="blog-source.md">source code for this blog post</a>, and the associated <a href="blog-post.pdf">pdf file</a>. Note how I've not numbered anything except the associated files. It's pretty cool.</p>
+<p>Alrighty - and that's it! Hope it helps others too.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2016-tooling-up-for-plain-text-academic-writing-in-markdown</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Tooling up for Plain Text Academic Writing in Markdown}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2016}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{06}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{22}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2016/6/22/tooling-up-for-plain-text-academic-writing-in-markdown}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

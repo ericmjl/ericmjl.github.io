@@ -1,0 +1,630 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="How to build self-improving coding agents - Part 1">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/how-to-build-self-improving-coding-agents-part-1' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>How to build self-improving coding agents - Part 1 - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">How to build self-improving coding agents - Part 1</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-01-17</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/agents/">
+        agents
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workflows/">
+        workflows
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/productivity/">
+        productivity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/software/">
+        software
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share my approach to making coding agents truly self-improving by focusing on operational feedback, not just model updates. I explain how using an AGENTS.md file as repository memory and developing reusable skills can help agents learn from mistakes and reduce repetitive guidance. My goal is to create an environment where agents get better each week without constant babysitting. Curious how these strategies can make your coding agents more effective?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I want my coding agents to get better every week.</p>
+<p>Not in the abstract “the models are improving” sense. I mean it in the operational sense: if an agent makes a mistake, or takes a path I would not take, I want that feedback to stick. If I have to repeat the same preference every session, I am not using an agent. I am babysitting a very fast intern.</p>
+<p>The trick is that the model weights are not changing mid-week. So if you want “self-improvement”, you need to change the environment the agent works inside.</p>
+<p>I have found two levers that compound:</p>
+<ul>
+<li><code>AGENTS.md</code> as repository memory</li>
+<li>skills as reusable playbooks</li>
+</ul>
+<p>This post is a longer “source of truth” version. My intent is to later break it into smaller blog entries, and also rework it into chapters for my data science bootstrap notes.</p>
+<h2 id="where-improvement-comes-from">Where improvement comes from</h2><p>The UX I am after is simple: I stop repeating myself. I stop doing the same end-of-day cleanup, writing the same reminders, re-explaining where files live. The agent starts each session closer to how I want it to work.</p>
+<p>If the model weights are not changing mid-week, improvement has to come from the environment you wrap around the agent.</p>
+<p>For me that environment has two pieces:</p>
+<ul>
+<li>durable repository memory (<code>AGENTS.md</code>)</li>
+<li>reusable playbooks (skills)</li>
+</ul>
+<p>Once you have those two, you can treat “agent improvement” like runbooks plus postmortems.</p>
+<p>The analogy is imperfect, because this is not documentation for humans. The loop is the same though: write down the repeatable steps, then write down what surprised you and what you will do differently next time.</p>
+<p>The difference is that natural language can turn into tool calls. When you write things down precisely, the agent can execute them.</p>
+<p>I usually start with <code>AGENTS.md</code>, because it cuts down exploration immediately.</p>
+<h2 id="agents-md-as-repository-memory"><code>AGENTS.md</code> as repository memory</h2><p>If you have not run into the <code>AGENTS.md</code> convention before, see <a href="https://agents.md/">agents.md</a>.</p>
+<p>To be effective, <code>AGENTS.md</code> needs to do two things for the agent.</p>
+<p>First, it needs to make the agent fast at navigating the repo so it can get to the right files with minimal wandering. A code map is a straightforward way to do that.</p>
+<p>Second, it needs to encode the local ways of working in this repo so the agent stops repeating the same mistakes. That is where corrections and norms live.</p>
+<p>This is the loop I want:</p>
+<ul>
+<li>I observe a mismatch.</li>
+<li>I tell the agent what must be true.</li>
+<li>The agent writes the correction into <code>AGENTS.md</code> (or a repo-local skill).</li>
+<li>The agent reads it next time.</li>
+</ul>
+<h3 id="fast-navigation-to-the-right-files">Fast navigation to the right files</h3><p>In the ideal state, the agent gets to the right files quickly.</p>
+<p>A code map is the simplest way I know to make that happen. It does not have to be perfect. It can be slightly stale and still be useful.</p>
+<p>I have seen this pay off in a very practical way. In my <code>canvas-chat</code> codebase, having a map of the repo let the agent one-shot an obscure spot where events were emitted for node rendering. Without a map, the agent previously needed 5 to 6 <code>rg</code> searches, just to find the right neighborhood of the code.</p>
+<p>The difference is small in absolute time, something like 40 seconds versus 2 seconds. But it changes the feel of the collaboration. The agent spends less time wandering, and I spend less time steering.</p>
+<h3 id="close-the-loop-when-the-map-is-stale">Close the loop when the map is stale</h3><p>There is one extra move that makes this feel self-correcting: When the agent notices that the code map looks stale, it should update the code map.</p>
+<p>This is a subtle point. The map is not a static artifact. It is part of a feedback loop. When the agent’s exploration discovers a mismatch between the map and reality, that discovery should flow back into <code>AGENTS.md</code>.</p>
+<p>You can encode this as an explicit instruction inside <code>AGENTS.md</code>. You can also refresh on a schedule, like weekly, but the on-demand update is the part that makes the loop feel alive.</p>
+<h3 id="corrections-that-become-durable-norms">Corrections that become durable norms</h3><p>The second job of <code>AGENTS.md</code> is to hold repo-specific corrections to agents behaviour.</p>
+<p>These are the things you find yourself saying out loud.</p>
+<p>Two examples from my own work:</p>
+<ul>
+<li>Run Python in the <code>pixi</code> context. Use <code>pixi run python ...</code>.</li>
+<li>Do not cheat by modifying the tests to make them pass.</li>
+</ul>
+<p>I say the first one because the agent will often try <code>python -c ...</code> to quickly check something. In a <code>pixi</code>-managed project, that fails if you do not have a global Python.</p>
+<p>I say the second one because changing tests to make them pass destroys the point of having tests.</p>
+<p>Once these rules are written down, the agent stops making you restate them. This is the simplest way I know to reduce repeated friction.</p>
+<h2 id="a-starter-prompt-for-generating-agents.md`">A starter prompt for generating <code>AGENTS.md</code></h2><p>I have found it useful to bootstrap <code>AGENTS.md</code> with a one-time deep dive.</p>
+<p>Here is a prompt I use as a starting point. It is intentionally repo-specific.</p>
+<div class="hll"><pre><span></span>You are a coding agent. Read through this repository and create an `AGENTS.md` file at the repo root.
+
+Requirements:
+- Include a short codebase map that helps an agent find files quickly.
+- Focus on entry points, directory roles, naming conventions, configuration wiring, and test locations.
+- Add a section called &quot;Local norms&quot; with repo-specific rules you infer from the code and tooling.
+- Add a section called &quot;Self-correction&quot; with two explicit instructions:
+  - If the code map is discovered to be stale, update it.
+  - If the user gives a correction about how work should be done in this repo, add it to &quot;Local norms&quot; (or another clearly labeled section) so future sessions inherit it.
+
+Process:
+- Use search and targeted file reads, do not read every file.
+- Prefer `rg` searches to find entry points and configs.
+- Prefer high-signal files: `README`, `pyproject.toml`, `package.json`, `Makefile`, `opencode.json`, `.github/workflows`, and top-level `src` or `app` directories.
+
+Output:
+- Write the final `AGENTS.md` contents in Markdown.
+- Keep it concise. Optimize for navigation and correctness.
+</pre></div>
+<p>If you want, you can go further and add a cadence rule like “refresh weekly”, but I would keep it lightweight. The goal is compounding value, not bureaucracy.</p>
+<p>Once <code>AGENTS.md</code> exists, skills are the second lever.</p>
+<h2 id="coming-next">Coming next</h2><p>Part 2 is about skills as reusable playbooks.</p>
+<p>It covers what a skill is, several examples from coding and scientific work, and why I ended up writing a <code>skill-installer</code> skill to deal with the current distribution story.</p>
+<p><a href="../../18/how-to-build-self-improving-coding-agents-part-2/">How to build self-improving coding agents - Part 2</a></p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-how-to-build-self-improving-coding-agents-part-1</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{How to build self-improving coding agents - Part 1}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{01}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{17}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/1/17/how-to-build-self-improving-coding-agents-part-1}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

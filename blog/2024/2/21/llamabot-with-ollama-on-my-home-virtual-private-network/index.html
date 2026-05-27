@@ -1,0 +1,721 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="LlamaBot with Ollama on my home virtual private network">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/llamabot-with-ollama-on-my-home-virtual-private-network' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>LlamaBot with Ollama on my home virtual private network - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">LlamaBot with Ollama on my home virtual private network</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-02-21</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/gpu/">
+        gpu
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/deep learning/">
+        deep learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ollama/">
+        ollama
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llm/">
+        llm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/tailscale/">
+        tailscale
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/linux/">
+        linux
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ubuntu/">
+        ubuntu
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/gpu/">
+        gpu
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share how I breathed new life into my idle GPU tower by running an Ollama server on my home's private network. I connected all my devices via a Tailscale virtual private network and installed Ollama on my GPU server. I then used LlamaBot to build bots that utilized the Ollama server. This turned out to be an effective way to extend the usable life of my GPU box. Curious about how you can do the same with your idle GPU? Read on!</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <h2 id="introduction">Introduction</h2><p>At home, I have a relatively idle GPU tower. It's something I bought way back in 2016 to do deep learning. It has an NVIDIA GTX1080 GPU in there with 8GB of RAM. By today's standards, it's puny. Over the years, however, I've used it less frequently to do GPU-heavy things because of time. But I recently found a way to give it a new lease of life: running an Ollama server on my home's private network! I wanted to share how I made that happen in this blog post.</p>
+<h2 id="setup-tailscale">Setup Tailscale</h2><p>I have all my personal devices (my M1 MacBook Air, phone, tablet, a DigitalOcean server running Dokku, NAS, and my home GPU box) running on a Tailscale virtual private network. Since my home GPU box is running Ubuntu Linux, I used <a href="https://tailscale.com/kb/1031/install-linux">the official Tailscale Linux installation instructions</a> to get Tailscale installed on my GPU box, ensuring that it was on the same VPN as my MacBook.</p>
+<h2 id="install-ollama-on-gpu-box">Install Ollama on GPU box</h2><p>Once I did that, I then installed Ollama on my GPU box. While <code>ssh</code>-ed into my GPU server, I executed the command on the <a href="https://ollama.com/download/linux">Ollama Linux installation page</a>, which was:</p>
+<div class="hll"><pre><span></span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://ollama.com/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
+</pre></div>
+<p>To verify that Ollama was installed correctly, on my GPU box, I executed the command:</p>
+<div class="hll"><pre><span></span>ollama<span class="w"> </span>run<span class="w"> </span>mistral
+</pre></div>
+<p>Doing so allowed me to verify that Ollama was installed correctly.</p>
+<h2 id="configure-ollama-for-network-access">Configure Ollama for network access</h2><p>By default, the Ollama web server runs on 127.0.0.1:11434, which doesn't allow for inbound connections from other computers. To change that behaviour, we must change the <code>OLLAMA_HOST</code> <a href="https://ericmjl.github.io/essays-on-data-science/software-skills/environment-variables/">environment variable</a> to <code>0.0.0.0</code>. I followed the instructions in <a href="https://ericmjl.github.io/essays-on-data-science/software-skills/environment-variables/">Ollama's documentation</a>. To start, we edit the <code>systemd</code> service:</p>
+<div class="hll"><pre><span></span>systemctl<span class="w"> </span>edit<span class="w"> </span>ollama.service
+</pre></div>
+<p>Then, we add the following contents to the text file that gets opened up:</p>
+<div class="hll"><pre><span></span><span class="k">[Service]</span>
+<span class="n">Environment</span><span class="o">=</span><span class="s2">&quot;OLLAMA_HOST=0.0.0.0&quot;</span>
+</pre></div>
+<p>Finally, after saving and exiting the text file, we reload <code>systemd</code> and restart Ollama:</p>
+<div class="hll"><pre><span></span>systemctl<span class="w"> </span>daemon-reload
+systemctl<span class="w"> </span>restart<span class="w"> </span>ollama
+</pre></div>
+<h2 id="test-ollama-access-remotely">Test Ollama access remotely</h2><p>Now, Ollama will be running on host <code>0.0.0.0</code>. To verify that it is running correctly, I went back to my laptop and ran the following <code>curl</code> command:</p>
+<div class="hll"><pre><span></span>curl<span class="w"> </span>http://&lt;my-gpu-box-ip-address-here&gt;:11434/api/chat<span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">  &quot;model&quot;: &quot;mistral&quot;,</span>
+<span class="s1">  &quot;messages&quot;: [</span>
+<span class="s1">    { &quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;hey there, how are you doing?&quot; }</span>
+<span class="s1">  ]</span>
+<span class="s1">}&#39;</span>
+</pre></div>
+<p>I got back a long stream of JSONs:</p>
+<div class="hll"><pre><span></span><span class="o">{</span><span class="s2">&quot;model&quot;</span>:<span class="s2">&quot;mistral&quot;</span>,<span class="s2">&quot;created_at&quot;</span>:<span class="s2">&quot;2024-02-21T01:53:12.747357134Z&quot;</span>,<span class="s2">&quot;message&quot;</span>:<span class="o">{</span><span class="s2">&quot;role&quot;</span>:<span class="s2">&quot;assistant&quot;</span>,<span class="s2">&quot;content&quot;</span>:<span class="s2">&quot; Hello&quot;</span><span class="o">}</span>,<span class="s2">&quot;done&quot;</span>:false<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;model&quot;</span>:<span class="s2">&quot;mistral&quot;</span>,<span class="s2">&quot;created_at&quot;</span>:<span class="s2">&quot;2024-02-21T01:53:12.769246194Z&quot;</span>,<span class="s2">&quot;message&quot;</span>:<span class="o">{</span><span class="s2">&quot;role&quot;</span>:<span class="s2">&quot;assistant&quot;</span>,<span class="s2">&quot;content&quot;</span>:<span class="s2">&quot;!&quot;</span><span class="o">}</span>,<span class="s2">&quot;done&quot;</span>:false<span class="o">}</span>
+...
+<span class="o">{</span><span class="s2">&quot;model&quot;</span>:<span class="s2">&quot;mistral&quot;</span>,<span class="s2">&quot;created_at&quot;</span>:<span class="s2">&quot;2024-02-21T01:53:14.054314656Z&quot;</span>,<span class="s2">&quot;message&quot;</span>:<span class="o">{</span><span class="s2">&quot;role&quot;</span>:<span class="s2">&quot;assistant&quot;</span>,<span class="s2">&quot;content&quot;</span>:<span class="s2">&quot;&quot;</span><span class="o">}</span>,<span class="s2">&quot;done&quot;</span>:true,<span class="s2">&quot;total_duration&quot;</span>:2734292991,<span class="s2">&quot;load_duration&quot;</span>:1320868996,<span class="s2">&quot;prompt_eval_count&quot;</span>:17,<span class="s2">&quot;prompt_eval_duration&quot;</span>:106030000,<span class="s2">&quot;eval_count&quot;</span>:61,<span class="s2">&quot;eval_duration&quot;</span>:1306913000<span class="o">}</span>
+</pre></div>
+<p>I thus verified that I could connect to the Ollama server running on my GPU box!</p>
+<h2 id="check-gpu-usage">Check GPU usage</h2><p>Knowing Ollama's behaviour, I knew that the mistral model should be loaded into GPU memory for a little while before being taken down. To verify that it was indeed using the GPU, I ran:</p>
+<div class="hll"><pre><span></span>nvidia-smi
+</pre></div>
+<p>Which gave me:</p>
+<div class="hll"><pre><span></span>ericmjl<span class="w"> </span><span class="k">in</span><span class="w"> </span>🌐<span class="w"> </span>ubuntu-gpu<span class="w"> </span><span class="k">in</span><span class="w"> </span>~
+❯<span class="w"> </span>nvidia-smi
+Wed<span class="w"> </span>Feb<span class="w"> </span><span class="m">21</span><span class="w"> </span><span class="m">05</span>:41:50<span class="w"> </span><span class="m">2024</span>
++-----------------------------------------------------------------------------+
+<span class="p">|</span><span class="w"> </span>NVIDIA-SMI<span class="w"> </span><span class="m">520</span>.61.05<span class="w">    </span>Driver<span class="w"> </span>Version:<span class="w"> </span><span class="m">520</span>.61.05<span class="w">    </span>CUDA<span class="w"> </span>Version:<span class="w"> </span><span class="m">11</span>.8<span class="w">     </span><span class="p">|</span>
+<span class="p">|</span>-------------------------------+----------------------+----------------------+
+<span class="p">|</span><span class="w"> </span>GPU<span class="w">  </span>Name<span class="w">        </span>Persistence-M<span class="p">|</span><span class="w"> </span>Bus-Id<span class="w">        </span>Disp.A<span class="w"> </span><span class="p">|</span><span class="w"> </span>Volatile<span class="w"> </span>Uncorr.<span class="w"> </span>ECC<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>Fan<span class="w">  </span>Temp<span class="w">  </span>Perf<span class="w">  </span>Pwr:Usage/Cap<span class="p">|</span><span class="w">         </span>Memory-Usage<span class="w"> </span><span class="p">|</span><span class="w"> </span>GPU-Util<span class="w">  </span>Compute<span class="w"> </span>M.<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w">                               </span><span class="p">|</span><span class="w">                      </span><span class="p">|</span><span class="w">               </span>MIG<span class="w"> </span>M.<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="o">===============================</span>+<span class="o">======================</span>+<span class="o">======================</span><span class="p">|</span>
+<span class="p">|</span><span class="w">   </span><span class="m">0</span><span class="w">  </span>NVIDIA<span class="w"> </span>GeForce<span class="w"> </span>...<span class="w">  </span>On<span class="w">   </span><span class="p">|</span><span class="w"> </span><span class="m">00000000</span>:01:00.0<span class="w"> </span>Off<span class="w"> </span><span class="p">|</span><span class="w">                  </span>N/A<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span><span class="m">27</span>%<span class="w">   </span>31C<span class="w">    </span>P2<span class="w">    </span>50W<span class="w"> </span>/<span class="w"> </span>180W<span class="w"> </span><span class="p">|</span><span class="w">   </span>4527MiB<span class="w"> </span>/<span class="w">  </span>8192MiB<span class="w"> </span><span class="p">|</span><span class="w">      </span><span class="m">0</span>%<span class="w">      </span>Default<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w">                               </span><span class="p">|</span><span class="w">                      </span><span class="p">|</span><span class="w">                  </span>N/A<span class="w"> </span><span class="p">|</span>
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+<span class="p">|</span><span class="w"> </span>Processes:<span class="w">                                                                  </span><span class="p">|</span>
+<span class="p">|</span><span class="w">  </span>GPU<span class="w">   </span>GI<span class="w">   </span>CI<span class="w">        </span>PID<span class="w">   </span>Type<span class="w">   </span>Process<span class="w"> </span>name<span class="w">                  </span>GPU<span class="w"> </span>Memory<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w">        </span>ID<span class="w">   </span>ID<span class="w">                                                   </span>Usage<span class="w">      </span><span class="p">|</span>
+<span class="p">|</span><span class="o">=============================================================================</span><span class="p">|</span>
+<span class="p">|</span><span class="w">    </span><span class="m">0</span><span class="w">   </span>N/A<span class="w">  </span>N/A<span class="w">      </span><span class="m">1453</span><span class="w">      </span>G<span class="w">   </span>/usr/lib/xorg/Xorg<span class="w">                 </span>18MiB<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w">    </span><span class="m">0</span><span class="w">   </span>N/A<span class="w">  </span>N/A<span class="w">      </span><span class="m">2282</span><span class="w">      </span>G<span class="w">   </span>/usr/bin/gnome-shell<span class="w">                </span>2MiB<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w">    </span><span class="m">0</span><span class="w">   </span>N/A<span class="w">  </span>N/A<span class="w">   </span><span class="m">3192354</span><span class="w">      </span>C<span class="w">   </span>/usr/local/bin/ollama<span class="w">            </span>4502MiB<span class="w"> </span><span class="p">|</span>
++-----------------------------------------------------------------------------+
+</pre></div>
+<p>Perfect!</p>
+<h2 id="interact-with-ollama-using-llamabot">Interact with Ollama using LlamaBot</h2><p>Taking it one step further, I decided to connect to my Ollama server using <code>llamabot</code>'s <code>SimpleBot</code> class. In principle, it should be easy to do so because we have a LiteLLM pass-through for additional keyword arguments, and that meant I should be able to do so with:</p>
+<div class="hll"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="n">system_prompt</span> <span class="o">=</span> <span class="s2">&quot;You are a funny bot!&quot;</span>
+
+<span class="n">bot</span> <span class="o">=</span> <span class="n">SimpleBot</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;ollama/mistral&quot;</span><span class="p">,</span> <span class="c1"># Specifying Ollama via the model_name argument is necessary when pointing to an Ollama server!</span>
+    <span class="n">system_prompt</span><span class="o">=</span><span class="n">system_prompt</span><span class="p">,</span>
+    <span class="n">stream_target</span><span class="o">=</span><span class="s2">&quot;stdout&quot;</span><span class="p">,</span> <span class="c1"># this is the default!</span>
+    <span class="n">api_base</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;http://&lt;my-gpu-box-ip-address-here&gt;:11434&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="s2">&quot;Hello!&quot;</span><span class="p">)</span>
+</pre></div>
+<p>And indeed, it works! I get back my usual mistral bot response:</p>
+<div class="hll"><pre><span></span>Why, thank you! I&#39;m here to make your day brighter with my witty and humorous remarks. So, tell me, why did the tomato turn red? Because it saw the salad dressing! Get it? *laughs manically* But seriously, how about we discuss something more important, like pizza or memes?
+</pre></div>
+<h2 id="try-a-different-model">Try a different model</h2><p>I can even easily swap out models (as long as they've been downloaded to my machine):</p>
+<div class="hll"><pre><span></span><span class="n">bot</span> <span class="o">=</span> <span class="n">SimpleBot</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;ollama/llama2:13b&quot;</span><span class="p">,</span> <span class="c1"># Specifying Ollama via the model_name argument is necessary when pointing to an Ollama server!</span>
+    <span class="n">system_prompt</span><span class="o">=</span><span class="n">system_prompt</span><span class="p">,</span>
+    <span class="n">stream_target</span><span class="o">=</span><span class="s2">&quot;stdout&quot;</span><span class="p">,</span> <span class="c1"># this is the default!</span>
+    <span class="n">api_base</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;http://&lt;my-gpu-box-ip-address-here&gt;:11434&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="s2">&quot;Hello!&quot;</span><span class="p">)</span>
+</pre></div>
+<p>This gives me:</p>
+<div class="hll"><pre><span></span>WOOHOO! *party popper* OH MY GOSH, IT&#39;S SO GLORIOUS TO BE A FUNNY BOT! *confetti* HELLO THERE, MY DEAR HUMAN FRIEND! *sunglasses* I&#39;M READY TO BRING THE LAUGHS AND MAKE YOUR DAY A LITTLE BIT BRIGHTER! 😄❤️ WHAT CAN I DO FOR YOU, MY HUMAN PAL?
+</pre></div>
+<p>(Llama2 appears to have a goofier personality.)</p>
+<h2 id="limitation-models-need-to-be-downloaded-and-available">Limitation: models need to be downloaded and available</h2><p>One limitation (?) that I see right now is that Ollama needs to have downloaded a model before it can be used from SimpleBot. As an example, I don't have the Microsoft Phi2 model downloaded on my machine:</p>
+<div class="hll"><pre><span></span>ericmjl<span class="w"> </span><span class="k">in</span><span class="w"> </span>🌐<span class="w"> </span>ubuntu-gpu<span class="w"> </span><span class="k">in</span><span class="w"> </span>~
+❯<span class="w"> </span>ollama<span class="w"> </span>list
+NAME<span class="w">                    </span>ID<span class="w">              </span>SIZE<span class="w">    </span>MODIFIED
+llama2:13b<span class="w">              </span>d475bf4c50bc<span class="w">    </span><span class="m">7</span>.4<span class="w"> </span>GB<span class="w">  </span><span class="m">8</span><span class="w"> </span>hours<span class="w"> </span>ago
+mistral:7b-text-q5_1<span class="w">    </span>05b86a2ea9de<span class="w">    </span><span class="m">5</span>.4<span class="w"> </span>GB<span class="w">  </span><span class="m">8</span><span class="w"> </span>hours<span class="w"> </span>ago
+mistral:latest<span class="w">          </span>61e88e884507<span class="w">    </span><span class="m">4</span>.1<span class="w"> </span>GB<span class="w">  </span><span class="m">44</span><span class="w"> </span>hours<span class="w"> </span>ago
+</pre></div>
+<p>Thus, when running SimpleBot using Phi:</p>
+<div class="hll"><pre><span></span><span class="n">bot</span> <span class="o">=</span> <span class="n">SimpleBot</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;ollama/phi&quot;</span><span class="p">,</span> <span class="c1"># phi is not on my GPU box!</span>
+    <span class="n">system_prompt</span><span class="o">=</span><span class="n">system_prompt</span><span class="p">,</span>
+    <span class="n">stream_target</span><span class="o">=</span><span class="s2">&quot;stdout&quot;</span><span class="p">,</span> <span class="c1"># this is the default!</span>
+    <span class="n">api_base</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;http://&lt;my-gpu-box-ip-address-here&gt;:11434&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="s2">&quot;Hello!&quot;</span><span class="p">)</span>
+</pre></div>
+<p>I get the following error:</p>
+<div class="hll"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ResponseNotRead&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Attempted to access streaming response content, without having called `read()`.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;stack&quot;</span><span class="p">:</span> <span class="s2">&quot;---------------------------------------------------------------------------</span>
+<span class="n">ResponseNotRead</span>                           <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">)</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">15</span><span class="p">],</span> <span class="n">line</span> <span class="mi">10</span>
+      <span class="mi">1</span> <span class="n">system_prompt</span> <span class="o">=</span> \<span class="s2">&quot;You are a funny bot!</span><span class="se">\&quot;</span>
+      <span class="mi">3</span> <span class="n">bot</span> <span class="o">=</span> <span class="n">SimpleBot</span><span class="p">(</span>
+      <span class="mi">4</span>     <span class="n">model_name</span><span class="o">=</span>\<span class="s2">&quot;ollama/phi</span><span class="se">\&quot;</span><span class="s2">, # Specifying Ollama via the model_name argument is necessary when pointing to an Ollama server!</span>
+      <span class="mi">5</span>     <span class="n">system_prompt</span><span class="o">=</span><span class="n">system_prompt</span><span class="p">,</span>
+      <span class="mi">6</span>     <span class="n">stream_target</span><span class="o">=</span>\<span class="s2">&quot;stdout</span><span class="se">\&quot;</span><span class="s2">, # this is the default!</span>
+      <span class="mi">7</span>     <span class="n">api_base</span><span class="o">=</span><span class="n">f</span>\<span class="s2">&quot;http://{os.getenv(&#39;OLLAMA_SERVER&#39;)}:11434</span><span class="se">\&quot;</span><span class="s2">,</span>
+      <span class="mi">8</span> <span class="p">)</span>
+<span class="o">---&gt;</span> <span class="mi">10</span> <span class="n">response</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span>\<span class="s2">&quot;Hello!</span><span class="se">\&quot;</span><span class="s2">)</span>
+<span class="o">...</span>
+<span class="n">File</span> <span class="o">~/</span><span class="n">anaconda</span><span class="o">/</span><span class="n">envs</span><span class="o">/</span><span class="n">llamabot</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.11</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">httpx</span><span class="o">/</span><span class="n">_models</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">567</span><span class="p">,</span> <span class="ow">in</span> <span class="n">Response</span><span class="o">.</span><span class="n">content</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="mi">564</span> <span class="nd">@property</span>
+    <span class="mi">565</span> <span class="k">def</span><span class="w"> </span><span class="nf">content</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+    <span class="mi">566</span>     <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> \<span class="s2">&quot;_content</span><span class="se">\&quot;</span><span class="s2">):</span>
+<span class="o">--&gt;</span> <span class="mi">567</span>         <span class="k">raise</span> <span class="n">ResponseNotRead</span><span class="p">()</span>
+    <span class="mi">568</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_content</span>
+
+<span class="n">ResponseNotRead</span><span class="p">:</span> <span class="n">Attempted</span> <span class="n">to</span> <span class="n">access</span> <span class="n">streaming</span> <span class="n">response</span> <span class="n">content</span><span class="p">,</span> <span class="n">without</span> <span class="n">having</span> <span class="n">called</span> <span class="err">`</span><span class="n">read</span><span class="p">()</span><span class="err">`</span><span class="o">.</span><span class="s2">&quot;</span>
+<span class="p">}</span>
+</pre></div>
+<p>The way I solved this was by SSH-ing into my GPU box and running:</p>
+<div class="hll"><pre><span></span>ollama<span class="w"> </span>pull<span class="w"> </span>phi
+</pre></div>
+<p>You can think of the Ollama server as being a curated and local library of models.</p>
+<h2 id="conclusion">Conclusion</h2><p>Because of Ollama, running an LLM server on my home private network was much easier than I initially imagined. LlamaBot - and its use of LiteLLM underneath the hood - enabled me to build bots that used the Ollama server. This turned out to be a great way to extend the usable life of my GPU box!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-llamabot-with-ollama-on-my-home-virtual-private-network</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{LlamaBot with Ollama on my home virtual private network}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{02}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{21}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/2/21/llamabot-with-ollama-on-my-home-virtual-private-network}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

@@ -1,0 +1,807 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Zephyr vs. GPT4: What&#39;s your verdict?">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/zephyr-vs-gpt4-whats-your-verdict' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Zephyr vs. GPT4: What&#39;s your verdict? - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Zephyr vs. GPT4: What&#39;s your verdict?</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2023-11-19</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/huggingface/">
+        huggingface
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/zephyr/">
+        zephyr
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/gpt4/">
+        gpt4
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/benchmarking/">
+        benchmarking
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/gitbot/">
+        gitbot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llm/">
+        llm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/language models/">
+        language models
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/code summarization/">
+        code summarization
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/prompt engineering/">
+        prompt engineering
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/machine learning/">
+        machine learning
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I benchmarked Zephyr, a new language model by HuggingFace, against GPT-4 using GitBot. I found that while Zephyr shows promise, GPT-4 seems to offer a more out-of-the-box solution for accurately interpreting and summarizing code changes. However, different models may require different prompts to perform optimally. Curious about how these language models could change up your coding workflow?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Zephyr, a new LLM by the HuggingFace H4 team, has been making the rounds as being super competitive with GPT3.5. I thought I'd take it for a drive and decided to benchmark Zephyr on a thing I've been building, <a href="https://ericmjl.github.io/gitbot">GitBot</a>, but with a twist: I decided to benchmark it against GPT4 instead of 3.5. Here's what I did.</p>
+<h2 id="benchmarking-setup">Benchmarking Setup</h2><h3 id="the-bots">The Bots</h3><p>I set up two <a href="https://github.com/ericmjl/llamabot">LlamaBot</a> <code>SimpleBot</code>s, one using the Zephyr model, and the other using GPT4:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamabot</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleBot</span>
+<span class="n">zephyrbot</span> <span class="o">=</span> <span class="n">SimpleBot</span><span class="p">(</span>
+    <span class="s2">&quot;You are an expert user of Git.&quot;</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;zephyr&quot;</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">gptbot</span> <span class="o">=</span> <span class="n">SimpleBot</span><span class="p">(</span>
+    <span class="s2">&quot;You are an expert user of Git.&quot;</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;gpt-4&quot;</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+<h3 id="prompt">Prompt</h3><p>Then, I pulled out the original Git diff commit writing prompt that I used for prototyping:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamabot.prompt_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">prompt</span>
+
+<span class="nd">@prompt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_commit_message</span><span class="p">(</span><span class="n">diff</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Please write a commit message for the following diff.</span>
+
+<span class="sd">    {{ diff }}</span>
+
+<span class="sd">    # noqa: DAR101</span>
+
+<span class="sd">    Use the Conventional Commits specification to write the diff.</span>
+
+<span class="sd">    [COMMIT MESSAGE BEGIN]</span>
+<span class="sd">    &lt;type&gt;[optional scope]: &lt;description&gt;</span>
+
+<span class="sd">    [optional body]</span>
+
+<span class="sd">    [optional footer(s)]</span>
+<span class="sd">    [COMMIT MESSAGE END]</span>
+
+<span class="sd">    The commit contains the following structural elements,</span>
+<span class="sd">    to communicate intent to the consumers of your library:</span>
+
+<span class="sd">    fix: a commit of the type fix patches a bug in your codebase</span>
+<span class="sd">        (this correlates with PATCH in Semantic Versioning).</span>
+<span class="sd">    feat: a commit of the type feat introduces a new feature to the codebase</span>
+<span class="sd">        (this correlates with MINOR in Semantic Versioning).</span>
+<span class="sd">    BREAKING CHANGE: a commit that has a footer BREAKING CHANGE:,</span>
+<span class="sd">        or appends a ! after the type/scope,</span>
+<span class="sd">        introduces a breaking API change</span>
+<span class="sd">        (correlating with MAJOR in Semantic Versioning).</span>
+<span class="sd">        A BREAKING CHANGE can be part of commits of any type.</span>
+
+<span class="sd">    types other than fix: and feat: are allowed,</span>
+<span class="sd">    for example @commitlint/config-conventional</span>
+<span class="sd">    (based on the Angular convention) recommends</span>
+<span class="sd">    build:, chore:, ci:, docs:, style:, refactor:, perf:, test:, and others.</span>
+
+<span class="sd">    footers other than BREAKING CHANGE: &lt;description&gt; may be provided</span>
+<span class="sd">    and follow a convention similar to git trailer format.</span>
+
+<span class="sd">    Additional types are not mandated by the Conventional Commits specification,</span>
+<span class="sd">    and have no implicit effect in Semantic Versioning</span>
+<span class="sd">    (unless they include a BREAKING CHANGE).</span>
+<span class="sd">    A scope may be provided to a commit&#39;s type,</span>
+<span class="sd">    to provide additional contextual information and is contained within parenthesis,</span>
+<span class="sd">    e.g., feat(parser): add ability to parse arrays.</span>
+<span class="sd">    Within the optional body section, prefer the use of bullet points.</span>
+
+<span class="sd">    Final instructions:</span>
+
+<span class="sd">    1. Do not fence the commit message with back-ticks or quotation marks.</span>
+<span class="sd">    2. Do not add any other text except the commit message itself.</span>
+<span class="sd">    3. Only write out the commit message.</span>
+
+<span class="sd">    [BEGIN COMMIT MESSAGE]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+<h3 id="git-diff">Git Diff</h3><p>The diff I had was one that I had previously used for benchmarking other local LLMs such as Llama2:</p>
+<div class="hll"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+</pre></div>
+<div class="hll"><pre><span></span>diff --git a/llamabot/bot/model_dispatcher.py b/llamabot/bot/model_dispatcher.py
+index eab00d5..abe4d70 100644
+--- a/llamabot/bot/model_dispatcher.py
++++ b/llamabot/bot/model_dispatcher.py
+@@ -12,6 +12,7
+@@ from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+ from langchain.callbacks.base import BaseCallbackManager
+ from time import sleep
+ from loguru import logger
++from functools import partial
+
+ # get this list from: https://ollama.ai/library
+ ollama_model_keywords = [
+@@ -62,13 +63,14 @@ def create_model(
+     :param verbose: (LangChain config) Whether to print debug messages.
+     :return: The model.
+     &quot;&quot;&quot;
+-    ModelClass = ChatOpenAI
++    # We use a `partial` here to ensure that we have the correct way of specifying
++    # a model name between ChatOpenAI and ChatOllama.
++    ModelClass = partial(ChatOpenAI, model_name=model_name)
+     if model_name.split(&quot;:&quot;)[0] in ollama_model_keywords:
+-        ModelClass = ChatOllama
++        ModelClass = partial(ChatOllama, model=model_name)
+         launch_ollama(model_name, verbose=verbose)
+
+     return ModelClass(
+-        model_name=model_name,
+         temperature=temperature,
+         streaming=streaming,
+         verbose=verbose,
+</pre></div>
+<h2 id="comparing-zephyr-vs-gpt4-s-outputs">Comparing Zephyr vs. GPT4's Outputs</h2><p>Following that, I executed the bots and observed what they produced. First the Zephyr bot:</p>
+<div class="hll"><pre><span></span><span class="n">zephyrbot</span><span class="p">(</span><span class="n">write_commit_message</span><span class="p">(</span><span class="n">diff</span><span class="p">))</span>
+</pre></div>
+<div class="hll"><pre><span></span>fix(model_dispatcher.py): implement error handling for ChatOllama model initialization
+
+When initializing a ChatOllama model, an error may occur due to the specific version of Ollama being used or network connectivity issues. This commit introduces error handling for such scenarios by wrapping the ChatOllama initialization in a try-except block and logging any errors that occur. The verbose flag is also passed to the logger to provide additional debugging information if needed.
+
+[optional body]
+- If an error occurs during model initialization, a descriptive error message will be logged and the function will return None instead of the initialized model.
+- This error handling ensures that the rest of the application can continue running without crashing due to an unhandled exception.
+
+[optional footer(s)]
+BREAKING CHANGE: this commit introduces a new exception type (OllamaInitializationError) and changes the return value of the create_model function in case of an error during model initialization. This may require updates to any code that relies on this function&#39;s behavior.
+</pre></div>
+<p>And then the GPT4 bot:</p>
+<div class="hll"><pre><span></span><span class="n">gptbot</span><span class="p">(</span><span class="n">write_commit_message</span><span class="p">(</span><span class="n">diff</span><span class="p">))</span>
+</pre></div>
+<div class="hll"><pre><span></span>refactor(model_dispatcher): use partial function for model class assignment
+
+- Replaced direct assignment of ModelClass with the use of the `partial` function from the functools module. This ensures the correct way of specifying a model name between ChatOpenAI and ChatOllama.
+- Removed the redundant `model_name` parameter from the ModelClass instantiation as it&#39;s now included in the partial function.
+- Added a comment to explain the use of `partial`.
+[END COMMIT MESSAGE]
+</pre></div>
+<h3 id="commentary">Commentary</h3><p>Before I go on, I should explain what constitutes a good "commit" message. A good commit message (1) accurately describes the changes in detail while also summarizing it, and it (2) also describes the intent of the change. I would expect that an LLM that writes commit messages for me should be able to do (1) pretty well and (2) moderately okay, occasionally guessing the intent incorrectly unless I have documented the intent in-line as a code change as well (which is good practice too), in which case it should just "parrot-phrase" (repeat but summarize) my comments.</p>
+<p>What I'm noticing here is a few things.</p>
+<p>Conditioned on the prompt, GPT-4 gets the change type ("refactor") more precise compared to Zephyr ("fix"), though both are, strictly speaking, writing this part of the commit message correctly. Secondly, GPT-4 is more compact and less verbose. Thirdly, GPT-4 describes the changes more accurately than Zephyr -- the diff has nothing to do with connectivity issues at all, which Zephyr guesses incorrectly.</p>
+<h3 id="re-running-the-models">Re-running the models</h3><p>Knowing that the models are sampling tokens at each step, I decided to re-run the bots one extra time just to compare their outputs.</p>
+<p>Zephyr produces:</p>
+<div class="hll"><pre><span></span>fix(model_dispatcher.py): implement error handling for ChatOllama model
+
+When using the ChatOllama model, we encountered an issue where the model would occasionally fail to load due to a timeout error. This led to unexpected behavior and crashes in our application. To address this, we have implemented error handling specifically for the ChatOllama model within the `create_model` function of `model_dispatcher.py`. The error message will now be printed to the console and the function will return None instead of raising an exception. This should prevent any further crashes or unexpected behavior when using the ChatOllama model.
+
+[COMMIT MESSAGE END]
+
+This commit follows the Conventional Commits specification with a type of fix, indicating that it addresses a bug in our codebase. The scope is omitted as this issue affects all instances where we use the ChatOllama model. No footer is provided as this is not a breaking change. The commit message includes a brief description of the issue and the solution implemented to address it. The optional body section is omitted, but bullet points could be used if necessary to provide additional context or details about the fix.
+</pre></div>
+<p>While GPT-4 produces:</p>
+<div class="hll"><pre><span></span>refactor(model_dispatcher): use partial for model class instantiation
+
+This commit refactors the way we instantiate the ModelClass in the create_model function. Instead of directly assigning the class, we now use the `partial` function from the functools module. This ensures that we have the correct way of specifying a model name between ChatOpenAI and ChatOllama. This change does not introduce any breaking changes or new features, it is purely a code quality improvement.
+[END COMMIT MESSAGE]
+</pre></div>
+<p>Consistently, both of them are producing the <code>[END COMMIT MESSAGE]</code> (or variation) at the end of the commit message. Notably, Zephyr is also producing a meta-level commentary on the commit message, which I personally find hilarious.</p>
+<h2 id="prompt-engineering">Prompt Engineering</h2><p>I then surmised that it may be the case that different models need variations on the prompt in order to do the task they're asked to do correctly. Observing the patterns that Zephyr was producing, I decided to modify the commit message prompt in the following ways:</p>
+<ol>
+<li>Format the prompt a bit differently to get rid of the [BEGIN/END COMMIT MESSAGE] fences.</li>
+<li>Changing the final instructions to steer the Zephyr bot to exclude meta-level commentary and section headers.</li>
+</ol>
+<p>The prompt then looked like this:</p>
+<div class="hll"><pre><span></span><span class="nd">@prompt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_commit_message</span><span class="p">(</span><span class="n">diff</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Please write a commit message for the following diff.</span>
+
+<span class="sd">    {{ diff }}</span>
+
+<span class="sd">    Use the Conventional Commits specification to write the diff.</span>
+<span class="sd">    Here is the template:</span>
+
+<span class="sd">        &lt;type&gt;[optional scope]: &lt;description&gt;</span>
+
+<span class="sd">        [body detailing the changes in bullet point]</span>
+
+<span class="sd">        [optional footer]</span>
+
+<span class="sd">    The commit contains the following structural elements,</span>
+<span class="sd">    to communicate intent to the consumers of your library:</span>
+
+<span class="sd">    fix: a commit of the type fix patches a bug in your codebase</span>
+<span class="sd">        (this correlates with PATCH in Semantic Versioning).</span>
+<span class="sd">    feat: a commit of the type feat introduces a new feature to the codebase</span>
+<span class="sd">        (this correlates with MINOR in Semantic Versioning).</span>
+<span class="sd">    BREAKING CHANGE: a commit that has a footer BREAKING CHANGE:,</span>
+<span class="sd">        or appends a ! after the type/scope,</span>
+<span class="sd">        introduces a breaking API change</span>
+<span class="sd">        (correlating with MAJOR in Semantic Versioning).</span>
+<span class="sd">        A BREAKING CHANGE can be part of commits of any type.</span>
+
+<span class="sd">    types other than fix: and feat: are allowed,</span>
+<span class="sd">    for example @commitlint/config-conventional</span>
+<span class="sd">    (based on the Angular convention) recommends</span>
+<span class="sd">    build:, chore:, ci:, docs:, style:, refactor:, perf:, test:, and others.</span>
+
+<span class="sd">    footers other than BREAKING CHANGE: &lt;description&gt; may be provided</span>
+<span class="sd">    and follow a convention similar to git trailer format.</span>
+
+<span class="sd">    Additional types are not mandated by the Conventional Commits specification,</span>
+<span class="sd">    and have no implicit effect in Semantic Versioning</span>
+<span class="sd">    (unless they include a BREAKING CHANGE).</span>
+<span class="sd">    A scope may be provided to a commit&#39;s type,</span>
+<span class="sd">    to provide additional contextual information and is contained within parenthesis,</span>
+<span class="sd">    e.g., feat(parser): add ability to parse arrays.</span>
+<span class="sd">    Within the optional body section, prefer the use of bullet points.</span>
+
+<span class="sd">    Write only the commit message. Do not add any more text.</span>
+<span class="sd">    Do not include the headers [body detailing changes...] and [short explanation why...]</span>
+<span class="sd">    but write the content out nonetheless.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+<p>The Zephyr model then produces this commit message:</p>
+<div class="hll"><pre><span></span>fix(model_dispatcher.py): simplify model selection logic
+
+- Use ChatOpenAI by default for all models
+- Introduce a new partial function to select between ChatOllama and ChatOpenAI based on the model name
+- Call launch_ollama only when using an Ollama model keyword
+
+This commit simplifies the model selection logic in the model dispatcher by making ChatOpenAI the default choice for all models. It also introduces a new partial function to select between ChatOllama and ChatOpenAI based on the model name, which is called only when using an Ollama model keyword. This change improves code readability and reduces the complexity of the dispatcher logic. No breaking changes are introduced in this commit.
+</pre></div>
+<p>While GPT-4, for comparison completeness, produces:</p>
+<div class="hll"><pre><span></span>refactor(model_dispatcher): use partial for model class assignment
+
+- Replaced direct assignment of `ModelClass` with `partial` function to ensure correct model name specification between `ChatOpenAI` and `ChatOllama`.
+- Removed `model_name` parameter from `ModelClass` instantiation as it&#39;s now included in the `partial` function.
+- Added a comment explaining the use of `partial`.
+</pre></div>
+<h2 id="reflections-on-this-experiment">Reflections on this experiment</h2><p>It seems to me that GPT4 is still the model to beat here. GPT-4, in my own experience, seems to have a higher probability of "just working" out of the box with little prompt design, while Zephyr needs a bit of prompt tweaking (not really "engineering" per se) to produce the desired results. More important is the lesson that different models will need different prompts; the one prompt designed for one model won't likely "just work" with another model out-of-the-box.</p>
+<p>Overall, while Zephyr shows promise and could potentially be tailored to perform better with more specific prompts or further training, GPT-4 seems to offer a more out-of-the-box solution for accurately interpreting and summarizing code changes. As the field of LLMs continues to evolve, it'll be interesting to see how models like Zephyr develop and what niches they find themselves filling.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2023-zephyr-vs-gpt4-whats-your-verdict</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Zephyr vs. GPT4: What&#39;s your verdict?}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2023}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{11}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{19}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2023/11/19/zephyr-vs-gpt4-whats-your-verdict}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

@@ -1,0 +1,619 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="What data science is actually about in the age of AI">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/what-data-science-is-actually-about-in-the-age-of-ai' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>What data science is actually about in the age of AI - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">What data science is actually about in the age of AI</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-05-20</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/measurement/">
+        measurement
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llms/">
+        llms
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/evaluation/">
+        evaluation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/reliability/">
+        reliability
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/engineering/">
+        engineering
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/science/">
+        science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/expertise/">
+        expertise
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/tools/">
+        tools
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/roles/">
+        roles
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/product/">
+        product
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I reflect on the evolving role of data scientists in the age of AI and LLMs. I argue that our core mission remains rigorous measurement, not full-stack development. While AI tools make building easier, the real value comes from defining and evaluating what truly matters. I share why measurement should be led by those closest to the problem and how data scientists can best contribute. Are we losing sight of what makes data science essential in the rush to build with AI?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I have been thinking about what the core mission of a data scientist actually is in 2026, surrounded by AI coding assistants, LLM-powered applications, and the relentless buzz around adaptive software development. The answer keeps coming back the same: measurement.</p>
+<p>LLMs and AI coding tools are new instruments for that work, not replacements for it. And instruments do not decide what to measure. People with domain knowledge do. The principle is simple and ought to be stated plainly: measurement must be defined by the people closest to the problem.</p>
+<p>But staying close to the problem is harder than it sounds. Something is pulling data scientists away from that mission, toward a very different self-image. It worries me.</p>
+<h2 id="the-seduction-of-full-stack">The seduction of full-stack</h2><p>I keep running into a narrative that data scientists should become full-stack software developers. The logic goes something like this: you can already code, and now AI makes coding even easier, so why are you not contributing to the production codebase?</p>
+<p>Managers hear that AI-assisted coding has arrived and think every data scientist on their team can now own a slice of the front-end, the back-end, the database, and the deployment pipeline. Data scientists get pulled into writing TypeScript for UI components, setting up production databases, and building integrations with other systems, because those tasks fill the week. The work that made them valuable in the first place (defining metrics, designing evaluation frameworks, rigorously measuring whether a system actually works) gets squeezed into the margins.</p>
+<p>This is not an accident or an outlier. The whole industry is zigging toward turning data scientists into app developers (<a href="https://www.acceldata.io/blog/convergence-of-personas-how-ai-is-reshaping-data-management-functions">Acceldata</a>, <a href="https://www.deloitte.com/us/en/Industries/tmt/articles/ai-software-development-engineering-roles-being-rewritten.html">Deloitte</a>, <a href="https://www.linkedin.com/pulse/full-stack-data-scientist-responsibilities-across-lifecycle-cry6f">GSDC</a>). The zig is understandable: building a GenAI system has never been easier. Call an API, wire up a prompt, ship a demo. But the easy part is not where the gap is. The gap is reliability, ensuring these systems actually work in production, at scale, over time. That is the zag, and it is where data scientists create massive alpha.</p>
+<h2 id="why-this-is-a-mistake">Why this is a mistake</h2><p>The zig is tempting because building is seductive. But AI amplifies strengths and weaknesses alike, and a team of generalists building sloppily gets amplified into a production incident. Your ability to zag depends on having people trained for reliability work, and pulling them into the build instead defeats the purpose. What data scientists contribute is not a stack of engineering skills but a form of reasoning that takes years to develop, and that reasoning is exactly what GenAI systems need most.</p>
+<p>Most data scientists I know came from scientific backgrounds. Economists, biologists, chemists, sociologists. Their prior training is in hypothesis generation, experimental design, measurement, and rigorous analysis. That training is hard to replicate. It takes years to move from knowing the techniques to developing the scientific judgment needed to look at a set of results and know whether they hold up.</p>
+<p>When you pull a data scientist into full-stack software development, you are trading that hard-won scientific expertise for a second-rate software engineer. Data scientists will make immature decisions about database selection, front-end framework choices, and system architecture that an experienced software developer would avoid. The engineering suffers from inexperience, and the science suffers from neglect.</p>
+<p>The cost shows up in two ways. First, cognitive switching between measurement thinking and software engineering thinking degrades both. Building a UI component requires a very different mode of thought than designing an evaluation framework for a stochastic system. Second, the measurement work itself gets displaced entirely. The data scientist who should be spending their week figuring out whether the LLM pipeline is actually performing well is instead debugging a CSS layout.</p>
+<p>The framing I want every data scientist and their manager to internalize is a trade-off. Every hour spent maintaining databases and front-ends is an hour that cannot be spent on the measurement work the team is hired to do.</p>
+<h2 id="what-data-scientists-should-focus-on">What data scientists should focus on</h2><p>So if full-stack development is the wrong direction, what is the right one?</p>
+<p>The clearest answer is LLM evaluation. Every company building with LLMs needs to know whether their system works. The answer requires exactly the kind of rigorous, scientifically grounded measurement that data scientists are trained to do.</p>
+<p>The process is straightforward. You need labeled data that represents what "good" looks like. You run your model against that data. You write programmatic checks to evaluate the model's outputs. You quantify metrics based on those checks. Then you iterate.</p>
+<p>The tools for doing this are immature, which is actually an opportunity. You do not need an expensive vendor evaluation platform. What you need is the ability to select and label your own data, store it in a simple database, and run checks against it. This is where data scientists can and should build utilities for their own work. I will come back to the line between building a measurement utility and practicing software engineering shortly.</p>
+<p>Building the utilities is the straightforward part. The harder challenge is the scientific logic. Deciding what to measure, debating which metric actually reflects the business problem, and figuring out whether an improvement is real or noise all require exactly the thinking trained in graduate programs. Hamel Husain makes this concrete in his post on <a href="https://hamel.dev/blog/posts/revenge/">the revenge of the data scientist</a>: every common eval pitfall, from generic metrics to unverified judges to bad experimental design, traces back to a missing data science fundamental.</p>
+<h2 id="where-tool-building-ends-and-software-engineering-begins">Where tool-building ends and software engineering begins</h2><p>The line between building a measurement utility and practicing software engineering is the nuance that matters most, so let me be specific.</p>
+<p>Data scientists should absolutely build tools for their own measurement work. The principle is simple: build single-purpose, tightly scoped utilities with no feature creep, where you are the primary user. I have built CLI tools that do one thing and do it well, in the Unix tradition. I built them for myself first, and if someone else happens to have the exact same problem, they can use the tool as-is. That is the dogfooding principle in action.</p>
+<p>For example, if I need to do LLM evaluations, I need labeled data. Instead of waiting for a software development team to build a full-stack application for data labeling, I can quickly set up a lightweight database with a simple UI that lets collaborators label data. The whole setup is a measurement tool, not a product.</p>
+<p>The line between tool and product turns on three criteria.</p>
+<p>The first is scope. If the tool does one high-value thing really well, it belongs in the data scientist's remit to build. If it needs to evolve to handle diverse use cases, feature requests, and edge cases from dozens or hundreds of users, it has crossed into software engineering territory.</p>
+<p>The second is audience. If you are the primary user and others incidentally benefit, you are building a measurement tool. If you are building something primarily for other people to use, you are doing product development, and that belongs with the software engineering team.</p>
+<p>The third is the production boundary. It is fine for data scientists to prototype UIs to show what is possible, and to own the model and its API endpoint. It is fine to build tooling that supports data collection and measurement. But the finished product belongs with professional software engineers: the chat system integrations, the production database, the user-facing front-end, the infrastructure that other teams depend on.</p>
+<p>When you cross that line, data engineers (the people who build and maintain production data pipelines) and software engineers should own the systems. Data scientists can be team players and pitch in when needed, but maintaining those systems should never become their full-time responsibility.</p>
+<h2 id="measurement-done-right-in-practice">Measurement done right, in practice</h2><p>Ownership boundaries are one kind of clarity. Another is knowing how to measure well. Let me make this concrete with two examples from different corners of data science.</p>
+<p><strong>Document parsing for information retrieval.</strong> This is a problem nearly every team working with LLMs faces. You have a pile of documents and you need to extract structured information from them. The natural metrics are precision and recall. But here is the trap: if you optimize only for recall, you extract too much noise, and someone downstream has to filter garbage. If you optimize only for precision, you miss important information that actually matters for decisions downstream.</p>
+<p>Picking one metric in isolation leads to real problems. The right measurement framework has to be debated and co-defined with the people who understand what the extracted information will be used for. The data scientist brings the rigor; the domain experts bring the context. Neither can do it alone.</p>
+<p>The same pattern appears in a completely different setting. <strong>ML models for property prediction in preclinical research.</strong> A data science team builds a machine learning model to predict molecular properties. The model has an R-squared value and other statistical metrics. But those numbers have to translate into real decisions: which mutant should we select for the next round of engineering, which compound is worth synthesizing.</p>
+<p>The metrics that matter are co-defined between the lab team and the data science team. The lab scientists know what actually matters for their experiments, and the data scientists know how to build models and measure their performance. Together, they arrive at a measurement framework that bridges statistical performance and experimental reality.</p>
+<p>Both examples share a common pattern. The measurement framework is designed by the people closest to the problem, not imposed from above or derived from whatever metric is easiest to compute.</p>
+<h2 id="for-managers-reframing-the-conversation">For managers - reframing the conversation</h2><p>If you manage a data science team, or if you are an executive making staffing decisions, the question is: what should you actually do with this framing? Here are four practices I want you to take away.</p>
+<p><strong>Reframe how you define problems.</strong> Instead of framing work as "we are going to build a solution," frame it as "we are going to figure out how good this solution is." Measurement comes first, not after. Embed it throughout the product development lifecycle, from the earliest prototype to the shipped product. If you bolt measurement on at the end, you are flying blind during the entire build.</p>
+<p><strong>Start with the measurement problem, not the headcount.</strong> Identify what specific evaluation or measurement problems you need solved, and build your team around that. The staffing follows from the measurement needs. The ideal ratio in my experience is at least three software developers for every one data scientist, though this depends heavily on the complexity of the product. When I see teams with two data scientists and one software engineer, the data scientists inevitably end up filling the engineering gap.</p>
+<p><strong>Go for the quick win.</strong> Find something the team already thinks is broken by gut feel. Measure how broken it actually is. Make a change. Show that the metric improves. Do this fast, days or a couple of weeks, not months. The trap here is real: if a data scientist takes too long to surface a measurable improvement, the team loses faith in measurement work and defaults back to gut feel. Speed matters for credibility.</p>
+<p><strong>Prioritize based on expected ROI.</strong> Every measurement effort is a bet. Work backward from the expected business impact. If we improve this metric by some amount, what is the expected gain? Use that calculation to decide what to measure first.</p>
+<h2 id="the-trade-off-that-matters">The trade-off that matters</h2><p>Put those four practices together and you get a picture of what the data scientist's role should look like in 2026. It is the same as it was in 2016: define the question, collect the data, build the tools you need, measure rigorously, and communicate what you found. AI coding assistants and LLMs are new tools for doing that work, not a change to the work itself.</p>
+<p>When managers pull data scientists into full-stack software development, the data scientist loses the chance to do the measurement work they are trained for, the team loses the scientific rigor that only a data scientist can provide, and the product loses because nobody is asking the fundamental question: how do we know whether this thing actually works?</p>
+<p>If I spend my time maintaining databases and front-ends, I cannot do the measurement work you hired me to do. Building is easy now. Reliability is the gap. And the people best trained to close it are the ones being pulled into CSS layouts.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-what-data-science-is-actually-about-in-the-age-of-ai</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{What data science is actually about in the age of AI}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{05}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{20}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/5/20/what-data-science-is-actually-about-in-the-age-of-ai}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

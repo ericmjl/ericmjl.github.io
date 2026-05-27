@@ -1,0 +1,645 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="The art of finesse as a data scientist">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/the-art-of-finesse-as-a-data-scientist' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>The art of finesse as a data scientist - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">The art of finesse as a data scientist</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-03-16</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/finesse/">
+        finesse
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/productivity/">
+        productivity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/career/">
+        career
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/communication/">
+        communication
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/leadership/">
+        leadership
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/strategy/">
+        strategy
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/problem solving/">
+        problem solving
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/technical skill/">
+        technical skill
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/professional development/">
+        professional development
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/stakeholder management/">
+        stakeholder management
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/project management/">
+        project management
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/collaboration/">
+        collaboration
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/adaptability/">
+        adaptability
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/work effectiveness/">
+        work effectiveness
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>Finesse in data science is the subtle skill that distinguishes exceptional practitioners from the merely competent. It involves recognizing when you're stuck in technical rabbit holes, creating tangible progress markers for stakeholders, working backwards from meaningful milestones, adapting with purpose when approaches aren't working, creatively overcoming technical roadblocks, and cultivating a network for timely assistance. These skills help data scientists navigate complex challenges while consistently delivering value, balancing persistence with adaptability, technical depth with clear communication, and planning with flexibility. How might developing your finesse transform your effectiveness as a data scientist?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I was reading <a href="https://newsletter.weskao.com/">Wes Kao's newsletter</a> recently when she brought up this <a href="https://newsletter.weskao.com/p/the-unspoken-skill-of-finesse">concept of "finesse."</a> This idea immediately clicked for me. In data science, finesse distinguishes exceptional practitioners from the merely competent. It's the subtle skill that allows data scientists to navigate complex challenges while consistently delivering value.</p>
+<h2 id="what-finesse-looks-like-in-practice">What finesse looks like in practice</h2><p>Finesse in data science manifests in several interconnected ways. At its core, it's about making smart decisions about where to focus your efforts, communicating progress effectively, and maintaining momentum even when faced with obstacles. Let me walk through how this plays out in real work situations.</p>
+<h2 id="recognizing-and-escaping-rabbit-holes">Recognizing and escaping rabbit holes</h2><p>Every data scientist has experienced it—what should have been a quick debugging task somehow consumes your entire week. You find yourself four days deep in a technical rabbit hole with nothing tangible to show for it.</p>
+<p>Finesse means developing the self-awareness to recognize when you're stuck and the judgment to adjust course. Instead of persisting with diminishing returns, ask yourself: "Is this the best use of my time right now? What alternative approaches might get me to a useful result faster?"</p>
+<p>For example, when working on prioritizing protein mutations with a computation taking far longer than expected, finesse guides you to develop a parallel approach. Rather than just waiting, you tell collaborators: "While my comprehensive analysis runs in the background, here's an interim solution to review. Can you identify any concerns with these initial results?"</p>
+<p>This strategic pivot keeps the project moving forward while still pursuing the optimal solution. You've created a path to progress rather than allowing a technical challenge to become a complete roadblock.</p>
+<h2 id="creating-tangible-progress-markers">Creating tangible progress markers</h2><p>The most visible demonstration of finesse is consistently showing progress through concrete evidence. Your stakeholders need to see the work advancing through tangible artifacts:</p>
+<ul>
+<li>Visualizations that highlight initial insights</li>
+<li>Written summaries documenting your current understanding</li>
+<li>Regularly updated documentation of your approach</li>
+<li>Working prototypes, even if they represent simplified solutions</li>
+</ul>
+<p>Your collaborators aren't simply curious—they're accountable to others and depend on your work to meet their own commitments. They need evidence of progress they can share with their stakeholders.</p>
+<p>Consider your manager specifically. They directly justify the resources allocated to your work. As one of the most expensive investments in the company, you need to demonstrate continuous value creation. Without visible progress markers, this becomes nearly impossible, putting both your manager and your project at risk.</p>
+<h2 id="working-backwards-from-meaningful-milestones">Working backwards from meaningful milestones</h2><p>A powerful technique for maintaining momentum is identifying meaningful intermediate milestones and working backwards from them. Ask yourself: "What halfway point would give my stakeholders confidence we're on the right track?"</p>
+<p>This approach forces you to break complex problems into demonstrable chunks. Each milestone provides an opportunity to gather feedback, validate assumptions, and adjust course if necessary.</p>
+<p>Rather than waiting until you have the perfect model, share preliminary results that show promise. Validate your data processing pipeline before completing the full analysis. These intermediate deliverables build credibility and trust with your team while ensuring you're headed in the right direction.</p>
+<h2 id="adapting-with-purpose-and-justification">Adapting with purpose and justification</h2><p>Finesse requires purposeful adaptability. When evidence suggests your current approach isn't optimal, make calculated adjustments while keeping your ultimate objective in focus.</p>
+<p>These adaptations must be defensible and based on what you've learned. When changing course, clearly articulate:</p>
+<ol>
+<li>What you've discovered that prompted this change</li>
+<li>Why the new direction is more promising</li>
+<li>How it still connects to your ultimate goal</li>
+</ol>
+<p>This balance between persistence and flexibility demonstrates maturity and judgment. You're neither rigidly sticking to a failing approach nor capriciously jumping between methods without justification.</p>
+<h2 id="overcoming-technical-roadblocks-creatively">Overcoming technical roadblocks creatively</h2><p>Technical limitations test your finesse perhaps more than anything else. When your stack is outdated or your environment creates blockers, finding creative workarounds becomes essential.</p>
+<p>Apply finesse by temporarily using alternative tools, simplifying your approach to work within current constraints, or creating mock-ups of what would be possible once technical issues are resolved. The goal is to ensure technical challenges don't halt all progress, even if you can't completely solve them immediately.</p>
+<p>This creative problem-solving shows initiative and demonstrates your commitment to delivering value despite obstacles. It builds confidence with stakeholders who see your ability to navigate complex technical environments.</p>
+<h2 id="cultivating-a-network-for-timely-assistance">Cultivating a network for timely assistance</h2><p>A crucial aspect of finesse is knowing whom in your organizational network to approach when you need specific help, rather than solely relying on your line management to make connections. This requires proactively building relationships across teams and disciplines over time.</p>
+<p>When facing a technical challenge or needing domain expertise, finesse means already knowing which colleague might have encountered a similar issue or possesses the knowledge you need. This network doesn't materialize overnight—it requires deliberate cultivation through regular cross-team interactions outside formal meetings, following up on casual conversations with meaningful exchanges, offering help to others before you need assistance yourself, and demonstrating genuine interest in colleagues' work.</p>
+<p>By building this network proactively, you can quickly tap into collective organizational knowledge when challenges arise. This approach often resolves problems faster than waiting for formal channels and demonstrates resourcefulness that builds confidence with stakeholders.</p>
+<h2 id="mastering-the-essential-balances">Mastering the essential balances</h2><p>Underlying all these aspects of finesse is the ability to maintain several critical balances. You must develop judgment about when to persist through difficulty versus when to pivot to a different approach. You need to balance perfectionism against progress, delivering valuable insights incrementally rather than waiting for the complete solution. Maintaining scientific integrity while making your work accessible requires balancing technical depth with clear communication. And following a clear strategy while incorporating new information demands a balance between planning and adaptation.</p>
+<p>Mastering these balances takes time and conscious effort, but they represent the foundation of effective professional judgment in data science.</p>
+<h2 id="developing-your-own-finesse">Developing your own finesse</h2><p>Finesse develops through experience, reflection, and deliberate practice. When facing obstacles, I've learned to ask myself: "What would a data scientist with finesse do right now?" The answer usually involves delivering incremental value while maintaining progress toward the comprehensive solution.</p>
+<p>What's important to understand is that finesse isn't typically an innate talent. It's a skill cultivated through intentional development over time. For some who may have natural inclinations toward strategic thinking or communication, this might take months to years to refine. For others starting from scratch, it can be a journey spanning years or even decades.</p>
+<p>The most effective way to develop finesse is through a combination of deliberate daily practice, mentorship, and reflective analysis. Consciously apply finesse principles to everyday challenges to build the muscle memory needed for these approaches to become second nature. Learn directly from those who already demonstrate these skills to find models to emulate and shortcuts past common pitfalls. Regularly examine your approaches and outcomes to identify improvement opportunities. Study how colleagues with finesse navigate similar situations to discover practical templates for your own work.</p>
+<p>The approaches I've outlined reflect what I've observed in my day-to-day work. Effective data scientists demonstrate finesse by balancing persistence with adaptability, communicating progress transparently, and finding creative paths forward when faced with technical limitations.</p>
+<p>Yet finesse manifests in countless ways beyond what I've described here. I'm curious - what are other ways you see finesse showing up in data science roles?</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-the-art-of-finesse-as-a-data-scientist</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{The art of finesse as a data scientist}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{03}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{16}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/3/16/the-art-of-finesse-as-a-data-scientist}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

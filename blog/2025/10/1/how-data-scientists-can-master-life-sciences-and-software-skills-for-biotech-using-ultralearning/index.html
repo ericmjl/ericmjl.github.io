@@ -1,0 +1,670 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="How data scientists can master life sciences and software skills for biotech using ultralearning">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/how-data-scientists-can-master-life-sciences-and-software-skills-for-biotech-using-ultralearning' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>How data scientists can master life sciences and software skills for biotech using ultralearning - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">How data scientists can master life sciences and software skills for biotech using ultralearning</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-10-01</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/biotech/">
+        biotech
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ultralearning/">
+        ultralearning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/datascience/">
+        datascience
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/lifesciences/">
+        lifesciences
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/software/">
+        software
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/learning/">
+        learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/career/">
+        career
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/skills/">
+        skills
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/modeling/">
+        modeling
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/feedback/">
+        feedback
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share how effective biotech data scientists master both life sciences and software skills by applying Scott Young's ultralearning principles. Drawing from my own experience, I explain how to strategically bridge knowledge gaps, focus on real-world projects, and alternate deep dives between domains for continuous growth. Want to know which ultralearning strategies can help you level up your biotech data science career?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>After 8 years working in biotech and 6 years of graduate training before that, I've observed something about the most effective data scientists in biotech: they aren't just T- or π-shaped -- posessing breadth in skill while being deep in 1 or 2 specialties. They're continuously learning new skills to bridge their knowledge gaps.</p>
+<p>There are two common knowledge gaps that I've observed. On one side, there's the vast world of life sciences: molecular biology, cell biology, genetics, immunology, neuroscience, analytical chemistry, organic chemistry, biochemistry. On the other, there's software development, the kind of skills that let you build reliable, maintainable tools that actually work in production.</p>
+<p>The challenge is that these two domains are fundamentally different in how you learn them. And here's the thing: you can't just "take courses" in those domains and call it done. The life sciences alone are too vast. You need a strategy for continuous, rapid learning in both domains over your entire career.</p>
+<p>When I interview data scientists for biotech roles, I assess five key areas: people skills, communication skills, scientific knowledge, coding skills, and modeling skills. The two domains I'm talking about here — life sciences and software development — map directly to scientific knowledge and coding skills. These aren't just nice-to-haves; they're essential for effectiveness in biotech data science.</p>
+<p>That's where "ultralearning" comes in. It's Scott Young's framework for aggressive, self-directed learning, and I know it works because I've lived it. I started as a bench scientist but taught myself computing, software development, and machine learning over the years. Now I want to show you how data scientists in biotech can do the same—whether you're learning domain knowledge or software skills.</p>
+<p>How do you strategically build depth in both life sciences and software over time? I'm going to walk through the 9 principles of ultralearning that Scott Young outlines and show you how they map to learning both domains for biotech data science. I've reordered them in a way that builds momentum, starting with what matters most.</p>
+<h2 id="the-9-principles">The 9 principles</h2><h3 id="principle-3-directness-learn-by-doing-the-real-thing">Principle 3: Directness - learn by doing the real thing</h3><p>Starting with principle 3, here's what directness means: you learn most viscerally in the actual context where you'll apply the skill. And I'm putting this first because it's where most people go wrong.</p>
+<p>Most people read textbooks and take courses. This isn't bad in and of itself, but if you assume that covering the material means you have learned it, you are wrong. Without a context to apply it, the knowledge doesn't stick. You need a real project where you actually use what you're learning.</p>
+<p>If you're already working in biotech, you have a huge advantage: you already have real projects with real stakes. These projects naturally focus your learning because you have a job to be done! This is why I put directness first: it leverages the learning environment you already have.</p>
+<p>For learning life sciences, this means treating your current project as your learning laboratory. You're analyzing RNA-seq data? Learn the biology behind the genes you're seeing, then immediately apply that knowledge to interpret your results and suggest follow-up experiments. You're working with metabolomics data? Learn the metabolic pathways, then use that understanding to identify which metabolites are actually biologically meaningful versus technical artifacts. You're building models for drug discovery? Learn the specific organic chemistry that you're working with, then apply it to explain why your model predicts certain compounds will work and others won't, and use that reasoning to guide your next round of experiments.</p>
+<p>Your current project is your learning laboratory. Treat the scientific knowledge gaps you encounter as targets for deep learning.</p>
+<p>And here's something I've noticed: when you write internal documentation or reports, that's actually retrieval practice for the science you're learning. More on retrieval later, but the point is your work gives you built-in learning opportunities if you use them intentionally.</p>
+<p>The same applies to learning software. Your pipeline is getting slow? Learn performance optimization and profiling, then immediately apply those techniques to identify bottlenecks and speed up your actual pipeline. Your code is getting hard to maintain? Learn design patterns, then refactor your existing codebase using those patterns to make it more modular and testable. You need to deploy something? Learn containerization and orchestration, then use those skills to get your tool running in production and accessible to your team.</p>
+<p>Your work projects provide the constraints and requirements that make software concepts meaningful. When you document your code or write design docs, you're forced to articulate the architectural decisions you're making—and that's when you really learn them.</p>
+<h3 id="principle-4-drill-isolate-and-attack-weak-points">Principle 4: Drill - isolate and attack weak points</h3><p>Drilling is about identifying rate-limiting steps in your skills and practicing them specifically. Once you're doing direct practice through your projects, you'll notice where you keep getting stuck.</p>
+<p>Here, there is a meta-skill that I think is critical: self-awareness. You need to develop the ability to notice when you're missing context, without someone explicitly telling you. When you're reading a paper and realize you're lost, or when you're in a meeting and can't follow the reasoning, that's your signal. Learning to recognize these moments yourself is what makes drilling effective.</p>
+<p>For learning life sciences, drilling means identifying the specific skills that are blocking your work and practicing them repeatedly. Do you keep having to ask biologists what ChIP-seq tells you? Drill by practicing biological interpretation: take 20 different ChIP-seq results and explain what each peak means biologically—what transcription factor is binding, what genes are being regulated, and what biological process is affected. Are you on a project with immunologists but can't follow their reasoning? Drill by practicing experimental logic: read 15 immunology papers and predict what the next experiment should be based on the current results, then check your reasoning against what the authors actually did, or consult an immunologist colleague.</p>
+<p>Or perhaps consider the chemistry side of things. Are you analyzing mass spec data but you're shaky on ionization and fragmentation? Drill by working through 50 fragmentation problems: given a compound structure, predict the top 5 fragments you'd expect to see, then check your answers. Is your lack of organic chemistry preventing you from understanding drug modifications? Drill by practicing modification effects: take 30 different drug structures, make specific modifications (add methyl group, change functional group), and predict how each change would affect binding affinity, solubility, and metabolic stability.</p>
+<p>The key is identifying the real bottleneck in your knowledge and then designing a drill around that. If you have no good priors on how to do this, you should actually be asking your colleagues who have domain knowledge. They can help you pinpoint exactly what you're missing and suggest focused practice exercises.</p>
+<p>For learning software, the same principle applies. Do your pipelines keep breaking in production? Drill by practicing debugging: take your broken pipeline, run it locally with the same data that failed in production, and systematically test each step until you find the exact failure point. Are you blocked on deployment because of containerization issues? Drill this skill while debugging! Start with a minimal Dockerfile that just runs your script, then gradually add dependencies one by one until it works. Strip it back to bare minimum and rebuild it piece by piece, and your understanding will follow too.</p>
+<p>Code review keeps catching the same issues in your code? Drill on those patterns by refactoring your existing code to avoid them. Take one function at a time and rewrite it to follow the patterns your reviewers want. Do you avoid writing tests because you don't really understand testing frameworks? Start by adding a single test to your existing codebase, then gradually add more tests to the functions you use most.</p>
+<p>Identify the one software skill that's limiting your effectiveness right now, and drill it until it's not a bottleneck anymore. Maybe it's Git workflows that are slowing your team down, or packaging that's preventing tool distribution.</p>
+<h3 id="principle-1-metalearning-map-the-territory-first">Principle 1: Metalearning - map the territory first</h3><p>Metalearning means researching how to learn something before diving in. I know it seems backwards to list this third when it's literally the first principle in Scott Young's framework, but here's why: directness and drilling are more immediately actionable. Once you're doing those, metalearning helps you be more strategic about what you're doing.</p>
+<p>For learning life sciences, this means understanding what you actually need to know for your work before diving into intensive learning. Is your team starting a new project in spatial transcriptomics? Before diving in, map out what you need: tissue biology, imaging concepts, the technology itself, analysis methods. Are you joining a drug discovery project? Identify the hierarchy of knowledge; do you need medicinal chemistry basics first, or can you start with binding assays and learn backward?</p>
+<p>Talk to the biologists or chemists you work with. Ask them what foundational concepts matter most for understanding their work. Look at the papers your team references most—what scientific knowledge do they assume? That's your map.</p>
+<p>Find the best resources for your specific need. Maybe it's that one review paper, or a specific textbook chapter, or that scientist down the hall who explains things well. Don't waste time learning areas that aren't relevant to your current work. Map what matters now.</p>
+<p>Additionally, be prepared to re-map! After working on a project for a while, you might find your initial map was wrong. That's totally OK! If you're making errors because you misunderstood what you needed to learn, that's a signal to step back and reassess. An incorrect map is worse than no map.</p>
+<p>For learning software, the same applies. Before diving into a new software skill, understand what good looks like in your specific context—biotech and scientific computing. Your team wants to adopt a new workflow system? Before learning it, map out what you need: workflow concepts, the specific tool's paradigms, container knowledge. Or can you start with examples?</p>
+<p>Look at mature tools in your space — <code>scikit-bio</code>, <code>scanpy</code>, or established pipelines like those from the ENCODE project. What patterns do they use? Are they functional-first or objects-first? And what are patterns in how they design their APIs? That's your north star. Talk to experienced engineers if you have access and ask what software skills actually matter for scientific tools.</p>
+<p>The key is understanding the learning path dependencies: do you need to understand Python packaging before you can learn about CI/CD? Or can you learn them together? Map out the shortest path to being effective, not the most comprehensive path to expertise. Focus on what will unblock your current work, not what would make you an expert in everything.</p>
+<h3 id="principle-6-feedback-get-signal-on-your-progress">Principle 6: Feedback - get signal on your progress</h3><p>Feedback is getting useful information about what you're doing wrong and how to fix it. And in biotech, you have built-in feedback mechanisms if you use them intentionally.</p>
+<p>For learning life sciences, leverage the scientists you work with as your feedback mechanism. When you present results in team meetings and biologists or chemists correct your interpretation, that's high-value feedback. Pay attention!</p>
+<p>Join journal clubs if your company has them. When you misunderstand a paper, someone will point it out. If your company doesn't have journal clubs, look in your local community—Boston has several industry-focused options including <a href="https://biotechtuesday.com/category/geographic-region-event/boston-ma/">BiotechTuesday</a>, <a href="https://massbio.microsoftcrmportals.com/event/?event=The_Science_of_Biotech_November">MassBio events</a>, and <a href="https://cambridgebiotechclub.org/">Cambridge Biotech Club</a> networking events that often include research discussions.</p>
+<p>When you write up results or make slides, ask a scientist to review. Where they add clarifications shows your knowledge gaps. If your predictions about experimental outcomes are wrong, that's feedback about your biological understanding. I remember being challenged by a colleague while on a call with external collaborators, and that was the best feedback I had being wrong in a "public" setting! When you explain your interpretation to a biologist and they look confused, you've either misunderstood the science or can't articulate it yet.</p>
+<p>Your work products -- analyses, reports, presentations -- are opportunities to get feedback on your scientific understanding. Don't just present results. Explain your biological reasoning and see where it's challenged.</p>
+<p>For learning software, code review is your primary feedback mechanism. Take it seriously. The comments show you what you don't yet understand.</p>
+<p>Does your code actually work at scale with real-sized data? That's feedback on your software design. When someone else tries to use your tool and files issues, those edge cases reveal gaps in your software thinking. Pair programming with more experienced engineers shows you patterns you're not seeing.</p>
+<p>When onboarding a new team member to your code takes too long, that's feedback that your architecture or documentation needs work. Production failures are harsh but clear feedback: what software concepts do you need to learn to prevent them?</p>
+<p>Ask for architectural review before building something big. Feedback up front prevents expensive mistakes.</p>
+<h3 id="principle-5-retrieval-test-yourself-actively">Principle 5: Retrieval - test yourself actively</h3><p>Retrieval is about actively recalling information, which strengthens learning more than passive review. And I want to emphasize something specific about this for life sciences learning.</p>
+<p>The vocabulary in life sciences is vast, and the meanings of everyday words often change in scientific contexts. Think about "competent" cells, "naive" T-cells, "promiscuous" enzymes, "housekeeping" genes. Good memory for vocabulary isn't just about rote memorization; it gives you the ability to name and label entities clearly, which is foundational even when your primary goal is understanding concepts.</p>
+<p>For learning life sciences, retrieval practice happens naturally in your work if you let it. When you're preparing a presentation for your team, try to explain the biological mechanism from memory first, then check your understanding. Before looking up that pathway or reaction mechanism again, try to draw it from memory. Where you get stuck shows what you haven't really learned.</p>
+<p>In meetings when discussing results, attempt to explain the biology without your notes. This reveals what you actually know versus what you've just read. When writing internal documentation about your project, explain the scientific concepts from memory, then verify. If you're presenting at journal club, practice explaining the paper's biology without constantly referring to slides.</p>
+<p>The act of trying to recall forces your brain to strengthen those neural pathways. Passive rereading doesn't do this. Your work already gives you retrieval opportunities—presentations, documentation, discussions with scientists. Use them.</p>
+<p>For learning software, the same principle applies. When you're about to look up how to do something in code, try to write it from memory first, then look it up if needed. Before copying a design pattern from Stack Overflow, try to implement it based on what you remember, then refine.</p>
+<p>In code review or design discussions, explain your architectural decisions from memory. If you can't, you don't really understand them yet. When documenting your code, write the explanation without constantly referencing the implementation. Try to debug issues by reasoning through the system before looking at logs—this builds your mental model.</p>
+<p>And here's something important: making it easy by constantly looking things up or always relying on AI to spoonfeed you answers is a surefire way to keep knowledge shallow. The struggle of trying to remember is what creates learning.</p>
+<p>This is especially true with AI-generated documentation. You can use AI to generate documentation, but the retrieval practice happens during review. When AI writes "this function calculates the binding affinity," question it: "Does it really? What's the actual algorithm? What are the inputs and outputs?" Challenge each line the AI wrote by trying to explain it from your own understanding. If you can't explain why a particular line is there or what it does, that's your signal to dig deeper into that concept.</p>
+<h3 id="principle-2-focus-cultivate-deep-concentration">Principle 2: Focus - cultivate deep concentration</h3><p>Focus is about managing procrastination, distraction, and maintaining sustained attention. And this matters more than you might think for both domains.</p>
+<p>For learning life sciences, reading that dense Nature paper about a pathway relevant to your project requires deep, uninterrupted focus. You can't do it between Slack messages and meetings -- block time, and shut off communication channels. Understanding complex scientific concepts, such as metabolic regulation, signaling cascades, reaction mechanisms, requires holding multiple pieces in your head simultaneously. Context switching destroys this.</p>
+<p>Block time on your calendar specifically for deep scientific learning. Treat it like a critical meeting. The 15 minutes before standup isn't enough to understand that review paper you need to read. When you're learning a new biological domain for a project, protect longer blocks of focused time for it.</p>
+<p>Your brain needs sustained attention to build the mental models that make scientific knowledge useful, not just memorized.</p>
+<p>For learning software, the same applies. Understanding a complex codebase or debugging a tricky issue requires uninterrupted deep work. You can't do it effectively in fragments. Reading source code of mature projects—like <code>scikit-bio</code>, <code>scanpy</code>, or established pipelines—requires sustained attention to follow design decisions.</p>
+<p>Designing a new system architecture requires holding the entire design in your head. That's impossible with constant interruptions. Block time for focused software learning and development, not just cramming it into gaps. The cognitive load of building mental models for software systems is high. Protect that learning time.</p>
+<p>If you're learning a new framework or pattern for work, give it dedicated focus time, not scattered moments. It'll pay dividends many-fold over an entire technical career.</p>
+<h3 id="principle-9-experimentation-explore-beyond-the-beaten-path">Principle 9: Experimentation - explore beyond the beaten path</h3><p>Experimentation is about trying new approaches, methods, and perspectives as you gain proficiency. This becomes more important as you build your foundation in both domains.</p>
+<p>For learning life sciences, as your foundational knowledge grows, start exploring adjacent domains that come up in your work. You're strong in genomics now? When an immunology opportunity comes up in a cross-functional meeting, that's your trigger to explore that domain.</p>
+<p>Try different ways of learning. Sometimes a textbook works, sometimes talking to the scientist at the next desk works better—especially if they're socratically coaching you. Sometimes it's working through a dataset. This reflects a key insight from ultralearning: there's no one-size-fits-all learning format. What works for learning genomics might not work for learning immunology, and what works for you might not work for your colleague. Experiment to find your optimal learning approach for each domain.</p>
+<p>Use insights from one domain to inform another. Cell signaling patterns you learned in neuroscience might help you understand what you're seeing in immunology data, since all cells have singaling pathways. As you work with both biologists and chemists, start connecting how chemical principles inform biological mechanisms. This cross-domain connection is a well-established way to improve retention and deepen understanding.</p>
+<p>Additionally, try experimenting with how you organize and retain scientific knowledge. What works for you personally? This exploration leads to developing your unique perspective, especially on how you synthesize biological and chemical knowledge differently than others.</p>
+<p>For learning software skills, as you gain proficiency, experiment with different approaches to the same problem at work. For example, have you been using conda to manage your Python environments? When you have time, try managing your environment with pixi instead to understand the tradeoffs.</p>
+<p>Try different testing strategies on real work projects to see what catches bugs most effectively for your use case. Experiment with different architectural patterns when building new tools—learn through direct comparison.</p>
+<p>As you grow, you'll develop engineering judgment: knowing when to use which approach, which rules to follow, which to break. This experimentation leads to finding your own effective patterns, not just copying what others do.</p>
+<h3 id="principle-8-intuition-develop-deep-understanding">Principle 8: Intuition - develop deep understanding</h3><p>Intuition is about building mental models of how things actually work, not just memorizing. And this is where the real payoff comes in both domains.</p>
+<p>For learning life sciences, the drilling and retrieval practice we discussed earlier builds the mental models that become intuition. When you drill on fragmentation patterns and then retrieve that knowledge while analyzing mass spec data, you're doing more than mere memorizing: you're building understanding of how molecules break apart. When you practice explaining biological mechanisms from memory and get feedback, you develop the mechanistic reasoning that becomes intuition.</p>
+<p>This intuition lets you reason about new situations you haven't seen before. You can predict whether an experimental approach will work or identify when results don't make biological sense. The goal isn't encyclopedic knowledge, but rather to develop the ability to reason about biological and chemical systems!</p>
+<p>For learning software, the same principle applies. When you drill on design patterns by implementing them from memory, and follow it up by getting feedback through code review, you build understanding of what problems they solve and their tradeoffs. This develops the engineering judgment to know when to use which approach, which rules to follow. And once you know the rules, you know which ones can be broken :-).</p>
+<p>At the end of the day, intuition develops through the active practice of drilling and retrieval, and not through passive consumption of information. Keep that in mind!</p>
+<h3 id="principle-7-retention-don-t-let-knowledge-leak-away">Principle 7: Retention - don't let knowledge leak away</h3><p>Retention is about understanding why we forget and using strategies to remember long-term. And this matters because you're constantly encountering new concepts in both domains.</p>
+<p>For learning life sciences, you're constantly encountering new biological and chemical concepts at work. Without retention strategies, you'll keep relearning the same things. When you write internal documentation or reports, you're creating reference material for future you and your team—but only if you structure it for easy retrieval and review. Create a personal knowledge base with clear tags and cross-references so you can quickly find concepts when they come up again. I use Obsidian for my personal work knowledge base; it is centered around projects, but I also curate and link facts in there.</p>
+<p>The knowledge you use regularly will naturally stick through repeated exposure. But concepts from past projects will fade without reinforcement. Identify which scientific knowledge you need for the long-term versus what you need just for this project. For long-term retention, create Anki decks for key terminology and mechanisms that keep appearing across different projects. With Obsidian, drilling with an spaced repetition is possible with the <a href="https://www.stephenmwangi.com/obsidian-spaced-repetition/">Spaced Repetition</a> plugin.</p>
+<p>Connect new concepts to existing knowledge from your work—this creates stronger memory traces. When you learn a new pathway, relate it to ones you already know. When you encounter a new protein, link it to similar ones you've worked with. Revisit foundational concepts periodically as they show up in different projects, and update your notes and records each time you work on a project.</p>
+<p>The scientific knowledge you use regularly in your work will stick. Everything else needs deliberate retention strategies.</p>
+<p>For learning software, patterns you don't use regularly will fade. Be deliberate about which ones you need to retain. Writing documentation about the systems you build serves as external memory you can reference later, but make it searchable and well-organized to facilitate retrieval later! Create code snippets and examples for patterns you want to remember, and archive them in your work knowledge vault, or share them with colleagues on shared documentation platforms like Confluence or Notion.</p>
+<p>The tools and patterns you use daily will stick naturally through repeated exposure. But specialized knowledge from past projects will fade without reinforcement. If you're not writing tests regularly in your work, you'll forget testing patterns. Find ways to practice what you need to retain: contribute to open source projects, build side projects, or create practice exercises.</p>
+<p>Connect new software concepts to existing knowledge from your work. When you learn a new framework, relate it to ones you already know. When you encounter a new design pattern, link it to similar patterns you've used. Contributing to the same codebase over time builds deep, lasting knowledge of its architecture through repeated exposure. When you learn something new for a project, consider whether it's one-time knowledge or something you'll need repeatedly. Prioritize retention for the latter.</p>
+<h2 id="bringing-it-together">Bringing it together</h2><p>These principles reinforce each other when learning both life sciences and software. But here's the key insight I want to emphasize: if you feel pressure to ultralearn both domains simultaneously, the answer is an emphatic "no".</p>
+<p>Instead, you cycle between domains based on what's blocking you. When a scientific knowledge gap prevents you from making progress, whether it's immunology, organic chemistry, or protein biochemistry, you shift into intensive life sciences learning mode using these principles. When software limitations hold you back, you focus there.</p>
+<p>Over years, this creates deep expertise in both domains. Not through divided attention, but through strategic, focused learning periods in each.</p>
+<p>Here's the cycle I've seen work: work with real problems using directness, identify gaps in whichever domain is limiting you through drilling, focus intensively on that domain, get feedback from domain experts, test yourself through writing and building using retrieval, develop intuition, retain through continued practice, then identify the next limiting domain and cycle back.</p>
+<p>At a higher level, there's an interplay between the domains that makes this work. Scientific understanding informs what software to build and what analyses matter. Software skills enable you to answer scientific questions and build tools others can use. They feed each other.</p>
+<p>This approach beats traditional "take courses in both fields" for biotech data scientists because both domains are too vast to learn all at once. Ultralearning gives you a framework for continuous, targeted learning throughout your career. Remember, your goal is not to become a PhD scientist or a senior software engineer, but to build deep enough understanding in both to be effective at the intersection.</p>
+<h2 id="conclusion-and-next-steps">Conclusion and next steps</h2><p>You don't need to apply all 9 principles to both domains at once. In fact, you shouldn't.</p>
+<p>Start with directness in whichever domain is currently limiting your effectiveness. If you can't interpret your results because you don't understand the biology or chemistry, focus there intensively for the next few months. If you can't scale your analyses or build reliable tools because of software gaps, focus there intensively.</p>
+<p>Add feedback loops from experts in that domain. Build from there using the other principles.</p>
+<p>Then, when you've made real progress, identify which domain is now the bottleneck and shift your intensive learning there.</p>
+<p>This is a career-long journey of alternating deep dives, not a sprint to learn everything at once. The most effective biotech data scientists I know are continuously learning in both domains, but wisely: one intensive focus at a time.</p>
+<p>Here's your actionable takeaway: Right now, which domain is most limiting your effectiveness? Pick one concrete gap in that domain. Spend the next month using ultralearning principles to address that specific gap. Only that one. Master it, then reassess.</p>
+<p>You can do it!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-how-data-scientists-can-master-life-sciences-and-software-skills-for-biotech-using-ultralearning</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{How data scientists can master life sciences and software skills for biotech using ultralearning}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{10}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{01}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/10/1/how-data-scientists-can-master-life-sciences-and-software-skills-for-biotech-using-ultralearning}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

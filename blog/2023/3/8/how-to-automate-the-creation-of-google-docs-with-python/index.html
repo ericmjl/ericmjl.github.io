@@ -1,0 +1,966 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="How to automate the creation of Google Docs with Python">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/how-to-automate-the-creation-of-google-docs-with-python' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>How to automate the creation of Google Docs with Python - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">How to automate the creation of Google Docs with Python</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2023-03-08</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/google docs/">
+        google docs
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/automation/">
+        automation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/markdown/">
+        markdown
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/html/">
+        html
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/programming/">
+        programming
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/api/">
+        api
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/google drive/">
+        google drive
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/google cloud/">
+        google cloud
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/service account/">
+        service account
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/environment variables/">
+        environment variables
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/mimetype/">
+        mimetype
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/permissions/">
+        permissions
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/templating/">
+        templating
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/jinja/">
+        jinja
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>I've just automated the creation of Google Docs using Python! 🐍
+I used a Google service account to authenticate,
+then created the doc content using Markdown.
+I converted the Markdown to HTML,
+then uploaded it as a Google Doc.
+I also learned how to set multi-line environment variables
+and programmatically set document permissions.
+It was a fun and enlightening project! 🎉</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <h2 id="the-backdrop">The backdrop</h2><p>At our church, I teach a Sunday school class about how to lead a Bible study.
+As part of the training, we ask our class to collaboratively create
+study notes and study questions for an assigned scripture each week.</p>
+<p>Previously, I would hold a template in Google Drive,
+one for each of the four weeks of class,
+then copy and paste them into another folder in Google docs
+and then share the link with others in the class.
+I would use the most permissive setting when sharing -
+anyone with the link could edit.
+(Doing so mainly was for simplicity.)
+Then, I would compose an email and send it to everyone in the class.</p>
+<h2 id="the-problem">The problem</h2><p>As it turns out, this workflow was a hassle in several ways.</p>
+<p>Firstly, because the template looked identical to the copied doc,
+I would have to double/triple check that I didn't accidentally send
+a link to the template rather than a copy.
+Checking that I had the correct doc then was tedious.
+It involved clicking around on the screen, checking permissions, and checking filenames...
+and even then, sometimes, I would still send out a link to the template.</p>
+<p>Secondly, the docs were quite similar,
+differing only in scripture references and links to other resources.
+If I wanted to update the standardized formatting or text in one doc,
+I would have to copy it seven more times into the other docs.
+If I forgot to do so, that would lead to <em>a drift</em> between the docs.
+Also undesirable.</p>
+<p>Thirdly, I would compose a weekly email, which was also relatively standardized.
+However, copying and pasting the text felt tedious.
+Writing from scratch in Chinese, my second language, was sometimes a mental challenge --
+compounded even more so with two kids who fragment my attention span.</p>
+<h2 id="the-solution-python">The solution: Python!</h2><p>Thinking hard about the problems above,
+I noticed a common thread:
+it was all about putting standardized text into the right places.
+That sounded like a problem I could use Python to solve --
+and that was precisely what I did!
+My desired end goal for this project was to write a Python program that could:</p>
+<ol>
+<li>Create Google docs for me,</li>
+<li>Grab the docs' URLs automatically, and</li>
+<li>Insert them into an HTML email that the program composed.</li>
+</ol>
+<h3 id="step-1-create-a-google-service-account">Step 1: Create a Google service account</h3><p>To create Google docs with Python, one needs a Google account,
+specifically, a service account that can remain authenticated
+without needing a human to sign in.
+To do this, we need to head over to our <a href="console.cloud.google.com">Google cloud console</a>.
+There, we'll do the following things:</p>
+<ol>
+<li>Create a new "project." Google keeps track of which service accounts are associated with which user by having a "project" between them.</li>
+<li>In the new project, enable the Google Drive API. This allows the project to access Google Drive.</li>
+<li>From the project's UI, we'll create a new Service Account and grant the Service Account the ability to access project APIs.</li>
+<li>For that service account, we'll then create a key credential file that will be used to authenticate the service account.</li>
+</ol>
+<p>I compiled a series of screenshots into an HTML slideshow below.
+Following the instructions on the slideshow
+while replacing "Test Project" with a more relevant name
+will get you to the place where you will have
+<strong>a JSON file that will act as the credentials</strong> to authenticate with Google.</p>
+<p><em>(Best viewed on a desktop browser!)</em></p>
+<iframe src="slides.html" width="100%" height="500vh" frameborder="0" scrolling="no"></iframe><p><br></p>
+<h3 id="step-2-store-the-json-file-contents-as-environment-variables">Step 2: Store the JSON file contents as environment variables</h3><p>When working with a deployed API, application, or other services,
+I habitually stick to <a href="https://12factor.net">the 12 Factor App patterns</a>.
+These are battle-tested patterns that enable secure app/service deployments.
+The third principle listed in the 12 Factor document is
+to store configuration in the environment as <a href="https://ericmjl.github.io/essays-on-data-science/software-skills/environment-variables/">environment variables</a>.
+This includes credentials (a.k.a. "secrets" in techno-lingo).</p>
+<p>However, Google just provided me with a JSON file for authentication;
+the usual expectation here would be to store the JSON file on disk in a remote server,
+for which a Python process can read the JSON file and pass it to Google's Python API client.
+However, this clearly violates the idea of storing configuration as environment variables.
+So how can we get around this?</p>
+<p>My answer is to store the credential file's information
+as part of the runtime environment variables available to the app.
+Looking at the contents of the JSON file:</p>
+<div class="hll"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;service_account&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;project_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;*****-******-******&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;private_key_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cc8823e98******d66da83f55aa0f3f74b8aedc05&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;private_key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;-----BEGIN PRIVATE KEY-----\n******\n******...\n-----END PRIVATE KEY-----\n&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;client_email&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test-project-service-account@******.iam.gserviceaccount.com&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;client_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;******&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;auth_uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://accounts.google.com/o/oauth2/auth&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;token_uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://oauth2.googleapis.com/token&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;auth_provider_x509_cert_url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://www.googleapis.com/oauth2/v1/certs&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;client_x509_cert_url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://www.googleapis.com/robot/v1/metadata/x509/test-project-service-account%40******.iam.gserviceaccount.com&quot;</span>
+<span class="p">}</span>
+</pre></div>
+<p>It's clear that there are specific key-value pairs
+uniquely identify the project and its security credentials.
+We merely have to store <em>those</em> values as environment variables.</p>
+<p>How about we go about doing authentication?
+I had a choice between two options:
+one was to use the <a href="https://developers.google.com/docs/api/quickstart/python">Official Google Python API</a>,
+and the other was to use the <a href="https://github.com/iterative/PyDrive2">PyDrive2 package</a>.
+As it turns out, authentication from a Python package is only part of the whole picture;
+I also needed to know which Python package was, overall, easier to use.
+So, I had to study them first.
+That meant taking them for a test drive in a Jupyter notebook.
+After a bunch of experimentation,
+I concluded that although the Google Python API is officially supported,
+it also involved abstractions that felt less natural than PyDrive2's.
+Hence, I went with the PyDrive2 package instead.</p>
+<p>While Google's Python API allows for service account authentication from a Python dictionary,
+PyDrive2 only supports loading from a credentials JSON file.
+As such, I had to figure out how to write the credentials to disk <em>at runtime</em>.
+I finally settled on the following hack:</p>
+<div class="hll"><pre><span></span><span class="c1"># contents of authenticate.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyprojroot</span><span class="w"> </span><span class="kn">import</span> <span class="n">here</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="n">load_dotenv</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">write_creds</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Write service account credentials to disk based on environment variables.&quot;&quot;&quot;</span>
+    <span class="n">credentials</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;service_account&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;project_id&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;GOOGLE_PROJECT_ID&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;private_key_id&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;GOOGLE_PRIVATE_KEY_ID&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;private_key&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;GOOGLE_PRIVATE_KEY&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;client_email&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;GOOGLE_CLIENT_EMAIL&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;client_id&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;GOOGLE_CLIENT_EMAIL&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;auth_uri&quot;</span><span class="p">:</span> <span class="s2">&quot;https://accounts.google.com/o/oauth2/auth&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;token_uri&quot;</span><span class="p">:</span> <span class="s2">&quot;https://oauth2.googleapis.com/token&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;auth_provider_x509_cert_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.googleapis.com/oauth2/v1/certs&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;client_x509_cert_url&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;GOOGLE_CLIENT_X509_CERT_URL&quot;</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">here</span><span class="p">()</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;GOOGLE_CREDENTIALS_FILENAME&quot;</span><span class="p">),</span> <span class="s2">&quot;w+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">credentials</span><span class="p">))</span>
+</pre></div>
+<p>With this in place, authentication could be much easier!
+All we need to do is store environment variables with appropriate values.
+(In Dokku, this is easy to configure.)
+With this code, we can avoid checking in the credentials JSON file
+while remaining compatible with the PyDrive2 API.
+Furthermore, the single-line variables are easy to store,
+as we would do something like:</p>
+<div class="hll"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">GOOGLE_CLIENT_ID</span><span class="o">=</span><span class="s2">&quot;cc8823e98e6cb5d69da83f5aca0f3f7rb8aedc05&quot;</span>
+</pre></div>
+<p>However, how do we configure multi-line environment variables,
+such as the <code>private_key</code> above?</p>
+<p>It turns out the answer is to wrap the environment variable in <em>single</em> quotes:</p>
+<div class="hll"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">GOOGLE_PRIVATE_KEY</span><span class="o">=</span><span class="s1">&#39;-----BEGIN RSA PRIVATE KEY-----</span>
+<span class="s1">MIIEpAIBAAKCAQEA04up8hoqzS1+APIB0RhjXyObwHQnOzhAk5Bd7mhkSbPkyhP1</span>
+<span class="s1">...</span>
+<span class="s1">iWlX9HNavcydATJc1f0DpzF0u4zY8PY24RVoW8vk+bJANPp1o2IAkeajCaF3w9nf</span>
+<span class="s1">q/SyqAWVmvwYuIhDiHDaV2A==</span>
+<span class="s1">-----END RSA PRIVATE KEY-----&#39;</span>
+</pre></div>
+<p>I had to do a bit of digging to figure this out,
+and eventually found the answer <a href="https://github.com/dwyl/learn-environment-variables/issues/17#issuecomment-376108747">in a GitHub issue comment</a>.
+Thank you, <a href="https://github.com/nelsonic">@nelsonic</a>,
+for providing such an informative answer!</p>
+<p>Taken together, to store this information locally for testing purposes,
+we create a <code>.env</code> file in the top-level directory of our project
+with the following contents:</p>
+<div class="hll"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">GOOGLE_PROJECT_ID</span><span class="o">=</span><span class="s2">&quot;psyched-brush-373815&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">GOOGLE_PRIVATE_KEY</span><span class="o">=</span><span class="s1">&#39;-----BEGIN PRIVATE KEY-----</span>
+<span class="s1">MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC24HtLxJk/Pk4N</span>
+<span class="s1">...</span>
+<span class="s1">Cr/HCzXyIxnK8HtVlaLumB7Q</span>
+<span class="s1">-----END PRIVATE KEY-----</span>
+<span class="s1">&#39;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">GOOGLE_PRIVATE_KEY_ID</span><span class="o">=</span><span class="s2">&quot;cc8823r48e6cb5d66da83f55aa0f3f74b8aedc05&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">GOOGLE_CLIENT_EMAIL</span><span class="o">=</span><span class="s2">&quot;test-project-service-account@psyched-brush-373815.iam.gserviceaccount.com&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">GOOGLE_CLIENT_ID</span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;110659425807002683920&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">GOOGLE_CLIENT_X509_CERT_URL</span><span class="o">=</span><span class="s2">&quot;https://www.googleapis.com/robot/v1/metadata/x509/test-project-service-account%40psyched-brush-373815.iam.gserviceaccount.com&quot;</span>
+</pre></div>
+<p>(I have, for obvious reasons, changed the contents to invalid credentials!)</p>
+<p>Once the contents of the <code>.env</code> file are populated,
+we can use the <code>python-dotenv</code> package to load the environment variables
+from the <code>.env</code> file during the first execution of the app when testing locally.</p>
+<p>When it comes to storing them on the runtime environment,
+because I use <a href="https://dokku.com/">Dokku</a> on <a href="https://m.do.co/c/2832a2124e66">DigitalOcean</a>
+to host my apps and APIs,
+I used <a href="https://dokku.com/docs/configuration/environment-variables/">Dokku's configuration tooling</a>
+to set up environment variables as well. Doing so is a one-time setup;
+the environment variables will remain available at runtime on subsequent deploys.</p>
+<h3 id="step-3-create-the-google-doc-s-contents-using-markdown">Step 3: Create the Google Doc's contents using Markdown</h3><p>The first two steps are one-time setup steps for each project.
+Once we've set them up, we can create the Google Doc content.</p>
+<p>As it turns out, Google Doc (and MS Word) documents actually have a 1-to-1 correspondence with HTML documents
+-- and hence, by extension, Markdown documents too!
+(<a href="https://pandoc.org/">Pandoc</a> users will likely have long known about this fact!)
+So, for example, the contents of an <code>&lt;h1&gt;</code> tag are converted to Header 1 in Word documents,
+and so on and so forth.
+Therefore, we should be able to template out our Markdown documents
+in our favourite templating engine,
+whether it is <a href="https://jinja.palletsprojects.com/en/3.1.x/">Jinja</a>
+or simple Python f-strings,
+and then use the <a href="https://python-markdown.github.io/">Python Markdown package</a>
+to convert the document into HTML...
+and then pass that to the Google API to create collaboratively-editable Google Doc!</p>
+<p>Let's see how we can accomplish this.
+For simplicity, I will show how to make this happen with f-strings,
+which are usable in a pinch (and I was in one!).
+That said, if you are fluent with Jinja2 templating,
+I recommend using that because it offers the advantage of the separation of concerns,
+where the contents of the templates are kept separate from
+the contents of the source code files.</p>
+<p>Firstly, we create the Markdown document that we want to template.
+Instead of using the text I initially used,
+in this example, I will use a more generic example with placeholder content.</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">document_template</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;# My Google Doc!</span>
+
+<span class="s2">## Abstract</span>
+
+<span class="s2">This is some introductory text.</span>
+<span class="s2">We could have lorem ipsum&#39;d it,</span>
+<span class="s2">but that would be too generic for my tastes.</span>
+<span class="s2">So instead, I have chosen to write freely from my mind.</span>
+
+<span class="s2">## Section 1</span>
+
+<span class="s2">- First bullet point</span>
+<span class="s2">- Second bullet point</span>
+
+<span class="s2">&lt;hr class=&quot;pb&quot;&gt;</span>
+
+<span class="s2">## Section 2</span>
+
+<span class="si">{</span><span class="n">content</span><span class="p">[</span><span class="s2">&quot;lorem ipsum&quot;</span><span class="p">]</span><span class="si">}</span>
+
+<span class="s2">| hello | world |</span>
+<span class="s2">|:-----:|:-----:|</span>
+<span class="s2">|  1  |  a  |</span>
+<span class="s2">|  2  |  b  |</span>
+
+<span class="s2">&lt;hr class=&quot;pb&quot;&gt;</span>
+
+<span class="s2">&quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">text</span>
+</pre></div>
+<p>If you were wondering what the <code>&lt;hr class=" pb"&gt;</code> tag is all about,
+this turns out to be the way to represent a <strong>page break</strong> in HTML.
+(I learned this <a href="https://stackoverflow.com/a/51704440">from this StackOverflow answer</a>.)</p>
+<p>Cool! With this template, we can now create the new Google Doc.
+Firstly, we authenticate to Google Drive:</p>
+<div class="hll"><pre><span></span><span class="c1"># inside a Jupyter notebook or a Python script</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyprojroot</span><span class="w"> </span><span class="kn">import</span> <span class="n">here</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydrive2.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">GoogleAuth</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydrive2.drive</span><span class="w"> </span><span class="kn">import</span> <span class="n">GoogleDrive</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.authenticate</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_creds</span>
+
+
+<span class="n">write_creds</span><span class="p">()</span>
+
+<span class="n">secret_file</span> <span class="o">=</span> <span class="n">here</span><span class="p">()</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;GOOGLE_CREDENTIALS_FILENAME&quot;</span><span class="p">)</span>
+
+<span class="n">settings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;client_config_backend&quot;</span><span class="p">:</span> <span class="s2">&quot;service&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;service_config&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;client_json_file_path&quot;</span><span class="p">:</span> <span class="n">secret_file</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+
+<span class="n">gauth</span> <span class="o">=</span> <span class="n">GoogleAuth</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
+<span class="n">gauth</span><span class="o">.</span><span class="n">ServiceAuth</span><span class="p">()</span>
+<span class="n">drive</span> <span class="o">=</span> <span class="n">GoogleDrive</span><span class="p">(</span><span class="n">gauth</span><span class="p">)</span>
+</pre></div>
+<p>Then, we create the HTML version of the Markdown contents:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">markdown</span><span class="w"> </span><span class="kn">import</span> <span class="n">markdown</span>
+
+<span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;lorem ipsum&quot;</span><span class="p">:</span> <span class="s2">&quot;Lorem ipsum dolor sit amet.&quot;</span><span class="p">}</span>
+<span class="n">text</span> <span class="o">=</span> <span class="n">document_template</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+<span class="n">htmldoc</span> <span class="o">=</span> <span class="n">markdown</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+<p>Finally, we create the file and upload it to Google Drive.</p>
+<div class="hll"><pre><span></span><span class="n">gdoc</span> <span class="o">=</span> <span class="n">drive</span><span class="o">.</span><span class="n">CreateFile</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;My Shiny New Google Doc from Python!&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mimeType&quot;</span><span class="p">:</span> <span class="s2">&quot;application/vnd.openxmlformats-officedocument.wordprocessingml.document&quot;</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="n">gdoc</span><span class="o">.</span><span class="n">SetContentString</span><span class="p">(</span><span class="n">htmldoc</span><span class="p">)</span>
+<span class="n">gdoc</span><span class="o">.</span><span class="n">Upload</span><span class="p">()</span>
+</pre></div>
+<p>That last set of code is where the magic happens!
+Now we have a <code>gdoc</code> object that connects to the created Google Doc.
+It is a dictionary-like object;
+if we take that object and access the <code>alternateLink</code> key,
+we will get back a URL to the actual Google doc!</p>
+<div class="hll"><pre><span></span><span class="n">gdoc</span><span class="p">[</span><span class="s2">&quot;alternateLink&quot;</span><span class="p">]</span>
+<span class="c1"># should give you an https:// URL to the doc!</span>
+</pre></div>
+<h3 id="step-4-share-the-doc">Step 4: Share the doc</h3><p>We can also set the sharing permissions of the Google document.
+If the security of the contents doesn't matter much,
+you can select the widest permissions possible:</p>
+<div class="hll"><pre><span></span><span class="c1"># Most permissive</span>
+<span class="n">gdoc</span><span class="o">.</span><span class="n">InsertPermission</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;anyone&quot;</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;writer&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;anyone&quot;</span><span class="p">})</span>
+</pre></div>
+<p>On the other hand, if you'd like to grant "write" access
+to just a group of people by their email addresses:</p>
+<div class="hll"><pre><span></span><span class="c1"># Write-access to specific email addresses</span>
+<span class="n">email_addresses</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;first@person.email&quot;</span><span class="p">,</span> <span class="s2">&quot;second@person.email&quot;</span><span class="p">,</span><span class="o">...</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">email</span> <span class="ow">in</span> <span class="n">email_addresses</span><span class="p">:</span>
+    <span class="n">gdoc</span><span class="o">.</span><span class="n">InsertPermission</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;writer&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">email</span><span class="p">})</span>
+</pre></div>
+<p>Through some digging,
+I found the official documentation for sharing permissions <a href="https://developers.google.com/drive/api/v2/reference/permissions/insert#request-body">here</a>,
+which lists the permissions we can set.</p>
+<h2 id="non-obvious-new-knowledge-gained">Non-obvious new knowledge gained</h2><p>This exercise taught me many new things that weren't obvious to me before.
+Here's what they are.</p>
+<h3 id="conversion-from-markdown-to-google-docs">Conversion from Markdown to Google Docs</h3><p>First, we can template new Google Docs
+by converting from Markdown through HTML into a Word document.
+Conceptually:</p>
+<div class="hll"><pre><span></span>Markdown --&gt; HTML --&gt; Word --&gt; Google Docs
+</pre></div>
+<p>The following line,
+where we set the <a href="https://en.wikipedia.org/wiki/Media_type">MIME type</a> of the new doc,
+is where part of the magic happens:</p>
+<div class="hll"><pre><span></span><span class="n">gdoc</span> <span class="o">=</span> <span class="n">drive</span><span class="o">.</span><span class="n">CreateFile</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;My Shiny New Google Doc from Python!&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mimeType&quot;</span><span class="p">:</span> <span class="s2">&quot;application/vnd.openxmlformats-officedocument.wordprocessingml.document&quot;</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+<p>As one can tell, there is a particular MIME type for Word-compatible documents -
+<code>application/vnd.openxmlformats-officedocument.wordprocessingml.document</code>.
+Correspondingly, there is a MIME type for spreadsheets and slideshows too.
+(This blog post on <a href="https://towardsdatascience.com/turn-google-sheets-into-your-own-database-with-python-4aa0b4360ce7">how to use Google Sheets as a database for Python</a>
+is another great example!
+It also is where I went to recall how to create a service account.)</p>
+<h3 id="page-break-has-an-html-tag">Page Break has an HTML tag</h3><p>And that HTML tag is:</p>
+<div class="hll"><pre><span></span><span class="p">&lt;</span><span class="nt">hr</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;pb&quot;</span><span class="p">&gt;</span>
+</pre></div>
+<p>That is a piece of trivia I will keep in my back pocket.
+I vividly remember searching online for "Google Docs page break HTML"
+before finding the relevant <a href="https://stackoverflow.com/a/51704440">SO answer</a>.</p>
+<h3 id="how-to-set-multi-line-environment-variables">How to set multi-line environment variables</h3><p>I remember having difficulty setting multi-line environment variables.
+But once I figured out how, it's mostly a set-and-forget affair.
+Just to recap, the key here is single quotation marks:</p>
+<div class="hll"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">MULTILINE_VARIABLE</span><span class="o">=</span><span class="err">&#39;</span>something
+and<span class="w"> </span><span class="k">then</span><span class="w"> </span>something<span class="w"> </span>on<span class="w"> </span>a<span class="w"> </span>new<span class="w"> </span>line
+and<span class="w"> </span><span class="k">then</span><span class="w"> </span>another<span class="w"> </span>new<span class="w"> </span>line
+and<span class="w"> </span>finally<span class="w"> </span>a<span class="w"> </span>final<span class="w"> </span>line
+</pre></div>
+<p>This was something for which I remember doing intense searches across the internet.
+It was challenging to figure out!</p>
+<h3 id="document-mime-types-are-non-obvious">Document MIME types are non-obvious</h3><p>It also took me a lot of Google searching to find the correct MIME type for a Word document.
+I stumbled upon the right answer by testing every plausible code chunk.</p>
+<h3 id="permissions-can-be-set-programmatically">Permissions can be set programmatically</h3><p>I appreciated this much once I figured it out with the API.
+Though I didn't use the feature in my Sunday school project,
+I can foresee the use for programmatic permissions being done later.
+For example, we have an Airtable database containing information about those participating in the class.
+So, we can pull down each student's email address and grant permissions programmatically that way.</p>
+<h3 id="how-to-create-a-service-account-on-google-cloud">How to create a service account on Google Cloud</h3><p>For whatever reason, service accounts on cloud services have baffled me.
+This time, I finally understand how (at least) Google Cloud's service accounts work -
+and their relationship to "projects."
+Knowing this for the future will be immensely helpful
+as I try to automate more of my personal life!</p>
+<h2 id="the-future">The Future</h2><p>Being able to create a Google Doc <em>programmatically</em> is pretty powerful.
+Also quite powerful is the ability to read <em>from</em> a Google doc.
+Combining it with GPT-3 to auto-generate <em>personalized</em> versions of templated documents
+based on known context about a situation or person would be rad!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2023-how-to-automate-the-creation-of-google-docs-with-python</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{How to automate the creation of Google Docs with Python}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2023}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{03}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{08}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2023/3/8/how-to-automate-the-creation-of-google-docs-with-python}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

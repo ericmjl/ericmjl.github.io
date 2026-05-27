@@ -1,0 +1,844 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Outlines: LLM prompt management and more">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/outlines-llm-prompt-management-and-more' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Outlines: LLM prompt management and more - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Outlines: LLM prompt management and more</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2023-06-16</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/outlines/">
+        outlines
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/coding bot/">
+        coding bot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ghostwriting/">
+        ghostwriting
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/docstrings/">
+        docstrings
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/unit tests/">
+        unit tests
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/prompt management/">
+        prompt management
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/composable prompts/">
+        composable prompts
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/gpt-4/">
+        gpt-4
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/code generation/">
+        code generation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ui design/">
+        ui design
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/jinja2/">
+        jinja2
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/clean code/">
+        clean code
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>Today, I explored the <code>outlines</code> library and built a coding bot that ghostwrites code, docstrings, and tests! 🤖 With clean prompt design, I was able to create a compact and efficient Python program. The best part? It's super easy to map this to a user interface! 🎉 Check out how I did it and learn about the benefits of using <code>outlines</code> for prompt management. 😄</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <h1 id="outlines">Outlines</h1><p>I recently picked up on the library <a href="https://github.com/normal-computing/outlines/tree/main"><code>outlines</code></a> by Normal Computing. Reading the README, it could have great potential in prompt management - the ability to concisely manage prompts in a composable fashion.</p>
+<p>For example, I decided to build a coding bot - not just the Copilot-esque autocomplete, but one that could ghostwrite code with me. As an experiment, I installed the <code>outlines</code> library and created a <code>codingbot</code> that would do three things: <code>ghostwrite</code> code, write <code>docstrings</code>, and write <code>tests</code>. With these three well-defined tasks on hand, I wrote the code + prompts needed to accomplish this task.</p>
+<p>Here is what the bot and the prompts looked like.</p>
+<p>Firstly, the bot's definition:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamabot.bot.simplebot</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleBot</span>
+
+<span class="n">codebot</span> <span class="o">=</span> <span class="n">SimpleBot</span><span class="p">(</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;You are a Python programming expert.</span>
+
+<span class="sd">You provide suggestions to programmers in Python.</span>
+
+<span class="sd">Only return code, do not put Markdown syntax in your output.</span>
+<span class="sd">Do not explain your code, only provide code.</span>
+
+<span class="sd">Code should have type hints.</span>
+<span class="sd">Ensure that the implementation of the function results in the simplest type hints possible.</span>
+
+<span class="sd">Ensure that within any errors raised, the error message is actionable</span>
+<span class="sd">and informs the user what they need to do to fix the error.</span>
+<span class="sd">Make sure the error message is prescriptive,</span>
+<span class="sd">possibly even more verbose than necessary,</span>
+<span class="sd">and includes verbiage such as &quot;please do X&quot; or &quot;please do not do Y&quot;.</span>
+
+<span class="sd">If you are called to suggest docstrings, you always use the sphinx-style docstrings.</span>
+
+<span class="sd">If you are asked to write tests, prefer the use of Hypothesis to generate property-based tests.</span>
+<span class="sd">Only suggest example-based tests if it is not possible to generate property-based tests.</span>
+<span class="sd">For each test, please write a docstring that explains what the test is testing.</span>
+<span class="sd">For test function style, use pytest-style test functions and not Unittest-style test classes.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="p">)</span>
+</pre></div>
+<p>I clearly had to do some iteration on the prompt, and I used <code>llamabot</code>'s <code>PromptRecorder</code> to help with that.</p>
+<p>Then, the prompt for ghostwriting the code:</p>
+<div class="hll"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">outlines.text</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">text</span>
+
+<span class="nd">@text</span><span class="o">.</span><span class="n">prompt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ghostwriter</span><span class="p">(</span><span class="n">desired_functionality</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;I would like to accomplish the following.</span>
+
+<span class="sd">    {{ desired_functionality }}</span>
+
+<span class="sd">    How do I write the code for this? Please return only the code without explaining it.</span>
+
+<span class="sd">    Ensure that there are type hints in the function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+<p>Next up, the docstring writer:</p>
+<div class="hll"><pre><span></span><span class="nd">@text</span><span class="o">.</span><span class="n">prompt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">docstring</span><span class="p">(</span><span class="n">code</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Please help me write docstrings for the following code.</span>
+
+<span class="sd">    Ensure that you use Markdown Python block(s) to showcase how the code should be used.</span>
+<span class="sd">    The code usage example should be before the parameter/argument documentation.</span>
+<span class="sd">    Do not use sphinx-style directives,</span>
+<span class="sd">    but instead use Markdown-style triple back-ticks to house the code block.</span>
+
+<span class="sd">    Do not include :type: or :rtype: in the docstring</span>
+<span class="sd">    as they should be covered by the type hints.</span>
+
+<span class="sd">    {{ code }}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+<p>And finally, the unit test code writer:</p>
+<div class="hll"><pre><span></span><span class="nd">@text</span><span class="o">.</span><span class="n">prompt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">tests</span><span class="p">(</span><span class="n">code</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Please help me write unit tests for the following code.</span>
+
+<span class="sd">    {{ code }}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+<p>With those, I tried the following code ghostwriting request:</p>
+<div class="hll"><pre><span></span><span class="n">output</span> <span class="o">=</span> <span class="n">codebot</span><span class="p">(</span>
+    <span class="n">ghostwriter</span><span class="p">(</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;I need a function that accepts a URL and returns the contents of the URL as a string.</span>
+
+<span class="sd">It should validate that the URL is from GitHub</span>
+<span class="sd">and that it is a valid GitHub pull request URL.</span>
+<span class="sd">It should also raise an error if the URL does not return a 200 status code.</span>
+<span class="sd">If the URL is a valid PR URL and does not end with .diff,</span>
+<span class="sd">then it should append .diff to the URL before retrieving the contents.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+<p>This is what I got back:</p>
+<div class="hll"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlparse</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_pr_contents</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">parsed_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">netloc</span> <span class="o">!=</span> <span class="s2">&quot;github.com&quot;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please provide a valid GitHub URL.&quot;</span><span class="p">)</span>
+
+    <span class="n">path_parts</span> <span class="o">=</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">path_parts</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span> <span class="ow">or</span> <span class="n">path_parts</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;pull&quot;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please provide a valid GitHub pull request URL.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">url</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.diff&quot;</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot;.diff&quot;</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The URL did not return a 200 status code. Please check the URL and try again.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span>
+</pre></div>
+<p>On being satisfied with the correctness of the function, I then asked the bot to add docstrings into the mix:</p>
+<div class="hll"><pre><span></span><span class="n">output_with_docstrings</span> <span class="o">=</span> <span class="n">codebot</span><span class="p">(</span><span class="n">docstring</span><span class="p">(</span><span class="n">output</span><span class="p">))</span>
+</pre></div>
+<p>This gives me:</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_pr_contents</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fetches the contents of a GitHub pull request as a diff.</span>
+
+<span class="sd">    Example usage:</span>
+
+<span class="sd">    ```python</span>
+<span class="sd">    pr_url = &quot;https://github.com/owner/repo/pull/42&quot;</span>
+<span class="sd">    pr_contents = get_pr_contents(pr_url)</span>
+<span class="sd">    print(pr_contents)</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    :param url: The URL of the GitHub pull request.</span>
+<span class="sd">    :returns: The contents of the pull request as a diff.</span>
+<span class="sd">    :raises ValueError: If the provided URL is not a valid GitHub URL or a valid GitHub pull request URL.</span>
+<span class="sd">    :raises ValueError: If the URL did not return a 200 status code.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parsed_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">netloc</span> <span class="o">!=</span> <span class="s2">&quot;github.com&quot;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please provide a valid GitHub URL.&quot;</span><span class="p">)</span>
+
+    <span class="n">path_parts</span> <span class="o">=</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">path_parts</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span> <span class="ow">or</span> <span class="n">path_parts</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;pull&quot;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please provide a valid GitHub pull request URL.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">url</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.diff&quot;</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot;.diff&quot;</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The URL did not return a 200 status code. Please check the URL and try again.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span>
+</pre></div>
+<p>Finally, we can do a test ghostwriter:</p>
+<div class="hll"><pre><span></span><span class="n">unit_test_output</span> <span class="o">=</span> <span class="n">codebot</span><span class="p">(</span><span class="n">tests</span><span class="p">(</span><span class="n">output</span><span class="p">))</span>
+</pre></div>
+<p>And that gives:</p>
+<div class="hll"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hypothesis</span><span class="w"> </span><span class="kn">import</span> <span class="n">given</span><span class="p">,</span> <span class="n">strategies</span> <span class="k">as</span> <span class="n">st</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">your_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_pr_contents</span>
+
+
+<span class="nd">@given</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">st</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_get_pr_contents_invalid_url</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Test that get_pr_contents raises a ValueError when given an invalid GitHub URL.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="s2">&quot;Please provide a valid GitHub URL.&quot;</span><span class="p">):</span>
+        <span class="n">get_pr_contents</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+
+<span class="nd">@given</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">st</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_get_pr_contents_invalid_pr_url</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Test that get_pr_contents raises a ValueError when given an invalid GitHub pull request URL.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://github.com/</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="s2">&quot;Please provide a valid GitHub pull request URL.&quot;</span><span class="p">):</span>
+        <span class="n">get_pr_contents</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_get_pr_contents_non_200_status_code</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Test that get_pr_contents raises a ValueError when the URL does not return a 200 status code.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/invalid/repo/pull/1.diff&quot;</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="s2">&quot;The URL did not return a 200 status code. Please check the URL and try again.&quot;</span><span class="p">):</span>
+        <span class="n">get_pr_contents</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_get_pr_contents_valid_url</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Test that get_pr_contents returns the correct content when given a valid GitHub pull request URL.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/valid/repo/pull/1&quot;</span>
+    <span class="n">expected_content</span> <span class="o">=</span> <span class="s2">&quot;some_content&quot;</span>
+
+    <span class="k">with</span> <span class="n">requests_mock</span><span class="o">.</span><span class="n">Mocker</span><span class="p">()</span> <span class="k">as</span> <span class="n">m</span><span class="p">:</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span> <span class="o">+</span> <span class="s2">&quot;.diff&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">expected_content</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">get_pr_contents</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">content</span> <span class="o">==</span> <span class="n">expected_content</span>
+</pre></div>
+<p>While I showed the outputs of GPT-4, those were not this exercise's main points. The thing I <em>really</em> wanted to highlight here is the compactness of the code involved:</p>
+<div class="hll"><pre><span></span><span class="n">output</span> <span class="o">=</span> <span class="n">codebot</span><span class="p">(</span>
+    <span class="n">ghostwriter</span><span class="p">(</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;I need a function that accepts a URL and returns the contents of the URL as a string.</span>
+
+<span class="sd">It should validate that the URL is from GitHub</span>
+<span class="sd">and that it is a valid GitHub pull request URL.</span>
+<span class="sd">It should also raise an error if the URL does not return a 200 status code.</span>
+<span class="sd">If the URL is a valid PR URL and does not end with .diff,</span>
+<span class="sd">then it should append .diff to the URL before retrieving the contents.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">output_with_docstrings</span> <span class="o">=</span> <span class="n">codebot</span><span class="p">(</span><span class="n">docstring</span><span class="p">(</span><span class="n">output</span><span class="p">))</span>
+<span class="n">unit_test_output</span> <span class="o">=</span> <span class="n">codebot</span><span class="p">(</span><span class="n">tests</span><span class="p">(</span><span class="n">output</span><span class="p">))</span>
+</pre></div>
+<p>If you think about it, all I've done in the ghostwriter prompt is provide a natural language-based, high-level design of the kind of code that I need, delving into sufficient detail when necessary. With good prompt design, we can, with very high probability, obtain outputs that can be directly fed into the <code>docstring()</code> and <code>tests()</code> functions. And because of the organization of this code, one can easily map it 1-to-1 with a possible user interface:</p>
+<ul>
+<li>The input to <code>ghostwriter</code> is a text area-style box;</li>
+<li>The outputs of each of <code>ghostwriter</code>, <code>docstring</code> and <code>tests</code> is a Markdown display box.</li>
+<li>The user experience here could be sampling multiple options from the <code>ghostwriter</code> and picking the one that feels the most correct, followed by auto-generating docstrings and tests in parallel.</li>
+</ul>
+<p>Having a clean separation of concerns makes building the UI much easier!</p>
+<h2 id="couldn-t-we-have-used-strings-and-string-interpolation-in-functions-instead">Couldn't we have used strings and string interpolation in functions instead?</h2><p>We could! Here is an example of how we might have accomplished prompt templating using f-strings, for example:</p>
+<div class="hll"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">docstring</span><span class="p">(</span><span class="n">code</span><span class="p">):</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Please help me write docstrings for the following code.</span>
+
+<span class="s2">    Ensure that you use Markdown Python block(s) to showcase how the code should be used.</span>
+<span class="s2">    The code usage example should be before the parameter/argument documentation.</span>
+<span class="s2">    Do not use sphinx-style directives,</span>
+<span class="s2">    but instead use Markdown-style triple back-ticks to house the code block.</span>
+
+<span class="s2">    Do not include :type: or :rtype: in the docstring</span>
+<span class="s2">    as they should be covered by the type hints.</span>
+
+<span class="s2">    </span><span class="si">{</span><span class="n">code</span><span class="si">}</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">prompt</span>
+</pre></div>
+<p>This could get tricky, however, if we have special syntax in the prompt that requires curly braces. If <code>code</code> also includes a docstring, there is no way of escaping those characters from the multi-line string.</p>
+<p>By contrast, using Jinja2 templating and the <code>@text.prompt</code> decorator to perform the docstring transformation dynamically, we can inject arbitrary strings into the prompt without worrying about escaping any characters. This is where the <code>outlines</code> package rescues the day.</p>
+<h2 id="what-can-we-learn-from-this-exercise">What can we learn from this exercise?</h2><p>The biggest one is of encapsulating a prompt in a Python function. Though it's doable without the use of <code>outlines</code>, the <code>@text.prompt</code> decorator enables interpolation without worrying about tricky edge cases.</p>
+<p>Apart from that, I also wanted to emphasize how the syntax here is quite enabling! Encapsulating natural language instructions in a function makes for very compact Python programs.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2023-outlines-llm-prompt-management-and-more</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Outlines: LLM prompt management and more}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2023}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{06}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{16}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2023/6/16/outlines-llm-prompt-management-and-more}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

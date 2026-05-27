@@ -1,0 +1,573 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="PyData NYC 2017 Recap">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/pydata-nyc-2017-recap' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>PyData NYC 2017 Recap - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">PyData NYC 2017 Recap</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2017-11-30</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/pydata/">
+        pydata
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/conferences/">
+        conferences
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>My notes from what I learned at PyData NYC 2017!</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>With that, we’ve finished PyData NYC! Here's some of my highlights of the conference.</p>
+<h2 id="keynotes">Keynotes</h2><p>There were three keynotes, one each by Kerstin Kleese van Dam, Thomas Sargent, and Andrew Gelman. Interestingly enough, they didn't do what I would expect most academics to do -- give talks highlighting the accomplishments of their research groups. Rather, Kerstin gave a talk that highlighted the use of PyData tools at Brookhaven National Labs. Thomas Sargent gave a philosophical talk on what economic models really are (they're "games", in a mathematical sense), and I took back the importance of being able to implement models, otherwise, "you're just bull*****ing".</p>
+<p>Andrew Gelman surprised me the most - he gave a wide-ranging talk about the problems we have in statistical analysis workflows. He emphasized that "robustness checks" are basically scams, because they're basically methods whose purpose is reassurance. He had a really cool example that highlighted that we need to understand our models by modifying our models, perhaps even using a graph of models to identify perturbations to our model that will help us understand our model. He also peppered his talk with anecdotes about how he made mistakes in his analysis workflows. I took home a different philosophy of data analysis: when we evaluate how "good" a model is, the operative question is, "compared against what?"</p>
+<h2 id="talks">Talks</h2><p>The talks were, for me, the highlight of the conference. A lot of good learning material around. Here's the talks from which I learned actionable new material.</p>
+<h3 id="analyzing-nba-foul-calls-using-python">Analyzing NBA Foul Calls using Python</h3><p>This talk by the prolific PyMC blogger Austin Rochford is one that I really enjoyed. The take-home that I got from him was towards the end of his talk, in which I picked up three ways to diagnose probabilistic programming models.</p>
+<p>The first was the use of residuals - which I now know can be used for classification problems as well as regression problems.</p>
+<p>The second was the use of the energy plots in PyMC3, where if the "energy transition" and "marginal energy distribution" plots match up (especially in the tails), then we know that the NUTS sampler did a great job.</p>
+<p>The third was the use of the Gelman-Rubin statistic to measure the in-chain vs. between-chain variation; measures close to 1 are generally considered good.</p>
+<p>Check out the talk slides <a href="http://austinrochford.com/resources/talks/nba-fouls-pydata-nyc-2017.slides.html#/">here</a>.</p>
+<h3 id="scikit-learn-compatible-model-stacking"><code>scikit-learn</code>-compatible model stacking</h3><p>This talk was a great one because it shows how to use model stacking (also known as "ensembling", a technique commonly used in Kaggle competitions) to enable better predictions.</p>
+<p>Conceptually, model stacking works like this: I train a set of model individually on a problem, and use the predictions from those models as features for a meta-model. The meta-model should perform, at worst, on par with the best model inside the ensemble, but may also perform better. This idea was first explored in Polley and van der Laan's work, available <a href="http://biostats.bepress.com/ucbbiostat/paper266">online</a>.</p>
+<p>Civis Analytics has released their implementation of model stacking in their <a href="https://github.com/civisanalytics/civisml-extensions">GitHub repository</a>, and it's available on PyPI. The best part of it? They didn't try inventing a new API, they kept a <code>scikit-learn</code>-compatible API. Kudos to them!</p>
+<p>Check out the repository <a href="https://github.com/civisanalytics/civisml-extensions">here</a>.</p>
+<h3 id="stream-processing-with-dask">Stream Processing with Dask</h3><p>Matthew Rocklin, as usual, gave an entertaining and informative talk on the use of Streamz, a lightweight library he built, to explore the use of Dask for streaming applications. The examples he gave were amazing showcases of the library's capabilities. Given the right project, I'd love to try this out!</p>
+<p>Check out his slides <a href="http://matthewrocklin.com/slides/pydata-nyc-2017.html#/">here</a>.</p>
+<h3 id="asynchronous-python-a-gentle-introduction">Asynchronous Python: A Gentle Introduction</h3><p>This talk, delivered by James Cropcho, defined what asynchronous programming was all about. For me, things finally clicked at the end when I asked him for an example of how asynchronous programming would be done in data analytics workflows -- to which he responded, "If you're querying for data and then performing a calculation, then async is a good idea."</p>
+<p>The idea behind this is as such: web queries written serially are often "blocking", meaning we can't do anything while we wait for the web query to return. If we want to do a calculation on the returned data point, we have to wait for it to return first. On the other hand, if written asynchronously, we could potentially do a calculation on the previous data point while waiting for the current result to return, shaving the total time off potentially by some considerable fraction.</p>
+<h3 id="turning-pymc3-into-scikit-learn">Turning PyMC3 into <code>scikit-learn</code></h3><p>This talk was by Nicole Carlson, and she did a tremendously great job delivering this talk. In it, she walked through how to wrap a PyMC3 model inside a <code>scikit-learn</code> estimator, including details on how to implement the <code>.fit()</code>, <code>.predict()</code>, and <code>.predict_proba()</code> methods. The code in <a href="https://github.com/parsing-science/ps-toolkit/blob/master/ps_toolkit/pymc3_models/HLR.py">her repository</a> provides a great base example to copy from.</p>
+<p>One thing I can't emphasize enough is that from a user experience standpoint, it's super important to follow idioms that people are used to. What Nicole did in this talk is to show how we can provide such idioms to end-users, rather than inventing a slightly modified wheel. Props to her for that!</p>
+<p>Her slides are online <a href="./">here</a>.</p>
+<h3 id="an-attempt-at-demystifying-bayesian-deep-learning">An Attempt at Demystifying Bayesian Deep Learning</h3><p>This talk was my own, put at the end of the 2nd day. The title definitely contributed to the hype. I popped into the room early, but then left for the restroom. When I got back, there was a lineup in the front door and in the back door. Totally unexpected. That said, big credit to the Boston Bayesians organizers Jordi and Colin, who let me do the talk as a rehearsal for PyData, so I felt very grounded.</p>
+<p>The talk went mostly smoothly. I think I was channeling my colleague, Brant Peterson, with his sense of humour during that time. There was one really hilarious hiccup - right after mentioning that I wouldn't overdo the "math" and "equations", I accidentally opened an adjacent tab with an alternate version of the slides... with, surprise surprise, a math equation on it! During the Q&amp;A, when I shared the point of not needing to do train/test splits in Bayesian analysis, I could sense the jaws dropping and eyes widening in disbelief; more than just a handful of people came up and asked for the reference later on.</p>
+<p>Having done the talk, I now realize how much people will appreciate a lighthearted and lightweight introduction to a topic that's very dense and filled with jargon. Conference speakers, we need to do more of this!</p>
+<p>From an emotional standpoint, many people brought me joy with their positive comments on the visuals and structure of the talk. Others put out positive comments on Twitter, which I collected together in a <a href="https://twitter.com/i/moments/924970479869448193?ref_src=twsrc%5Etfw">Twitter Moment</a>. It was very encouraging, especially on this deep learning journey that I'm on right now.</p>
+<h2 id="tutorials">Tutorials</h2><h3 id="interactive-matplotlib-figures">Interactive <code>matplotlib</code> Figures</h3><p>This was something I totally didn't realize was possible before - we can create interactive <code>matplotlib</code> figures very easily! I have cloned the repository, and I think it'll be neat to hack on some projects at work to use this.</p>
+<p>The tutorial repository can be found <a href="https://github.com/tacaswell/interactive_mpl_tutorial">here</a>.</p>
+<h3 id="linear-regression-three-ways">Linear Regression Three Ways</h3><p>This one was by Colin Carroll, a software engineer at the MIT Media Lab (previously at Kensho). I sat in and learned a good deal of math from him. One thing new I learned was how we can specify a model without requiring the use of observed variables. Any sampling we do will take into account the hierarchical and mathematical relationships we've done. This makes it neat to implement Bayesian nets to test how things will look under different scenarios!</p>
+<p>His tutorial repository can be found <a href="https://github.com/ColCarroll/pydata_nyc2017">here</a>.</p>
+<h3 id="top-to-bottom-line-by-line">Top-To-Bottom, Line-By-Line</h3><p>This one was led by the ever-entertaining, ever-surprising James Powell. I wish the tutorial was recorded, because even though this is a "novice" tutorial, it nonetheless was still an eye-opening talk. Anybody who thinks they know Python should go listen to James' talks, whenever he gives them live - it's bound to be entertaining and eye-opening!</p>
+<h2 id="overall-thoughts">Overall Thoughts</h2><p>I'm glad I made it to PyData NYC 2017 this year. Made many new friends and connections, and caught up with old friends in the PyData community. As always, learned a ton as well!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2017-pydata-nyc-2017-recap</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{PyData NYC 2017 Recap}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2017}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{11}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{30}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2017/11/30/pydata-nyc-2017-recap}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

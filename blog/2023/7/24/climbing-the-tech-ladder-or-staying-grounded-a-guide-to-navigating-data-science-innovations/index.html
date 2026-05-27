@@ -1,0 +1,731 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Climbing the Tech Ladder or Staying Grounded? A Guide to Navigating Data Science Innovations">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/climbing-the-tech-ladder-or-staying-grounded-a-guide-to-navigating-data-science-innovations' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Climbing the Tech Ladder or Staying Grounded? A Guide to Navigating Data Science Innovations - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Climbing the Tech Ladder or Staying Grounded? A Guide to Navigating Data Science Innovations</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2023-07-24</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/technology ladder/">
+        technology ladder
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/technological trinity/">
+        technological trinity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/decision making/">
+        decision making
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/protein engineering/">
+        protein engineering
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/methodologies/">
+        methodologies
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/innovation/">
+        innovation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/team building/">
+        team building
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/technical strategy/">
+        technical strategy
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/bayesian optimization/">
+        bayesian optimization
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/graph neural networks/">
+        graph neural networks
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/variational autoencoder/">
+        variational autoencoder
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/machine learning/">
+        machine learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/library design/">
+        library design
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/lead optimization/">
+        lead optimization
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this post, I discuss how to decide which technological models to adopt in our work. I introduce two frameworks: the 'technological trinity' and the 'technology ladder'. The former helps us evaluate if a new technology is worth investing in, while the latter places it within a broader context. I illustrate these concepts using protein engineering as an example.</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <h2 id="how-do-we-choose-the-model-to-use">How do we choose the model to use?</h2><p>One of our DSAI interns asked an excellent question,
+"One of the attractive things about DSAI
+is its promotion of the use of a Journal Club for reviewing the latest literature.
+Do we put that latest stuff into our daily work much?"</p>
+<p>I took this question and responded with the following ideas.</p>
+<p>Firstly, keeping up with the latest literature is important
+because we need to know the latest methodologies.
+Doing so gives us a feel and, more importantly, a taste for technology.
+Developing that taste for tech is essential.
+It informs how we evaluate the performance of a model,
+the validity of a scientific conclusion, and more.
+Keeping up with the literature can help us find new talent to hire.</p>
+<p>What comes next, then,
+is developing judgment for whether to invest time in
+the latest methodologies or not.
+To make that judgment call,
+we need a goal and frameworks to make those decisions.
+We work backwards from our goals,
+and the frameworks are the compasses we use to guide our choices.</p>
+<p>I rely on two frameworks here.
+The first is what I call the <em>technological trinity</em>.
+The second is the <em>technology ladder</em>,
+which I adapted from my colleague <a href="https://www.linkedin.com/in/joshua-bishop-9367787/">Joshua Bishop</a>.
+I want to expand on them here.</p>
+<h2 id="technological-trinity">Technological Trinity</h2><p>The technological trinity is us being able to answer "yes" to the following questions:</p>
+<ol>
+<li>Will a new technological or methodological innovation help us achieve our goals and deliver value to those we serve?</li>
+<li>Do we have the personnel to implement those methods in-house and maintain them long-term?</li>
+<li>Does the method fit within a broader, unified technical strategy that already exists?</li>
+</ol>
+<p>Point #3 is only sometimes articulated clearly,
+especially for those who work to make medicines.
+We're only sometimes going to be sophisticated technically and mathematically.
+Still, without a strong foundation,
+we'll be assembling Rube Goldberg machines that may work now,
+may not be architected for the long term,
+and may not be attractive to individuals of the next level of technical sophistication,
+thus limiting innovation.</p>
+<p>If the answer is "yes" to all three of those questions, then we can invest our time in doing a build-out.
+If any of them gets a "no" from us, then there will be a risk that we must weigh.</p>
+<h2 id="technology-ladder">Technology Ladder</h2><p>The technology ladder is a framework for placing that new tech or method within a broader context.
+For a given method, we identify a simpler version of that tech/method that achieves the same goals.
+We also imagine a more complex version that achieves the same goals,
+but it may come with more bells and whistles, such as efficiency gains or capability expansions.
+The price we pay is the need for skilled individuals to build and maintain those shiny things.</p>
+<h2 id="example-protein-engineering">Example: Protein Engineering</h2><p>I used the example of library design methods in protein engineering to illustrate this.
+One way of designing libraries can involve prior training data for an enzyme's activity.
+How do we build a system that does this?</p>
+<p>At the bottom of the technology ladder, we can generate mutations by randomly sampling single, double, triple, or more.
+Our coverage of mutational space would be highly sparse;
+we would be navigating blindfolded.
+Anyone skilled in Python could write this code quickly,
+as it is essentially just a string mutation problem.</p>
+<p>One rung up the ladder, we might incorporate evolutionary information.
+One method would be to train a variational autoencoder on evolutionarily related sequences retrieved via BLAST.
+Doing so would be akin to navigating sequence space with signposts (evolutionary examples).
+To build this out in-house, we need to find a skilled individual who has built variational autoencoder models before,
+understands at least the one-hot encoding representation of protein sequences,
+and knows tricks for stably training a VAE.</p>
+<p>Another rung up the ladder would be to use protein language models,
+which came later than variational autoencoder models,
+trained on the space of observed protein sequences.
+Using this class of models productively would require someone who has worked with language models before,
+understands tokenization and embeddings,
+and understands the caveats of using language models and how they differ from evolutionary models of proteins.</p>
+<p>Another rung up the ladder is to use graph representations of protein <em>structures</em>.
+Using this class of models productively requires an individual who has worked with GNNs,
+ideally understands protein structural biochemistry,
+and has training in biophysics.
+They would also need to be comfortable wrangling an ever-evolving landscape of graph neural network tooling (torch-geometric, Graphein, etc.),
+with bonus points if they are also core developers on those tools.</p>
+<p>And yet another rung up the ladder would be to find someone who could train diffusion models of protein structure.
+As of writing, no established tooling exists to do this robustly;
+it is an active area of research.
+At this point, the pool of candidates would likely be current Ph.D. students in academic research labs.</p>
+<p>A side rung on a parallel technological ladder would be to incorporate the use of uncertainties in our sequence-function models.
+Here, we need someone trained in Bayesian optimization who understands ensemble neural networks
+and knows how to hook up a VAE to an ensemble predictor to traverse latent space to design a library
+that maximizes the posterior probability of superiority compared to a lead candidate.
+There's ample literature to support the incorporation of Bayesian optimization into library designs -
+with efficiency gains in exploring sequence space being the payoff.</p>
+<h3 id="deciding-which-ladder-to-climb-the-technological-trinity">Deciding which ladder to climb: the Technological Trinity</h3><p>Now, we have to step back and ask:
+to what end are we interested in using models for protein engineering?
+What is the fundamental value proposition here?
+How do we gain leverage -- efficiency gains or entirely new capabilities?</p>
+<p>Working backwards, the most obvious application of these models is in the lead optimization of a candidate.
+For lead optimization, our goal with these models is to help us navigate protein sequence space more efficiently
+and get us to an optimized candidate faster than humans would be able to do so.
+If we're on the technology ladder rung where we can use protein language models and VAEs to design libraries, we have a choice.
+Given a fixed staff count to work on such problems,
+do we invest in pushing toward protein structure ML models,
+or do we support incorporating uncertainty in our workflows?</p>
+<p>I will note that these are not mutually exclusive decisions:
+in an unconstrained world, we'd push on both and meld them together.
+But we live in a world with constraints.</p>
+<p>At this point, the Tech Trinity framework can help us decide.</p>
+<ol>
+<li>Which of GNNs &amp; structure vs. Bayesian Optimization will deliver us more value for the same amount of effort? Can we quantify this?</li>
+<li>Can our existing staff handle GNNs better or Bayesian optimization better? Which are they more motivated to wrangle?</li>
+<li>How would GNNs &amp; structure fit within a unified technological strategy and vision for gradient-based design?
+What about Bayesian optimization of library designs?
+What is the theoretical grounding, and is it sound?</li>
+</ol>
+<p>Here lies a judgment call to make,
+each with a tradeoff -
+an especially stark one if only increasing the team's staffing count can allow us to pursue both options in parallel.</p>
+<h2 id="summary">Summary</h2><p>We can contextualize each piece of technology as being rungs in a ladder.
+Within each ladder, different tech versions accomplish the same broad goals
+but vary in the demands of the people involved in making it happen.
+The further we climb the ladder, the more likely tech will be highly experimental, unsupported, and immature.
+But it would also be exciting, attractive, and a signal of highly sophisticated technological maturity.</p>
+<p>The lower the position on the technology ladder, the more commoditized and mature that tech would be,
+and the more likely there will be a vendor to support that.
+But it would also be boring and need more attraction factors for the most motivated individuals
+who would be able to generate innovations that unleash new value.</p>
+<p>Which do we choose? We must weigh the tradeoffs.
+We don't always have to use methods and tools at the top of a technological ladder,
+<em>but we do have to be constantly aware of what the top ladder rung looks like</em>.</p>
+<p>Simultaneously, there is a technological trinity of (1) goals, (2) personnel, and (3) technical strategy
+that we must address when we think about what tech to adopt or build.
+Staying at the forefront of tech is nice and cool,
+but we must also ensure that it's not a piecemeal effort but a concerted one the team is building towards.</p>
+<p>If you've made it this far, thank you for reading!
+This post detailed my framework for navigating technology decisions.
+If you found it helpful, do leave me a comment below!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2023-climbing-the-tech-ladder-or-staying-grounded-a-guide-to-navigating-data-science-innovations</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Climbing the Tech Ladder or Staying Grounded? A Guide to Navigating Data Science Innovations}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2023}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{07}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{24}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2023/7/24/climbing-the-tech-ladder-or-staying-grounded-a-guide-to-navigating-data-science-innovations}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

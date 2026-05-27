@@ -1,0 +1,703 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="How to use multiple GitHub accounts on the same computer">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/how-to-use-multiple-github-accounts-on-the-same-computer' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>How to use multiple GitHub accounts on the same computer - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">How to use multiple GitHub accounts on the same computer</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-10-10</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/github/">
+        github
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ssh/">
+        ssh
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/git/">
+        git
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/accounts/">
+        accounts
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/configuration/">
+        configuration
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/authentication/">
+        authentication
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/troubleshooting/">
+        troubleshooting
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/setup/">
+        setup
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/remotes/">
+        remotes
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workflow/">
+        workflow
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share how I solved the challenge of using multiple GitHub accounts on the same computer by configuring separate SSH keys and updating SSH and Git settings. I walk through step-by-step instructions, troubleshooting tips, and ways to automate account switching for different repositories. If you've ever struggled with Git pushing to the wrong account or want a smoother workflow for personal and volunteer projects, this guide is for you. Curious how to make Git always use the right account without hassle?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <h1 id="how-to-use-multiple-github-accounts-on-the-same-computer">How to use multiple GitHub accounts on the same computer</h1><p>I recently ran into a frustrating situation where I couldn't push to a repository even though I had the right permissions. The problem? I was trying to use two different GitHub accounts on the same computer, and Git was getting confused about which account to use.</p>
+<p>If you're in a similar situation - maybe you have a personal account and also contribute to a non-profit or open source project with a separate account - this guide will help you set everything up correctly.</p>
+<h2 id="the-core-problem">The core problem</h2><p>Here's what was happening to me: I had switched my GitHub CLI to my other account using <code>gh auth switch</code>, but when I tried to push, Git was still authenticating with my personal account's SSH key.</p>
+<p>The issue is that <code>gh auth switch</code> only changes which account the GitHub CLI uses for API operations. It doesn't affect which SSH key Git uses for push/pull operations. Git and SSH operate independently from the <code>gh</code> tool.</p>
+<h2 id="what-you-ll-need">What you'll need</h2><p>Two GitHub accounts (I'll call them <code>personal-account</code> and <code>volunteer-account</code> in this guide), terminal access, admin permissions on your repositories, and about 10-15 minutes.</p>
+<h2 id="step-1-create-separate-ssh-keys-for-each-account">Step 1: Create separate SSH keys for each account</h2><p>First, we need distinct SSH keys for each account. If you don't already have separate keys, create them:</p>
+<div class="hll"><pre><span></span><span class="c1"># Create a key for your volunteer account</span>
+ssh-keygen<span class="w"> </span>-t<span class="w"> </span>ed25519<span class="w"> </span>-C<span class="w"> </span><span class="s2">&quot;volunteer-email@example.com&quot;</span><span class="w"> </span>-f<span class="w"> </span>~/.ssh/id_ed25519_volunteer
+
+<span class="c1"># Create a key for your personal account (if you don&#39;t have one)</span>
+ssh-keygen<span class="w"> </span>-t<span class="w"> </span>ed25519<span class="w"> </span>-C<span class="w"> </span><span class="s2">&quot;personal-email@example.com&quot;</span><span class="w"> </span>-f<span class="w"> </span>~/.ssh/id_ed25519_personal
+</pre></div>
+<p>When prompted for a passphrase, you can either set one or leave it empty (though a passphrase is more secure).</p>
+<h2 id="step-2-add-the-ssh-keys-to-your-ssh-agent">Step 2: Add the SSH keys to your SSH agent</h2><div class="hll"><pre><span></span>ssh-add<span class="w"> </span>~/.ssh/id_ed25519_volunteer
+ssh-add<span class="w"> </span>~/.ssh/id_ed25519_personal
+</pre></div>
+<p>You can verify both keys are loaded:</p>
+<div class="hll"><pre><span></span>ssh-add<span class="w"> </span>-l
+</pre></div>
+<h2 id="step-3-add-the-public-keys-to-github">Step 3: Add the public keys to GitHub</h2><p>For each account, you need to add its corresponding public key:</p>
+<div class="hll"><pre><span></span><span class="c1"># Copy your volunteer account&#39;s public key</span>
+cat<span class="w"> </span>~/.ssh/id_ed25519_volunteer.pub
+</pre></div>
+<p>Then:</p>
+<ol>
+<li>Log into GitHub as your volunteer account</li>
+<li>Go to Settings → SSH and GPG keys → New SSH key</li>
+<li>Paste the public key there</li>
+</ol>
+<p>Repeat this process for your personal account with <code>id_ed25519_personal.pub</code>.</p>
+<h2 id="step-4-configure-ssh-to-use-different-keys-for-different-hosts">Step 4: Configure SSH to use different keys for different "hosts"</h2><p>Edit or create <code>~/.ssh/config</code>:</p>
+<pre><code># Default GitHub (personal account)
+Host github.com
+  HostName github.com
+  User git
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519_personal
+
+# GitHub for volunteer account
+Host github.com-volunteer
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_volunteer
+  IdentitiesOnly yes
+</code></pre>
+<p>The <code>Host github.com-volunteer</code> line creates a local alias that only exists in your SSH config. When Git tries to connect to <code>github.com-volunteer</code>, SSH will actually connect to <code>github.com</code> but use the specified SSH key.</p>
+<p>The <code>IdentitiesOnly yes</code> line tells SSH to only use the key you specified and not try other keys from your SSH agent.</p>
+<h2 id="step-5-update-your-repository-s-remote-url">Step 5: Update your repository's remote URL</h2><p>For any repository belonging to your volunteer account, you need to update the remote URL to use the SSH alias:</p>
+<div class="hll"><pre><span></span><span class="c1"># Navigate to your repo</span>
+<span class="nb">cd</span><span class="w"> </span>~/path/to/nonprofit-project
+
+<span class="c1"># Check current remote</span>
+git<span class="w"> </span>remote<span class="w"> </span>-v
+
+<span class="c1"># Update to use the volunteer account&#39;s SSH config</span>
+git<span class="w"> </span>remote<span class="w"> </span>set-url<span class="w"> </span>origin<span class="w"> </span>git@github.com-volunteer:organization/nonprofit-project.git
+</pre></div>
+<p>Notice the change: <code>git@github.com-volunteer:</code> instead of <code>git@github.com:</code>. This is necessary because the hostname in the URL is what triggers SSH to look up the configuration in your <code>~/.ssh/config</code> file. When Git sees <code>github.com-volunteer</code>, SSH matches it to the <code>Host github.com-volunteer</code> entry and uses the correct key.</p>
+<h2 id="step-6-test-the-connection">Step 6: Test the connection</h2><p>Before pushing, verify SSH is authenticating correctly:</p>
+<div class="hll"><pre><span></span>ssh<span class="w"> </span>-T<span class="w"> </span>git@github.com-volunteer
+</pre></div>
+<p>You should see:</p>
+<pre><code>Hi volunteer-account! You've successfully authenticated, but GitHub does not provide shell access.
+</code></pre>
+<p>If it says your personal account name instead, something's wrong with your SSH config.</p>
+<p>Now try pushing:</p>
+<div class="hll"><pre><span></span>git<span class="w"> </span>push
+</pre></div>
+<h2 id="troubleshooting-common-issues">Troubleshooting common issues</h2><h3 id="issue-1-ssh-still-authenticates-with-the-wrong-account">Issue 1: SSH still authenticates with the wrong account</h3><p>If <code>ssh -T git@github.com-volunteer</code> shows your personal account name instead of your volunteer account, the problem is usually that SSH is trying multiple keys and GitHub is accepting the first one that works.</p>
+<p>Make sure you have <code>IdentitiesOnly yes</code> in your <code>~/.ssh/config</code> for the <code>github.com-volunteer</code> host. This forces SSH to only use the specified key.</p>
+<h3 id="issue-2-could-not-resolve-hostname-github.com-volunteer"">Issue 2: "Could not resolve hostname github.com-volunteer"</h3><p>This usually means Git has a custom SSH command configured that's bypassing your SSH config file. Check:</p>
+<div class="hll"><pre><span></span>git<span class="w"> </span>config<span class="w"> </span>--get<span class="w"> </span>core.sshCommand
+</pre></div>
+<p>If this returns something with <code>-F /dev/null</code>, that's your problem. The <code>-F /dev/null</code> flag tells SSH to ignore all config files.</p>
+<p>Remove it:</p>
+<div class="hll"><pre><span></span>git<span class="w"> </span>config<span class="w"> </span>--unset<span class="w"> </span>core.sshCommand
+</pre></div>
+<h3 id="issue-3-config-changes-don-t-seem-to-apply">Issue 3: Config changes don't seem to apply</h3><p>If you have conditional Git configs (using <code>includeIf</code> directives), they might be overriding your settings. Check:</p>
+<div class="hll"><pre><span></span>git<span class="w"> </span>config<span class="w"> </span>--list<span class="w"> </span>--show-origin<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>sshCommand
+</pre></div>
+<p>This shows you exactly which config file is setting the SSH command. You may need to edit that file directly.</p>
+<p>For example, I had a <code>~/.gitconfig-volunteer</code> file that was automatically loaded for repos in certain directories, and it had a problematic <code>core.sshCommand</code> setting that needed to be fixed.</p>
+<h3 id="issue-4-repository-not-found-error">Issue 4: "Repository not found" error</h3><p>This means SSH is connecting and authenticating, but as the wrong account. Double-check:</p>
+<ol>
+<li>Run <code>ssh -T git@github.com-volunteer</code> and verify it shows the correct account name</li>
+<li>Verify the account has access to the repository on GitHub</li>
+<li>Check that your remote URL uses the correct alias: <code>git@github.com-volunteer:org/repo.git</code></li>
+</ol>
+<h2 id="optional-set-up-conditional-git-configs">Optional: Set up conditional Git configs</h2><p>If you keep repositories for your volunteer work in a specific directory (like <code>~/volunteer-projects/</code>), you can automatically apply settings to all repos in that directory.</p>
+<p>Add this to your <code>~/.gitconfig</code>:</p>
+<pre><code>[includeIf "gitdir:~/volunteer-projects/"]
+    path = ~/.gitconfig-volunteer
+</code></pre>
+<p>Then create <code>~/.gitconfig-volunteer</code>:</p>
+<pre><code>[user]
+    email = volunteer-email@example.com
+
+[core]
+    sshCommand = ssh
+</code></pre>
+<p>This automatically sets your volunteer account's email for commits in that directory. The <code>sshCommand</code> should be set to plain <code>ssh</code> so it uses your <code>~/.ssh/config</code> properly.</p>
+<h2 id="how-this-all-works-together">How this all works together</h2><p>When you run <code>git push</code>:</p>
+<ol>
+<li>Git reads the remote URL: <code>git@github.com-volunteer:org/repo.git</code></li>
+<li>Git asks SSH to connect to <code>github.com-volunteer</code></li>
+<li>SSH looks in <code>~/.ssh/config</code> and finds the <code>Host github.com-volunteer</code> entry</li>
+<li>SSH sees it should actually connect to <code>github.com</code> but use the <code>id_ed25519_volunteer</code> key</li>
+<li>SSH connects to GitHub with the correct key</li>
+<li>GitHub authenticates you as your volunteer account</li>
+<li>Push succeeds</li>
+</ol>
+<p>Each repository uses the correct account automatically based on its remote URL, so you never have to manually specify which key to use.</p>
+<h2 id="wrapping-up">Wrapping up</h2><p>Managing multiple GitHub accounts on the same computer isn't intuitive, but once you understand that Git uses SSH keys (not <code>gh auth</code> settings), the solution becomes clear. The SSH config host alias pattern is the standard way to handle this, and it works reliably once everything is configured correctly.</p>
+<p>The key points to remember:</p>
+<ul>
+<li>SSH keys are what matter for Git operations, not <code>gh auth</code></li>
+<li>Host aliases in <code>~/.ssh/config</code> let you use different keys for different repos</li>
+<li><code>IdentitiesOnly yes</code> prevents SSH from trying multiple keys</li>
+<li>Your remote URL must use the alias (e.g., <code>git@github.com-volunteer:</code>)</li>
+</ul>
+<p>If you run into issues, the troubleshooting section above covers the most common problems I encountered.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-how-to-use-multiple-github-accounts-on-the-same-computer</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{How to use multiple GitHub accounts on the same computer}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{10}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{10}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/10/10/how-to-use-multiple-github-accounts-on-the-same-computer}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

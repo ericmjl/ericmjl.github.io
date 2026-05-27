@@ -1,0 +1,690 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="A practical comparison of DSPy and LlamaBot for structured LLM applications">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/a-practical-comparison-of-dspy-and-llamabot-for-structured-llm-applications' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>A practical comparison of DSPy and LlamaBot for structured LLM applications - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">A practical comparison of DSPy and LlamaBot for structured LLM applications</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-10-18</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llm/">
+        llm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/dspy/">
+        dspy
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llamabot/">
+        llamabot
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/frameworks/">
+        frameworks
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/extraction/">
+        extraction
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/schema/">
+        schema
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/prompting/">
+        prompting
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/expenses/">
+        expenses
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/automation/">
+        automation
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share my hands-on comparison of DSPy and LlamaBot for building structured LLM applications, using a real-world expense extraction example. I explore how each framework handles schema design, type safety, and prompt optimization, highlighting their strengths and trade-offs. Curious which approach might best fit your next LLM project?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>When Omar Khattabe presented <a href="https://dspy.ai">DSPy 3.0</a> at PyData Boston Cambridge last week, I finally had the chance to dig into a framework that's been generating significant buzz in the LLM development community. As someone who's built structured LLM applications with <a href="https://ericmjl.github.io/llamabot/">LlamaBot</a>, I was particularly curious about DSPy's core claim: that signatures represent the only abstraction you need for LLM-powered programs.</p>
+<p>The presentation focused on two key concepts: signatures as a new LLM abstraction and prompt optimization techniques. But what caught my attention was the practical similarity between DSPy's approach and what I've been doing with LlamaBot's StructuredBot. This led me to build a direct comparison using a real-world example from my personal expense tracking application.</p>
+<h2 id="the-structured-llm-challenge">The structured LLM challenge</h2><p>Most developers working with LLMs face the same fundamental problem: how do you reliably extract structured data from unstructured inputs? Whether you're processing receipts, parsing documents, or analyzing text, you need consistent, typed outputs that integrate cleanly with your existing systems.</p>
+<p>Traditional approaches rely heavily on natural language prompts, which are fragile, hard to maintain, and difficult to optimize. DSPy proposes a different path through its signature abstraction, claiming this eliminates the need for verbose prompt engineering.</p>
+<h2 id="a-real-world-comparison-receipt-processing">A real-world comparison: Receipt processing</h2><p>To test DSPy's claims, I built a practical comparison using an expense extraction system I developed for personal use. This application processes receipts in various formats (PNG, PDF, JPG, WEBP) and automatically extracts structured expense data into Notion — essentially a lightweight alternative to enterprise expense management systems.</p>
+<p>The challenge here is typical of structured LLM applications: converting unstructured visual and textual data into consistent, typed outputs that integrate with existing workflows. Let's see how both frameworks handle this task.</p>
+<h3 id="llamabot-s-structuredbot-approach">LlamaBot's StructuredBot approach</h3><p>LlamaBot uses Pydantic models to define structured outputs, leveraging Python's type system for validation and documentation. The approach emphasizes explicit data modeling with detailed field descriptions:</p>
+<div class="hll"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">llamabot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">lmb</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">FlowType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">MONEY_OUT</span> <span class="o">=</span> <span class="s2">&quot;Money Out&quot;</span>
+    <span class="n">MONEY_IN</span> <span class="o">=</span> <span class="s2">&quot;Money In&quot;</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">TypeEnum</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">PAYMENT</span> <span class="o">=</span> <span class="s2">&quot;Payment&quot;</span>
+    <span class="n">INVOICE</span> <span class="o">=</span> <span class="s2">&quot;Invoice&quot;</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PaymentMethodEnum</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">CASH</span> <span class="o">=</span> <span class="s2">&quot;Cash&quot;</span>
+    <span class="n">BANK_TRANSFER</span> <span class="o">=</span> <span class="s2">&quot;Bank Transfer&quot;</span>
+    <span class="n">CREDIT_CARD</span> <span class="o">=</span> <span class="s2">&quot;Credit Card&quot;</span>
+    <span class="n">CHECK</span> <span class="o">=</span> <span class="s2">&quot;Check&quot;</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ExpenseData</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">transaction_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Short, memorable description of the purchase. E.g.: &#39;Anker Dock&#39;, &#39;Coffee at Triangle Bar&#39;, &#39;dbrand laptop skin&#39;&quot;</span>
+    <span class="p">)</span>
+    <span class="n">date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;transaction date&quot;</span><span class="p">)</span>
+    <span class="n">amount</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;transaction amount&quot;</span><span class="p">)</span>
+    <span class="n">category</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Business category, e.g. Office Supplies, Travel, Meals&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="n">TypeEnum</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Either Payment or Invoice&quot;</span><span class="p">)</span>
+    <span class="n">flow</span><span class="p">:</span> <span class="n">FlowType</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Either &#39;Money Out&#39; or &#39;Money In&#39;&quot;</span><span class="p">)</span>
+    <span class="n">payment_method</span><span class="p">:</span> <span class="n">PaymentMethodEnum</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;How the payment was made.&quot;</span>
+    <span class="p">)</span>
+    <span class="n">purpose</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Brief business purpose or description of the expense.&quot;</span>
+    <span class="p">)</span>
+    <span class="n">reference_number</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Invoice/receipt number if visible&quot;</span>
+    <span class="p">)</span>
+    <span class="n">person</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="s2">&quot;Person responsible or who made the purchase if mentioned.&quot;</span>
+    <span class="p">)</span>
+
+<span class="c1"># Usage</span>
+<span class="n">bot</span> <span class="o">=</span> <span class="n">lmb</span><span class="o">.</span><span class="n">StructuredBot</span><span class="p">(</span>
+    <span class="n">system_prompt</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">pydantic_model</span><span class="o">=</span><span class="n">ExpenseData</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;ollama_chat/gemma3n:latest&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">bot</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/receipt.png&quot;</span><span class="p">))</span>
+</pre></div>
+<h3 id="dspy-s-signature-approach">DSPy's signature approach</h3><p>DSPy takes a different approach with its signature abstraction, which defines both inputs and outputs in a single class. The framework emphasizes simplicity and automatic prompt optimization:</p>
+<div class="hll"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">dspy</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ExpenseExtraction</span><span class="p">(</span><span class="n">dspy</span><span class="o">.</span><span class="n">Signature</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract expense information from receipt images.&quot;&quot;&quot;</span>
+
+    <span class="n">receipt_image</span><span class="p">:</span> <span class="n">dspy</span><span class="o">.</span><span class="n">Image</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">InputField</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Receipt image&quot;</span><span class="p">)</span>
+    <span class="n">transaction_name</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">OutputField</span><span class="p">(</span>
+        <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Short description of the purchase&quot;</span>
+    <span class="p">)</span>
+    <span class="n">date</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">OutputField</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Transaction date (YYYY-MM-DD)&quot;</span><span class="p">)</span>
+    <span class="n">amount</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">OutputField</span><span class="p">(</span>
+        <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Total transaction amount (number, no currency symbols)&quot;</span>
+    <span class="p">)</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">OutputField</span><span class="p">(</span>
+        <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Business category (e.g., Office Supplies, Travel, Meals)&quot;</span>
+    <span class="p">)</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">OutputField</span><span class="p">(</span>
+        <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Transaction type, either &#39;Payment&#39; or &#39;Invoice&#39;&quot;</span>
+    <span class="p">)</span>
+    <span class="n">flow</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">OutputField</span><span class="p">(</span>
+        <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Cash flow direction, either &#39;Money Out&#39; or &#39;Money In&#39;&quot;</span>
+    <span class="p">)</span>
+    <span class="n">payment_method</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">OutputField</span><span class="p">(</span>
+        <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;How the payment was made (e.g., Cash, Bank Transfer, Credit Card, Check)&quot;</span>
+    <span class="p">)</span>
+    <span class="n">purpose</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">OutputField</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Brief business purpose or description&quot;</span><span class="p">)</span>
+    <span class="n">reference_number</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">OutputField</span><span class="p">(</span>
+        <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Invoice/receipt number if present&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span>
+    <span class="n">person</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">OutputField</span><span class="p">(</span>
+        <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Person involved, if mentioned&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span>
+
+<span class="c1"># Usage</span>
+<span class="n">lm</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">LM</span><span class="p">(</span><span class="s2">&quot;ollama_chat/gemma3n:latest&quot;</span><span class="p">)</span>
+<span class="n">dspy</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">lm</span><span class="o">=</span><span class="n">lm</span><span class="p">)</span>
+<span class="n">module</span> <span class="o">=</span> <span class="n">dspy</span><span class="o">.</span><span class="n">Predict</span><span class="p">(</span><span class="n">ExpenseExtraction</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">module</span><span class="p">(</span><span class="n">receipt_image</span><span class="o">=</span><span class="n">ctx</span><span class="o">.</span><span class="n">images</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+<h2 id="comparing-the-approaches">Comparing the approaches</h2><p>Both frameworks successfully extracted structured data from receipt images, but they take fundamentally different approaches to the problem.</p>
+<p><strong>LlamaBot's StructuredBot</strong> leverages Python's existing type system through Pydantic models. This approach provides several advantages: automatic validation, IDE support, and integration with existing Python data processing pipelines. The explicit type definitions make the data contract clear and enforceable.</p>
+<p><strong>DSPy's signatures</strong> offer a more streamlined interface that combines input and output definitions in a single class. The framework's strength lies in its automatic prompt optimization capabilities, which can improve performance over time without manual intervention.</p>
+<h2 id="key-differences-in-practice">Key differences in practice</h2><p>The most noticeable difference is verbosity. LlamaBot requires more explicit type definitions and imports, while DSPy's signature approach is more concise. However, this conciseness may come at the cost of some type safety and IDE support that Pydantic provides.</p>
+<p>Both frameworks use LiteLLM for model routing, making it easy to switch between different LLM providers. The model configuration syntax is identical, which suggests a common underlying architecture.</p>
+<h2 id="the-schema-first-principle">The schema-first principle</h2><p>Regardless of which framework you choose, structured LLM applications require careful upfront schema design. The bulk of development time goes into defining your data model, not writing prompts. This schema-first approach is what makes these frameworks powerful—they force you to think clearly about your data requirements before implementation.</p>
+<h2 id="looking-ahead-dspy-s-broader-vision">Looking ahead: DSPy's broader vision</h2><p>DSPy's claim that signatures are the only abstraction needed for LLM applications is ambitious but not entirely accurate. The framework includes additional abstractions like modules and optimizers that handle more complex scenarios. Signatures represent the core abstraction for simple input-output transformations, but building production LLM applications often requires more sophisticated orchestration.</p>
+<p>I'm planning to explore DSPy's more advanced features as I rebuild LlamaBot's agent abstractions. The goal is to understand how to construct autonomous LLM agent frameworks rather than individual agents—a challenge that requires thinking beyond simple input-output mappings.</p>
+<p>Being unfamiliar with DSPy's documentation initially, I found it challenging to follow, but thanks to fellow PyData Boston Cambridge organizer <a href="https://www.linkedin.com/in/nnssa/">Nash Sabti</a>'s guidance, I was able to make it happen and build this comparison.</p>
+<p>The structured LLM landscape is rapidly evolving, and frameworks like DSPy and LlamaBot are pushing the boundaries of what's possible. The key insight is that successful LLM applications require the same engineering discipline as traditional software: clear interfaces, robust error handling, and maintainable abstractions.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-a-practical-comparison-of-dspy-and-llamabot-for-structured-llm-applications</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{A practical comparison of DSPy and LlamaBot for structured LLM applications}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{10}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{18}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/10/18/a-practical-comparison-of-dspy-and-llamabot-for-structured-llm-applications}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

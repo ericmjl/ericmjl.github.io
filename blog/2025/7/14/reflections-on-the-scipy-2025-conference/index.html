@@ -1,0 +1,627 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Reflections on the SciPy 2025 Conference">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/reflections-on-the-scipy-2025-conference' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Reflections on the SciPy 2025 Conference - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Reflections on the SciPy 2025 Conference</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2025-07-14</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/scipy/">
+        scipy
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/conference/">
+        conference
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/marimo/">
+        marimo
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/tutorials/">
+        tutorials
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llms/">
+        llms
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/xarray/">
+        xarray
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/community/">
+        community
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/networking/">
+        networking
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/career/">
+        career
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I reflect on my 10th year at the SciPy Conference, sharing highlights from teaching tutorials, attending inspiring talks, recording informal podcast conversations, and contributing to open source projects. I discuss the power of community, the evolution of scientific notebooks, and the importance of financial aid in making SciPy accessible. Curious about the behind-the-scenes moments and lessons learned from a decade at SciPy?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>This year marks my 10th year of being involved with the Scientific Python Conference, and it has been an absolute blast! What started as curiosity about the intersection of science and software has grown into a decade of learning, teaching, and contributing to this incredible community.</p>
+<h2 id="conference-activities-summary">Conference Activities Summary</h2><p>This year's SciPy was particularly active for me. I taught two tutorials: "Building with LLMs Made Simple" (a new one) and "Network Analysis Made Simple" (my longtime favorite). After the tutorials, I attended several inspiring talks, including an especially motivating presentation on XArray in biology that prompted me to create a Marimo notebook demonstrating XArray's applications in biological data analysis.</p>
+<p>One of my favorite conference activities this year was recording conversations with fellow attendees. In lieu of my Insta360 camera, I brought my DJI mic everywhere and captured numerous insightful discussions, creating an informal podcast collection of SciPy conversations. Finally, during the sprints, I felt more tapped out than usual but still managed to contribute to Llamabot development with others and work on the XArray biology materials I had envisioned.</p>
+<h2 id="tutorials">Tutorials</h2><h3 id="building-with-llms-made-simple">Building with LLMs Made Simple</h3><p>This was my first time teaching this tutorial, and I was thrilled to use Marimo notebooks throughout the entire session. The tutorial covered three main areas: simple LLM interactions, structured generation, and RAG (Retrieval-Augmented Generation). You can find the tutorial materials at: <a href="https://github.com/ericmjl/building-with-llms-made-simple">https://github.com/ericmjl/building-with-llms-made-simple</a></p>
+<p>The structured generation section was particularly powerful. I emphasized that structured generation is fundamentally about automating form-filling using natural language. Having free text input and getting a filled-out Pydantic model output is incredibly valuable for productivity. One participant mentioned the concept of automating "the dangerous, the dull, and the dirty" - which perfectly captures how LLMs can handle routine tasks.</p>
+<p>For RAG, I clarified that RAG doesn't necessarily equal vector databases - it's about information retrieval through various means including keyword search. I demonstrated custom chunking strategies for standard operating procedures, showing how simple solutions (like appending source references) often work better than complex hierarchical structures.</p>
+<p>The tutorial concluded with brief demos on evaluation and agents. I shared my experience testing different models (Gemma, Llama 3, Llama 4) for docstring generation, emphasizing the importance of experimentation and model selection. For agents, I stressed starting with simpler structured generation approaches before building complex autonomous systems.</p>
+<p>Thanks to Modal's generous credit allocation from their DevRel Charles, I was able to deploy an Ollama endpoint in the cloud, making the tutorial accessible to all participants.</p>
+<h3 id="network-analysis-made-simple">Network Analysis Made Simple</h3><p>This marked either my ninth or tenth time teaching this tutorial at SciPy - my longtime favorite. This year I made the significant transition from Jupyter to Marimo notebooks, which was an experiment that generally worked well despite some setup challenges. You can find the tutorial materials at: <a href="https://github.com/ericmjl/Network-Analysis-Made-Simple">https://github.com/ericmjl/Network-Analysis-Made-Simple</a></p>
+<p>The tutorial faced some technical hurdles for installation with the Network Analysis Made Simple package being published on my own PyPI server, plus some participants weren't familiar with Marimo. Fortunately, Erik Welch from NVIDIA was present to help assist participants. By the end of the conference talk days, I was able to resolve the issue by changing the notebooks to draw from the Network Analysis Made Simple source directly instead of my own PyPI server, which solved most of the installation problems.</p>
+<p>What I loved most was the audience engagement. We didn't cover as much content as usual because participants asked so many thoughtful questions, especially during the visualization section. This interaction made the session incredibly valuable, as people were clearly learning and developing new ideas for their own work.</p>
+<p>The Marimo experiment succeeded in shifting the learning environment with minimal overhead. For future iterations, I'm considering eliminating the separate NAMS package and making the entire notebook self-contained with answers included at the bottom.</p>
+<h3 id="overarching-thoughts-on-the-tutorials">Overarching thoughts on the tutorials</h3><p>Both tutorials were conducted entirely within Marimo notebooks, which convinced quite a few participants to switch over to Marimo. They saw the power of fully reactive notebooks and the ability to seamlessly share analysis from one person to another - something that's much more cumbersome with traditional Jupyter notebooks.</p>
+<p>Both tutorials will also be available on YouTube! There was a technical glitch with the Building with LLMs Made Simple tutorial recording, so I'm planning to re-record the full tutorial this coming Saturday - including content we didn't get to cover during the live session. This should actually result in a better, more complete recording for the YouTube release, which I'll also release to my own channel.</p>
+<h2 id="talks-and-presentations">Talks and Presentations</h2><p>I attended several inspiring talks throughout the conference. Here are short summaries of the key presentations that caught my attention:</p>
+<h3 id="xarray-in-biology-ian-hunt-isaak">XArray in Biology (Ian Hunt-Isaak)</h3><p>This talk was particularly inspiring and prompted me to create a Marimo notebook demonstrating XArray applications in biology. Ian, a biologist and microscopist from Earthmover (funded by the Chan Zuckerberg Initiative), presented a compelling case for XArray adoption in biological research.</p>
+<p>XArray excels at handling multi-dimensional biological data like time-series microscopy images, multi-channel fluorescent data, and complex experimental metadata. Its semantic indexing capabilities (e.g., <code>data.sel(time='30.5min', field_of_view=1, channel='GFP').max('z')</code>) make biological data analysis much more intuitive.</p>
+<p>Despite its benefits, XArray has seen limited adoption in biology due to awareness barriers and lack of biology-specific examples. Recent improvements like DataTree for hierarchical data structures and flexible indices for complex coordinate systems address many biological data needs. The roadmap includes developing biology-specific documentation and building a user community within the next year.</p>
+<h3 id="scipy-statistical-distributions-infrastructure-albert-steppi">SciPy Statistical Distributions Infrastructure (Albert Steppi)</h3><p>Albert, one of SciPy's maintainers, presented the complete rewrite of SciPy's statistical distributions framework, primarily designed by Matt Haberland. The new infrastructure addresses significant limitations of the old system, including memory leaks, inflexible documentation, and parameter processing overhead.</p>
+<p>Key improvements include a single consistent API where distributions are classes users instantiate, better performance, arithmetic operations on distributions (shifting, scaling, transformations), and simplified custom distribution creation. Future development will focus on distribution-specific fitting methods and support for alternative array backends like PyTorch and JAX.</p>
+<h3 id="high-level-api-dispatching-for-community-scaling-erik-welch">High-Level API Dispatching for Community Scaling (Erik Welch)</h3><p>This presentation explored how dispatching enables scaling of open source communities while managing contributor burden. The speaker shared implementation experiences with NetworkX (3-year evolution from pure Python to supporting faster implementations) and Scikit-Image (1-year implementation dispatching to NVIDIA cuCIM).</p>
+<p>The talk emphasized community engagement importance, careful bandwidth management, and maintaining balance between users, library maintainers, and backend developers. While dispatching is "deceptively simple," it requires careful consideration of nuanced implementation choices.</p>
+<h3 id="marimo-the-future-of-notebooks-akshay-agrawal">Marimo: The Future of Notebooks (Akshay Agrawal)</h3><p>I was thrilled to see Marimo's founder Akshay give a talk about the future of notebooks. His live demo showcasing all of Marimo's capabilities was as gutsy as my own Data-Driven Pharma talk (which was also done entirely in a Marimo notebook).</p>
+<p>The fundamental change Marimo has brought to my workflow has been amazing. Not having to specify a separate manifest file for dependencies like with Jupyter notebooks was one of the big selling points for me. We had dinner together with a large group and got to discuss Marimo's future development - it was awesome to meet him in person and share thoughts on where the platform is heading.</p>
+<h2 id="recording-conversations-and-networking">Recording Conversations and Networking</h2><p>One of my favorite activities this year was bringing my DJI mic everywhere and recording conversations with fellow attendees. Over the years, I've realized how informative and valuable these SciPy conversations are, so I decided to capture them as informal podcast content.</p>
+<p>The first recording happened over breakfast with Hugo Bowne-Anderson. We were discussing everything while eating salmon frittata - we now call it "the frittata chat." Hugo loved the idea so much that he sent it to his editor, and it will appear on his podcast "Vanishing Gradients" soon.</p>
+<p>I continued this approach with Daniel Chen (my conference doppelganger - we get mistaken for each other at every conference) and Ryan Cooper. I also had an incredible hour-and-twenty-minute conversation with Zweli, covering topics from Bayes and graphs to apartheid and parenting. While I missed some talks due to these extended conversations, that's often the real purpose of conferences - engaging in dialogue we don't usually get to have.</p>
+<p>Whether I'll release these as formal podcast episodes depends partly on my energy levels and whether the participants agree, but the conversations themselves provided immense value and captured knowledge I didn't want to lose.</p>
+<h2 id="nerd-sniping-and-code-reviews">Nerd Sniping and Code Reviews</h2><p>I got thoroughly nerd-sniped by Joe Cheng, CTO of Posit, who found Llamabot and conducted an impromptu code review. We first met at the NVIDIA event while I was recording a conversation with Daniel Chen about AI education and assessment.</p>
+<p>Joe had recently decided that generative AI was a productive area for Posit and found Llamabot during his research. Standing outside the Glass Museum for half an hour, he grilled me with questions about design choices I'd never had the chance to discuss with anyone before. The nerd sniping continued over ramen takeout in the hotel lobby from Thekoi (awesome restaurant by the way!), where he asked about corners of the codebase with the thoroughness of a technical interview that I've subjected multiple people to. Talk about karma!</p>
+<p>Joe also ended up nerd sniping himself during our discussions and built something with the OpenAI real-time API that he showed me on Thursday evening. It was incredibly fun - we were on his computer together, nerding out about tweaking the real-time API settings to fit a user experience that would work with my brain, where I take a bit more time to respond and don't necessarily like the rapid-fire conversation turns.</p>
+<p>This nerd sniping cascade had a knock-on effect: it led me to implement graph-based memory for Llamabot, which then revealed that the chat memory API really wasn't optimal and needed another rewrite. There's now a 0.13 release of Llamabot planned in my head that will need to happen soon - all thanks to Joe's infectious curiosity and builder mentality!</p>
+<h2 id="sprints">Sprints</h2><p>The sprints provided a chance to contribute to open source projects, though I felt more tapped out than usual this year. Despite the fatigue, I managed to make meaningful contributions to three key areas.</p>
+<h3 id="llamabot-development">Llamabot Development</h3><p>Joe Cheng's nerd sniping during the conference led me to spend time during the sprints implementing graph-based memory for Llamabot. The challenge was representing conversation turns as pairs of human and AI messages while inferring the most probable message that a human is responding to when creating new branches in the conversation.</p>
+<p>I successfully implemented this graph memory system, which required determining how to connect new human messages to existing assistant messages in the conversation graph. This feature allows for more sophisticated conversation tracking and branching compared to traditional linear chat histories. You can see the implementation in this pull request: <a href="https://github.com/ericmjl/llamabot/pull/226">https://github.com/ericmjl/llamabot/pull/226</a></p>
+<h3 id="xarray-biology-contributions">XArray Biology Contributions</h3><p>Inspired by Ian's talk on XArray in biology, I worked on creating Marimo notebook examples demonstrating how XArray can be effectively used for biological data analysis. This contribution aims to bridge the gap between XArray's powerful capabilities and the biology community's needs for multi-dimensional data handling.</p>
+<p>The goal was to provide concrete examples that biologists could use as starting points for their own projects, helping to increase XArray adoption in biological research by making its benefits more tangible and accessible. You can find the completed notebook at: <a href="https://gist.github.com/ericmjl/e5b267782f9cbd27f712153deab426e1">https://gist.github.com/ericmjl/e5b267782f9cbd27f712153deab426e1</a></p>
+<h3 id="teen-track-talk">Teen Track Talk</h3><p>Inessa Pawson asked if I would be willing to give a talk to the teens attending the conference. I shared stories about building your own tools and recounted experiences from my career journey. I told them how I got in through the back door and walked out through the front door of grad school, emphasizing how much you can learn along the way.</p>
+<p>Using the same approach from my Data-Driven Pharma talk, I showed them how I can build my own tools without relying on PowerPoint - by showing them live that I built my own slide deck generator. I shared how I picked up programming and made 70+ pull requests with the Matplotlib team, which was an incredible learning experience, and how the learning experience helped me later professionally at Novartis and Moderna, where being able to build tools for myself helped me be the change I wanted to see in the world. The goal was to inspire them to see that they too can build their own tools and, perhaps, be the change they wanted to see.</p>
+<h2 id="conference-tidbits">Conference Tidbits</h2><p>A few smaller moments that captured the spirit of SciPy and the power of modern notebook sharing: I helped Hugo with a quick analysis during the conference and was able to simply airdrop him a Marimo notebook with the complete analysis. The fact that I could share a fully self-contained, executable analysis so seamlessly really demonstrated how far we've come in making scientific computing more collaborative and accessible.</p>
+<p>Another remarkable tidbit: I went to Chili Thai for the sixth and seventh time in two years, which is pretty remarkable considering that I've only been at the conference for a total of 14 days. Chili Thai really earns high ratings from me - the duck curry and the panang curry are amongst the best I've ever had.</p>
+<h2 id="conclusion">Conclusion</h2><p>Attending the SciPy conference for about a decade now has been an immense resource for my career growth. Beyond being a participant, I've also been involved as an organizer, serving on the financial aid committee for almost a decade. It's my little way of giving back to a community that has given me so much, and I'm always looking for ways to contribute even more.</p>
+<p>What makes SciPy special is its incredible community of people who are curious, nerdy, and remarkably ego-free. There's a genuine spirit of learning and teaching - many are educators at heart, eager to share knowledge and help others grow. This creates an environment where meaningful connections and learning happen naturally.</p>
+<p>I'd really recommend more people attend SciPy if their company finances allow for it. The value you get from the tutorials, talks, networking, and collaborative spirit is immense. However, I do know from helping organize the conference that this year we ran at a deficit, which isn't financially sustainable. I hope we can find more sponsors for next year to keep this amazing event accessible.</p>
+<p>If possible, I'd love to help sponsor the conference, especially the Financial Aid program. Being able to bring new people to the conference - particularly community contributors who have demonstrated need - would be amazing. I was a beneficiary of financial aid myself early in my career, and it made all the difference in my ability to participate and grow within this community.</p>
+<p>The SciPy conference continues to be a cornerstone of my professional development and a source of inspiration for pushing the boundaries of what's possible with scientific computing!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2025-reflections-on-the-scipy-2025-conference</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Reflections on the SciPy 2025 Conference}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2025}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{07}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{14}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2025/7/14/reflections-on-the-scipy-2025-conference}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

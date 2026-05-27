@@ -1,0 +1,856 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Dissecting the ESM3 Model Architecture">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/dissecting-the-esm3-model-architecture' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Dissecting the ESM3 Model Architecture - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Dissecting the ESM3 Model Architecture</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-08-25</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/esm3/">
+        esm3
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/neural network/">
+        neural network
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/multi-modality/">
+        multi-modality
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/model training/">
+        model training
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data/">
+        data
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/tokenization/">
+        tokenization
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/model architecture/">
+        model architecture
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/vector embedding/">
+        vector embedding
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/machine learning/">
+        machine learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/protein modeling/">
+        protein modeling
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/journal club/">
+        journal club
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I explore the ESM3 model, focusing on its handling of missing modalities in multi-modality training. I dissect the model's architecture, input and output configurations, and the strategic use of default values for absent data. By examining the source code and conducting a toy example, I illustrate how embeddings are calculated and how they shift in vector space when modalities are missing. This deep dive reveals the model's elegant design and its potential for multi-modality integration. Has this piqued your curiosity yet?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I recently read the <a href="https://www.biorxiv.org/content/10.1101/2024.07.01.600583v1">ESM3 paper</a>. Setting aside the more marketing-oriented title ("Simulating 500 million years of evolution..."), I was genuinely curious to see how this multi-modality model was trained. Previously, when writing about multi-modality models, the one thing that baffled me was this problem: <strong>How do we handle the situation where some of our modalities are missing from a training set sample?</strong></p>
+<p>ESM3 was the first model in which I observed how accommodating missing modalities worked. Here are my notes after digging into the model's source code.</p>
+<h2 id="model-inputs-and-outputs">Model Inputs and Outputs</h2><p>Firstly, we start with what the neural network model takes as inputs and returns as outputs. We will also study the tokenization scheme of the ESM3 model, which is crucial for understanding the inputs to ESM.</p>
+<table>
+<thead><tr>
+<th style="text-align:left">Argument</th>
+<th style="text-align:center">Embedding</th>
+<th>Semantics</th>
+<th>Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>sequence_tokens</code></td>
+<td style="text-align:center">✅</td>
+<td>tokenized sequence</td>
+<td><code>sequence.mask_token_id</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>structure_tokens</code></td>
+<td style="text-align:center">✅</td>
+<td>tokenized 3D structure</td>
+<td><code>STRUCTURE_MASK_TOKEN</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>average_plddt</code></td>
+<td style="text-align:center">✅</td>
+<td>average of predicted LDDT (i.e. model confidence) across the structure</td>
+<td><code>1.0</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>per_res_plddt</code></td>
+<td style="text-align:center">✅</td>
+<td>per-residue pLDDT</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ss8_tokens</code></td>
+<td style="text-align:center">✅<br></td>
+<td>secondary structure tokens</td>
+<td><code>SS8_PAD_TOKEN</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>sasa_tokens</code></td>
+<td style="text-align:center">✅<br></td>
+<td>solvent accessible surface area (SASA) tokens</td>
+<td><code>SASA_PAD_TOKEN</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>function_tokens</code></td>
+<td style="text-align:center">✅<br></td>
+<td>function tokens</td>
+<td><code>INTERPRO_PAD_TOKEN</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>residue_annotation_tokens</code></td>
+<td style="text-align:center">✅<br></td>
+<td>residue annotation tokens</td>
+<td><code>RESIDUE_PAD_TOKEN</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>structure_coords</code></td>
+<td style="text-align:center">❌</td>
+<td>structure 3D coordinates</td>
+<td><code>nan</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>chain_id</code></td>
+<td style="text-align:center">❌</td>
+<td>chain ID, usually "A", "B", or some other name</td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>sequence_id</code></td>
+<td style="text-align:center">❌</td>
+<td>sequence ID</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+<p>Crucially, the model <code>ESM3</code> only requires one of the inputs to be passed in. We can know this by studying the <a href="https://github.com/evolutionaryscale/esm/blob/main/esm/models/esm3.py#L272"><code>forward</code> pass of the model</a>. For the arguments not provided, each has default values, as described in the table above. These are set per batch of sequence that is passed in.</p>
+<p>The outputs of the ESM3 model are as follows, with the following shapes:</p>
+<table>
+<thead><tr>
+<th>Output</th>
+<th>Dimensions</th>
+<th>Dimension Semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>embeddings</code></td>
+<td><code>(batch, seq_length, d_model)</code></td>
+<td><code>d_model</code> is set by humans.</td>
+</tr>
+<tr>
+<td><code>function_logits</code></td>
+<td><code>(batch, seq_length, 8, 260)</code></td>
+<td>"8" refers to <code>lsh_bits_per_token</code>, 260 is the function token vocabulary size after using TF-IDF.</td>
+</tr>
+<tr>
+<td><code>sasa_logits</code></td>
+<td><code>(batch, seq_length, 19)</code></td>
+<td>15 boundaries imply 16 levels, + 3 tokens for <code>pad</code>, <code>motif</code>, and <code>unk</code> (unknown)</td>
+</tr>
+<tr>
+<td><code>sequence_logits</code></td>
+<td><code>(batch, seq_length, 64)</code></td>
+<td>20 standard a.a. + XBUZO + <code>.-|</code> + <code>&lt;cls&gt;</code>, <code>&lt;pad&gt;</code>, <code>&lt;eos&gt;</code>, <code>&lt;bos&gt;</code>, <code>&lt;mask&gt;</code>. Not sure how we get to 64; I suspect it's in preparation for a codon model, or just extra capacity.</td>
+</tr>
+<tr>
+<td><code>structure_logits</code></td>
+<td><code>(batch, seq_length, 4096)</code></td>
+<td>4096 is the dimension of the VQ-VAE that's used to embed structure.</td>
+</tr>
+<tr>
+<td><code>secondary_structure_logits</code></td>
+<td><code>(batch, seq_length, 11)</code></td>
+<td>8-class vocabulary for secondary structure + 3 special tokens <code>&lt;pad&gt;</code>, <code>&lt;motif&gt;</code>, and <code>&lt;unk&gt;</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>I'm noticing that the Evolutionary Scale folks have chosen to discretize properties considered continuous, such as SASA. Though this choice is arbitrary, it fits the language modelling paradigm. Presumably, one may choose a smaller number of discrete levels while trading off granularity.</p>
+<h2 id="model-architecture">Model Architecture</h2><p>At a high level, the model's architecture looks roughly (but not exactly!) like the following, with the relevant attributes assumed to be set up in the <code>__init__()</code>:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ESM3</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">tokenized_inputs</span><span class="p">):</span>
+        <span class="n">tokenized_inputs</span> <span class="o">=</span> <span class="n">_set_defaults</span><span class="p">(</span><span class="o">*</span><span class="n">tokenized_inputs</span><span class="p">)</span>
+
+        <span class="n">embeddings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="o">*</span><span class="n">tokenized_inputs</span><span class="p">)</span>
+        <span class="n">transformed_embeddings</span><span class="p">,</span> <span class="n">embeddings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer_stack</span><span class="p">(</span><span class="n">encoded</span><span class="p">,</span> <span class="o">**</span><span class="n">other_information</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_heads</span><span class="p">(</span><span class="n">transformed_embeddings</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span> <span class="c1"># embeddings is passed through to the output</span>
+</pre></div>
+<p>Most crucially, we need to examine what conceptually happens within <code>self.encoder</code> on a per-sample basis:</p>
+<div class="hll"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ESMEncoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">tokenized_inputs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">embedded_inputs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">tokenized_input</span> <span class="ow">in</span> <span class="n">tokenized_inputs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">embedded_input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedder</span><span class="p">[</span><span class="n">name</span><span class="p">](</span><span class="n">tokenized_input</span><span class="p">)</span>
+            <span class="n">embedded_inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">embedded_input</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">embedded_inputs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+<p>As you can see, we sum the embedding vectors together. I had quite a few questions about this, and I will address them later.</p>
+<h2 id="dealing-with-missing-modalities">Dealing with missing modalities</h2><p>So, we now come to the key question of this post: how does the model deal with missing modalities?</p>
+<p>The <strong>"Default Value"</strong> column above gives us the answer: if we are missing a data modality, then we use a default value to fill it in! Looking at the table above, any modality involved in calculating the embedding uses a default value, such as the respective pad token, mask token, or a semantically relevant floating point value. Thinking back to a conversation I had with colleagues at work, this was also an idea we thought of implementing, but we weren't 100% sure whether this would so-called 'work' or not.</p>
+<p>Now, from studying the model source code, we know that there are 8 modalities that are used for calculating the final embedding. When a modality is missing, we use a sentinel value as a default value. What effect will this have on the learned embedding layers, and what effect will this have on the model's encoder's outputs?</p>
+<p>To understand this, we need to remember two facts. Firstly, addition in vector space represents a location shift. Secondly, tokenization effectively indexes into a trainable vector representation of text.</p>
+<p>Let's see how these two play together by exploring a minimally complex toy example. We will begin with the following setup:</p>
+<ul>
+<li>Two modalities:<ul>
+<li>String letters with alphabet <code>ABCDE*</code></li>
+<li>String numbers with alphabet <code>12345*</code></li>
+<li><code>*</code> in both cases represents the <code>pad</code> token.</li>
+</ul>
+</li>
+<li>Sequence of length 7.<ul>
+<li>Modality 1's sequence is: <code>EECADEB</code></li>
+<li>Modality 2's sequence is: <code>2151322</code></li>
+<li>Modality 2 is the one we will choose to be optionally missing, and when missing, will be represented by the following string: <code>*******</code></li>
+</ul>
+</li>
+<li>Embeddings are 3-dimensional. For simplicity's sake, we will draw them from an isotropic Gaussian distribution, except for the pad character, which falls into three cases:<ul>
+<li>In the base case, we will use an isotropic Gaussian</li>
+<li>In one extreme case, we will set it to be all ones: <code>np.array([1.0, 1.0, 1.0])</code></li>
+<li>In another extreme case, we will set it to be zeros: <code>np.array([0.0, 0.0, 0.0])</code></li>
+</ul>
+</li>
+</ul>
+<div class="hll"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">dim_size</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="c1"># Create embedding for modality 1</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">44</span><span class="p">)</span>
+<span class="n">alphabet1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="s2">&quot;ABCDE*&quot;</span><span class="p">)</span>
+<span class="n">trainable_embeddings1</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">alphabet1</span><span class="p">),</span> <span class="n">dim_size</span><span class="p">))</span>
+<span class="n">tokenization1</span> <span class="o">=</span> <span class="p">[</span><span class="n">alphabet1</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">letter</span><span class="p">)</span> <span class="k">for</span> <span class="n">letter</span> <span class="ow">in</span> <span class="s2">&quot;EECADEB&quot;</span><span class="p">]</span>
+<span class="n">sequence_embedding1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">trainable_embeddings1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tokenization1</span><span class="p">])</span> <span class="c1"># shape: (len(sequence), dim_size)</span>
+
+<span class="c1"># Create embedding for modality 2</span>
+<span class="n">rng2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">alphabet2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="s2">&quot;12345*&quot;</span><span class="p">)</span>
+<span class="n">trainable_embeddings2</span> <span class="o">=</span> <span class="n">rng2</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">alphabet2</span><span class="p">),</span> <span class="n">dim_size</span><span class="p">))</span>
+<span class="n">tokenization2</span> <span class="o">=</span> <span class="p">[</span><span class="n">alphabet2</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">number</span><span class="p">)</span> <span class="k">for</span> <span class="n">number</span> <span class="ow">in</span> <span class="s2">&quot;2214523&quot;</span><span class="p">]</span>
+<span class="n">sequence_embedding2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">trainable_embeddings2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tokenization2</span><span class="p">])</span> <span class="c1"># shape: (len(sequence), dim_size)</span>
+
+<span class="c1"># For the three ways of exploring what happens when we are missing sequence 2</span>
+<span class="n">tokenization2_missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">alphabet2</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">number</span><span class="p">)</span> <span class="k">for</span> <span class="n">number</span> <span class="ow">in</span> <span class="s2">&quot;*******&quot;</span><span class="p">]</span>
+<span class="n">sequence_embedding2_missing</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">trainable_embeddings2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tokenization2_missing</span><span class="p">])</span> <span class="c1"># shape: (len(sequence), dim_size)</span>
+<span class="n">sequence_embedding2_ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">sequence_embedding2_missing</span><span class="p">)</span> <span class="c1"># shape: (len(sequence), dim_size)</span>
+<span class="n">sequence_embedding2_zeros</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sequence_embedding2_missing</span><span class="p">)</span> <span class="c1"># shape: (len(sequence), dim_size)</span>
+
+<span class="c1"># Now we create the summed embeddings for each of the four cases</span>
+<span class="n">summed_embedding</span> <span class="o">=</span> <span class="n">sequence_embedding1</span> <span class="o">+</span> <span class="n">sequence_embedding2</span>
+<span class="c1">## NOTE: for the following three cases, modality 2 is missing!</span>
+<span class="n">summed_embedding_ones</span> <span class="o">=</span> <span class="n">sequence_embedding1</span> <span class="o">+</span> <span class="n">sequence_embedding2_ones</span>
+<span class="n">summed_embedding_zeros</span> <span class="o">=</span> <span class="n">sequence_embedding1</span> <span class="o">+</span> <span class="n">sequence_embedding2_zeros</span>
+<span class="n">summed_embedding_missing2</span> <span class="o">=</span> <span class="n">sequence_embedding1</span> <span class="o">+</span> <span class="n">sequence_embedding2_missing</span>
+</pre></div>
+<p>Let's view what happens when we visualize all four cases (modality 2 not missing + three representation variation when modality 2 is missing):</p>
+<div class="hll"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+<span class="c1"># Plot embeddings when no modality is missing</span>
+<span class="n">ax_no_missing</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">221</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
+<span class="n">ax_no_missing</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sequence_embedding1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">sequence_embedding1</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">sequence_embedding1</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Mod. 1&quot;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+<span class="n">ax_no_missing</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">trainable_embeddings2</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">trainable_embeddings2</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">trainable_embeddings2</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Mod. 2&quot;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+<span class="n">ax_no_missing</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">summed_embedding</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">summed_embedding</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">summed_embedding</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Sum. Embed.&quot;</span><span class="p">)</span>
+<span class="n">ax_no_missing</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax_no_missing</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;All Modalities Present&quot;</span><span class="p">)</span>
+
+<span class="c1"># Plot embeddings when modality 2 is missing and is represented by a vector of ones.</span>
+<span class="n">ax_missing_ones</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">222</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
+<span class="n">ax_missing_ones</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sequence_embedding1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">sequence_embedding1</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">sequence_embedding1</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Mod. 1&quot;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+<span class="n">ax_missing_ones</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sequence_embedding2_ones</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">sequence_embedding2_ones</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">sequence_embedding2_ones</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Mod. 2 (ones)&quot;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+<span class="n">ax_missing_ones</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">summed_embedding_ones</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">summed_embedding_ones</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">summed_embedding_ones</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Sum. Embed.&quot;</span><span class="p">)</span>
+<span class="n">ax_missing_ones</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax_missing_ones</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Mod. 2 Pad = 1.0&quot;</span><span class="p">)</span>
+
+<span class="c1"># Plot embeddings when modality 2 is missing and represented with a vector of zeros.</span>
+<span class="n">ax_missing_zero</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">223</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
+<span class="n">ax_missing_zero</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sequence_embedding1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">sequence_embedding1</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">sequence_embedding1</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Mod. 1&quot;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+<span class="n">ax_missing_zero</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sequence_embedding2_zeros</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">sequence_embedding2_zeros</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">sequence_embedding2_zeros</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Mod. 2 (zeros)&quot;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+<span class="n">ax_missing_zero</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">summed_embedding_zeros</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">summed_embedding_zeros</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">summed_embedding_zeros</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Sum. Embed.&quot;</span><span class="p">)</span>
+<span class="n">ax_missing_zero</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax_missing_zero</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Mod. 2 Pad = 0.0&quot;</span><span class="p">)</span>
+
+<span class="c1"># Plot embeddings when modality 2 is missing and represented with trainable embeddings.</span>
+<span class="n">ax_missing_trainable</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
+<span class="n">ax_missing_trainable</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sequence_embedding1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">sequence_embedding1</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">sequence_embedding1</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Mod. 1&quot;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+<span class="n">ax_missing_trainable</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sequence_embedding2_missing</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">sequence_embedding2_missing</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">sequence_embedding2_missing</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Mod. 2 (trained)&quot;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">)</span>
+<span class="n">ax_missing_trainable</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">summed_embedding_missing2</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">summed_embedding_missing2</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">summed_embedding_missing2</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Sum. Embed.&quot;</span><span class="p">)</span>
+<span class="n">ax_missing_trainable</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax_missing_trainable</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Mod. 2 Pad = Trained&quot;</span><span class="p">)</span>
+
+<span class="c1"># Set all axes to the same scale</span>
+<span class="n">xaxes_vals</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">yaxes_vals</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">zaxes_vals</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">fig</span><span class="o">.</span><span class="n">axes</span><span class="p">:</span>
+    <span class="n">x_vals</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xlim3d</span><span class="p">()</span>
+    <span class="n">y_vals</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_ylim3d</span><span class="p">()</span>
+    <span class="n">z_vals</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_zlim3d</span><span class="p">()</span>
+    <span class="n">xaxes_vals</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">x_vals</span><span class="p">)</span>
+    <span class="n">yaxes_vals</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">y_vals</span><span class="p">)</span>
+    <span class="n">zaxes_vals</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">z_vals</span><span class="p">)</span>
+
+<span class="c1"># Set all of the x/y/z labels.</span>
+<span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">fig</span><span class="o">.</span><span class="n">axes</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Dim 1&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Dim 2&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s2">&quot;Dim 3&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim3d</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">xaxes_vals</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">xaxes_vals</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim3d</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">yaxes_vals</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">yaxes_vals</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_zlim3d</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">zaxes_vals</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">zaxes_vals</span><span class="p">))</span>
+</pre></div>
+<p><img src="embeddings.webp" alt=""></p>
+<p>To interpret the figure above, let's zoom in on the bottom-left (which is easiest to look at because the points are overlaid on top of one another). What we've done here is plot the sequence's 3D embedding position-by-position. Because there are repeated tokens within the sequence, we thus have repeated 3D embeddings in our sequence and revisit some of the 3D coordinates. This is also a graph where nodes are the embedding positions, and edges denote positionally adjacent embedding positions based on the original sequence.</p>
+<p>To help with visualization, I also made a <a href="https://docs.manim.community/en/stable/index.html">Manim</a> (math animation), with a little help from ChatGPT, which first shows modality 1 and then shows the result of adding modality 2's embedding to modality 1.</p>
+<video style="width: 100%" src="https://f005.backblazeb2.com/file/ericmjl-public-share/esm3-blogpost/VectorAddition3D.mp4" controls></video><p>As shown in the figure and animation above, using a default token shifts the first modality's embeddings off by a constant amount in vector embedding space or by zero if we look at the bottom-left subplot, where we set the pad embedding to have a zero value. By contrast, if we look at the top-left corner where we have modality 2 present, we see the summed embeddings effectively being a distorted version of modality 1 when modality 2's embeddings are summed with modality 1's.</p>
+<p>I did this deep dive to give us a geometric intuition of what's happening in vector space from a geometric perspective. Crucially, I've been using random numbers above, but in reality, the n-dimensional coordinates representing each token are trainable parameters that will be adjusted according to the training data. This is how, in protein or codon language models, we observe similar amino acids clustering with one another. But what does this mean semantically? I'm not 100% sure as we are operating in token-level embedding space here, but at the risk of anthropomorphizing the model, the simplest explanation I can think of is as follows. The relative geometry of the points in the embedding space preserves information about the underlying sequence. So, even if points are shifted off, there is sufficient information for the decoder to guess what the missing values might be, especially when trained on millions of examples. Thanks to the attention mechanism, the most important relationship between positions -- in some ways, this is the <em>topology</em> of the sequence -- can be modelled in a data-driven fashion.</p>
+<h2 id="model-architecture-reprise">Model architecture reprise</h2><p>Let's revisit the ESM model architecture once again. It looks like this:</p>
+<iframe src="https://link.excalidraw.com/readonly/iQTxShs9tZzKqNczk6ps" width="100%" height="100%" style="border: none;"></iframe><p>Each modality is in red, green, or blue (apologies for the colour-blind; I am using Excalidraw's default colours). Modalities are masked to different degrees, represented by cross-hatched positions (you may need to zoom into the figure to see them). Summation happens after we calculate the per-modality embeddings for each sample, giving us an array of shape <code>(sequence_length, model_dimension)</code> per sample. It is passed through the Transformer block before decoding, where the decoder is nothing more than a feed-forward neural network that is applied to each position independently.</p>
+<p>Viewed from a causal perspective, each output can be interpreted as causally related to each input. Whether this makes biological sense or not is a different matter. We have effectively created a hypergraph between the modalities -- all modalities are connected to all other modalities, but their edges are tied together in the summed embedding space. The nature of the model's training, where we mask and reconstruct the inputs, allows us to pass in placeholders of entire sequences and attempt to rebuild them from the information in other modalities.</p>
+<h2 id="my-thoughts">My thoughts</h2><p>After dissecting the model architecture, I realized it's pretty elegant. Though the model has varying capacities, the overall architecture remains the same:</p>
+<ol>
+<li>embed,</li>
+<li>sum,</li>
+<li>transformer block, and</li>
+<li>decode.</li>
+</ol>
+<p>All-to-all embeddings open the door for multi-modality integration -- a term that I thought was a buzzword in the early days of multi-modality neural network models. However, I can now see the potential. Retrieval-augmented generation (RAG) showed us the utility of embedding data in vector space and using them to generate new content. When paired with a model explicitly trained to be multi-modality, we can use it to create a missing modality conditioned on other modalities' values.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-dissecting-the-esm3-model-architecture</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Dissecting the ESM3 Model Architecture}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{08}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{25}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/8/25/dissecting-the-esm3-model-architecture}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

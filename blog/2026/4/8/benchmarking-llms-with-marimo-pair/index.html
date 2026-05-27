@@ -1,0 +1,1035 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Benchmarking LLMs with Marimo Pair">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/benchmarking-llms-with-marimo-pair' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Benchmarking LLMs with Marimo Pair - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Benchmarking LLMs with Marimo Pair</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-04-08</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/marimo/">
+        marimo
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/benchmarking/">
+        benchmarking
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llm/">
+        llm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/notebooks/">
+        notebooks
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/automation/">
+        automation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/evaluation/">
+        evaluation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/opensource/">
+        opensource
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/experiments/">
+        experiments
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/cost/">
+        cost
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/markdown/">
+        markdown
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share my experience benchmarking several LLMs using the new Marimo Pair skill for a data analysis task. I tested models like Claude Opus, Sonnet, GLM-5.1, and others, evaluating their performance, cost, and adherence to coding instructions. Some models excelled, while others struggled with basic requirements. Curious to see which models stood out and what lessons I learned from this experiment?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p><a href="https://www.youtube.com/watch?v=VKvjPJeNRPk">Marimo Pair has been released!</a></p>
+<p>I've known about it since 11 March, when Trevor Manz did a demo over a Google Meet call, and I'm thrilled to see it being announced officially! I also had Trevor showcase it to the <a href="https://agent-assisted-data-science.vercel.app/verify">Agentic Data Science Workshop</a> that I led on 3 April as a fundraiser for the <a href="https://www.scipy2026.scipy.org/">SciPy Conference</a> Financial Aid Program.</p>
+<p>Now, one thing I know about Trevor is that he almost exclusively agentically codes with Claude Code. But I'm an OpenCode user, and in the interest of remaining vendor-agnostic, I wanted to check to see how good Marimo Pair's agent skill is when, ahem, <em>paired up</em> with various LLMs within the OpenCode harness. To do so, I decided to spend a few dollars and do a quick benchmarking exercise.</p>
+<h2 id="skill-environment-check">Skill environment check</h2><p>To start, I verified that my skills environment doesn't contain anything that could be data science-y in nature, so as to avoid interfering with the marimo-pair skill. I checked my global skills:</p>
+<div class="hll"><pre><span></span>marimo-pair-benchmark<span class="w"> </span>on<span class="w">  </span>main<span class="w"> </span>on<span class="w"> </span>☁️<span class="w">  </span>eric.ma@nonlinearlabs.ai
+❯<span class="w"> </span>npx<span class="w"> </span>skills<span class="w"> </span>list<span class="w"> </span>-g
+Global<span class="w"> </span>Skills
+
+Marimo<span class="w"> </span>Pair
+<span class="w">  </span>marimo-pair<span class="w"> </span>~/.agents/skills/marimo-pair
+<span class="w">    </span>Agents:<span class="w"> </span>Claude<span class="w"> </span>Code,<span class="w"> </span>OpenClaw
+
+General
+<span class="w">  </span>agent-browser<span class="w"> </span>~/.agents/skills/agent-browser
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>agents-md-improver<span class="w"> </span>~/.agents/skills/agents-md-improver
+<span class="w">    </span>Agents:<span class="w"> </span>Claude<span class="w"> </span>Code,<span class="w"> </span>OpenClaw,<span class="w"> </span>Cursor
+<span class="w">  </span>ast-grep<span class="w"> </span>~/.agents/skills/ast-grep
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>claudeception<span class="w"> </span>~/.agents/skills/claudeception
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>continuous-learning-v3<span class="w"> </span>~/.agents/skills/continuous-learning-v3
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>design-driven-dev<span class="w"> </span>~/.agents/skills/design-driven-dev
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>find-skills<span class="w"> </span>~/.agents/skills/find-skills
+<span class="w">    </span>Agents:<span class="w"> </span>Claude<span class="w"> </span>Code,<span class="w"> </span>OpenClaw,<span class="w"> </span>Cursor
+<span class="w">  </span>gh-activity-summary<span class="w"> </span>~/.agents/skills/gh-activity-summary
+<span class="w">    </span>Agents:<span class="w"> </span>Cursor
+<span class="w">  </span>gh-cli<span class="w"> </span>~/.agents/skills/gh-cli
+<span class="w">    </span>Agents:<span class="w"> </span>Cursor
+<span class="w">  </span>gh-daily-timeline<span class="w"> </span>~/.agents/skills/gh-daily-timeline
+<span class="w">    </span>Agents:<span class="w"> </span>Cursor
+<span class="w">  </span>github-activity-summarizer<span class="w"> </span>~/.agents/skills/github-activity-summarizer
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>google-calendar-manager<span class="w"> </span>~/.agents/skills/google-calendar-manager
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>html-presentations<span class="w"> </span>~/.agents/skills/html-presentations
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>pinchtab<span class="w"> </span>~/.agents/skills/pinchtab
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>post-edit-error-check<span class="w"> </span>~/.agents/skills/post-edit-error-check
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>publish-to-google-docs<span class="w"> </span>~/.agents/skills/publish-to-google-docs
+<span class="w">    </span>Agents:<span class="w"> </span>Cursor
+<span class="w">  </span>revealjs<span class="w"> </span>~/.agents/skills/revealjs
+<span class="w">    </span>Agents:<span class="w"> </span>Cursor
+<span class="w">  </span>roborev:address<span class="w"> </span>~/.agents/skills/roborev-address
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>roborev:design-review<span class="w"> </span>~/.agents/skills/roborev-design-review
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>roborev:design-review-branch<span class="w"> </span>~/.agents/skills/roborev-design-review-branch
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>roborev:fix<span class="w"> </span>~/.agents/skills/roborev-fix
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>roborev:respond<span class="w"> </span>~/.agents/skills/roborev-respond
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>roborev:review<span class="w"> </span>~/.agents/skills/roborev-review
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>roborev:review-branch<span class="w"> </span>~/.agents/skills/roborev-review-branch
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>skill-creator<span class="w"> </span>~/.agents/skills/skill-creator
+<span class="w">    </span>Agents:<span class="w"> </span>Claude<span class="w"> </span>Code,<span class="w"> </span>OpenClaw,<span class="w"> </span>Cursor
+<span class="w">  </span>skill-installer<span class="w"> </span>~/.agents/skills/skill-installer
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>vault-title-renamer<span class="w"> </span>~/.agents/skills/vault-title-renamer
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>write-like-eric<span class="w"> </span>~/.agents/skills/write-like-eric
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+<span class="w">  </span>youtube-ingestion<span class="w"> </span>~/.agents/skills/youtube-ingestion
+<span class="w">    </span>Agents:<span class="w"> </span>not<span class="w"> </span>linked
+</pre></div>
+<p>And within my repo, <code>marimo-pair-benchmark</code>:</p>
+<div class="hll"><pre><span></span>marimo-pair-benchmark<span class="w"> </span>on<span class="w">  </span>main<span class="w"> </span>on<span class="w"> </span>☁️<span class="w">  </span>eric.ma@nonlinearlabs.ai
+❯<span class="w"> </span>npx<span class="w"> </span>skills<span class="w"> </span>list
+No<span class="w"> </span>project<span class="w"> </span>skills<span class="w"> </span>found.
+Try<span class="w"> </span>listing<span class="w"> </span>global<span class="w"> </span>skills<span class="w"> </span>with<span class="w"> </span>-g
+</pre></div>
+<p>Though the marimo pair skill is available globally, I decided to install it locally as an override.</p>
+<div class="hll"><pre><span></span>marimo-pair-benchmark<span class="w"> </span>on<span class="w">  </span>main<span class="w"> </span><span class="o">[</span>?<span class="o">]</span><span class="w"> </span>on<span class="w"> </span>☁️<span class="w">  </span>eric.ma@nonlinearlabs.ai
+❯<span class="w"> </span>npx<span class="w"> </span>skills<span class="w"> </span>install<span class="w"> </span>marimo-team/marimo-pair
+</pre></div>
+<p>And so now we're ready to go:</p>
+<div class="hll"><pre><span></span>marimo-pair-benchmark<span class="w"> </span>on<span class="w">  </span>main<span class="w"> </span><span class="o">[</span>?<span class="o">]</span><span class="w"> </span>on<span class="w"> </span>☁️<span class="w">  </span>eric.ma@nonlinearlabs.ai
+❯<span class="w"> </span>npx<span class="w"> </span>skills<span class="w"> </span>list
+Project<span class="w"> </span>Skills
+
+Marimo<span class="w"> </span>Pair
+<span class="w">  </span>marimo-pair<span class="w"> </span>~/github/marimo-pair-benchmark/.agents/skills/marimo-pair
+<span class="w">    </span>Agents:<span class="w"> </span>Antigravity,<span class="w"> </span>Cursor,<span class="w"> </span>Gemini<span class="w"> </span>CLI,<span class="w"> </span>OpenCode
+</pre></div>
+<p>I then start a marimo server within this repo:</p>
+<div class="hll"><pre><span></span>marimo-pair-benchmark<span class="w"> </span>on<span class="w">  </span>main<span class="w"> </span><span class="o">[</span>?<span class="o">]</span><span class="w"> </span>on<span class="w"> </span>☁️<span class="w">  </span>eric.ma@nonlinearlabs.ai
+❯<span class="w"> </span>uvx<span class="w"> </span>marimo<span class="w"> </span>edit<span class="w"> </span>--sandbox<span class="w"> </span>--no-token
+
+<span class="w">        </span>Create<span class="w"> </span>or<span class="w"> </span>edit<span class="w"> </span>notebooks<span class="w"> </span><span class="k">in</span><span class="w"> </span>your<span class="w"> </span>browser<span class="w"> </span>📝
+
+<span class="w">        </span>➜<span class="w">  </span>URL:<span class="w"> </span>http://localhost:2719
+
+<span class="w">        </span>💡<span class="w"> </span>Tip:<span class="w"> </span>Coming<span class="w"> </span>from<span class="w"> </span>Jupyter?
+<span class="w">                </span>Guide:<span class="w"> </span>https://docs.marimo.io/guides/coming_from/jupyter/
+
+<span class="w">        </span>🧪<span class="w"> </span>Experimental<span class="w"> </span>features<span class="w"> </span><span class="o">(</span>use<span class="w"> </span>with<span class="w"> </span>caution<span class="o">)</span>:<span class="w"> </span>external_agents
+<span class="w">        </span>🌐<span class="w"> </span>MCP<span class="w"> </span>servers:<span class="w"> </span>marimo
+</pre></div>
+<p>I intentionally start up in <code>--sandbox</code> and <code>edit</code> mode with <code>--no-token</code> to make it easier for the coding agent to connect.</p>
+<h2 id="data-analysis-task">Data analysis task</h2><p>Our task at hand is as follows. I have data from a paper I published while at Novartis.</p>
+<div class="hll"><pre><span></span>marimo-pair-benchmark<span class="w"> </span>on<span class="w">  </span>main<span class="w"> </span><span class="o">[</span>?<span class="o">]</span><span class="w"> </span>on<span class="w"> </span>☁️<span class="w">  </span>eric.ma@nonlinearlabs.ai
+❯<span class="w"> </span>ls<span class="w"> </span>data/ired-novartis
+Permissions<span class="w"> </span>Size<span class="w"> </span>User<span class="w">    </span>Group<span class="w"> </span>Date<span class="w"> </span>Modified<span class="w"> </span>Git<span class="w"> </span>Name
+.rw-r--r--@<span class="w"> </span><span class="m">1</span>.0M<span class="w"> </span>ericmjl<span class="w"> </span>staff<span class="w">  </span><span class="m">7</span><span class="w"> </span>Apr<span class="w"> </span><span class="m">21</span>:22<span class="w">   </span>--<span class="w"> </span>cs1c02786_si_002.csv
+.rw-r--r--@<span class="w">  </span>21k<span class="w"> </span>ericmjl<span class="w"> </span>staff<span class="w">  </span><span class="m">7</span><span class="w"> </span>Apr<span class="w"> </span><span class="m">21</span>:22<span class="w">   </span>--<span class="w"> </span>cs1c02786_si_003.csv
+.rw-r--r--@<span class="w">  </span>12M<span class="w"> </span>ericmjl<span class="w"> </span>staff<span class="w">  </span><span class="m">7</span><span class="w"> </span>Apr<span class="w"> </span><span class="m">21</span>:22<span class="w">   </span>--<span class="w"> </span>ired-master-table.csv
+.rw-r--r--@<span class="w">  </span>12k<span class="w"> </span>ericmjl<span class="w"> </span>staff<span class="w">  </span><span class="m">7</span><span class="w"> </span>Apr<span class="w"> </span><span class="m">21</span>:22<span class="w">   </span>--<span class="w"> </span>layouts.csv
+.rw-r--r--@<span class="w"> </span><span class="m">1</span>.1k<span class="w"> </span>ericmjl<span class="w"> </span>staff<span class="w">  </span><span class="m">7</span><span class="w"> </span>Apr<span class="w"> </span><span class="m">21</span>:22<span class="w">   </span>--<span class="w"> </span>README.md
+</pre></div>
+<p>This file, <code>cs1c02786_si_002.csv</code> in particular includes single, double, and more mutations plus activity values, with the single point mutants covering a large fraction of the deep mutational scan space. I want to accomplish three things:</p>
+<ol>
+<li>Plot a heatmap of activity of mutants by position,</li>
+<li>Plot an UpSet plot of the top 10 positions by average activity v.s. top 10 positions by top mutant activity,</li>
+<li>Include a summary recommendation at the end of the notebook.</li>
+</ol>
+<p>This serves as a microcosm of what we would do with a data analysis session.</p>
+<p>Goal #2 is particularly instructive. In my first attempts at feeling out how to do this benchmark, I found out that UpSet is incompatible with Pandas 3.0, which invariably may get installed in the environment. I wanted to see how various AI models performed at this task.</p>
+<p>Additionally, I also have additional requirements that I encoded into the AGENTS.md file for this repo:</p>
+<ol>
+<li>Imports must be done in a separate cell from code execution.</li>
+<li>Markdown cells must always be written before a code cell is written</li>
+<li>All cells must be run after being created, so that we can catch execution errors.</li>
+</ol>
+<h2 id="benchmarking">Benchmarking</h2><p>With these in place, I started the benchmarking exercise.</p>
+<p>The models we tested are:</p>
+<ul>
+<li>GLM-5.1 (via OpenRouter)</li>
+<li>Claude Opus 4.6 (via OpenRouter)</li>
+<li>Claude Sonnet 4.6 (via OpenRouter)</li>
+<li>MiniMax M2.7 (via OpenRouter)</li>
+<li>Kimi K2.5 (via OpenRouter)</li>
+<li>Gemma 4 31B (via OpenRouter)</li>
+<li>Qwen 3 Coder Next (via OpenRouter)</li>
+</ul>
+<p>In order to leave a working artifact behind, I created 7 notebooks, one for each model. As you will see below, I eventually evaluated each model on whether they passed each stage gate and what their earliest error mode diagnosis looked like.</p>
+<p>In order to do the benchmarking fairly, I created one superprompt that outlined what the coding agent was supposed to do.</p>
+<div class="hll"><pre><span></span>Use the marimo-pair skill here. Discover running sessions. Edit the notebook &quot;NOTEBOOK_NAME_GOES_HERE&quot;. Read data/ired-novartis/cs1c02786_si_002.csv, identify the single point mutations, and plot me a heatmap of x-axis position, y-axis mutant letter, and heatmap value taken from the &#39;mean&#39; column. When done, rank order the positions by average value of the &#39;mean&#39; column, then rank order the positions by top value of the &#39;mean&#39; column, and plot me an UpSet plot of the top 20 for each to visualize the set overlaps. Finally, write in for me a recommendation for what positions we should be mutating.
+</pre></div>
+<p>The agent is then tasked with executing.</p>
+<p>To script this, I took advantage of opencode's ability to be scripted. The script is <code>run_benchmark.sh</code> in the repo. I used GLM5.1 to help me draft it, including discovering the exact models that opencode had configured to be available, and running the opencode sessions in parallel (totally doable!). Essentially it boils down to:</p>
+<div class="hll"><pre><span></span>opencode<span class="w"> </span>run<span class="w"> </span><span class="s2">&quot;your prompt here&quot;</span><span class="w"> </span>--model<span class="w"> </span>provider/model-name
+</pre></div>
+<p>Additionally, I set up opencode.json to allow for access to the <code>/tmp</code> directory, because that allows the coding agent to do what it needs with code writing to get around heredoc limitations.</p>
+<p>All in all, this computational experiment took me about 1 hour to set up.</p>
+<p>I then ran the script <code>run_benchmark.sh</code> from within OpenCode (GLM 5.1 orchestrating), with a timeout of 10 minutes. Thanks to logging in JSON log files, I was able to programmatically convert them to Markdown using a custom Python script written by GLM 5.1. And with that, I can go in and start looking at the data.</p>
+<p>To start, let's look at the cost of the experiment:</p>
+<table>
+<thead><tr>
+<th>Model</th>
+<th>Cost</th>
+<th>Input Tokens</th>
+<th>Output Tokens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Claude Opus 4.6</td>
+<td>$1.62</td>
+<td>76,770</td>
+<td>16,575</td>
+</tr>
+<tr>
+<td>Claude Sonnet 4.6</td>
+<td>$2.00</td>
+<td>213,803</td>
+<td>27,689</td>
+</tr>
+<tr>
+<td>GLM-5.1</td>
+<td>$0.43</td>
+<td>96,639</td>
+<td>7,581</td>
+</tr>
+<tr>
+<td>Kimi K2.5</td>
+<td>$0.12</td>
+<td>35,049</td>
+<td>8,250</td>
+</tr>
+<tr>
+<td>Qwen 3 Coder</td>
+<td>$0.07</td>
+<td>208,308</td>
+<td>8,386</td>
+</tr>
+<tr>
+<td>MiniMax M2.7</td>
+<td>$0.04</td>
+<td>14,419</td>
+<td>4,074</td>
+</tr>
+<tr>
+<td>Gemma 4 31B</td>
+<td>$0.03</td>
+<td>170,280</td>
+<td>3,986</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>$4.31</strong></td>
+<td>815,268</td>
+<td>76,541</td>
+</tr>
+</tbody>
+</table>
+<p>As it turns out, Opus is undisputedly the most expensive per token, but Sonnet 4.6 did more work this time round so its costs were higher.</p>
+<p>I also decided to check whether the notebooks that were generated were valid notebooks or not. This is what we have:</p>
+<table>
+<thead><tr>
+<th>Model</th>
+<th>marimo check</th>
+<th>Markdown cells</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Claude Opus 4.6</td>
+<td>PASS</td>
+<td>Yes (100%)</td>
+</tr>
+<tr>
+<td>Claude Sonnet 4.6</td>
+<td>PASS</td>
+<td>Mostly (86%)</td>
+</tr>
+<tr>
+<td>GLM-5.1</td>
+<td>PASS</td>
+<td>Yes (100%)</td>
+</tr>
+<tr>
+<td>Kimi K2.5</td>
+<td>FAIL</td>
+<td>Mostly (88%)</td>
+</tr>
+<tr>
+<td>Qwen 3 Coder</td>
+<td>PASS (warnings)</td>
+<td>No (0%)</td>
+</tr>
+<tr>
+<td>MiniMax M2.7</td>
+<td>FAIL</td>
+<td>No (0%)</td>
+</tr>
+<tr>
+<td>Gemma 4 31B</td>
+<td>PASS (warnings)</td>
+<td>No (0%)</td>
+</tr>
+</tbody>
+</table>
+<p>A note on the columns: "marimo check" is the result of running <code>uvx marimo check &lt;notebook_name&gt;.py</code>, which catches issues like redefined variables and invalid cells. Notably, Kimi K2.5 and MiniMax M2.7 failed this check due to re-defined variables. "Markdown cells" is the percentage of code cells that have a preceding markdown cell, which was something I explicitly required in the instructions.</p>
+<p>And to elaborate on the markdown cells point:</p>
+<table>
+<thead><tr>
+<th>Model</th>
+<th>Code Cells</th>
+<th>MD Cells</th>
+<th>Code w/o preceding MD</th>
+<th>Coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Claude Opus 4.6</td>
+<td>6</td>
+<td>7</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>Claude Sonnet 4.6</td>
+<td>7</td>
+<td>8</td>
+<td>1</td>
+<td>86%</td>
+</tr>
+<tr>
+<td>GLM-5.1</td>
+<td>8</td>
+<td>9</td>
+<td>0</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>Kimi K2.5</td>
+<td>8</td>
+<td>8</td>
+<td>1</td>
+<td>88%</td>
+</tr>
+<tr>
+<td>Qwen 3 Coder</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>0%</td>
+</tr>
+<tr>
+<td>MiniMax M2.7</td>
+<td>6</td>
+<td>0</td>
+<td>6</td>
+<td>0%</td>
+</tr>
+<tr>
+<td>Gemma 4 31B</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>0%</td>
+</tr>
+</tbody>
+</table>
+<p>We see that MiniMax M2.7 completely failed to include markdown cells, even though it is, supposedly, a model that is as capable as Opus 4.6.</p>
+<p>Digging deeper into each of the models, and whether they passed each stage gate, I looked at the corresponding Marimo notebooks and evaluated them for whether they created the relevant artifacts <em>successfully</em>:</p>
+<table>
+<thead><tr>
+<th>Model</th>
+<th>G1: Heatmap</th>
+<th>G2: UpSet Plot</th>
+<th>G3: Recommendations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Claude Opus 4.6</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Claude Sonnet 4.6</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>GLM-5.1</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Kimi K2.5</td>
+<td>Yes</td>
+<td>No</td>
+<td>No*</td>
+</tr>
+<tr>
+<td>Qwen 3 Coder</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>MiniMax M2.7</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Gemma 4 31B</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p>To pass a stage gate, the plot (G1, G2) or markdown (G3) cell must be rendered in the notebook. Writing the code is not enough; it has to actually execute and show up.</p>
+<p>Kimi K2.5 technically did write the recommendation, but I am calling it unsuccessful because it did not render out. This stricter criteria explicitly demands that the model wiggle its way out of errors it encounters.</p>
+<p>One pattern I noticed across models is that many of them bundled imports into the same cell as code that used them. In Marimo's execution model, this is a problem: if two cells both import <code>pandas</code>, the notebook fails with a redefined variable error. Upon noticing this, I decided to explicitly quantify:</p>
+<table>
+<thead><tr>
+<th>Model</th>
+<th>Code Cells w/ Imports</th>
+<th>Total Code Cells</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Claude Opus 4.6</td>
+<td>1</td>
+<td>6</td>
+</tr>
+<tr>
+<td>Claude Sonnet 4.6</td>
+<td>1</td>
+<td>7</td>
+</tr>
+<tr>
+<td>GLM-5.1</td>
+<td>1</td>
+<td>8</td>
+</tr>
+<tr>
+<td>Kimi K2.5</td>
+<td>2</td>
+<td>8</td>
+</tr>
+<tr>
+<td>Qwen 3 Coder</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>MiniMax M2.7</td>
+<td>3</td>
+<td>6</td>
+</tr>
+<tr>
+<td>Gemma 4 31B</td>
+<td>0</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p>Every model can benefit from being steered to reduce the number of code cells with imports, which would dramatically reduce the incidence of Marimo errors from redefined symbols.</p>
+<h2 id="how-the-upset-plots-turned-out">How the UpSet plots turned out</h2><p>As mentioned earlier, in my initial explorations I discovered that the <code>upsetplot</code> library is incompatible with Pandas 3.0, which invariably gets installed in the sandboxed environment. This made the UpSet plot task an especially interesting test of how each model handles a real-world dependency conflict. Here is how they fared.</p>
+<p>Opus, in particular, produced a beautiful UpSet plot out of raw <code>matplotlib</code>:</p>
+<p><img src="opus-upset-plot.webp" alt="Opus UpSet plot"></p>
+<p>While Sonnet went ahead and patched UpSet appropriately to make it work within the notebook:</p>
+<p><img src="sonnet-upset-plot.webp" alt="Sonnet UpSet plot"></p>
+<p>I was duly impressed by Sonnet taking the initiative to patch UpSet live in the notebook.</p>
+<p>On the other hand, GLM 5.1's UpSet plot is really weird:</p>
+<p><img src="glm-upset-plot.webp" alt="GLM 5.1 UpSet plot"></p>
+<h2 id="other-observations">Other observations</h2><p>Other pointers of note: Gemma 4 and Qwen3 Coder Next produced nothing in the notebook. Both completely failed at this task. I am not sure what is doable here to salvage these models.</p>
+<p>GLM 5.1 gave very weirdly formatted markdown cells, in which <code>\n\n</code> was not rendered but preserved verbatim.</p>
+<p>This is probably fixable by adding in additional instructions on how to write and format Markdown cells using Marimo's code mode APIs.</p>
+<h2 id="recommendations">Recommendations</h2><p>First off: Gemma 4 31B and Qwen 3 Coder completely failed at this task. I think it is safe to say we can ignore these two going forward.</p>
+<p>That leaves Claude Opus 4.6, Sonnet 4.6, GLM-5.1, Kimi K2.5, and MiniMax M2.7. Based on the data above, here are four things I want to try. The key discipline: deploy one change at a time, re-run the benchmark, and measure. If you change four things at once and performance improves, you will never know which change mattered. Stop when the KPIs hit acceptable levels.</p>
+<p><strong>1. Add import isolation examples to the skill.</strong> Every model had at least one cell that mixed imports with executable code. The fix is simple: add an explicit two-cell example to the marimo-pair skill (cell 1: imports only; cell 2: code that uses them). MiniMax had 3 cells mixing the two, which directly caused its <code>marimo check</code> failure. Give weaker models a concrete template to follow, re-run, and check whether the "code cells with imports" count drops to zero.</p>
+<p><strong>2. Fix GLM-5.1's newline rendering.</strong> GLM wrote <code>mo.md(r"""..text with \n\n..""")</code> instead of using actual newlines. One line in the skill instructions ("use actual line breaks in markdown strings, not <code>\n</code> escape sequences") should resolve this entirely. Re-run and check whether GLM's markdown cells render correctly.</p>
+<p><strong>3. Help Kimi K2.5 self-correct redefined variables.</strong> Kimi is 1/10th the cost of Opus and scored 88% on markdown coverage, making it the highest-leverage model to fix. Its failure was at error recovery, not code generation. The intervention: add <code>uvx marimo check</code> as a mandatory post-edit step in the skill. If Kimi can self-correct its redefined variables, it becomes a viable budget alternative to Opus and Sonnet. This should get even easier with <a href="https://github.com/marimo-team/marimo/pull/9056">marimo PR #9056</a>, which exposes cell execution errors directly through the <code>code_mode</code> API, giving agents built-in self-correction visibility without needing a separate <code>marimo check</code> step.</p>
+<p><strong>4. Bake a post-edit validation loop into the marimo-pair skill.</strong> More broadly, the single most impactful change would be adding a "run it, check it, fix it" loop to the skill file itself (SKILL.md), not AGENTS.md: after writing each cell, run it; after writing the full notebook, run <code>marimo check</code>; fix any errors. This belongs in the skill because it is universal to any marimo-pair session, whereas AGENTS.md is project-specific. This would help Kimi, MiniMax, and potentially GLM all move up a tier, because their failures were in error recovery, not in code generation.</p>
+<h2 id="discussion">Discussion</h2><p>One caveat to this analysis is that it is one-shotted with a superprompt. This is decidedly <em>not</em> how people do their data analysis work, but it is also the best guardrail against my biases in interacting ad-hoc with AI interfering with a fair comparison. (For example, I can confidently say that Opus and Sonnet were smooth as butter when I did an ad-hoc test to feel out how to work with Marimo Pair.)</p>
+<p>If Kimi K2.5 were able to resolve redefined variable issues autonomously or be steered away from doing that to begin with, I am confident it would be able to be a great open weight alternative to Opus 4.6 and Sonnet 4.6. This is especially in light of it being extremely cost-effective at performing the analysis at ~1/10th the cost of Opus 4.6. It handled the creation of markdown cells well, failing to accomplish the task only on technicalities, and though its prose was qualitatively shallower than Opus 4.6, I still think it can serve as a first pass to delivering an easily understandable artifact for others.</p>
+<p>I did one round of measurement here. If we want to systematically improve this and turn it into long-running evals, the next step would be to identify a second task along which to generate transcript and notebook data for us to mine, and systematically measure agent KPIs for that new task as well. Over time, this builds a corpus of eval data that makes model comparison rigorous rather than anecdotal.</p>
+<h2 id="reflections">Reflections</h2><p>This was a pretty fun exercise in measuring and evaluating the performance of various models on this task. Like Biology experiments, LLM evals are never going to be complete: the number of axes of variations we can try is combinatorially explosive.</p>
+<p>More broadly, I think often about how experiments get designed. Not in the statistical sense, but in an informational sense. Are we playing out experiments and their possible conclusions so that they are designed to be actionable whichever way the result pans out? If not, we have work to do.</p>
+<p>Additionally, experiments involve measurement, and measurement are an integral part of being a data scientist. Hamel Husain, whose course with Shreya Shankar on LLM evals was one that influenced my thinking around the matter, notes that there will be a <a href="https://hamel.dev/blog/posts/revenge/">forceful revenge of the data scientist</a> in an AI age. This is because the skill of experiment design and measurement were always the "science" part of "data science".</p>
+<p>Another thought also comes to mind: I have seen data scientists do experimentation without systematic measurement. I'm going to go out on a limb and say this: it's vibe experimentation, and I am using this term pejoratively. It feels good. But it is ultimately unproductive. If you do vibe experimentation, you <em>will</em> get stuck tweaking the digital equivalent of an entangled biological system, with no bearings to tell you whether your tweaks are doing any good or not! You <em>must</em> measure how good the LLM or agent is, and you <em>must</em> define key performance indicators (KPIs) for the LLM. In my case here, I defined multiple KPIs: cost, stage gated progress, adherence to code import instructions (all failed), adherence to markdown documentation instructions.</p>
+<p>And to echo what I learned from the LLM Evals course, those KPIs must be <em>application-specific</em>. If you choose to be intellectually lazy and go with generic pre-defined metrics, you will <em>never</em> develop the logically actionable metric that gives you hypotheses to test further. In my case, the markdown cell adherence and code import adherence metrics pointed immediately to editing the instruction files (e.g. skills or AGENTS.md).</p>
+<p>Now to be clear, there's no problem with initial vibe-based experimentation to feel out axes of variation and how to measure performance. I did that here, in a separate repo first, before I designed this measurement experiment. The important part is this: as soon as you have a grasp of how to measure the performance, you must systematically measure that KPI. Otherwise, you will be left groping in the dark.</p>
+<p>If you're curious to see the full results, including logs, chat transcripts, and the generated notebooks, check out the <a href="https://github.com/ericmjl/marimo-pair-benchmark">marimo-pair-benchmark repository</a>.</p>
+<p>And Trevor, if you ever chance upon this blog post, I hope the data and methodology are helpful for you!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-benchmarking-llms-with-marimo-pair</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Benchmarking LLMs with Marimo Pair}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{04}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{08}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/4/8/benchmarking-llms-with-marimo-pair}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

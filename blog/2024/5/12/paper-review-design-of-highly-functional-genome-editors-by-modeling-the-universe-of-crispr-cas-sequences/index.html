@@ -1,0 +1,673 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Paper Review: Design of highly functional genome editors by modeling the universe of CRISPR-Cas sequences">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/paper-review-design-of-highly-functional-genome-editors-by-modeling-the-universe-of-crispr-cas-sequences' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Paper Review: Design of highly functional genome editors by modeling the universe of CRISPR-Cas sequences - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Paper Review: Design of highly functional genome editors by modeling the universe of CRISPR-Cas sequences</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2024-05-12</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/crispr-cas/">
+        crispr-cas
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/protein language models/">
+        protein language models
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/genomic data/">
+        genomic data
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/machine learning/">
+        machine learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/bioinformatics/">
+        bioinformatics
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/sequence generation/">
+        sequence generation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/protein engineering/">
+        protein engineering
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/gene editing/">
+        gene editing
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/dataset curation/">
+        dataset curation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/computational biology/">
+        computational biology
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/generative model/">
+        generative model
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/generative artificial intelligence/">
+        generative artificial intelligence
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I do a deep dive into a fascinating paper on designing CRISPR-Cas sequences using machine learning. The authors develop a generative model to produce novel protein sequences, validated in the lab, aiming to circumvent intellectual property restrictions. They curate a vast dataset, the CRISPR-Cas Atlas, and employ various models and filters to ensure sequence viability. My review highlights the methodology, emphasizing the importance of filtering and the challenges of using 'magic numbers' without justification. How many sequences are enough to train a generative model, and what makes laboratory experiments faster? Curious to find out more?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I recently caught wind of <a href="https://www.biorxiv.org/content/10.1101/2024.04.22.590591v1">a new paper designing CRISPR-Cas sequences</a>. Upon reading it, I thought it was very interesting for multiple reasons. Within this paper, the authors fine-tune protein language models and use those models to generate new protein sequences, which they were then able to validate within the lab. Overall, I thought the paper was well-written, though rough in some places. Here's my review, with a focus on the ML-in-bio methodology.</p>
+<h2 id="goal">Goal</h2><p>As mentioned in the paper, the author's goal is to develop a generative model of CRISPR-Cas sequences that they could then screen in the lab for activity. Within the industry, one motivation for doing this is to discover novel sequences for intellectual property (IP) reasons to circumvent IP restrictions imposed by patents.</p>
+<h2 id="dataset-1-the-crispr-cas-atlas">Dataset 1: The CRISPR-Cas Atlas</h2><p>To train this generative model, there were multiple datasets curated, each of them biologically motivated.</p>
+<p>To start, the authors curated "26.2 terra-bases worth of <em>assembled</em> microbial genomes and metagenomes". I can guess as to why assembled genomes and metagenomes are important -- if genomes are sequenced using short read sequencing, then those reads (~100 base pairs in length) are often not enough to cover the size of CRISPR-Cas9 complexes (which are in the ~1,000s-10,000s of base pairs). Metagenomes are also important; CRISPR-Cas9 complexes may reside within microbes that are not culturable (i.e. we can't grow them in a lab), and metagenome sequencing enables us to know what may be present within a microbial community without needing to go through the laborious process of figuring out how to culture the microbe(s) in that community.</p>
+<p>As described in the paper, the dataset also "spans diverse phyla and biomes." From a genome mining perspective, this is important because it expands the universe of potentially undiscovered proteins, and from a protein generation perspective, it gives us a more diverse base of proteins upon which to generate novel, undiscovered sequences.</p>
+<p>In total, based on the author's description of the dataset, this constituted:</p>
+<ul>
+<li>1,246,163 CRISPR-Cas operons,</li>
+<li>including 389470 single effector systems</li>
+<li>a total of 5.1 million proteins in the database</li>
+</ul>
+<p>This became a new resource called the CRISPR-Cas Atlas. No details were provided in the paper on how to access the compiled data, so I think the authors are not planning to release it, especially given this quote:</p>
+<blockquote><p>All data used to create the CRISPR-Cas Atlas are available in their original form via the IMG/M, ENA, and NCBI databases.</p>
+</blockquote>
+<p>This also gives us, the readers, a hint that the real secret sauce of the model isn't the model itself but the training data. This mirrors the broad sentiment within the deep learning world that fancier models won't do the trick, but getting creative with datasets will.</p>
+<p>One of the claimed upsides of this dataset is that it represented an increase in diversity for Cas families of proteins, as measured by the number of protein clusters at 70% identity, compared to what's available on Uniprot. While this is a great metric to understand how newly diverse the dataset is, I also wonder how the cluster identity threshold value was chosen for reporting; though shared, it isn't explained. (This is a theme throughout the paper, and I think it's worth highlighting that pure ML papers also fall into the same trap.)</p>
+<h2 id="model-1-a-crispr-cas-generator">Model 1: A CRISPR-Cas Generator</h2><p>The authors train a series of models here. The first model is trained by fine-tuning the ProGen2 protein language model on the CRISPR-Cas Atlas. ProGen2 is a transformer decoder model that autoregressively decodes protein sequences. During fine-tuning, the authors mention that the training set composition enabled "balancing for protein family representation and sequence cluster size" but do not appear to refer to any methods section details on how this was done, making it difficult to ascertain how this was accomplished for the reader.</p>
+<p>Setting this opaque detail aside, the authors used the model to generate 4M protein sequences. 2M were generated "directly from the model", and what this means is that the authors provided the <code>&lt;BOS&gt;</code> (beginning of sequence, or equivalent) token and let the model free to autoregressively generate 2M sequences. Another 2M were prompted "with up to 50 residues from the N- or C-terminus of a natural protein to guide generation towards a particular family". This point intrigued me; it's easy to see how one can do autoregressive decoding from the N-terminus since, by convention, the N-terminus is at the beginning of the sequence. Still, I struggled to understand how one can decode autoregressively from the C-terminus until I saw in the paper that sequences "were provided to the model in forward (N-to-C) and reverse (C-to-N) directions," the latter, therefore, allowing for autoregressive decoding while providing the tail of the sequence. However, if one used an encoder-style model (e.g. AbLang), we could get away with feeding in sequences in the N-to-C direction.</p>
+<p>According to the methods section, the model was trained relatively shortly -- 5 epochs, with the learning rate increased linearly over 70k warmup steps from an <strong>unknown value</strong> to $5 \times 10^{-5}$, and then decayed at an <strong>unknown rate</strong> "according to an inverse-square-root schedule". Ultimately, the model with the lowest validation set loss was chosen. No model ensembling was done here, and that is a reasonable choice. (I do wish the authors were more explicit about details here as well.)</p>
+<h2 id="sequence-viability-filters">Sequence viability filters</h2><p>Now, as a machine learner, one thing I'm starting to warm up to is this idea that the sequence generator model isn't particularly interesting in the absence of the <em>sequence viability filters</em> that are applied to the generated sequences post-hoc. According to the methods here, we see the following filters.</p>
+<p><strong>Firstly, sequences containing non-canonical or unknown amino acids were discarded.</strong> However, this begs the question -- why not mask output probabilities and re-normalize them to achieve the same effect? And why were there non-canonical or unknown amino acids present in the training set if this was going to be a filter anyway? In any case, this filter is an obvious one because, for experimental validation, it is much easier to build a protein that uses only the 20 standard amino acids. That said, this filter can be ameliorated (or even eliminated) if one were to train a model with the right tokenizer (one that ignores non-standard amino acids) or apply masking instead.</p>
+<p><strong>Secondly, "degenerate sequences were filtered according to k-mer repetition</strong>, such that no amino acid motif of 6/4/3/2 residues was repeated 2/3/6/8 times consecutively, respectively". To illustrate this more clearly, the authors did not want to see a 6-mer amino acid motif repeated 2 times or a 4-mer amino acid motif repeated 3 times. Of note is the following sentence in the methods section:</p>
+<blockquote><p>These criteria were satisfied by over 99.5% of natural proteins from the CIRSPR-Cas Atlas yet removed dominant failure modes among generated sequences.</p>
+</blockquote>
+<p>The authors are unclear here: What are these so-called "dominant failure modes"? The paper does not describe this well. Additionally, the motif and repeat lengths appear to be magic numbers that have no justification, so it's unclear how the authors came up with these criteria; while I can intuit why these might be problematic, I'd much prefer to see the authors' justification instead.</p>
+<p><strong>Thirdly, the authors filter sequences "according to coverage within CRISPR-Cas families."</strong> This is likely with the goal of ensuring evolutionary plausibility, which is a great biological prior to impose on generated sequences. Another magic number shows up here:</p>
+<blockquote><p>Using BLAST, all generated sequences were aligned against 90% identity cluster representatives from the CRISPR-Cas Atlas. Sequences were retained if the top-scoring alignment (excluding exact matches) had greater than 80% query and target coverage, as well as a BLAST score greater than 50.</p>
+</blockquote>
+<p>More unjustified magic numbers are in there, though this set of numbers appears to be more understandable. 90% identity to cluster representatives ensures that we retain some diversity in sampled sequences, while alignment coverage of &gt;80% and a BLAST score &gt;50 help ensure that we have sequences that could have been evolutionarily plausible based on common descent. There may be other ways to accomplish the same goal, though, but I would wager that these are simple heuristics that go a long way.</p>
+<p>Finally, a similar filter was applied with profile HMMs (using the HMMER program), with analogous criteria (coverage &gt;80% on both query and target sequences and score &gt;50).</p>
+<p>So to summarize, here are the filters applied to the generated sequences:</p>
+<ol>
+<li>Sequences with non-canonical amino acids are discarded,</li>
+<li>Sequences with undesirable kmer repeats are discarded,</li>
+<li>Sequences with low coverage and scores on BLAST and HMMER are discarded.</li>
+</ol>
+<p>These criteria are not specific to CRISPR-Cas systems and can be used for other applications. As mentioned above, a generative model of protein sequences, even if made domain-specific, is insufficient on its own; we need prior biological knowledge of known patterns (and anti-patterns) to inform the filtering and prioritization of generated sequences. The point of computational filters also reminds me of the paper, <a href="https://www.biorxiv.org/content/10.1101/2023.03.04.531015v1">Computational Scoring and Experimental Evaluation of Enzymes Generated by Neural Networks</a>, in which the authors describe COMPSS, a suite of metrics for selecting protein sequences from a pool of generated ones.</p>
+<h2 id="the-pattern-of-the-paper">The pattern of the paper</h2><p>The first model sets a lot of the patterns used in the paper:</p>
+<ol>
+<li>A highly curated dataset</li>
+<li>A short amount of finetuning,</li>
+<li>Sequence sampling,</li>
+<li>Filtering</li>
+<li>Laboratory testing or computational characterization (I'm skipping this in this review)</li>
+</ol>
+<p>Once we understand and follow the framework, it becomes easier to follow the rest of the paper. Let's dive into the rest of it.</p>
+<h2 id="model-2-a-crispr-cas9-specific-generator">Model 2: A CRISPR-Cas9-specific generator</h2><p>There are many families of Cas, and Cas9 is one of them. This protein family is interesting because it is one of the most widely used in gene editing applications. It makes sense to generate novel Cas9s; when using the pan-CRISPR-Cas model, it's possible to steer the model to generate Cas9-like proteins by prompting with the first 50 amino acids at either the N- or C-terminus. Still, according to the authors, this resulted in only just a bit more than 1/4 of the sequences passing the sequence viability filters described above. As such, the authors chose to train a Cas9-specific model fine-tuned on approximately 1/4 million Cas9 sequences from the CRISPR-Cas Atlas, which gave them an approximately 50% sequence viability rate (just a bit higher).</p>
+<p>As per the pattern of the paper, the generated Cas9-like sequences were characterized computationally first. The assessment involved the following:</p>
+<ul>
+<li>Identifying how closely related the Cas9-like sequences were compared to existing sequences, which can be argued as a check to see whether these sequences could have existed in nature,</li>
+<li>Protein length, which is another helpful check for the plausible function of a sequence, as large insertions or deletions may change the structure of the protein and hence whether it can function or not,</li>
+<li>Structure, through the use of AlphaFold2, in which 5,000 generated and 5,000 natural sequences' structures were predicted, using AlphaFold's internal measure of structural confidence, pLDDT, having a value &gt; 80, for which 99.4% of the 10,000 sequences (presumably) qualified</li>
+<li>The presence of structural domains that are Cas9-like is another indicator of possible function. I'll note here that domains are not <em>fixed</em> sequences <em>per se</em>. Instead, domains are <em>homologous</em> (biology word for "similar") regions of sequence that can fold into the same structure. Sequences can have up to 20-30% of amino acids differing, some even more, with variable (but generally similar) lengths between any pair of homologous domains.</li>
+</ul>
+<p>Of the four assessments described above, the last one contains a lot of magic sauce, and it's worth going through. Homology often indicates similar functions, and for the generated sequences, being homologous in domain structure is a strong signal of similarity in functional space. Though not shown in the main figures of the paper, I can imagine making a map of sequences that looks like the following:</p>
+<p><img src="domain_map.webp" alt=""></p>
+<p>If we assume that each of the sequences above was generated from a language model, and the three coloured domains were present in a naturally occurring and functional variant of the protein, then we may deduce that of the five sequences generated above, only sequence 2, which has a missing domain, may be non-functional. (There are more nuanced situations, though, such domains being unnecessary for function.) Overall, as a sanity-check on generated sequences, I generally like this idea, as a ton of prior biological knowledge is encoded in such a check. Indeed, for the generated Cas9 sequences, there was a high rate of generating synthetic Cas9s with the following domains:</p>
+<ul>
+<li>HNH and RuvC nuclease domains (100% and 52.1%, respectively), which are responsible for DNA cleavage,</li>
+<li>PAM-interacting domain (92.9%)</li>
+<li>target recognition (REC) lobe (99.9%)</li>
+</ul>
+<p>However, the downside is that such a check is likely to be specific to a protein family and can't be treated as an automated sanity check.</p>
+<p>I will also note that though I glossed over the magic numbers listed in this section of the paper while writing this overview, I still would have liked to see those numbers justified or subject to sensitivity analyses.</p>
+<h2 id="model-3-crrna-and-tracrrna-generator">Model 3: crRNA and tracrRNA generator</h2><p>CrRNA (CRISPR RNA) and tracrRNA (trans-activating CRISPR RNA) are essential molecules within gene editing systems. While I'm not a gene editing expert, if I am not mistaken, crRNA and tracrRNA together form the complex that guides Cas9 to the target site for DNA cleavage, and in engineered gene editing systems, they get fused directly to form a single guide RNA (sgRNA).</p>
+<p>In designing crRNA and tracrRNA, the authors treated this as a sequence-to-sequence (seq2seq) modelling problem. Within seq2seq problems, the left seq is used to generate the right seq, and the framework used here is to use the protein sequence (left seq) to generate the nucleotide crRNA + tracrRNA combined sequence (right seq). Here, the authors identified 112,212 Type II effector proteins, the broader family of Cas9 proteins, for which they could also confidently identify the crRNA and tracrRNA sequences. I would guess that the broadened family was necessary to capture diversity.</p>
+<p>The way that the authors characterized the sequences was as follows:</p>
+<ul>
+<li>Visually clustering the generated tracrRNA:crRNA sequences, formatted into sgRNAs, and observing that the generated sgRNAs clustered most closely with naturally occurring tracrRNA:crRNAs formatted as sgRNAs as well,</li>
+<li>Checking how often the crRNA:tracrRNA complex formed a canonical duplex, which is necessary for function and</li>
+<li>Checking whether the model could "predict the compatibility of sgRNAs between diverse Cas9 orthologs", produced by the seq2seq model as the language model log-likelihood scores.</li>
+</ul>
+<p>Visual clustering is a valuable tool, though I would have wanted the authors to check that they were not being Fooled by the Projection<sup>(tm)</sup> (a nod to both cartography and <a href="https://en.wikipedia.org/wiki/Fooled_by_Randomness">Nassim Nicholas Taleb's "Fooled by Randomness"</a>) by checking that their visual clustering still holds with at least two more methods, such as <a href="https://umap-learn.readthedocs.io/en/latest/">UMAP</a> and/or <a href="https://scikit-learn.org/stable/modules/generated/sklearn.manifold.MDS.html">multi-dimensional scaling (MDS)</a>. The authors used the term "validate" to describe this. Still, I think the term should be reserved solely for experimental validation and the visual clustering step should be described as a "sanity check" instead.</p>
+<h2 id="overall-thoughts">Overall thoughts</h2><p>Here are my overall thoughts on the paper, having read it.</p>
+<h3 id="the-generative-model-isn-t-the-star-filtering-and-prioritization-are">The generative model isn't the star; filtering and prioritization are</h3><p>Having read the paper and having been involved in multiple protein engineering campaigns, small molecule design projects, and mRNA design efforts, the part that has been the most challenging in AI-based library design isn't the generative model but rather knowing which outputs of the generative model to trust. Once one has a generative model, sequences and molecules become a commodity; the hard part is encoding expert knowledge into filters and rankers that can prioritize sequences to test in a lab. Different forms of generative models vary in terms of their <em>efficiency</em> of generation, with evolutionarily-informed generators (like the ones described here) being more likely than pure random sequence generators to generate evolutionarily plausible (and hence plausibly functional) proteins. Still, the <em>real</em> value lies in whether we've shortcut experimentation through the library design, and my priors here are that in the presence of evolutionarily-informed sequence generators, the presence of biologically informed (or even better, subject matter expert-informed) prioritization and filtering will be what makes laboratory experiments faster.</p>
+<h3 id="magic-numbers-were-pervasive-throughout-the-methods">Magic numbers were pervasive throughout the methods</h3><p>Many, many, many numbers were shared but not explained. If they were pulled out of the posterior of one's intuition, that intuition should be documented. If not, there should be a sensitivity analysis of certain parameters, such as 70%, 80%, or 90% similarity thresholds, to see whether conclusions change based on those values.</p>
+<h3 id="thousands-of-sequences-are-good-enough">Thousands of sequences are good enough?</h3><p>I've been asked, "How many sequences do you need to train a generative model?" While I know from posterior intuition that dozens are probably not enough, I've wondered whether we could do a Darn Fine Job<sup>(tm)</sup> with just thousands of sequences from a single protein family. Indeed, when it came to my unpublished work doing an <a href="https://flu-forecaster.ericmjl.com/">influenza sequence forecaster</a> using variational autoencoders in 2017, I worked with a small handful (14455) of influenza HA sequences. Here, the authors were using only a few hundred thousand sequences too. I think the protein language model world has already had its "generalist model" moment w.r.t. architectures; just like with GenAI experiencing a Cambrian explosion of domain-specific and/or local models, protein language models are going to be generated or fine-tuned on a per-application basis.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2024-paper-review-design-of-highly-functional-genome-editors-by-modeling-the-universe-of-crispr-cas-sequences</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Paper Review: Design of highly functional genome editors by modeling the universe of CRISPR-Cas sequences}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2024}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{05}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{12}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2024/5/12/paper-review-design-of-highly-functional-genome-editors-by-modeling-the-universe-of-crispr-cas-sequences}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+    <p>
+      <i><span>Finally, I do free 30-minute GenAI strategy calls for teams
+        that are looking to leverage GenAI for maximum impact. Consider </span>
+        <a href="https://calendly.com/ericmjl/llm-chat">booking a call on Calendly</a>
+        if you're interested!</i>
+      </i>
+    </p>
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>
