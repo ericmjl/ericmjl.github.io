@@ -1,0 +1,679 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.webp">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Git worktrees for beginners">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/git-worktrees-for-beginners' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Git worktrees for beginners - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Git worktrees for beginners</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-06-15</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/git/">
+        git
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/worktree/">
+        worktree
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/branches/">
+        branches
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workflow/">
+        workflow
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/productivity/">
+        productivity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/hotfix/">
+        hotfix
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/review/">
+        review
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/cloning/">
+        cloning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/cleanup/">
+        cleanup
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/tips/">
+        tips
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share how git worktrees have become my go-to solution for juggling multiple branches without the hassle of stashing, committing unfinished work, or cloning repos. I explain what worktrees are, how they differ from clones, and why they're perfect for quick reviews, hotfixes, and parallel development. I also cover common pitfalls and cleanup tips. Curious how worktrees can simplify your workflow and keep your projects organized? Read on to find out!</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>You are deep in a feature branch. Files are half-edited, tests are mid-run, your terminal is a graveyard of useful state. Then a teammate pings you: "can you review this PR?" Or a bug on <code>main</code> needs fixing right now.</p>
+<p>Your options feel lousy. You can stash your work and pray you remember the path back. You can commit a half-finished change just to park it. Or you can clone the repo into a second folder and juggle two copies of the history.</p>
+<p>There is a fourth option, and it is the one I now reach for every time: <code>git worktree</code>.</p>
+<h2 id="what-a-worktree-feels-like-as-a-beginner">What a worktree feels like as a beginner</h2><p>Let's strip away the internals for a second. What is a git worktree? A git worktree shows up as a <strong>new folder on disk that contains a full copy of your repo's files</strong>, checked out on whatever branch you ask for, placed anywhere you want on your computer.</p>
+<p>That is the essential experience of git worktrees. You run one command, you <code>cd</code> into a new directory, and you have a clean working tree ready to go. When you are done, you remove it, and the folder disappears.</p>
+<p>Here is the basic loop:</p>
+<div class="hll"><pre><span></span><span class="c1"># create a new folder ../hotfix with the repo checked out on a new branch &quot;hotfix&quot;</span>
+git<span class="w"> </span>worktree<span class="w"> </span>add<span class="w"> </span>../hotfix
+
+<span class="c1"># go work there</span>
+<span class="nb">cd</span><span class="w"> </span>../hotfix
+<span class="c1"># ...edit, commit, push...</span>
+
+<span class="c1"># when you are done, clean it up</span>
+<span class="nb">cd</span><span class="w"> </span>-
+git<span class="w"> </span>worktree<span class="w"> </span>remove<span class="w"> </span>../hotfix
+</pre></div>
+<p><code>git worktree remove</code> deletes the folder and deregisters it from git. That is cleanup. If you ever do it by hand (<code>rm -rf ../hotfix</code>), git leaves a stale registration behind, and <code>git worktree prune</code> sweeps that up.</p>
+<p>You can have several worktrees at once. <code>git worktree list</code> shows you every one:</p>
+<div class="hll"><pre><span></span>git<span class="w"> </span>worktree<span class="w"> </span>list
+</pre></div>
+<p>Each entry is a folder on disk, a branch, and a commit. Treat them like separate workspaces that happen to share one brain.</p>
+<h2 id="so-how-is-this-different-from-cloning-into-a-second-folder">So how is this different from cloning into a second folder?</h2><p>That's a great question! If I just need a second copy of the repo, why run <code>git clone</code> into another folder?</p>
+<p>You can, and people do. I have one colleague at work who has the software developer's equivalent of <code>Untitled12.ipynb</code> for multiple repos. But a clone and a worktree are doing fundamentally different things under the hood, and the difference shows up the moment you start working.</p>
+<p><strong>A clone is a second, independent repository.</strong> <code>git clone</code> copies the entire <code>.git</code> database, history and all, into a brand new repository. The two clones know about each other only as remotes. To share work between them you fetch and push, the same as you would with a colleague's machine. Branches you create in one clone are invisible to the other until you sync them.</p>
+<p><strong>A worktree is a second door into the same repository.</strong> It adds a working directory, but the history, the commits, the branches, and the tags all live in one shared <code>.git</code>. Make a commit in any worktree and it is instantly visible in all the others, because they are reading from the same underlying git database. There is nothing to sync.</p>
+<p>Here is how that plays out side by side:</p>
+<table>
+<thead><tr>
+<th></th>
+<th><code>git clone</code> into a new folder</th>
+<th><code>git worktree add</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Storage</td>
+<td>Copies the full <code>.git</code> history again</td>
+<td>Adds only the working files; shares the <code>.git</code> database</td>
+</tr>
+<tr>
+<td>Branches</td>
+<td>Each clone keeps its own copy; must fetch/push to sync</td>
+<td>All branches shared instantly across worktrees</td>
+</tr>
+<tr>
+<td>New branches</td>
+<td>Invisible elsewhere until pushed</td>
+<td>Visible everywhere immediately</td>
+</tr>
+<tr>
+<td>Same branch twice</td>
+<td>Allowed (independent checkouts)</td>
+<td>Blocked; a branch lives in one worktree at a time</td>
+</tr>
+<tr>
+<td>Network</td>
+<td>Needed to sync between copies</td>
+<td>Never needed (storage is shared locally)</td>
+</tr>
+</tbody>
+</table>
+<p>That last row is the one I feel most. With clones, every "let me grab that branch" is a fetch. With worktrees, the branch is already there because it was never anywhere else.</p>
+<h2 id="the-one-rule-that-trips-people-up">The one rule that trips people up</h2><p>Git enforces a single constraint, and it is worth knowing up front: <strong>a branch can be checked out in only one worktree at a time.</strong></p>
+<p>If you are on <code>feature-x</code> in your main folder, git will refuse to also check out <code>feature-x</code> in a worktree. That refusal protects you from two working directories racing on the same branch's index. If you need a second working tree for similar work, make a new branch for it:</p>
+<div class="hll"><pre><span></span>git<span class="w"> </span>worktree<span class="w"> </span>add<span class="w"> </span>-b<span class="w"> </span>feature-x-take2<span class="w"> </span>../take2
+</pre></div>
+<p>This is the tradeoff worktrees make. Clones give you total independence at the cost of duplication and syncing. Worktrees give you zero duplication and zero syncing at the cost of that one-branch-one-worktree rule. This is basically perfect for the "park my work and go look at something else" use case.</p>
+<h2 id="are-the-worktrees-linked-on-disk">Are the worktrees linked on disk?</h2><p>Yes, and that is the essence of how git worktrees work.</p>
+<p>A normal repository has a <code>.git</code> directory that holds everything: the object database (every commit, tree, and blob), the refs (branches and tags), the configuration, the logs. One repository, one <code>.git</code>.</p>
+<p>A linked worktree has a <code>.git</code> <strong>file</strong> instead of a <code>.git</code> directory. That file is one line long:</p>
+<div class="hll"><pre><span></span>gitdir: /Users/you/myproject/.git/worktrees/hotfix
+</pre></div>
+<p>That path points back into the main repository's <code>.git</code> directory, into a small admin folder that holds only the per-worktree state: the worktree's own <code>HEAD</code>, its own <code>index</code>, a few logs. The heavy lifting, the object database and the refs, is shared from the main repo.</p>
+<p>You can see it for yourself:</p>
+<div class="hll"><pre><span></span>cat<span class="w"> </span>../hotfix/.git
+<span class="c1"># gitdir: /Users/you/myproject/.git/worktrees/hotfix</span>
+
+ls<span class="w"> </span>/Users/you/myproject/.git/worktrees/
+<span class="c1"># hotfix</span>
+</pre></div>
+<p>That is the linkage. Every worktree points into the same <code>.git</code> directory, which is why a commit made in one shows up immediately in the rest. They are separate folders on disk with separate working files, but they read and write to one shared repository. One brain, many desks.</p>
+<h2 id="when-i-actually-reach-for-worktrees">When I actually reach for worktrees</h2><p>A few patterns where worktrees have earned their keep for me. Each one is a plain-English ask you can hand to a coding agent:</p>
+<ul>
+<li><strong>Quick reviews and hotfixes.</strong> I am on a feature branch and someone needs me on <code>main</code>. I <code>git worktree add</code> a throwaway folder, do the review or the fix, push, and remove it. My feature branch never moves. The ask: "Help me review <code>&lt;PR URL&gt;</code> in a new worktree."</li>
+<li><strong>Running two versions side by side.</strong> I keep one worktree on the released version and one on <code>main</code>, so I can reproduce a bug against both without juggling stashes. The ask: "Check out the v1.2 release tag in a worktree so I can compare it against main."</li>
+<li><strong>Long-running branches with context I want to keep.</strong> Some experiments take days and accumulate useful terminal state. A worktree lets me park them in their own folder and pop back in without disturbing my main flow. The ask: "Create a worktree for this experiment so I can leave its state alone."</li>
+<li><strong>Handing a whole task to a coding agent.</strong> A worktree is just a folder, which means I can hand a coding agent the full lifecycle in one instruction: "do this work in a worktree, open a PR, and remove the worktree when you're done." The agent gets its own clean workspace, my main folder sits untouched while it churns, and once the PR is open the throwaway folder disappears on its own. The ease of this is the part I want to flag: the whole loop is small enough that delegating it in plain English feels natural. I am writing this very post that way.</li>
+</ul>
+<p>The shared storage means I can have five of these open and still pay only for the working files, five times over, instead of five copies of the entire history.</p>
+<h2 id="a-note-on-cleanup">A note on cleanup</h2><p><code>git worktree remove &lt;path&gt;</code> is the polite way out. It deletes the folder and tells git to forget about it. If the worktree has uncommitted changes, git will refuse unless you pass <code>--force</code>, which is a nice safety net.</p>
+<p>If you ever delete a worktree folder by hand, the registration lingers until you run <code>git worktree prune</code>. I treat <code>prune</code> as the "tidy up" command and run it now and then after a week of creating and discarding worktrees.</p>
+<h2 id="give-it-a-try">Give it a try</h2><p>The next time you are tempted to stash or clone just to look at another branch, try this instead:</p>
+<div class="hll"><pre><span></span>git<span class="w"> </span>worktree<span class="w"> </span>add<span class="w"> </span>../scratchpad
+<span class="nb">cd</span><span class="w"> </span>../scratchpad
+</pre></div>
+<p>Or alternatively, ask an agent to work in a worktree for you:</p>
+<blockquote><p>"Set up a worktree on a new branch and make the changes there."</p>
+</blockquote>
+<p>Work there. Commit there. When you are done, come back and <code>git worktree remove ../scratchpad</code>. Your main folder stays exactly as you left it, the throwaway folder is gone, and you never duplicated a single commit to get there.</p>
+<p>One brain, many desks. That is all a worktree is!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-git-worktrees-for-beginners</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Git worktrees for beginners}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{06}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{15}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/6/15/git-worktrees-for-beginners}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

@@ -1,0 +1,684 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.webp">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="ODSC East 2026&#39;s Zeitgeist and Conference Report">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/odsc-east-2026-zeitgeist' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>ODSC East 2026&#39;s Zeitgeist and Conference Report - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">ODSC East 2026&#39;s Zeitgeist and Conference Report</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-05-10</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/agentic/">
+        agentic
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/conference/">
+        conference
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llm/">
+        llm
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data/">
+        data
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/mlops/">
+        mlops
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/applied/">
+        applied
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/governance/">
+        governance
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workforce/">
+        workforce
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/strategy/">
+        strategy
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/systems/">
+        systems
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share my experiment at ODSC East 2026, where I analyzed talk abstracts to uncover the conference's true zeitgeist. By categorizing sessions into five key zones—agentic AI systems, LLM engineering, data infrastructure, applied AI, and governance—I reveal how AI builder culture is evolving into systems culture. I also reflect on my own workshop experience and the shifting focus from models to repeatable systems. Curious about what trends are shaping the future of AI conferences?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>This year I ran a small experiment at ODSC East 2026.</p>
+<p>As I was speaking and catching up with old friends at the conference, I could only attend a slice of sessions. So I thought, rather than try to catch every last talk, what if I could figure out what the <em>zeitgeist</em> of the conference was using just the talk abstracts? If I scraped the schedule and abstracts across talks, workshops, and keynotes, can they reveal the conference center of gravity, and hence the zeitgeist of the conference?</p>
+<h2 id="how-i-ran-the-experiment">How I ran the experiment</h2><p>I used Cursor Agent on Premium for the scrape and extraction workflow.</p>
+<p>The process was straightforward:</p>
+<ul>
+<li>Use <code>https://schedule.odsc.ai/</code> as the source of truth</li>
+<li>Query the schedule backend session table and filter to the East 2026 event ID</li>
+<li>Pull session title, abstract, day, track, format, and speaker metadata</li>
+<li>Save the full result as structured JSON for analysis</li>
+</ul>
+<p>This pass includes 237 sessions from the live schedule backend, exported as structured JSON.</p>
+<h2 id="the-map-after-reading-abstracts">The map after reading abstracts</h2><p>I ran a multi-agent categorization pipeline. Four independent coding agents each read 50 full abstracts and proposed a five-category taxonomy. Then three cross-review agents read all 200 abstracts and all four proposals, identified points of agreement and disagreement, and each produced a unified taxonomy. A final arbitrator agent resolved the remaining disputes using majority vote, reading the abstracts directly for tiebreaks.</p>
+<p>Corpus snapshot:</p>
+<ul>
+<li>237 total sessions in the schedule export</li>
+<li>200 sessions with non-empty abstracts</li>
+<li>193 substantive sessions after filtering logistics and networking entries</li>
+<li>7 excluded as non-substantive (badge pickup, happy hours, morning run, career fair, networking receptions)</li>
+</ul>
+<p>The five categories that emerged from this process follow.</p>
+<h2 id="zone-1-agentic-ai-systems-55-talks-28-of-substantive">Zone 1 - Agentic AI systems (55 talks, 28% of substantive)</h2><p>This zone captures the shift from prompt craft to system design: agent architectures, multi-agent orchestration, tool use, MCP and A2A protocols, harness engineering, agent memory, simulation sandboxes, guardrails, and production deployment patterns for systems where AI plans, decides, and acts autonomously.</p>
+<p>Sub-zeitgeist in this zone:</p>
+<ul>
+<li>Teams are wrestling with a core systems question: what architecture keeps agents reliable when they run for long periods, call many tools, and fail mid-flight?</li>
+<li>The recurring design problem is orchestration and control, from runtimes to control planes to workflow verification.</li>
+<li>This was the largest zone at the conference, reflecting how agentic AI has moved from demos to engineering.</li>
+<li>Talks that anchor this pattern include:<ul>
+<li>Architectural Patterns for Building and Governing Production-Grade Multi-Agent Systems (Dr. Ali Arsanjani, Google Cloud)</li>
+<li>Agents Don't Need Better Frameworks: They Need a New Runtime (John A. De Goes, Golem Cloud)</li>
+<li>Building Production-Ready Agentic AI - Why a Control Plane Matters (Wayne Segar, Dynatrace)</li>
+<li>Verification-Driven Agentic Workflows (Julie Yaunches, NVIDIA)</li>
+</ul>
+</li>
+</ul>
+<p>If you are building agentic systems right now, treat architecture as the first design surface. Start with runtime boundaries, failure recovery, and orchestration patterns, then layer prompts into that structure.</p>
+<h2 id="zone-2-llm-and-foundation-model-engineering-37-talks-19">Zone 2 - LLM and foundation model engineering (37 talks, 19%)</h2><p>This zone covers the model layer: training, fine-tuning, quantization, inference optimization, RAG architecture, prompt engineering, model interpretability, hallucination research, evaluation methodology, and novel computational substrates.</p>
+<p>Sub-zeitgeist in this zone:</p>
+<ul>
+<li>The dominant production question is deployment economics: how do we sustain quality while meeting latency, throughput, and cost targets?</li>
+<li>The technical pressure points are quantization, efficient fine-tuning, inference behavior under load, and hardware-induced variability.</li>
+<li>Talks that capture this pressure include:<ul>
+<li>Less Compute, More Impact: How Model Quantization Fuels the Next Wave of Agentic AI (David vonThenen, NetApp)</li>
+<li>Efficient Finetuning of Quantized LLMs (Tim Dettmers, CMU / Ai2)</li>
+<li>Fast, Cheap, and Accurate: LLM Inference in Practice (Legare Kerrison, Red Hat)</li>
+<li>Why AI Systems Behave Differently in Production: Nondeterminism, GPU Execution Drift, and Hidden Reliability Gaps (Santosh Appachu Devanira Poovaiah, NVIDIA)</li>
+</ul>
+</li>
+</ul>
+<p>Use this zone as a nudge to benchmark for real operating conditions, not demo conditions. Optimize for latency, cost, and stability together, and pick model and fine-tuning strategies that survive production constraints.</p>
+<h2 id="zone-3-data-engineering-and-ml-infrastructure-28-talks-15">Zone 3 - Data engineering and ML infrastructure (28 talks, 15%)</h2><p>This zone includes the substrate work that determines whether agents reason well in production: data platforms, pipelines, data quality frameworks, real-time streaming architectures, training and serving infrastructure, data modeling, and ML operational systems.</p>
+<p>Sub-zeitgeist in this zone:</p>
+<ul>
+<li>The shared diagnosis is that many agent failures are context failures, data-shape failures, or lineage failures before they are model failures.</li>
+<li>The leading question is how to build context substrates that preserve meaning across retrieval, reasoning, and execution paths.</li>
+<li>Talks that make this explicit include:<ul>
+<li>What "AI-Ready Data" Actually Means: A Framework to Trustworthy AI (Jacob Prall, Snowflake)</li>
+<li>Entity Resolved Knowledge Graphs: The Foundation for Effective GraphRAG (Clair Sullivan, Clair Sullivan &amp; Associates)</li>
+<li>Real-Time Event-Time Consistent Analytics Pipelines using Kafka, Flink, and Apache Pinot (Deep Patel, Robinhood)</li>
+<li>Beyond the Context Window: Anchoring Agentic Reasoning with World-State and Context Graphs (Amy Hodler &amp; David Hughes, GraphGeeks.org)</li>
+</ul>
+</li>
+</ul>
+<p>For readers shipping AI systems, this is a reminder to diagnose context and data pathways before blaming the model. Invest in data contracts, context structure, and retrieval quality early, because those choices determine downstream reliability.</p>
+<h2 id="zone-4-applied-ai-domain-solutions-and-foundations-41-talks-21">Zone 4 - Applied AI, domain solutions, and foundations (41 talks, 21%)</h2><p>This zone spans two related audiences: introductory training courses teaching core skills (Python, SQL, R, statistics, ML basics) and domain-specific AI applications in healthcare, finance, defense, biopharma, accessibility, and marketing. The common thread is that the audience is learning or applying rather than researching.</p>
+<p>Sub-zeitgeist in this zone:</p>
+<ul>
+<li>The main adoption problem is role redesign: what should humans own when agents can execute large parts of the workflow?</li>
+<li>The recurring organizational question is how to scale AI usage while preserving accountability in regulated and high-stakes domains.</li>
+<li>Talks that carry this thread include:<ul>
+<li>Ready for Primetime: Creating the AI-enabled Clinician (Ami Bhatt, MD, FDA / American College of Cardiology)</li>
+<li>Panel: Building the AI-Ready Workforce: Human-AI Collaboration in 2026 (Usama Fayyad, Sadie St Lawrence, Sheamus McGovern, Dr. William Streilein)</li>
+<li>The Expertise Upheaval: How AI Promises to Transform the Nature of Work (Matt Sigelman, Burning Glass Institute)</li>
+<li>What Does a Data Professional Do When AI Can Do the Data Work? (Shane Butler, Ontra)</li>
+</ul>
+</li>
+</ul>
+<p>The move for practitioners here is to design human roles and escalation paths alongside technical architecture. Adoption succeeds when accountability, decision rights, and domain workflows are specified as clearly as APIs and evals.</p>
+<h2 id="zone-5-ai-strategy-governance-and-workforce-32-talks-17">Zone 5 - AI strategy, governance, and workforce (32 talks, 17%)</h2><p>This zone is where technical capability meets organizational uptake: enterprise AI strategy and transformation, governance frameworks, regulation and compliance, trust engineering, workforce transformation, career development, and the societal and human dimensions of AI.</p>
+<p>Sub-zeitgeist in this zone:</p>
+<ul>
+<li>The central problem is assurance: how do we prove behavior quality for agentic systems that adapt and call tools dynamically?</li>
+<li>The recurring question is how to convert policy and risk language into tests, guardrails, and monitoring loops that engineers can run every day.</li>
+<li>Talks that anchor this zone include:<ul>
+<li>Beyond Static Benchmarks: How to Test AI That Thinks, Acts, and Adapts (Yash Vijay, Snorkel AI)</li>
+<li>Lessons from Evaluating Production AI Agents for over a year (Susan Shu Chang, Elastic)</li>
+<li>The Leadership Imperative: AI Governance as Strategic Infrastructure (Shoshana Rosenberg, WSP in the U.S.)</li>
+<li>How I learned to Stop Worrying and love AI Regulation (Benjamin Batorsky, GoGuardian)</li>
+</ul>
+</li>
+</ul>
+<p>A practical takeaway for teams is to translate trust goals into runnable checks. Build evaluation and guardrail loops that run continuously, and make policy language executable in your delivery workflow.</p>
+<h2 id="visualizing-the-conference-landscape">Visualizing the conference landscape</h2><p>To see how these categories relate to an unsupervised view of the same abstracts, I embedded all 193 substantive abstracts using <code>all-MiniLM-L6-v2</code>, clustered them with HDBSCAN, and projected the embeddings into 2D with UMAP. The <a href="https://molab.marimo.io/github/ericmjl/website/blob/main/content/blog/odsc-east-2026-zeitgeist/odsc-report-notebook.py">companion Marimo notebook</a> includes an interactive scatter plot where you can toggle between the agent-based zone classification (the five categories above) and the embedding-based HDBSCAN clusters. Mouse over any point to see the talk title, speaker, track, and full abstract. You can open it directly in your browser with <a href="https://molab.marimo.io">molab</a>.</p>
+<p>The two views do not perfectly align, and that is instructive. Where the embedding clusters split a zone, it usually means the zone contains sub-communities with distinct vocabulary (for example, "agent architecture" talks cluster separately from "agent ops" talks within Zone 1). Where the embedding clusters merge zones, it means the abstracts share enough language that an unsupervised method cannot tell them apart.</p>
+<h2 id="what-the-center-of-gravity-says-in-2026">What the center of gravity says in 2026</h2><p>If I compress the whole conference into one sentence, it is this: ODSC East 2026 feels like the year AI builder culture became systems culture.</p>
+<p>The numbers bear this out. Agentic AI systems accounted for 28% of substantive sessions, more than any other zone. LLM and foundation model engineering took another 19%. The event still celebrates model progress, but the practical energy sits in the joints between components: agent architecture, data infrastructure, evaluation, deployment, and decision-making structures inside organizations.</p>
+<p>I also notice a healthy coupling of technical and leadership tracks. That pairing usually shows up when teams are moving from experimentation budgets to accountability budgets.</p>
+<h2 id="a-short-list-of-likely-macro-trends">A short list of likely macro trends</h2><ul>
+<li>Agentic AI becomes an engineering discipline with explicit quality loops</li>
+<li>RAG and context strategy remain central, but with more scrutiny on evaluation</li>
+<li>MLOps and LLMOps converge into one reliability stack for mixed AI systems</li>
+<li>Governance work sits closer to platform design and product strategy</li>
+<li>The value of attending this conference shifts from "learn a model" to "learn a repeatable system"</li>
+</ul>
+<h2 id="my-own-field-note-from-odsc-east">My own field note from ODSC East</h2><p>I taught a 1 hr workshop called "How to Do Agentic Data Science" on Day 1. The abstract reflected my original plan: use Python scripts executed with <code>uv run</code>, one script per plot, and pair that with markdown journals and reports so the workflow stayed inspectable and reproducible.</p>
+<p>Then I learned about Marimo Pair about a month before the session. At that point, conscience kicked in for me. I felt a strong obligation to avoid giving folks a workflow that could feel outdated within a quarter of a calendar year. So I pivoted live and ran a coding demo with Marimo Pair because that workflow felt cleaner and tighter for the same core ideas I wanted to teach. Those ideas stayed simple: slow down, look at your data directly, gate analyses one plot at a time, and use LLMs to help with documentation while keeping human judgment in charge. Marimo made that "look at your data" step much more natural through direct dataframe display in the notebook flow.</p>
+<p>Overall, I was floored by the early response - when I ducked out briefly to grab some water, I saw a wall of people outside, and the demand hit me all at once. Others I met in the hallway and in the VIP/Speakers room gave overall positive feedback, and agreed with my own assessment that the content would be better done with a longer session, which would give me the space to be more hands-on.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-odsc-east-2026-zeitgeist</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{ODSC East 2026&#39;s Zeitgeist and Conference Report}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{05}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{10}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/5/10/odsc-east-2026-zeitgeist}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>
