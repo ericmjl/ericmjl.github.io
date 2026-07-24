@@ -1,0 +1,602 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.webp">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Choose your own AI policy">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/choose-your-own-ai-policy' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Choose your own AI policy - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Choose your own AI policy</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-07-20</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/open-source/">
+        open-source
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/agents/">
+        agents
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/policy/">
+        policy
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/community/">
+        community
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/collaboration/">
+        collaboration
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/scipy/">
+        scipy
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/maintainers/">
+        maintainers
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share my thoughts from SciPy 2026 on how open source projects should handle AI-assisted contributions. Drawing from a community discussion and a new AI policy template, I distinguish between developers using AI as a power tool versus mass-produced slop. I encourage maintainers to pick a policy tier, write it down, enforce it, and engage with the humans behind the PRs. What AI policy fits your project?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I just got back from SciPy 2026, my eleventh year at the conference. The loudest thread across the week was AI in open source, and what maintainers are supposed to do about it.</p>
+<p>The thread surfaced in a Scientific Python community session, run as a Birds of a Feather (BoF). Stefan van der Walt walked us through the project's work: the specification process (SPECS, the Python-community analog of PEPs and NEPs), four developer summits, shared tools like <a href="https://repo-review.readthedocs.io/">RepoReview</a> and <a href="https://github.com/scientific-python/spin"><code>spin</code></a>, and <a href="https://mystmd.org/">MyST</a> as the documentation engine behind the next <a href="https://jupyterbook.org/">Jupyter Book</a>. Then the floor opened for Q&amp;A.</p>
+<p>Someone raised a worry I haven't been able to shake. As Claude and its cousins make it cheap to spin up a working tool, maintainers build bespoke utilities for themselves and stop contributing back. The room offered an analogy: if everyone builds their own vehicle, the roads stop working. Someone drives a tank, someone else a bicycle, and the shared infrastructure collapses. The cheap-prototype problem makes it worse: the version a person publishes often only works for them, pushing the next person to build their own.</p>
+<p>That conversation was still on my mind when a pull request hit my review queue that week, giving me a cleaner frame for these questions.</p>
+<h2 id="two-flavors-of-ai-in-open-source">Two flavors of AI in open source</h2><p>Henry Schreiner opened <a href="https://github.com/scientific-python/cookie/pull/821">PR #821 on scientific-python/cookie</a> to add an AI page to the cookie project, the Scientific Python community's recommended project template. (Henry started the draft by pointing Claude Opus at the issue and reworking the output by hand, which is exactly the meta-lesson of the page itself.) The page opens with a distinction I believe is useful here:</p>
+<ul>
+<li>A developer driving an interactive AI harness with a capable model, reading the output, and taking responsibility for the result.</li>
+<li>Low-cost models running unattended in automated systems that mass-produce pull requests.</li>
+</ul>
+<p>The first is a power tool. The second is slop. Most maintainer frustration about AI contributions comes from the second case, and most of the value comes from the first. Conflating them produces bad policy.</p>
+<p>I see this conflation constantly. A contributor opens a pull request with a generic "I improved the code" message, the diff is a wall of token churn, and when you ask a question the answer comes back in the same flat model-voice. That is slop with a human attached. The human is the relay, not the author. Reviewing it takes longer than writing the change myself.</p>
+<p>The first flavor is what I want more of. A contributor who uses an agent to engage with my project, reads the result, and defends every line, is using a tool. I want to encourage them. Encouragement only lands if contributors can tell which flavor you're asking for, which means writing it down before they open a PR.</p>
+<h2 id="write-your-stance-down">Write your stance down</h2><p>The heart of Henry's PR is <code>AI_POLICY.md</code>, a project-level file that tells contributors what you expect. The PR sketches three tiers you can adapt.</p>
+<p><strong>All in.</strong> AI-assisted contributions are welcome on the same footing as any other, as long as they meet your quality bar and are disclosed.</p>
+<p><strong>Moderate.</strong> AI assistance is fine, but the contributor has to show real human involvement and prior buy-in before opening the PR.</p>
+<p><strong>Minimal.</strong> AI-generated PRs are discouraged or restricted. Use this if you have limited review capacity.</p>
+<p>Which one fits depends on the project. The point, however, is that you should pick one. A contributor reading your <code>AI_POLICY.md</code> should know what to expect before they open a PR, and a maintainer closing a PR should be able to point at the policy rather than re-litigate it every time.</p>
+<p>The cookie PR leaves the policy out of the template by default, letting each project select and modify their own. I think that's right. A project with one overworked maintainer is in a different situation from a project with twenty regular contributors, and the policy should reflect that. The maintainer reserves the right to take whatever action fits the project; nobody is paying for this work, which means no contributor is owed a review.</p>
+<h2 id="engage-with-the-human-not-the-bot">Engage with the human, not the bot</h2><p>The policy also has a recommendation for how maintainers should treat contributors, and my favorite passage is tucked inside a callout:</p>
+<blockquote><p>If you maintain a project: try to engage with the human. If they are willing to interact (and not just type "address the review" into their harness), treat them like a human, even if you also see the AI working on their behalf. They also may use AI to address a language barrier.</p>
+</blockquote>
+<p>The failure mode of an AI-assisted contribution is the human tagging out, which is the power-tool flavor sliding back into slop. A contributor pastes review comments into their harness, pastes the harness's reply back into the PR, and walks away. The maintainer is now arguing with a bot. That's draining, and it's disrespectful of volunteer time.</p>
+<p>The policy handles this directly with one rule: <strong>keep human review human-to-human.</strong> If an AI is responding on your behalf, say so, with a disclaimer line at the top of the comment. You're accountable for every change you submit. Don't make a maintainer talk to an AI without knowing it.</p>
+<p>Disclosure norms pay off here too. The PR recommends the Linux kernel's <code>Assisted-by: &lt;harness&gt;:&lt;model&gt;</code> trailer for commits. A convention I first saw Daniel Chen use is the <code>:robot: _AI text below_ :robot:</code> line for any AI-generated prose in a PR or comment. Knowing which model was used lets a reviewer run a different model family to cross-check the work (the PR calls this the "rubber-duck" technique). It also just respects the maintainer. Hiding your process when you contribute to open source is a small lie, repeated. It stings because it withholds the context a reviewer needs to do their job.</p>
+<h2 id="context-is-the-bottleneck">Context is the bottleneck</h2><p>Both worries, fragmentation and slop, trace back to the same constraint: the cost of producing code dropped faster than the cost of producing context. When anyone can ship a working prototype in an afternoon, the scarce thing is the understanding of what the code should do, why it should do it, and how it fits with what already exists.</p>
+<p>This shows up in every issue triage. The issue that says "the build is broken" with no logs, no repro, no environment info. The PR that addresses a problem the contributor never confirmed anyone had. The agent-generated patch that is locally correct and globally wrong because nobody told it about the other module that depends on the current behavior. In each case the gap is the same: context that lives in someone's head and nowhere in writing.</p>
+<p>What helps is documentation written for an agent to read. The cookie PR includes a section on <code>AGENTS.md</code>, the cross-harness standard file that captures how your repository works: preferred command runners, architecture notes, conventions, traps. A good <code>AGENTS.md</code> makes the AI far more effective, because the AI stops guessing. The same instinct applies to issues: write down what you tried, what you expected, what you saw. The agent working from a thorough issue is a different animal from the agent working from a one-liner. Agents are also good at producing that context. A minimal reproducible example is tedious for a human; for an agent that can spin up the environment, run the code, and iterate until the bug fires, it's a short task. Your <code>AI_POLICY.md</code> can ask contributors to use their agent to produce a self-contained repro first. The maintainer gets something runnable; the contributor finds out whether the bug is real before anyone else spends time on it. On the PR side, prompts that shape agent behavior belong in <code>AGENTS.md</code>, which travels with the code and reaches every contributor's agent: ask for the smallest diff that fixes one thing, and for stacked PRs when a change needs more. AGENTS.md itself is documentation written for an agent.</p>
+<p>AGENTS.md captures mechanics. Intent is a different kind of context, and it matters just as much. Thomas Caswell's SciPy keynote traced the story of Matplotlib's design decisions, the kind of narrative that lives in maintainers' heads and leaves with them. Writing that story down as <a href="https://loki.ws/code/2026/01/25/the-arrow-of-intent.html">design docs</a> (a high-level design for the project, then low-level designs and EARS requirement specs per feature) gives an agent the intent it needs to stay grounded. The docs will shift as the project evolves. That malleability is fine, because the current version still beats an agent guessing.</p>
+<p>Later in Q&amp;A, someone who works with NASA data raised the same point from their own side: they had started asking whether to write their documentation for a chatbot instead of a human. They had started shipping documentation as markdown alongside the rendered HTML, because the markdown is what the chatbot consumes. The rendered page is for a human; the source is for the agent. The lesson generalizes. If you want agents to do good work on your project, give them something to read.</p>
+<h2 id="be-courageous">Be courageous</h2><p>Documentation is what you write for the agent; your AI policy is what you write for your contributors.</p>
+<p>If you maintain an open source project, pick an AI policy from any of the three tiers. Write it down, commit it, link to it from your contributing guide, and enforce it. The action that fits your project is correct. A solo maintainer with no review capacity is within their rights to say "no unsolicited AI PRs, full stop." A healthy project with twenty contributors and review bandwidth can be all-in, and benefit from it. Both are legitimate. What's undesirable is having no policy, drifting, and burning out.</p>
+<p>That burnout lands on you. The action that fits <em>you</em> is also legitimate. If engaging with AI-assisted contributors drains you, require prior buy-in, close the PR, or step back from the project for a week. Some projects are solely volunteer. Protecting your capacity is part of the job.</p>
+<p>Protecting your capacity and welcoming contributors go together: hold the line against tag-out bots, and give your time to the humans behind real contributions. When a contributor shows up willing to engage, even when their harness did most of the typing, treat them like a human. Read their PR, ask your questions, and teach them the parts they don't know yet. That is how open source onboards people. Thomas Caswell onboarded me to Matplotlib a decade ago by walking me through seventy pull requests over two months. The first four were painful for him, but he did it anyway, and I'm still here. That people connection is invaluable.</p>
+<p>That human connection is what got more valuable this year. The cost of writing code dropped. The value of a maintainer who knows their project, writes down their stance, and engages with the humans who show up rose, because <a href="../../../6/17/agents-amplify-expertise-and-ignorance/">agents amplify whoever brings the judgment</a>. That's the work. Go do it, and don't apologize for the policy you choose.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-choose-your-own-ai-policy</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Choose your own AI policy}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{07}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{20}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/7/20/choose-your-own-ai-policy}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

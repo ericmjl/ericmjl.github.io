@@ -1,0 +1,659 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.webp">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="The understanding zeitgeist in AI code review">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/understanding-zeitgeist-ai-code-review' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>The understanding zeitgeist in AI code review - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">The understanding zeitgeist in AI code review</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-07-24</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/agents/">
+        agents
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/code review/">
+        code review
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/cognitive debt/">
+        cognitive debt
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/software engineering/">
+        software engineering
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llms/">
+        llms
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/pull requests/">
+        pull requests
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/understanding/">
+        understanding
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/learning/">
+        learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/micro-worlds/">
+        micro-worlds
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>I map a growing consensus: now that AI agents write so much of our code, producing it is cheap, but <em>understanding</em> it is the real bottleneck. I share my own struggles reviewing forty-file diffs and explore how cognitive debt quietly accrues when we approve polished PRs we can't actually explain. Drawing from thinkers like Geoffrey Litt and Simon Willison, I highlight practical techniques to fight back, like literate diffs, interactive micro-worlds, and quizzes. (I even quiz you on this very post!) How are you keeping your mental model alive when your agent types faster than you can think?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I've spent the year on both ends of agent-written pull requests. I've opened them after a long coding session, half-hoping the reviewer catches what I only half-tracked. And I've reviewed them, eyes glazing over a forty-file diff, typing "looks good to me" while a quieter voice asks whether it actually does. (Reader, I've been the problem as often as the solution.) If you've used a coding agent, you know the feeling.</p>
+<p>This spring and summer, a bunch of people I read arrived at the same worry from completely different angles: now that agents write so much of our code, producing it is cheap, but <em>understanding</em> it is the expensive part. I want to map where the conversation has landed, so you can see its shape and find your own place in it.</p>
+<p>One warning, and a promise. The worry has a name now, and the people working on it have built real techniques for it. I'm going to steal one of those techniques here, because Geoffrey Litt and Andy Matuschak both argue that reading is a weak way to build understanding; you have to be quizzed on it. So this post practices what it preaches. Three quick questions up front, to surface what you already think, and five at the end, to check what landed. (Yes, I'm quizzing you on a post about why quizzes work. I couldn't resist.)</p>
+<h2 id="before-you-read">Before you read</h2><p>These aren't graded, and the cards won't tell you if you're right. Pick your honest answer for each, notice your assumptions, then read on. The survey revisits every one.</p>
+<iframe src="before-you-read.html" width="100%" scrolling="no" style="border: 1px solid #ddd; border-radius: 6px;" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><p>Hold your answers. Let's see where the field has landed.</p>
+<h2 id="understanding-is-the-bottleneck">Understanding is the bottleneck</h2><p>Geoffrey Litt gave a talk at the AI Engineer conference in July 2026 with a thesis that names the whole conversation: <strong>understanding is the new bottleneck.</strong> Writing code got cheap. Holding a mental model of what the code does is the expensive part now, and it's the gap every pull request asks us to cross.</p>
+<p>The deeper root of this worry predates the AI boom by decades. <a href="https://margaretstorey.com/blog/2026/02/09/cognitive-debt/">Margaret Storey</a>, reviving Peter Naur's 1985 essay <a href="https://pages.cs.wisc.edu/~remzi/Naur.pdf">"Programming as Theory Building"</a>, puts it precisely: a program is a theory that lives in the minds of the developers, capturing what the software does and how it can change. Technical debt lives in the code. <strong>Cognitive debt lives in the developers' minds</strong>, and Storey argues it will paralyze a team before technical debt does. She watched it happen to a student team that could no longer make simple changes, because nobody could explain why the system worked the way it did.</p>
+<p>This is the through-line of the whole survey. The people I've been reading disagree on tactics but agree on the diagnosis. When typing the code stops being the bottleneck, the bottleneck moves to whoever has to hold the theory.</p>
+<h2 id="what-breaks-at-the-pull-request">What breaks at the pull request</h2><p>The diagnosis bites hardest at the pull request, because that's the moment the theory has to move from author to reviewer. Several practitioners wrote the reviewer's side raw this year, and it hits closest to home.</p>
+<p><a href="https://hojberg.xyz/the-programmer-identity-crisis/">Simon Højberg</a> names the lived experience: code reviewers are "rapidly losing their minds" because they've become "the first layer of quality control instead of one of the last," picking apart hallucinated libraries and uncalled functions while the author shrugs that Claude wrote it. I recognize the feeling; I gloss over the diff, overwhelmed and bored, and approve whatever's there as long as CI is green.</p>
+<p><a href="https://tim-schipper.nl/en/blog/reviewing-ai-generated-pull-requests">Tim Schipper</a> explains why agent PRs are uniquely hard to review, with a framing I've stolen more than once. <strong>An AI PR has no smell.</strong> It's uniformly polished, because polish is the one thing next-token prediction is genuinely good at, so the reviewer's instinct fires the wrong way: the surface looks more reviewable than a human's, so it gets less review. His test for whether you actually reviewed it is the sharpest line in the whole conversation: approve a PR you couldn't have written and can't fully explain, and you didn't review it. You witnessed it.</p>
+<p>Here is what that looks like in practice: a clean diff, and the five checks a reviewer actually has to run.</p>
+<iframe src="ai-pr-no-smell.html" width="100%" scrolling="no" style="border: 1px solid #ddd; border-radius: 6px;" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><p>Every checklist I read hits the same failure modes. <a href="https://github.blog/ai-and-ml/generative-ai/agent-pull-requests-are-everywhere-heres-how-to-review-them/">GitHub's engineering team</a> published guidance in May 2026 built around the insight that agents optimize for surface plausibility, not semantic correctness. Their data is striking: GitHub Copilot code review has processed over 60 million reviews, more than one in five code reviews on GitHub now involve an agent, and a January 2026 study found agent-generated code introduces more redundancy and quiet debt per change than human-written code. The playbook targets the specific ways agents slip: gaming CI to go green, reimplementing utilities that already exist, hallucinating imports that resolve to the wrong symbol, and writing tests that pass without verifying anything.</p>
+<p>That last one is the most insidious. If the same agent wrote the code and the tests in the same run, the green checkmark is nearly worthless, because a model that made a wrong assumption in the code makes the identical wrong assumption in the test. The strongest heuristic is the same in every checklist: <strong>demand a test that fails on the pre-change behavior.</strong> If the agent can't write a test that would have caught the bug it claims to fix, the fix is incomplete or the understanding is wrong.</p>
+<h2 id="the-cost-of-velocity-without-understanding">The cost of velocity without understanding</h2><p>Why does this bite? Because agents let us ship changes that we'd normally have deliberated over for weeks in a matter of hours, and the mismatch between output speed and comprehension speed is where the debt compounds.</p>
+<p>Mario Zechner, who built the Pi agent framework, put it bluntly in a post <a href="https://simonwillison.net/2026/Mar/25/thoughts-on-slowing-the-fuck-down/">Simon Willison</a> amplified. With an orchestrated army of agents there's no human bottleneck, and the mistakes compound faster than any one person would let them:</p>
+<blockquote><p>These tiny little harmless booboos suddenly compound at a rate that's unsustainable. You have zero fucking idea what's going on because you delegated all your agency to your agents. You let them run free, and they are merchants of complexity.</p>
+</blockquote>
+<p>Willison's own takeaway is that cognitive debt is real, and that we now need a new balance of speed against mental thoroughness, since typing the code is no longer anywhere close to the bottleneck on writing software.</p>
+<p>The cost shows up as burnout too. Steve Yegge describes the "AI vampire" effect: agents automate the easy work and leave you with all the difficult decisions, which is exhausting in a way raw output isn't, and he finds four hours of agent work a day a more realistic pace than eight. <a href="https://hbr.org/2026/02/ai-doesnt-reduce-work-it-intensifies-it">A Berkeley Haas study in HBR</a> found AI intensifies work rather than reducing it, creating continual attention-switching and a sense of always juggling. Velocity without understanding produces brittle code, and it produces tired people.</p>
+<h2 id="understand-to-participate">Understand to participate</h2><p>Litt flips the question here. If agents are getting better at verifying their own work, what's left for the human reviewer?</p>
+<p>The tempting answer is to keep checking the code. But the people I read are converging on a different answer. <strong>We understand to participate.</strong> A project is hundreds of iterative loops with the agent, and the mental model you carry into the next loop is exactly what lets you come up with the next idea. Litt's phrase, which <a href="https://simonwillison.net/2026/Jul/2/understand-to-participate/">Willison picked out</a> as the framing that resonated most, is "understand to participate." Verification is the part agents are eating. Participation is the part that's left to us, and it's the part that matters.</p>
+<p>This reframe has old, deep roots. Litt closes his talk by reaching back to Alan Kay and Douglas Engelbart: the point of computing was always to augment, not just automate. <a href="https://distill.pub/2017/aia/">Shan Carter and Michael Nielsen</a> made the distinction sharp in a 2017 Distill essay: cognitive outsourcing hands a task to an oracle, while cognitive transformation invents new representations that expand the range of human thought. A reviewer who only checks correctness is doing cognitive outsourcing. A reviewer who builds a richer mental model is doing cognitive transformation, and that's the goal.</p>
+<h2 id="techniques-borrowed-from-teaching">Techniques borrowed from teaching</h2><p>If understanding is the bottleneck, how do we cross it faster? Litt's move is to stop trying to review harder and steal instead from a field that's worked on this for centuries: education. His talk lays out three techniques, and the first two are things an agent can produce while it reviews.</p>
+<p><strong>Explanations.</strong> Litt's <a href="https://gist.github.com/geoffreylitt/a29df1b5f9865506e8952488eac3d524"><code>/explain-diff</code></a> skill turns a diff into a structured explainer: background first, then the goal and the intuition behind it, then the code walked through in a sensible order with prose around it. A typical diff hands you forty files in alphabetical order; a literate diff hands you a story you can follow.</p>
+<p>Toggle between the two for the same change:</p>
+<iframe src="literate-diff.html" width="100%" scrolling="no" style="border: 1px solid #ddd; border-radius: 6px;" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><p>This is where reviewing big PRs with agents pays off most, since the bigger the change, the more the raw diff fails and the explainer earns its keep. Nested inside every explainer is a second device Litt borrowed from Andy Matuschak: a five-question quiz you answer before you approve. His rule is one I've adopted wholesale; he won't send code to a teammate until he can pass the quiz, and he does the same when he reviews theirs. The agent loop runs faster than the speed of human understanding, and the quiz is the mechanical brake that asks whether you actually get it. (This post is my own attempt at that brake; the widget at the end is the quiz, built from <a href="https://andymatuschak.org/books/">Matuschak's argument</a> that "books don't work" and the spaced-repetition pattern he and Nielsen embedded in Quantum Country.)</p>
+<p><strong>Micro-worlds.</strong> This one's my favorite. Simon Willison arrived at the same idea independently and calls them <a href="https://simonwillison.net/guides/agentic-engineering-patterns/interactive-explanations/">interactive explanations</a>. Instead of describing what a change does, have the agent build a little environment you can poke. Litt migrated his website between frameworks and couldn't review the agent's script, so he asked the agent to build a command center where he clicked through the migration step by step and watched the two sites side by side. Willison wanted to understand a word-cloud algorithm whose code only told him it used "Archimedean spiral placement," so he had an agent animate the placement, watching each word try a spot, overlap, and spiral outward until the idea clicked.</p>
+<p><strong>Shared spaces.</strong> The first two are solo techniques; the third is about understanding <em>together</em>. Litt's point is that when a team holds the same mental model they can communicate efficiently, jam, and riff, and without those shared structures the creative conversations stall. It loops straight back to Storey and Naur: the theory of the system is distributed across the team, and the review is one of the moments that theory gets rebuilt and shared.</p>
+<p>Here's the thread across all three: <strong>agents can write code that helps you understand other code.</strong> Nathan Baschez adds a trick that works at the planning stage: ask the agent for two versions of every plan, one highly technical and detailed for itself, and one "entertaining essay designed to build my intuition" for you. The second version exists to hand you the mental model.</p>
+<h2 id="huds-over-copilots">HUDs over copilots</h2><p>These techniques imply something about what good AI review tooling should feel like, and <a href="https://geoffreylitt.com/2025/07/27/enough-ai-copilots-we-need-ai-huds">Litt makes the distinction explicit</a> in a separate essay. A tool that returns approve or request changes is a copilot, a virtual assistant you talk to. <strong>A tool that builds a micro-world around the change is a HUD</strong>, a new sense layered into your field of view, like spellcheck's red squiggles. Litt's argument, drawing on Mark Weiser's 1992 rant against the agent metaphor, is that we have enough copilots. We need HUDs!</p>
+<p>Practitioners arrive at the same place: the human role in review is narrowing from correctness verification to context verification, judging whether the agent understood the codebase, the contract, and the intent. Automated review owns the mechanical first pass, and human attention goes to the semantic judgment agents can't self-check. Copilots automate the verdict. HUDs extend your senses so you can make that judgment yourself.</p>
+<h2 id="the-zeitgeist-in-one-map">The zeitgeist in one map</h2><p>Here's the whole conversation compressed. Each one I read contributes a single move to the argument.</p>
+<table>
+<thead><tr>
+<th>Source</th>
+<th>What it contributes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://geoffreylitt.com/2026/07/02/understanding-is-the-new-bottleneck">Geoffrey Litt</a>, "Understanding is the new bottleneck"</td>
+<td>The diagnosis; the understand-to-participate reframe; explanations, micro-worlds, shared spaces</td>
+</tr>
+<tr>
+<td><a href="https://margaretstorey.com/blog/2026/02/09/cognitive-debt/">Margaret Storey</a> / Peter Naur</td>
+<td>Cognitive debt lives in minds; a program is a theory the team holds</td>
+</tr>
+<tr>
+<td><a href="https://simonwillison.net/tags/cognitive-debt/">Simon Willison</a></td>
+<td>"Understand to participate"; interactive explanations as a technique</td>
+</tr>
+<tr>
+<td><a href="https://hojberg.xyz/the-programmer-identity-crisis/">Simon Højberg</a></td>
+<td>The reviewer's lived agony; gloss and the first-layer-of-QC problem</td>
+</tr>
+<tr>
+<td><a href="https://tim-schipper.nl/en/blog/reviewing-ai-generated-pull-requests">Tim Schipper</a></td>
+<td>"An AI PR has no smell"; witnessed, not reviewed</td>
+</tr>
+<tr>
+<td><a href="https://github.blog/ai-and-ml/generative-ai/agent-pull-requests-are-everywhere-heres-how-to-review-them/">GitHub engineering</a>, May 2026</td>
+<td>The agent-PR volume data; the failure-mode playbook and the failing-test heuristic</td>
+</tr>
+<tr>
+<td>Mario Zechner / Steve Yegge / HBR</td>
+<td>The cost: merchants of complexity, burnout, intensified work</td>
+</tr>
+<tr>
+<td><a href="https://distill.pub/2017/aia/">Carter &amp; Nielsen</a>, Distill 2017</td>
+<td>The deep root: augment not automate; cognitive transformation over outsourcing</td>
+</tr>
+<tr>
+<td>Mark Weiser, 1992</td>
+<td>HUDs over copilots</td>
+</tr>
+</tbody>
+</table>
+<p>Read down the table and you can see the conversation's shape: a diagnosis (understanding is the bottleneck), a symptom (reviewers witness instead of review), a cost (debt and burnout), a reframe (understand to participate), a toolkit (explainers, quizzes, micro-worlds), and a design imperative (build HUDs). My take is simple, and it's the through-line of how I work: lead with curiosity, demand artifacts you can poke, and use these techniques to keep understanding alive when the agents are typing fast. I <a href="../../21/curiosity-at-the-wheel/">wrote about the curiosity piece recently</a>, and it's the same instinct here.</p>
+<h2 id="check-your-understanding">Check your understanding</h2><p>Here's the quiz. Five cards, instant feedback, and a live score. This is the speed-regulator technique, turned back on the post itself.</p>
+<iframe src="check-understanding.html" width="100%" scrolling="no" style="border: 1px solid #ddd; border-radius: 6px;" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><p>If you missed any, that's the spot where your mental model and the field's are still diverging, and it's exactly where cognitive debt would quietly accrue. Ask, find the gap, close it, and ask again. That loop is the whole point.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-understanding-zeitgeist-ai-code-review</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{The understanding zeitgeist in AI code review}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{07}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{24}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/7/24/understanding-zeitgeist-ai-code-review}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

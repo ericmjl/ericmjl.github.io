@@ -1,0 +1,606 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.webp">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Going Bayesian automates your manual data analysis">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/going-bayesian-automates-data-analysis' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Going Bayesian automates your manual data analysis - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Going Bayesian automates your manual data analysis</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-07-23</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/bayesian/">
+        bayesian
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/outliers/">
+        outliers
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/automation/">
+        automation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/hierarchy/">
+        hierarchy
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/statistics/">
+        statistics
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/reproducibility/">
+        reproducibility
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/dose response/">
+        dose response
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data analysis/">
+        data analysis
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>Bayesian modeling with heavy-tailed likelihoods and hierarchical structure automates away manual data analysis tasks like hand-flagging outliers. By using Student-t likelihoods and partial pooling, your pipeline handles messy data points and weird curves in a principled, reproducible way. No clicking through software required. What could your team do with all those afternoons back?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>If you've ever spent an afternoon clicking through dose-response curves, flagging outliers by hand, there's a way to make the model do that automatically.</p>
+<p>People usually talk about Bayesian modeling in terms of richer uncertainty estimates, prior knowledge, and posterior distributions. All true, and all worth the switch on their own. But there's a benefit almost nobody talks about. Going Bayesian automates away the manual data analysis you'd otherwise do by hand. And once you experience it, you wonder how you ever worked any other way.</p>
+<p>Let me show you what I mean.</p>
+<h2 id="the-manual-outlier-dance">The manual outlier dance</h2><p>Picture a cell viability assay lab. Each 96-well plate holds five dose-response curves. An eighteen-plate experiment generates ninety curves in a single run, and your group is already eyeing robotics and 384-well formats to multiply throughput further.</p>
+<p>I've seen workflows where a single study generates anywhere from 125 to 375 curves. Each one gets inspected by hand.</p>
+<p>For every curve, there's usually a point or two that looks off. The standard workflow goes like this: copy raw data from the instrument output, paste it into Excel to line up sample names with plate positions, then copy again into GraphPad Prism to plot and fit the curve. Spot a deviating point, hit a shortcut key to mark it as an outlier, exclude it, refit. Then look again. Maybe another point looks suspicious now. Repeat. And pray you didn't misalign a paste somewhere along the way.</p>
+<p>For one curve, it'll be seconds, but multiply this over dozens of plates and you have an unbounded amount of time spent clicking on a UI (if one's lucky) or switching between two applications, Excel and GraphPad Prism (if one is unlucky).</p>
+<iframe src="outlier-dance.html" width="100%" scrolling="no" style="border: 1px solid #ddd; border-radius: 6px;" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><p>Are you really going to hire more research assistants to click through curves? That approach collapses under its own weight.</p>
+<p>Now, a quick but important distinction. There are two completely different reasons to exclude a data point.</p>
+<p>The first is a documented physical cause. You saw a bubble in the well. The pipette tip fell off. The reagent looked cloudy. These are data integrity issues, and you can justify removing them before you look at any numbers; in fact, you <em>should</em> document these in your lab records.</p>
+<p>The second reason is that <strong>a point is statistically inconvenient</strong>. It sits too far from the curve and inflates your error. That second reason is the one I want to talk about, because it's both common and statistically broken.</p>
+<h2 id="two-ways-exclusion-corrupts-your-results">Two ways exclusion corrupts your results</h2><p>Excluding a point because it's statistically inconvenient has two deep problems.</p>
+<p>The first is reproducibility. What's your rule for calling something an outlier? Two standard deviations from the fit? Three? The classic tools, like Grubbs' test or the ROUT method that Prism builds in, hand you a threshold. But where did that threshold come from? It's a cutoff someone picked, not a principle someone derived. Two analysts staring at the same curve flag different points, because the decision rests on an arbitrary line in the sand. You're eyeballing with extra steps.</p>
+<p>Here is curve 11 from the demo above, reviewed by two different analysts. Dilution 4 reads 100%, which looks like it belongs to the upper plateau. But the transition zone expects something closer to 73% at that dilution. Analyst A keeps it; Analyst B removes it. Toggle between them and watch the ID50 shift.</p>
+<iframe src="two-analysts.html" width="100%" scrolling="no" style="border: 1px solid #ddd; border-radius: 6px;" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><p>Same data, same software, different ID50. The point at dilution 4 sits right at the inflection of the curve, so keeping or removing it swings the estimate of where the curve crosses 50%. Which analyst is right? Both think they are, and without a principled criterion, neither can prove the other wrong.</p>
+<p>The second problem is subtler, and it's the one that actually corrupts your results. When you run a test like Grubbs', the test assumes your data come from a clean normal distribution with at most one contaminating point. But dose-response data violate this assumption doubly. The raw points along a dose-response curve don't come from a single normal distribution at all; they follow a sigmoidal shape. You'd have to apply Grubbs' to residuals after fitting, but those residuals are often heteroscedastic (more variance at certain concentrations than others), which breaks the test's assumptions even further. With only five to eight dilutions per curve, the test has almost no power to distinguish a genuine outlier from noise. So you find the outlier, remove it, then refit your curve as if that contamination never existed. Your uncertainty estimates now lie to you. They don't account for the decision you already made. You've baked the removal into your results without propagating the uncertainty that choice introduced.</p>
+<p>This isn't just my opinion. Karch demonstrated in a paper literally titled "Outliers May Not Be Automatically Removed" that automatic removal invalidates confidence intervals and biases your estimates (<a href="https://pubmed.ncbi.nlm.nih.gov/37104797/">Karch, 2023</a>). The APA Publication Manual itself states plainly that omitting troublesome observations to present a more convincing story <strong>is prohibited</strong> (APA, 2020). And the FDA's <a href="https://www.fda.gov/media/70858/download">Bioanalytical Method Validation guidance</a> is even more direct: repeat analysis is acceptable only for <strong>assignable causes</strong> such as equipment failure, sample processing errors, or poor chromatography. "It looked like an outlier" is conspicuously absent from that list.</p>
+<h2 id="down-weight-don-t-delete">Down-weight, don't delete</h2><p>Here's where Bayesian modeling changes the game. Instead of fitting a curve and deciding afterward which points to throw away, <strong>you choose a likelihood</strong> (the part of your model that scores how well the data fits) <strong>that handles outliers from the start</strong>.</p>
+<p>The normal distribution, the bell curve you know, has thin tails. Probability drops off fast as you move away from the center. A single point sitting far from the curve becomes astronomically unlikely under a normal likelihood, and the only way the model can reduce that penalty is to drag the entire fit toward the outlier. One bad point yanks your curve.</p>
+<p>The Student-t distribution fixes this. It looks like a normal bell curve, but with heavier tails. More probability spills into the extremes. So when a point sits way off the curve, the likelihood essentially shrugs and says, "that's rare, but not impossible," and the fit barely moves. The further the point drifts from the trend, the less pull it exerts. Its influence fades gradually rather than being a binary in-or-out decision.</p>
+<p>Here is the elegant part. The Student-t has a parameter called the degrees of freedom (nu) that controls how heavy the tails are. At nu=1, you get the canonical Student-t distribution with the heaviest tails; outliers barely register. As nu increases, the tails thin out, and the distribution converges toward the Normal. At nu=30 or above, they are nearly indistinguishable. You can put a prior (your belief about the parameter before seeing data) on nu and let the data tell you how much outlier tolerance each dataset needs. The model learns its own robustness.</p>
+<p>And critically, the point is never deleted. It still contributes to the fit, just with proportionally less weight. Your data stays intact.</p>
+<p>Enough theory. Let me show you what this actually looks like on a dose-response curve with a real outlier.</p>
+<iframe src="bayesian_curves_demo.html" width="100%" scrolling="no" style="border: 1px solid #ddd; border-radius: 6px;" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><p>The blue curve is the Normal likelihood fit; the orange dashed curve is the Student-t. Dotted vertical lines mark each model's ID50 estimate. Shaded bands are 94% credible intervals from 4,000 posterior draws (PyMC/NUTS, 4 chains). The buttons go from nu=1 (the Student-t at its heaviest-tailed, most forgiving of outliers) to nu=30 (nearly indistinguishable from the Normal, least forgiving).</p>
+<p>Here is what to watch for. At nu=1, the outlier is absorbed by the heavy tails; the orange curve and its ID50 stay put, right where they belong. At nu=30, the orange and blue curves nearly overlap; the distribution has thinned into a Normal, and the outlier drags the ID50 leftward just like the blue curve does. The interesting territory is nu=3 to nu=5, where the model starts caring about the outlier but doesn't let it dominate. That is the sweet spot for most assay data.</p>
+<p>But this demo handles one weird point on one curve. What happens when an entire curve is the outlier?</p>
+<h2 id="hierarchy-handles-the-weird-curves">Hierarchy handles the weird curves</h2><p>Heavy tails solve the point-level problem. But some curves are weird all on their own. Maybe one dose-response curve came out noisy across every well, or the shape is off in a way that suggests a systematic issue for that row.</p>
+<p>This is where hierarchical modeling earns its keep. Instead of fitting each curve in isolation, a hierarchical model fits all of them together. Each curve borrows strength from the others through a shared population distribution. A noisy curve with a couple of strange wells gets gently pulled toward the behavior of its neighbors. Statisticians call this partial pooling.</p>
+<p>The philosophy mirrors the heavy tails, just one level up. Heavy tails down-weight weird points. Hierarchy regularizes weird curves. It's the same idea, merely applied at different scales.</p>
+<iframe src="hierarchy-demo.html" width="100%" scrolling="no" style="border: 1px solid #ddd; border-radius: 6px;" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><p>Six curves from the same experiment. Five came out clean; curve 3 had a bad day with noisy wells. Toggle between independent fits (curve 3 flails) and hierarchical fits (curve 3 borrows strength from the population and snaps into shape). The faint dashed line on curve 3 shows where the population says it should sit.</p>
+<h2 id="this-is-what-automation-looks-like">This is what automation looks like</h2><p>Here's where everything converges. Once you write down your hierarchical model with a heavy-tailed likelihood, you fit it to all eighteen plates at once. The sampler runs. Heavy tails handle the outlier points. Hierarchy handles the outlier curves. The whole thing runs without a single human judgment call.</p>
+<p>I built a prototype of exactly this for a cell viability assay workflow.</p>
+<p>Thirty-six plates. Four minutes. On a laptop.</p>
+<p>How would you feel about that instead of spending your afternoon doing it by hand?</p>
+<p>No shortcut keys. No research assistants clicking through Prism. No two-analysts-flag-different-points problem. The model handles the data analysis decisions you used to make by hand, and it makes them in a principled, reproducible, mathematically grounded way.</p>
+<p>This is the hidden benefit of going Bayesian. People talk about richer uncertainty, prior knowledge, posterior distributions. All genuine advantages. But the automation of manual data analysis is the one that compounds as your experiments scale. Every new plate, every new study, every new operator, the model just handles it. You get your afternoons back, and your results become reproducible by construction.</p>
+<p>If this resonates, find a statistician or data scientist who works with Bayesian tools. Show them your curve-fitting workflow and ask: "Can we use a hierarchical model with a Student-t likelihood for this?" If they know Bayesian modeling, they'll know exactly what you mean.</p>
+<p>Going Bayesian isn't just about better statistics. It's about building a data analysis pipeline that scales without breaking, handles messy data without manual intervention, and gives you answers you can trust as your experiments grow. The math does the work so your team can focus on the science.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-going-bayesian-automates-data-analysis</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Going Bayesian automates your manual data analysis}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{07}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{23}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/7/23/going-bayesian-automates-data-analysis}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>
