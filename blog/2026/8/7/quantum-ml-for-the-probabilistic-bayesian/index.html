@@ -1,0 +1,634 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.webp">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Quantum ML, for the Probabilistic Bayesian">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/quantum-ml-for-the-probabilistic-bayesian' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Quantum ML, for the Probabilistic Bayesian - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Quantum ML, for the Probabilistic Bayesian</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-08-07</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/quantum computing/">
+        quantum computing
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/bayesian/">
+        bayesian
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/probability/">
+        probability
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/qubits/">
+        qubits
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/entanglement/">
+        entanglement
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/interference/">
+        interference
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/superposition/">
+        superposition
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/sampling/">
+        sampling
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/inference/">
+        inference
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/amplitudes/">
+        amplitudes
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this post, I share what I've learned about quantum computing from the perspective of a probabilistic Bayesian. I strip away the physics to reveal a familiar picture: qubits as amplitude vectors whose squares are probabilities, gates that shape distributions through interference, and measurement as sampling. The parallel to Bayesian inference is striking. Our priors and likelihoods shape posteriors; quantum gates shape amplitudes. What if the quantum computer isn't a magic box, but a sampler purpose-built for the combinatorial spaces we already struggle to navigate classically?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>This is a post I have been wanting to write for a while. As of 2026, I have been working much more closely with my teammate Alexey Galda, and part of that has been one-on-one tutoring on the foundations of quantum computing. (To be able to learn from someone well-trained, in a one-on-one setting, is a real privilege!)</p>
+<p>Because I learn best by teaching, and because retrieval practice is the best way to make knowledge stick, I decided to write up what I have absorbed so far. I will readily admit that plenty of details are still beyond my grasp. Even so, I want to leave you with enough of a "<a href="https://basecamp.com/shapeup/1.3-chapter-04#fat-marker-sketches">fat marker sketch</a>" of the ideas to reason about where quantum computing might genuinely help.</p>
+<p>Here is the angle I am going to take. I have been doing Bayesian modeling for years, which means I have spent a lot of time thinking about probability distributions, sampling, and inference over spaces too big to enumerate. That turns out to be a surprisingly good lens for quantum computing. So that is how I am going to explain it: quantum mechanics as seen by a probabilistic Bayesian.</p>
+<p>If you're ready for the ride, here we go!</p>
+<iframe src="before-you-read.html" width="100%" scrolling="no" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><h2 id="the-fundamentals">The fundamentals</h2><p>Start with the most fundamental object in quantum computing: the state of a single qubit. A one-qubit state is an arrow of length 1 in a two-dimensional space whose axes are the two basic states |0&gt; and |1&gt;. The arrow's coordinates along those axes are its amplitudes. Because the arrow has length 1, its tip sits on a unit circle, a slice of the Bloch sphere (the standard name for the full qubit state space).</p>
+<iframe src="bloch-circle.html" width="100%" scrolling="no" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><p>Drag the arrow above. Its projections onto the |0&gt; and |1&gt; axes are the amplitudes, and the squares of those projections are the probabilities of measuring |0&gt; or |1&gt;. That squaring is the bridge into your world as a probabilistic Bayesian, and it is the lens we will use for the rest of the post. The new ingredient, with no analogue in classical probability, is that amplitudes carry a sign: the arrow can point anywhere on the circle, including where a coordinate is negative. That signedness stays quiet for a single measurement, but it is the seed of everything quantum that follows.</p>
+<h3 id="many-qubits-exponentially-many-amplitudes">Many qubits, exponentially many amplitudes</h3><p>That picture was for one qubit, which lives in two dimensions. Add a second qubit and the state now has four basis states (|00&gt;, |01&gt;, |10&gt;, |11&gt;), so the arrow lives in four dimensions, with one amplitude per basis state. Add a third and you get eight. The number of amplitudes doubles with every qubit:</p>
+<table>
+<thead><tr>
+<th>Number of qubits</th>
+<th>Basis states (= amplitudes)</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>2</td>
+<td>0, 1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>4</td>
+<td>00, 01, 10, 11</td>
+</tr>
+<tr>
+<td>3</td>
+<td>8</td>
+<td>000, 001, 010, 011, 100, 101, 110, 111</td>
+</tr>
+<tr>
+<td>n</td>
+<td>2^n</td>
+<td>All binary strings of length n</td>
+</tr>
+</tbody>
+</table>
+<p>Play with the doubling below: one qubit gives two amplitudes, two qubits give four, three give eight.</p>
+<iframe src="many-qubits.html" width="100%" scrolling="no" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><p>This is the first place quantum computing leaves classical intuition behind, and it leaves fast. A 50-qubit register has 2^50 amplitudes, more than a quadrillion; you cannot write them all down, let alone store the state on a classical machine. Measuring collapses that whole arrow to a single bitstring, drawn with probability equal to its amplitude squared, the many-qubit version of what the Bloch circle showed.</p>
+<p>We should clarify one assumption: in the interactive diagrams above, we treated the qubits as independent. The general n-qubit state is a single arrow in 2^n dimensions, and most such arrows cannot be split into one circle per qubit. That non-splitting is entanglement, which has its own section below.</p>
+<p>Before we move on, we should make this picture second nature. Drag the circles until it is obvious how each independent qubit maps to one circle, how the joint amplitudes are the products of their coordinates, and how the probabilities factor. That clean correspondence is the foothold we will want when entanglement arrives and the one-circle-per-qubit picture stops working.</p>
+<h3 id="the-probability-view-coins">The probability view (coins)</h3><p>Step back from amplitudes for a moment. If you only care about what a measurement will tell you, a qubit behaves like a biased coin, and a register of qubits like a pile of coins. That is the probabilistic-Bayesian lens I promised in the intro, and I will lean on it for the rest of the post; the widget below lets you flip 1, 2, or 3 and watch the outcomes follow the distribution. Just remember the coin view is a simplification, the shadow the amplitudes cast on a measurement, and it hides the signs that the interference section later puts to work.</p>
+<iframe src="qubit-measurement.html" width="100%" scrolling="no" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><h3 id="entanglement">Entanglement</h3><p>Entanglement, in this framing, is when the state of one qubit cannot be described independently of another. When two qubits are entangled, measuring one instantly tells you something about the other, no matter how far apart they are. This non-local correlation is a key resource in quantum computing, and it has no clean classical analogue. For a probabilistic Bayesian, think of it as two coins where reading one immediately tells you what the other shows.</p>
+<p>Here is that idea made geometric. Two dials below set the qubits as if they were independent; the entanglement dial mixes in correlation. Watch the joint amplitudes stop factorizing, and the concurrence climb from 0 (independent) toward 1 (maximally entangled).</p>
+<iframe src="two-qubit-entanglement.html" width="100%" scrolling="no" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><h3 id="interference">Interference</h3><p>An amplitude's sign is easy to ignore, because a single measurement only sees the squared size, which is just a probability. The sign only matters when amplitudes combine: two amplitudes of the same sign reinforce, and two of opposite sign can subtract all the way to zero. That cancellation is <em>interference</em>, and it has no classical analogue. Classical probability distributions are built from non-negative numbers that pile up; quantum states are built from signed amplitudes that can interfere.</p>
+<p>One tool that does the mixing is the Hadamard gate. It takes any input state and produces a specific output by blending the two input amplitudes together, with a minus sign baked into one of the blends. The widget below lets you drag the input arrow and watch the output respond. The butterfly diagram in the middle traces each input amplitude as it splits into contributions at each output, so you can see exactly where reinforcement and cancellation happen.</p>
+<iframe src="hadamard-gate.html" width="100%" scrolling="no" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><p>Drag the input to the diagonal (45 degrees, the |+&gt; state) and look at the butterfly. Two contributions arrive at each output. At output |0&gt;, both are positive, so they reinforce, and the output arrow swings hard toward |0&gt;. At output |1&gt;, one is positive and one is negative, so they cancel, and |1&gt; vanishes. That is interference made visible: the minus sign killed one output while boosting the other. Now drag to other angles and watch how the balance between reinforcement and cancellation shifts. When only one input amplitude is nonzero (try |0&gt; or |1&gt;), there is only one path through the gate, so nothing cancels.</p>
+<p>Two Hadamards in a row undo each other precisely because the minus signs cancel on the way back. On <em>n</em> qubits you apply a Hadamard to each wire; that is how a uniform superposition gets built in the first place, and how it gets recombined later so the signs can interfere.</p>
+<h3 id="from-interference-to-answers">From interference to answers</h3><p>A quantum program is an arrangement of gates that concentrates amplitude on the qubit configurations representing the solution to a problem, and cancels the rest. The gates do not need to know the answer ahead of time; they encode a way to score candidates, and interference amplifies whatever scores well. The result is a probability distribution deliberately shaped so that the solution is likely and the noise has vanished.</p>
+<p>If you are a Bayesian, this should sound familiar. Your prior and likelihood shape a posterior; a quantum circuit's gates shape amplitudes. Then, to read the answer out, you measure, and measurement is just drawing a sample from that shaped distribution.</p>
+<p>And here is where it finally clicks for me, because in my own work building Bayesian models, sampling is the bottleneck. The core problem in Bayesian inference never changes: your posterior may be intractable, so you sample. But sampling is hard! Your chains may not mix, or there may be divergences, and if part of your problem lives in a combinatorial space, good luck with the approximations.</p>
+<p>What if you didn't have to enumerate a combinatorial space at all, but instead let your sampler live in superposition over the whole of it?</p>
+<p>That's the quantum computer's party trick. It isn't a magical exponential speedup for everything. But it can be viewed as an MCMC sampler, purpose-built for exactly the kind of problem we already wrestle with: inference over spaces too big to enumerate classically.</p>
+<iframe src="check-understanding.html" width="100%" scrolling="no" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><h2 id="the-takeaway">The takeaway</h2><p>In this blog post, we stripped away much of the physics of quantum computing to give you the following picture to walk away with. A qubit is an arrow on a unit circle; its coordinates are amplitudes, and their squares are probabilities. A register of <em>n</em> qubits is a single arrow in 2^n dimensions, one amplitude per possible bitstring. Entanglement is when that arrow cannot be split into one circle per qubit. Interference is what happens when signed amplitudes combine through gates: same signs reinforce, opposite signs cancel, and the quantum program uses this to concentrate amplitude on the configurations that represent solutions. Measurement is drawing a sample from the resulting distribution.</p>
+<p>If you are a probabilistic Bayesian, the parallel is exact. Your prior and likelihood shape a posterior; a quantum circuit's gates shape amplitudes. You sample from your posterior; you measure from the quantum state. The quantum computer is not a faster laptop or a magic box. It is a device that is very good at exactly the thing we already struggle with classically: representing and sampling from distributions over spaces too big to enumerate.</p>
+<p>Many details here are still beyond my grasp. But holding this mental model has already changed how I read about quantum computing. Where I used to see mysterious physics, I now see amplitude vectors, clever encodings, and interference doing the heavy lifting, all on hardware built for exactly that. I hope it does the same for you.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-quantum-ml-for-the-probabilistic-bayesian</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Quantum ML, for the Probabilistic Bayesian}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{08}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{07}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/8/7/quantum-ml-for-the-probabilistic-bayesian}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

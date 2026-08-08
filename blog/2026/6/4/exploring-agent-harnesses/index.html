@@ -1,0 +1,658 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.webp">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Exploring Agent Harnesses - A Comparative Analysis of Codex, CMux, and Cursor">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/exploring-agent-harnesses' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Exploring Agent Harnesses - A Comparative Analysis of Codex, CMux, and Cursor - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Exploring Agent Harnesses - A Comparative Analysis of Codex, CMux, and Cursor</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-06-04</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/automation/">
+        automation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workspace/">
+        workspace
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/notifications/">
+        notifications
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/browser/">
+        browser
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/comparison/">
+        comparison
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/productivity/">
+        productivity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/review/">
+        review
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/open source/">
+        open source
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/coding/">
+        coding
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/agents/">
+        agents
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this blog post, I share my hands-on experience comparing three coding agent harnesses: Codex, cmux + OpenCode, and Cursor. I break down their features, workspace management, notification systems, automation capabilities, and open source status, highlighting what sets each apart. Curious which harness might boost your productivity or fit your workflow best? Read on to find out!</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I have used three coding agent harnesses extensively over the past few months: the <a href="https://openai.com/codex/">Codex</a> app, <a href="https://github.com/manaflow-ai/cmux"><code>cmux</code></a>, and <a href="https://www.cursor.com">Cursor</a>. All three have been immense in amplifying my productivity. All three share a similar layout: workspaces on the left, a coding agent in the middle, and a terminal on the right. A terminal and a browser are really all you need. I decided to write up how they compare.</p>
+<h2 id="the-comparison-matrix">The comparison matrix</h2><p>I decided to compare them against the following axes:</p>
+<table>
+<thead><tr>
+<th>Feature</th>
+<th>Codex</th>
+<th><code>cmux</code> + OpenCode</th>
+<th>Cursor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Workspace view</td>
+<td>Yes</td>
+<td>Partial</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Notification system</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Natural-language automations</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Open source</td>
+<td>Yes (Apache-2.0 CLI)</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Built-in browser</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes (element selection)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Workspace view refers to whether the harness provides a visual workspace abstraction where one workspace corresponds to one project, and each workspace contains multiple chat threads.</li>
+<li>Notification system is whether the harness provides visual indicators (dots, badges, rings) that show which threads or workspaces need your attention.</li>
+<li>Natural-language automations is whether you can set up recurring or ephemeral tasks by describing them in plain language rather than editing <code>cron</code> or writing scripts by hand.</li>
+<li>Open source is obvious: whether it's open source or not.</li>
+<li>Built-in browser is whether the harness ships with a browser pane so you can preview web apps without leaving the tool.</li>
+</ul>
+<p>With those defined, let's dive in.</p>
+<h2 id="workspace-management">Workspace management</h2><p>Before we go on, I think it'll be helpful to disambiguate some terms. In the following paragraphs, when we talk about a workspace, it really refers to one project, or one folder, or one git repo. (Incidentally, this is in line with the <a href="https://ericmjl.github.io/data-science-bootstrap-notes/project/">1:1:1:1... rule</a> that I advocate for in the Data Science Bootstrap Notes.) Each workspace contains multiple chat threads, one per task or conversation with the agent. You might have one workspace for your web app, another for a data pipeline, a third for a side project. Within each workspace, you spin up threads as needed: one to debug a failing test, another to add a feature, another to review a pull request.</p>
+<p>Effectively, workspaces group related work, while threads keep individual tasks isolated. As a coder, you will want to see all of this at a glance, switch between threads, and know which ones are active. Without workspaces, you are stuck juggling unrelated conversations in a flat list, constantly losing context when you switch tasks.</p>
+<p>Codex and Cursor both handle this well. You can see a list of workspaces on the left sidebar, expand into threads within each one, and pick up where you left off. Workspaces group your projects, threads track your conversations. This two-level model, workspaces plus threads, is the right visual abstraction for agent harnesses. Cursor's UI looks like the following:</p>
+<p><img src="cursor-workspaces.webp" alt="Cursor workspace UI showing multiple workspaces on the left sidebar"></p>
+<p>On the other hand Codex's UI looks like the following:</p>
+<p><img src="codex-workspaces.webp" alt="Codex workspace UI showing workspaces on the left sidebar"></p>
+<p>The commonality is that workspaces (i.e. projects) are on the left, and I can quickly switch between them.</p>
+<p><code>cmux</code> provides workspace-level tabs. When paired with OpenCode, threads live either as individual tabs within a <code>cmux</code> workspace (more visually obvious) or as sessions within OpenCode itself (less visually obvious, since they are not visually separated). Visually, it looks like this:</p>
+<p><img src="cmux-workspaces.webp" alt="cmux workspace UI showing vertical tabs"></p>
+<h2 id="notification-systems">Notification systems</h2><p>Workspaces tell you what is running. Notifications tell you when something finishes or needs attention.</p>
+<p>Codex and Cursor both show clear indicators: a dot, a badge, or a color change on the workspace tab when an agent completes a task. You can glance at the sidebar and know what is done without scrolling through tabs.</p>
+<p><code>cmux</code> has notification features: blue rings on tabs and a sidebar notification panel. When I first started using it, notifications were not yet exposed. I submitted a pull request to a fork that was working on them, and the feature has since shipped in <code>cmux</code>. You can see at a glance which tasks have finished.</p>
+<p><code>cmux</code> supports multiple agents including OpenCode, with hooks for session restore and notification wiring. Without notifications, you have to manually scroll through tabs and windows to check on background tasks, which defeats the purpose of multitasking. Notifications are only the second layer. The third piece is automation.</p>
+<h2 id="automations">Automations</h2><p>Automations are where things get exciting. All three harnesses let you set up recurring tasks, but they differ in how you create them and how you manage them.</p>
+<p>Codex allows you to create automations using natural language from within a workspace. You can tell it: "Set up an automation that checks GitHub every five minutes for a deployment to finish, and then delete the automation when it is done." These ephemeral automations are self-cleaning. You describe the task, tell it to shut itself down when complete, and Codex handles the rest.</p>
+<p>Cursor supports similar automation workflows. You can configure recurring tasks and let them run in the background.</p>
+<p>The OpenCode ecosystem has scheduling capabilities through plugins and community tools. You configure automations using natural language, and the plugin translates that into a scheduled task. The downside is that there is no unified user interface for viewing or managing these automations yet. You can set them up, but you cannot easily see what is running (yet). That is another gap worth noting, but knowing the open source world, it'll get better!</p>
+<h2 id="built-in-browser">Built-in browser</h2><p>All three come with a built-in browser, which is a big deal if you are building web apps. You can see your app running alongside the agent, iterate on changes, and verify results without leaving the harness.</p>
+<p><img src="cursor-browser.webp" alt="Cursor&#39;s built-in browser showing a web app alongside the coding agent"></p>
+<p>Cursor is the standout here. It lets you select individual DOM elements and add them directly into the context window. When you are building a web app and want the agent to focus on a specific component, you can point at it and say "fix this" without having to describe where it is. That kind of selective context control makes a real difference for front-end work.</p>
+<p><img src="cursor-element-selection.webp" alt="Cursor element selection feature highlighting a DOM element"></p>
+<h2 id="open-source-status">Open source status</h2><p>OpenCode, <code>cmux</code>, and the <a href="https://github.com/openai/codex">Codex CLI</a> (Apache-2.0) are open source. Cursor is proprietary. The Codex desktop app builds on the open-source CLI but is itself a closed product.</p>
+<p>This matters more to some people than others. I grew up in the open-source world during grad school, and I gravitate toward open tools. With open-source tools, if something annoys you, you can fix it yourself. In the age of agents, fixing tool limitations is more a matter of imagination than skill.</p>
+<p>That said, I am not going to be pushy about open source here. It is a personal preference; use what works for you.</p>
+<h2 id="choosing-a-harness">Choosing a harness</h2><p>All three harnesses I've gone through here are pretty capable. I obviously did not cover Claude Code, it's well-known by now; these are just the three that I've used. They're all pretty capable; once set up properly, they handle roughly the same range of tasks.</p>
+<p>For me, the deciding factors are practical. If your company mandates a specific tool, use that at work. <strong>Then pick a different one for home.</strong> Visual separation between work and home environments matters more than you might think. I <a href="https://ericmjl.github.io/blog/2026/4/28/how-i-recognized-and-handled-ai-burnout/">burned out in April</a> partly because I was using <code>cmux</code> with OpenCode at both work and home -- the same interface, even on different laptops, with no visual disconnect. Effectively, my brain never left the office.</p>
+<p>Using different tools at work and at home has a bonus side effect: you avoid muscle-memory lock-in to a single vendor. You stay flexible.</p>
+<p>Cost is another factor worth considering. If cost is a factor, OpenCode plus <code>cmux</code> with open-weight models through providers like <a href="https://openrouter.ai">OpenRouter</a> can be significantly cheaper than subscription-based options. The free tier on some model providers goes a long way.</p>
+<h2 id="try-them-for-yourself">Try them for yourself</h2><p>If you're looking for counsel on what to pick, this is what I would say: pick one, use it for a few weeks to build real familiarity, then try another. Give yourself enough time with each one to form an honest opinion. These tools are evolving fast, and the landscape will look different six months from now! Only by trying things out can you know what suits you best.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-exploring-agent-harnesses</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Exploring Agent Harnesses - A Comparative Analysis of Codex, CMux, and Cursor}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{06}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{04}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/6/4/exploring-agent-harnesses}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>
