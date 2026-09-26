@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interference: phases + recombination</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: monospace; font-size: 13px; line-height: 1.5;
+    color: #222; background: transparent;
+  }
+  .card {
+    background: #fafafa; border: 1px solid #ddd; border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    max-width: 640px; margin: 0 auto; padding: 16px;
+  }
+  .card h1 { font-size: 15px; margin: 0 0 4px; color: #0066cc; }
+  .sub { font-size: 11.5px; color: #999; margin: 0 0 10px; }
+  .legend { font-size: 11px; color: #666; margin: 0 0 10px; }
+  .legend .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: middle; margin: 0 3px 0 10px; }
+  .sw.b { background: #0066cc; } .sw.r { background: #e85d3a; } .sw.g { background: #ccc; }
+  .rowtitle { font-size: 11.5px; color: #555; margin: 8px 0 4px; }
+  .rowtitle .hint { color: #999; font-weight: normal; }
+  .strip { display: flex; align-items: stretch; justify-content: center; gap: 6px; }
+  .col { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; min-width: 0; }
+  .lab { margin-top: 4px; font-weight: bold; font-size: 11px; color: #222; }
+  /* Row A: phase cells (clickable) */
+  .cells { height: 64px; }
+  .cell {
+    width: 82%; height: 44px; border-radius: 5px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: bold; font-size: 16px; transition: background 0.12s;
+  }
+  .cell.pos { background: #0066cc; }
+  .cell.neg { background: #e85d3a; }
+  /* Probability plots: absolute 0-100% axis */
+  .plot {
+    position: relative; height: 104px; background: #fff; border: 1px solid #eee; border-radius: 6px;
+    display: flex; align-items: flex-end; justify-content: center; gap: 6px; padding: 4px 4px 0;
+  }
+  .gline { position: absolute; left: 0; right: 0; border-top: 1px dashed #e2e2e2; pointer-events: none; }
+  .gline span { position: absolute; right: 4px; font-size: 11px; color: #aaa; background: #fff; padding: 0 2px; }
+  .g100 { top: 4px; }       /* aligns with the top of a 100% bar */
+  .g100 span { top: 2px; }
+  .g50 { top: 54px; }       /* 4px inset + 50px = 50% of the 100px bar region */
+  .g50 span { top: -10px; }
+  .pcol { flex: 1 1 0; display: flex; align-items: flex-end; justify-content: center; min-width: 0; height: 100%; }
+  .pcol.sel { outline: 2px solid #0066cc; outline-offset: 2px; border-radius: 4px; }
+  .pcol.ccol { cursor: pointer; }
+  .bar { width: 64%; max-width: 24px; border-radius: 4px 4px 0 0; transition: height 0.2s ease; }
+  .bar.b { background: #0066cc; } .bar.g { background: #d9d9d9; }
+  .plotlabs { display: flex; justify-content: center; gap: 6px; padding: 0 4px; margin-top: 2px; }
+  .plotlabs .labcol { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; min-width: 0; }
+  .plotlabs .lab { font-weight: bold; font-size: 11px; color: #222; }
+  .plotlabs .num { font-size: 11px; color: #777; }
+  .note { font-size: 11px; color: #888; margin: 4px 0 6px; }
+  .ctrl { margin-top: 8px; }
+  .btn {
+    font-family: monospace; font-size: 12px; padding: 6px 14px;
+    border: 1px solid #0066cc; border-radius: 5px; background: #fff; color: #0066cc; cursor: pointer;
+  }
+  .btn:hover { background: #0066cc; color: #fff; }
+  /* Breakdown panel */
+  .bd { margin-top: 12px; padding: 12px; background: #fff; border: 1px solid #e3eafa; border-radius: 6px; }
+  .bd h3 { margin: 0 0 2px; font-size: 12.5px; color: #0066cc; }
+  .bd .h3sub { font-size: 11px; color: #888; margin: 0 0 8px; }
+  .bd-row { display: flex; justify-content: center; gap: 6px; }
+  .bd-col { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
+  .bd-k { font-size: 11px; color: #999; }
+  .bd-p { font-size: 11px; font-weight: bold; }
+  .bd-v { width: 78%; height: 18px; border-radius: 3px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 11px; }
+  .bd-v.pos { background: #0066cc; } .bd-v.neg { background: #e85d3a; }
+  .bd-lab { font-size: 11px; color: #555; margin-top: 1px; }
+  .bd-net { margin-top: 10px; padding: 8px 10px; background: #eef4ff; border: 1px solid #cfe0ff; border-radius: 6px; color: #0066cc; font-size: 12px; line-height: 1.5; }
+  .caption { font-size: 11.5px; color: #555; margin: 10px 0 0; padding-top: 10px; border-top: 1px dashed #ddd; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Interference: phases + recombination</h1>
+  <p class="sub">Start from a uniform superposition. Flip phases by clicking. The Hadamard gate then sums the signed amplitudes, click an output to see how.</p>
+
+  <div class="legend"><span class="sw b"></span>adds (phase +, or vote +)<span class="sw r"></span>subtracts (phase &minus;, or vote &minus;)<span class="sw g"></span>canceled (0%)</div>
+
+  <div class="rowtitle">Phase pattern <span class="hint">— your signs on the uniform state. Click a cell to flip.</span></div>
+  <div class="strip cells" id="histA"></div>
+
+  <div class="rowtitle">Measure now &rarr; probability = |amplitude|&sup2; <span class="hint">(absolute 0&ndash;100% scale)</span></div>
+  <div class="plot" id="histBPlot"></div>
+  <div class="plotlabs" id="histBLabs"></div>
+  <div class="note">Every outcome sits at 12.5%, no matter the phases. A sign vanishes when squared, so phases are invisible here.</div>
+
+  <div class="rowtitle">After the Hadamard gate &rarr; probability <span class="hint">(absolute 0&ndash;100% scale; click a bar to inspect how it is built)</span></div>
+  <div class="plot" id="histCPlot"></div>
+  <div class="plotlabs" id="histCLabs"></div>
+
+  <div class="bd" id="breakdown"></div>
+
+  <div class="ctrl">
+    <button type="button" class="btn" id="resetBtn">Reset phases (all +)</button>
+  </div>
+
+  <p class="caption">The Hadamard gate builds each output by adding up all 8 inputs with signs, its kernel gives each input a + or &minus; (gray), that combines with your phase into a vote (blue + / red &minus;), and the votes sum to the output's amplitude. Click a 0% output and you will see the votes balanced, half + and half &minus;, canceling to zero. That visible cancellation is interference.</p>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  function fit() {
+    var f = window.frameElement;
+    if (!f) return;
+    f.style.height = '0px';
+    f.style.height = document.body.scrollHeight + 'px';
+  }
+
+  var PLOT_H = 100; // bar region height in px; a 100% bar fills it exactly
+  function popcount(x) { var c = 0; while (x) { c += x & 1; x >>= 1; } return c; }
+  function labels() { var a = []; for (var i = 0; i < 8; i++) a.push(i.toString(2).padStart(3, '0')); return a; }
+
+  // kernel sign the gate assigns to input j when building output k: (-1)^popcount(j & k)
+  function kernel(j, k) { return (popcount(j & k) % 2 === 0) ? 1 : -1; }
+
+  function recombine(phases) {
+    var out = [];
+    for (var k = 0; k < 8; k++) {
+      var s = 0;
+      for (var j = 0; j < 8; j++) s += kernel(j, k) * phases[j];
+      out.push(s / 8);
+    }
+    return out;
+  }
+
+  var phases = [1, 1, 1, 1, 1, 1, 1, 1];
+  var selected = 0;
+
+  // Render a probability plot on a fixed 0-100% axis (100% fills PLOT_H).
+  function renderPlot(plotEl, labsEl, probs, clickable) {
+    plotEl.innerHTML = '';
+    labsEl.innerHTML = '';
+    var labs = labels();
+    probs.forEach(function (pc, i) {
+      var pcol = document.createElement('div');
+      pcol.className = 'pcol' + (clickable ? ' ccol' : '') + (clickable && i === selected ? ' sel' : '');
+      var h = (pc < 1e-9) ? 2 : Math.round(pc * PLOT_H);
+      var bar = document.createElement('div');
+      bar.className = 'bar ' + (pc < 1e-9 ? 'g' : 'b');
+      bar.style.height = h + 'px';
+      pcol.appendChild(bar);
+      if (clickable) {
+        (function (ii) { pcol.addEventListener('click', function () { selected = ii; render(); }); })(i);
+      }
+      plotEl.appendChild(pcol);
+
+      var lc = document.createElement('div'); lc.className = 'labcol';
+      var lb = document.createElement('div'); lb.className = 'lab'; lb.textContent = labs[i]; lc.appendChild(lb);
+      var nm = document.createElement('div'); nm.className = 'num'; nm.textContent = (pc * 100).toFixed(1) + '%'; lc.appendChild(nm);
+      labsEl.appendChild(lc);
+    });
+    // grid lines last so they overlay the bars (pointer-events: none lets clicks through)
+    var g100 = document.createElement('div'); g100.className = 'gline g100'; g100.innerHTML = '<span>100%</span>'; plotEl.appendChild(g100);
+    var g50 = document.createElement('div'); g50.className = 'gline g50'; g50.innerHTML = '<span>50%</span>'; plotEl.appendChild(g50);
+  }
+
+  function render() {
+    var labs = labels();
+    var histA = document.getElementById('histA');
+    histA.innerHTML = '';
+
+    // Row A: phase cells (click to flip)
+    for (var i = 0; i < 8; i++) {
+      (function (ii) {
+        var col = document.createElement('div'); col.className = 'col';
+        var cell = document.createElement('div');
+        cell.className = 'cell ' + (phases[ii] === 1 ? 'pos' : 'neg');
+        cell.textContent = phases[ii] === 1 ? '\u2191' : '\u2193';
+        cell.title = 'flip phase of ' + labs[ii];
+        cell.addEventListener('click', function () { phases[ii] *= -1; render(); });
+        col.appendChild(cell);
+        var lb = document.createElement('div'); lb.className = 'lab'; lb.textContent = labs[ii]; col.appendChild(lb);
+        histA.appendChild(col);
+      })(i);
+    }
+
+    // Row B: measure-now = 1/8 each, always (absolute scale)
+    var uniform = [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125];
+    renderPlot(document.getElementById('histBPlot'), document.getElementById('histBLabs'), uniform, false);
+
+    // Row C: after Hadamard, clickable to select (absolute scale)
+    var amps = recombine(phases);
+    var probs = amps.map(function (a) { return a * a; });
+    renderPlot(document.getElementById('histCPlot'), document.getElementById('histCLabs'), probs, true);
+
+    renderBreakdown();
+    fit();
+  }
+
+  function renderBreakdown() {
+    var k = selected;
+    var labs = labels();
+    var bd = document.getElementById('breakdown');
+    bd.innerHTML = '';
+
+    var h3 = document.createElement('h3');
+    h3.textContent = 'Inside the Hadamard: how output ' + labs[k] + ' is built';
+    bd.appendChild(h3);
+    var sub = document.createElement('div'); sub.className = 'h3sub';
+    sub.textContent = 'the gate signs each input (gray \u00d7+/\u00d7\u2212), combines with your phase into a vote, then sums all 8 votes into the amplitude.';
+    bd.appendChild(sub);
+
+    var row = document.createElement('div'); row.className = 'bd-row';
+    var nplus = 0;
+    for (var j = 0; j < 8; j++) {
+      var ks = kernel(j, k);
+      var ph = phases[j];
+      var vote = ks * ph;
+      if (vote === 1) nplus += 1;
+      var col = document.createElement('div'); col.className = 'bd-col';
+      var kEl = document.createElement('div'); kEl.className = 'bd-k'; kEl.textContent = '\u00d7' + (ks === 1 ? '+' : '\u2212'); col.appendChild(kEl);
+      var pEl = document.createElement('div'); pEl.className = 'bd-p'; pEl.style.color = (ph === 1 ? '#0066cc' : '#e85d3a'); pEl.textContent = (ph === 1 ? '\u2191' : '\u2193'); col.appendChild(pEl);
+      var vEl = document.createElement('div'); vEl.className = 'bd-v ' + (vote === 1 ? 'pos' : 'neg'); vEl.textContent = (vote === 1 ? '+' : '\u2212'); col.appendChild(vEl);
+      var lEl = document.createElement('div'); lEl.className = 'bd-lab'; lEl.textContent = labs[j]; col.appendChild(lEl);
+      row.appendChild(col);
+    }
+    bd.appendChild(row);
+
+    var nminus = 8 - nplus;
+    var net = nplus - nminus;
+    var amp = net / 8;
+    var prob = amp * amp;
+    var netEl = document.createElement('div'); netEl.className = 'bd-net';
+    netEl.innerHTML = labs[k] + ': <b>' + nplus + '</b> add &minus; <b>' + nminus + '</b> subtract ' +
+      ' = net <b>' + (net >= 0 ? '+' : '') + net + '</b>/8 = amplitude <b>' + (amp >= 0 ? '+' : '') + amp.toFixed(3) + '</b>' +
+      ' &rarr; probability = (' + amp.toFixed(3) + ')\u00b2 = <b>' + (prob * 100).toFixed(1) + '%</b>' +
+      (nplus === nminus ? '  (balanced votes cancel to zero)' : '');
+    bd.appendChild(netEl);
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', function () {
+    phases = [1, 1, 1, 1, 1, 1, 1, 1]; render();
+  });
+
+  render();
+  fit();
+  window.addEventListener('load', fit);
+})();
+</script>
+</body>
+</html>

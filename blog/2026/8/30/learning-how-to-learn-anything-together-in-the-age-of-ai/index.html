@@ -1,0 +1,604 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.webp">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Learning how to learn anything, together, in the age of AI">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/learning-how-to-learn-anything-together-in-the-age-of-ai' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Learning how to learn anything, together, in the age of AI - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Learning how to learn anything, together, in the age of AI</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-08-30</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai learning/">
+        ai learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/learning/">
+        learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/teaching/">
+        teaching
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/retreat/">
+        retreat
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/education/">
+        education
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/community/">
+        community
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/growth/">
+        growth
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/practice/">
+        practice
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/compounding/">
+        compounding
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this post, I share why Dan Chen and I are running the Learn Anything with AI retreat: a five-day, in-person gathering built on the idea that AI can either hand you answers you'll forget or accelerate genuine understanding. Drawing on my own journey from lab science to computing, I explore learning science, the cognitive debt of skipping deliberate practice, and why teaching what you learn makes it stick. The retreat week is for acquiring the skills of using AI to learn anything; mastering new fields is what those skills then deliver. What could a year of practicing those skills do?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>Dan Chen and I have a tradition: every year at <a href="https://conference.scipy.org">SciPy</a>, we find a corner of the venue, grab coffee, and nerd out about teaching, talking through how people learn, how to teach better, and what actually sticks. The past two years, the conversation has actually taken a pretty sharp turn. Students can now get every answer from AI the moment they sit down with an AI tool, so what is a teacher even for? After sitting with that question for a while, we soon realized the flip side was equally interesting: if someone is genuinely motivated to learn something new, how do they point AI at that goal for maximum leverage?</p>
+<p>That flip is why Dan and I are running <a href="https://learn-anything.nonlinearlabs.ai/">the Learn Anything with AI retreat</a>: a five day, in person retreat from the 14th to the 20th of February 2027, with a small, handpicked cohort of people, in the United States. If you click on the link, you'll see the logistics and the details. I want to use this blog post to explain why I want to do this retreat. Here goes.</p>
+<h2 id="we-opened-pandora-s-box">We opened Pandora's box</h2><p>Here's the assumption we're working from: everything related to the boom in AI that we've seen over the past two, three years, they're here to stay. Pandora's box is open. I actually don't see a realistic path back to a world without AI, short of some catastrophe happening. So what's interesting for us as individuals is, what do we do with it? And given that AI is here for good, how do we thrive with it?</p>
+<p>My answer, and Dan's answer as well, is the entire premise of this retreat: to get really good at learning how to learn anything, and how to use AI as the accelerator in that process. If used wrongly, AI will hand you answers without you learning anything. If used correctly, AI can help you build understanding. Because understanding still needs to be built in your head, and that part is the part that people are quietly skipping when they just ask AI for answers. So the people who learn how to learn, with AI's leverage, are going to compound what they know how to do over an entire decade and more. And the people who just collect answers are going to wonder why nothing's stuck. I want to spend five days with a small group of people to explore how we can use AI for the betterment of ourselves.</p>
+<p>The cost of this really needs to be addressed; earlier this year I paid it. I was pumping out stuff using AI models, and by the end of each of those days my brain was fried. I couldn't remember anything I was doing! I was operating faster than the speed of thought, and so I was building what we would call cognitive debt: the equivalent of just cramming for an exam. You cram the inputs in, you skip the deliberate practice, and after the push, the bill arrives in the form of not remembering anything from what you've learned. The antidote is deliberate learning, where we learn it properly, we retain it, and we teach it. And as Dan and I studied and experimented with how to teach and how to learn, here's what we realized: AI can unlock new tools to help us with our understanding, and that turned out to be the real premise of the retreat.</p>
+<p>Want to see the difference between the two paths? Drag the slider and watch what happens to what you remember.</p>
+<iframe src="cognitive-debt.html" width="100%" scrolling="no" style="border: none;" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><h2 id="the-sea-of-change">The sea of change</h2><p>The clearest way I can show you this premise is through my own history. I used to be a lab scientist. Then, after an advisor change during graduate school, I made the choice: I really wanted to move into computing. I knew I had a knack with computers, I just never had the space and time, and this was the perfect space and time to go and make that change for myself. So I flipped the switch on computing. I picked up Python on my own, picked up machine learning on my own, with a little help from some classes, picked up computational biology and the general methods, and soon taught myself network science through books and others' work. I also learned Bayesian statistics in graduate school, self-taught. Throughout that process, something clicked for me: my ability to learn those topics was greatly facilitated by knowing how to do programming. Once I understood programming, I could do math. It wasn't the other way around.</p>
+<p>Most other people, most CS folks, probably get good at math first, and then programming comes as a natural consequence. For me it was the other way around, and I had to learn that about myself. So my ability to learn anything came partly from computing arriving in my life as a tool. But even then, I had some limitations. I couldn't build interactive visualizations for myself. I just didn't understand that paradigm, and building them took too much effort for stuff I wanted to learn, so I just didn't do it and had to find other ways around that limitation. Now with AI, I can have an HTML canvas and build these beautiful visuals that help me understand what's going on, in a Marimo notebook or inside an HTML page. AI can do that heavy lifting for me now. Computing was my first great learning accelerator, and AI is the second. That's the sea of change worth shouting about.</p>
+<p>Here's what that first accelerator looked like up close. <a href="https://www.cs.toronto.edu/~duvenaud/">David Duvenaud</a> taught me the backpropagation algorithm in 2016, and how it was really just the chain rule. I'd learned the chain rule in high school, but it didn't really stick for me until graduate school, where the chain rule could be written in Python with NumPy. And once you have the machinery in the form of <a href="https://github.com/HIPS/autograd">autograd</a>, you have a way of differentiating through almost any mathematical program you can think of and write. That was really fun. I had to re-derive backprop for myself, starting from linear regression, to really understand how it extends to a larger neural net model very naturally, just by chaining up more functions. That's all a neural net was: chained-up functions. And it was very tedious to get there. But nothing really stuck until I deployed my knowledge in the form of teaching.</p>
+<p>When I committed to teach <a href="https://ericmjl.github.io/teaching/network-analysis-made-simple/">network analysis</a> as a tutorial at the scientific Python conference, that commitment was the greatest accelerator of my learning journey. There was one crazy year where I did three tutorials, <a href="https://ericmjl.github.io/teaching/deep-learning-fundamentals/">deep learning fundamentals</a>, <a href="https://ericmjl.github.io/teaching/bayesian-data-science-probabilistic-programming-scipy-2019/">Bayesian statistics</a>, and network analysis, and I had to solo two of the three because my co-presenters couldn't make it. It was chaotic, and it was a blast. The moment I agreed to teach each of those subjects, I found exactly which parts I had just been hand-waving and never pushed on with real curiosity. It's wonderfully uncomfortable, and it works! That's why the retreat ends with what we call a festival of teaching: everybody teaches what they've learned to the rest of the room, to get that first real rep in.</p>
+<h2 id="in-person-on-purpose">In person, on purpose</h2><p>Beyond the cognitive cost, there's a social one: interacting with AI can be incredibly isolating, because you're sitting alone with a screen, asking questions, and not really interacting with another human. But the whole point of a learning community is other people. One guy I talked with about this retreat put it plainly: he lives in a tech hub, and whenever he goes to networking events, there's always a pitch. There's just no one to interact with in a normal way. So this room we're building, this group of people we're inviting, is essentially a space where you can nerd out with other people, and nobody's selling anything.</p>
+<p>The format is intentionally human centered. We all physically stay together in a retreat center. There are lectures about learning theory, good pedagogy, and how people make things stick, but there's also enough space to duck out when you're peopled out; I'm an introvert, so these escape hatches matter. We're keeping the cohort really small, and we want it to hold a real diversity of knowledge fields. And sharing meals together, five days of shared hallways, is how hallway conversations compound into friendships, just like the SciPy hallway track did for me with Dan Chen. If we run this with overlapping groups, I think this community could grow into one of the more valuable things that any one of us has.</p>
+<h2 id="the-shape-of-the-week">The shape of the week</h2><p>Curious how the five days actually unfold? Step through the week below.</p>
+<iframe src="retreat-week.html" width="100%" scrolling="no" style="border: none;" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><p>Days one through three are the learning science days, and they're Dan's home turf. I've known <a href="https://chendaniely.github.io/">Dan Chen</a> for years through the SciPy community; being a professional educator, he has read widely about the science of learning. He's taught multiple classrooms of data science master's students at the University of British Columbia in Vancouver, and he's deeply attuned to how people actually learn and retain stuff, the stuff we were never taught in grad school, or even undergrad. Interspersed throughout those days are sessions to put into practice what you're learning, and practical guidance on where AI slots into each step. As a small example: if you need to generate flashcards for retrieval practice, AI can help you with that. You can even get it to build adaptive systems for your own learning. We'll show you ways to build tools like these for yourself. Everyone arrives having picked a field that's genuinely foreign to them, and starts applying what the days teach to that field, deliberately.</p>
+<p>Day four is more unstructured by design. This is where you home in on prepping to teach the topic you've spent the week learning: you take everything you've absorbed and build the teaching material you'll use to teach someone else the concepts, with plenty of space for creative freedom. And throughout the day, Dan and I will check in with each person once or twice, to see how things are developing and where you're stuck, acting as coaches to push and challenge you toward the day five festival of teaching.</p>
+<p>Day five is the festival of teaching: twenty-some first reps, all in one day. This whole week is a microcosm of what I had to do when I was learning my way through new fields, and here's the goal of it: the retreat is about acquiring the skills needed to use AI to master a brand new field, and we'll spend that week acquiring them, practiced deliberately on a field of your choosing. Stack those skills consistently, month after month, even if you've got kids and a day job, and your capacity to learn compounds in a way that will massively accelerate everything else you take on.</p>
+<p>One more source of inspiration for the retreat design: <a href="https://whonothow.com/">the book <em>Who Not How</em></a>. We always encourage you to find a who in your life who can act as the subject matter expert for whatever field you're learning, someone you can tap when you have questions, and who you trust to be the ultimate arbiter of whether you've really learned that field. You do want to approach that person with respect for their time. And AI can help you level up your knowledge to the point where you're engaging with that person as a peer, or close to it, rather than in a coach-mentee relationship.</p>
+<h2 id="why-i-keep-calling-it-a-learning-retreat">Why I keep calling it a learning retreat</h2><p>So really, this isn't an AI retreat, and it's not one of those feel-the-spirit kind of retreats either. It's a very practical retreat. The science of learning is the main content. And the main motivation is to bring people together: to build a group of people who are genuinely interested in improving themselves, as I've been able to taste over the past decade of teaching myself multiple things. That's why I keep calling it a learning retreat: the learning comes first, and AI accelerates it.</p>
+<p>If this resonates with you, <a href="https://learn-anything.nonlinearlabs.ai/">come take a look at the retreat</a>. We're keeping it small on purpose and making it exclusive: not to a particular demographic, but to a type of personality. Dan and I really hope that we can see you there in February. I think the friends you make in that retreat might be the part that compounds the longest.</p>
+<p>And I'd really love for you to take a small bet on yourself.</p>
+<p>Before you go: five quick statements, and you be the judge of whether they sound like you.</p>
+<iframe src="does-this-resonate.html" width="100%" scrolling="no" style="border: none;" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe>
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-learning-how-to-learn-anything-together-in-the-age-of-ai</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Learning how to learn anything, together, in the age of AI}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{08}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{30}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/8/30/learning-how-to-learn-anything-together-in-the-age-of-ai}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i>I'm co-teaching a one-week retreat on how to
+        <a href="https://learn-anything.nonlinearlabs.ai/">learn anything with AI</a>
+        with <a href="https://chendaniely.github.io/">Daniel Chen</a>, February 2027.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

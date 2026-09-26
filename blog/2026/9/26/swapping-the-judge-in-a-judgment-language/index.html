@@ -1,0 +1,601 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.webp">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Swapping the judge in a judgment language">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/swapping-the-judge-in-a-judgment-language' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Swapping the judge in a judgment language - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Swapping the judge in a judgment language</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-09-26</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/programming/">
+        programming
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/agents/">
+        agents
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/creativity/">
+        creativity
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/inference/">
+        inference
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/open source/">
+        open source
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/decision models/">
+        decision models
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/machine learning/">
+        machine learning
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this post, I share how I forked Seems, a Python-flavored judgment language, into seems-laya, swapping the hosted judge for an open-weight model running on my own machine. I walk through the one-file swap, getting judgment syntax into plain Python imports and marimo notebooks, and the concurrency, calibration, namespace, and bytecode-cache surprises along the way, most of them fixed by my coding agent. I also wrestle honestly with whether the work was creative at all. If I can't tell the difference between interpolation and invention, how would any of us know when a machine crosses that line?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>In late September, <a href="https://github.com/kavehmz">@kavehmz</a> published <a href="https://github.com/kavehmz/seems-lang">Seems</a>, a programming language that is Python <em>plus a few words</em>. In a Seems program, a condition can be plain English, and a decision model answers it with a probability:</p>
+<div class="hll"><pre><span></span><span class="k">if</span> <span class="n">ticket</span><span class="o">.</span><span class="n">amount</span> <span class="o">&gt;</span> <span class="mi">500</span> <span class="ow">and</span> <span class="n">ticket</span><span class="o">.</span><span class="n">text</span> <span class="n">asks</span> <span class="k">for</span> <span class="n">a</span> <span class="n">refund</span><span class="p">:</span>
+    <span class="n">send_to_manager</span><span class="p">(</span><span class="n">ticket</span><span class="p">)</span>
+<span class="n">unsure</span><span class="p">:</span>
+    <span class="n">send_to_human</span><span class="p">(</span><span class="n">ticket</span><span class="p">)</span>
+</pre></div>
+<p><code>ticket.amount &gt; 500</code> runs in Python. <code>ticket.text asks for a refund</code> goes to a decision model. TypeSafe's Jev reads the text and returns a probability. Below 0.25 the judgment is no, above 0.75 it's yes, and in between it's unsure. <code>unsure:</code> is a real branch of <code>if</code>, so a program that isn't sure enough routes to a human instead of acting on a guess.</p>
+<p>Under the hood, there is no AI in the language itself. A Seems program is a <code>.seems</code> file, and a translator rewrites it into plain Python using Python's own tokenizer and a fixed list of judgment verbs (<code>seems</code>, <code>sounds</code>, <code>asks</code>, <code>contradicts</code>, and a few more). The rule is mechanical: an expression, then a verb, then English up to the next comma or colon. The expression becomes the state, the English becomes the question, and the whole judgment becomes a call into a small runtime that batches questions and caches answers. Everything else in the file passes through byte for byte, line numbers untouched. The one thing the translator cannot do locally is answer: judgments leave as a single HTTP call to TypeSafe's hosted Jev endpoint, billed to an API key.</p>
+<iframe src="seems-parser.html" width="100%" scrolling="no" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><p>The project ships as a Docker container. There is no wheel to install. The import hook that understands <code>.seems</code> files only switches on inside the project's own entry points, so a regular Python session has no path to any of it: <code>import</code> has never heard of the <code>.seems</code> suffix, and a script you run directly bypasses the import system entirely. Hence the compose file, the playground, the demo desk app, and a README whose setup section is one command, <code>docker compose up --build -d</code>.</p>
+<p>I loved it! And I had two questions the README couldn't answer for me. Can this work outside its Docker container, in a regular Python session? And the one I cared about more, the reason I built anything at all: every judgment in this language is billed to a closed hosted model. Could the whole idea run on open weights instead, on my own machine, with no API key and no meter running?</p>
+<p>So I forked the idea and the code. The result is <a href="https://github.com/ericmjl/seems-laya"><code>seems-laya</code></a>, where every judgment is answered by <a href="https://github.com/NandhaKishorM/laya">Laya</a>, Convai Innovations' open-weight decision model. The language is kavehmz's; I only swapped the judge. He added an MIT license the same week, which unblocks a PyPI release for the variant.</p>
+<h2 id="the-swap-was-one-seam">The swap was one seam</h2><p>The architecture <a href="https://github.com/kavehmz">@kavehmz</a> shipped made this easier than it sounds. Every judgment in Seems funnels through a single client call: give it a state and a list of questions, and it returns an answer with a probability for each one. Jev and Laya, rivals launched three days apart, turned out to ask questions in an identical format (noul for yes or no, choice for picking among options, score for rating on a scale, each with instructions and optional criteria). Everything around the questions differs: Jev wants an API key and bills per token; Laya runs locally for free. So I only had to rewrite one file. <code>seems/client.py</code> used to post to TypeSafe's endpoint; now it loads a Laya checkpoint in-process, or posts to a Laya server on your network if you'd rather keep the model on a GPU box.</p>
+<h2 id="three-doors-into-plain-python">Three doors into plain Python</h2><p><a href="https://github.com/ericmjl/seems-laya"><code>seems-laya</code></a> ships as an import hook. The wheel installs a startup file, so any plain <code>.py</code> file on your machine can contain judgment syntax and a normal <code>import</code> runs it through the translator. You never create a <code>.seems</code> file: write an ordinary <code>.py</code> file, judgment syntax included, and the hook translates the files that carry judgment verbs. Original <code>.seems</code> files still load, so programs written for the language as published keep working, but nothing generates them either. Flask apps, workers, pytest files: anything that imports your package gets judgments. Two boundaries needed extra work. CPython compiles the file you run directly below the import system, so scripts go through a launcher, <code>seems run script.py</code>. And marimo compiles notebook cells itself, so the project ships a wrapper, <code>seems-marimo</code>, that teaches marimo's compiler the same trick. A cell can now hold the <code>if</code> / <code>unsure:</code> branch directly, reactive over widgets.</p>
+<iframe src="import-hook.html" width="100%" scrolling="no" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe><h2 id="what-broke">What broke</h2><ul>
+<li><strong>Concurrency.</strong> Laya crashed the process under simultaneous requests on macOS. Turns out, it was due to an MPS command-buffer race. The runtime already batches same-state questions into one request, so serializing inference cost almost nothing. A hosted API parallelizes for you; a local model asks you to serialize.</li>
+<li><strong>Calibration.</strong> Example 06 in the original repo now raises <code>Unsure</code> where Jev was confident enough to act. In it, <code>intent is one of leave, complain</code> scores 0.64 under Laya against the 0.75 bar, and the example has no <code>unsure:</code> branch there. So the program stops with an <code>Unsure</code> error instead of acting on the 0.64 answer. The base Laya checkpoint spreads probability more diffusely than Jev, and programs written against Jev's calibration can need explicit <code>unsure:</code> branches under Laya.</li>
+<li><strong>Namespaces.</strong> My first version injected the runtime's names into every imported module. Torch's config machinery asserts that its own module namespaces are clean, and the process died on import. The fix was to inject names only where the compiled code actually references them.</li>
+<li><strong>The bytecode cache.</strong> Translated code validated against untouched source files, so a warm cache would keep running judgment syntax even after you turned the hook off. Translated files never write bytecode now.</li>
+</ul>
+<p>Here is the performance of seems-laya. Warm, the six example programs finish in 0.2 to 0.9 seconds; upstream measured 1 to 4 seconds against the hosted API. Inference runs on my machine, so the marginal cost is $0.00, and the answers are deterministic.</p>
+<h2 id="was-any-of-this-actually-creative">Was any of this <em>actually</em> creative?</h2><p>I've been writing Python for many years. I maintain libraries, I teach data science, Python pays my salary. And almost nothing in this project was within my range of knowledge. When the notebook kernel died with a Metal command-buffer assertion, I hadn't finished reading the traceback before the agent had serialized the client. When torch's config machinery choked on an injected name, the agent moved the injection where third-party introspection wouldn't see it. When marimo's kernel turned out to be a spawned subprocess, the fix was an environment variable and a startup file we already had. All told, GLM-5.3-Flash running in Pi went from kavehmz's untouched tree to the working notebook in about 90 minutes and five commits.</p>
+<p>If I had hired a human engineer with that exact combination of knowledge, I would call the engineer creative. But I have no way to audit the model's reading. Every fix it made might be interpolation over some GitHub thread I've never read; my sense that it was creative could just measure how small my corpus is. There's a company-scale version of the same question: Laya shipped three days after Jev, and Laya's author has said in public that the architecture is his own earlier work, relaunched by a better-funded company. When everyone reads the same papers and builds with the same tools, two teams can pull the same thread and each experience the pull as invention.</p>
+<p>So, will AI be truly creative, at least in the sense of going beyond its own training set boundaries? Most of what I can find says not yet. <a href="https://www.nature.com/articles/d41586-026-02804-x">Demis Hassabis proposed the cleanest test</a>: train a model on everything known before 1900 and ask it to derive relativity, the way Einstein did. The attempts so far mostly fail. One experiment found that a searcher trained on pre-1905 physics was over a million times less likely to propose the Lorentz factor than a blind one; everything it had read pointed at Newton, and the right answer violated everything it knew. And yet, <a href="https://arxiv.org/abs/2603.17019">in 2026, one paper showed</a> that in a setting where interpolation provably scores zero, a transformer learns the hidden rule anyway, and other teams have coaxed frontier models into original proofs of open conjectures. I can't tell the difference from my chair. Maybe creativity was always interpolation over a corpus, with taste deciding what to combine; maybe the model is doing exactly that with a corpus the size of civilization. Or maybe creativity is in the eye of the beholder, expanding the beholder's sense of what's possible. I'll believe it the day a machine combines ideas into something that works, and nobody can trace where it came from: not to a paper, not to a repository, not to anything in its training data.</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-swapping-the-judge-in-a-judgment-language</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Swapping the judge in a judgment language}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{09}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{26}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/9/26/swapping-the-judge-in-a-judgment-language}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i>I'm co-teaching a one-week retreat on how to
+        <a href="https://learn-anything.nonlinearlabs.ai/">learn anything with AI</a>
+        with <a href="https://chendaniely.github.io/">Daniel Chen</a>, February 2027.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

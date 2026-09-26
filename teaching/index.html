@@ -1,0 +1,517 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.webp">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+    
+
+    
+    
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Teaching - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+<section class="collection-front">
+<header class="collection-head">
+<h1 class="collection-title">Teaching</h1>
+<span class="collection-count">12 artifacts</span>
+</header>
+<div class="collection-grid"><article class="artifact-card">
+<a class="card-artwork" href="building-llm-agents-made-simple-pydata-boston-2025/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/WXSXOSHb0UY/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="building-llm-agents-made-simple-pydata-boston-2025/">Building LLM Agents Made Simple</a></h2>
+<p class="card-meta">PyData Boston 2025 · December 2025</p>
+<div class="card-summary">Building LLM Agents Made Simple | PyData Boston 2025</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=WXSXOSHb0UY" rel="noopener" class="action-primary">watch</a></li><li><a href="building-llm-agents-made-simple-pydata-boston-2025/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="building-with-llms-made-simple-scipy-2025/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/lF8fXWp89J0/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="building-with-llms-made-simple-scipy-2025/">Building with LLMs Made Simple</a></h2>
+<p class="card-meta">SciPy 2025 · August 2025</p>
+<div class="card-summary">Create robust, production-ready LLM applications that actually work—no hype, just practical code you can use tomorrow.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=lF8fXWp89J0&amp;t=11188s" rel="noopener" class="action-primary">watch</a></li><li><a href="building-with-llms-made-simple-scipy-2025/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="network-analysis-made-simple-scipy-2025/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/r0k_cMxqva0/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="network-analysis-made-simple-scipy-2025/">Network Analysis Made Simple</a></h2>
+<p class="card-meta">SciPy 2025 · August 2025</p>
+<div class="card-summary">Think about data as connections rather than just points—reveal patterns that traditional analysis misses.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=r0k_cMxqva0" rel="noopener" class="action-primary">watch</a></li><li><a href="network-analysis-made-simple-scipy-2025/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="network-analysis-made-simple-eric-ma-mridul-seth-scipy-2022/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/LTnsaD-rXW4/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="network-analysis-made-simple-eric-ma-mridul-seth-scipy-2022/">Network Analysis Made Simple</a></h2>
+<p class="card-meta">SciPy 2022 · August 2022</p>
+<div class="card-summary">Extract meaningful insights from connected data with practical tools and a new way of thinking about your data.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=LTnsaD-rXW4" rel="noopener" class="action-primary">watch</a></li><li><a href="network-analysis-made-simple-eric-ma-mridul-seth-scipy-2022/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="magical-numpy-with-jax-tutorial/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/ztthQJQFe20/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="magical-numpy-with-jax-tutorial/">Magical NumPy with JAX</a></h2>
+<p class="card-meta">PyCon US 2021 · June 2021</p>
+<div class="card-summary">NumPy with superpowers—automatic differentiation, JIT compilation, and seamless GPU acceleration for lightning-fast scientific computing.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=ztthQJQFe20" rel="noopener" class="action-primary">watch</a></li><li><a href="magical-numpy-with-jax-tutorial/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="bayesian-data-science-simulation-tutorial-scipy-2020/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/8eh5A72hIWM/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="bayesian-data-science-simulation-tutorial-scipy-2020/">Bayesian Data Science by Simulation</a></h2>
+<p class="card-meta">SciPy 2020 · July 2020</p>
+<div class="card-summary">Build intuition by coding your way through probability distributions—where simulation reveals insights that analytical approaches miss.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=8eh5A72hIWM" rel="noopener" class="action-primary">watch</a></li><li><a href="bayesian-data-science-simulation-tutorial-scipy-2020/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="network-analysis-made-simple/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/ED4NZ-4EWRw/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="network-analysis-made-simple/">Network Analysis Made Simple</a></h2>
+<p class="card-meta">July 2019</p>
+<div class="card-summary">My take on teaching network analysis and graph theory concepts, using NetworkX. Taught at many conferences since 2015.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://ericmjl.github.io/Network-Analysis-Made-Simple" rel="noopener" class="action-primary">notebooks</a></li><li><a href="https://www.youtube.com/watch?v=ED4NZ-4EWRw" rel="noopener">watch</a></li><li><a href="https://leanpub.com/nams" rel="noopener">book</a></li><li><a href="network-analysis-made-simple/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="bayesian-data-science-probabilistic-programming-scipy-2019/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/2wvt6GPZl1U/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="bayesian-data-science-probabilistic-programming-scipy-2019/">Bayesian Data Science: Probabilistic Programming</a></h2>
+<p class="card-meta">SciPy 2019 · July 2019</p>
+<div class="card-summary">From uncertainty to understanding—embrace probabilistic thinking and build models that reflect what you know (and what you don&#39;t).</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=2wvt6GPZl1U" rel="noopener" class="action-primary">watch</a></li><li><a href="bayesian-data-science-probabilistic-programming-scipy-2019/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="deep-learning-fundamentals/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/JPBz7-UCqRo/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="deep-learning-fundamentals/">Deep Learning Fundamentals</a></h2>
+<p class="card-meta">SciPy 2019 · July 2019</p>
+<div class="card-summary">Model, loss, and optimizer: the core components of deep learning. Come learn more; at the end, we even build the beginnings of a deep learning framework!</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=JPBz7-UCqRo" rel="noopener" class="action-primary">watch</a></li><li><a href="https://github.com/ericmjl/dl-workshop" rel="noopener">notebooks</a></li><li><a href="deep-learning-fundamentals/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="bayesian-statistical-modelling/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/89ye2hfsAsk/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="bayesian-statistical-modelling/">Bayesian Data Science Two Ways: Simulation and Probabilistic Programming</a></h2>
+<p class="card-meta">SciPy 2018 · July 2018</p>
+<div class="card-summary">Bayesian statistical analysis concepts, taught using PyMC3, with Hugo Bowne-Anderson.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=89ye2hfsAsk" rel="noopener" class="action-primary">watch</a></li><li><a href="https://github.com/ericmjl/bayesian-stats-modelling-tutorial" rel="noopener">notebooks</a></li><li><a href="bayesian-statistical-modelling/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="network-science-and-statistics-fundamentals-and-applications-scipy-2017/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/KilcBIgaQ-8/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="network-science-and-statistics-fundamentals-and-applications-scipy-2017/">Network Science and Statistics - Fundamentals and Applications</a></h2>
+<p class="card-meta">SciPy 2017 · August 2017</p>
+<div class="card-summary">Where it all started—thinking about data as networks to reveal hidden patterns in social systems and biological networks.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=KilcBIgaQ-8" rel="noopener" class="action-primary">watch</a></li><li><a href="network-science-and-statistics-fundamentals-and-applications-scipy-2017/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="network-analysis-fundamentals-pydata-2015/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/wcrwASR5DCQ/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="network-analysis-fundamentals-pydata-2015/">Network Analysis Fundamentals</a></h2>
+<p class="card-meta">PyData 2015 · December 2015</p>
+<div class="card-summary">Think about data as connections rather than just points—reveal patterns that traditional analysis misses.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=wcrwASR5DCQ" rel="noopener" class="action-primary">watch</a></li><li><a href="network-analysis-fundamentals-pydata-2015/">details</a></li>
+</ul>
+</div>
+</article>
+
+</div>
+</section>
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

@@ -1,0 +1,644 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.webp">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="A Multiplayer Chat Agent Is Just a Coding Agent in a Container">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/multiplayer-chat-agent' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>A Multiplayer Chat Agent Is Just a Coding Agent in a Container - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">A Multiplayer Chat Agent Is Just a Coding Agent in a Container</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    Eric J. Ma
+    
+    on
+    <span id="pub_date" name="pub_date">2026-09-25</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/discord/">
+        discord
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/modal/">
+        modal
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/agents/">
+        agents
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/software/">
+        software
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/community/">
+        community
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/coding agents/">
+        coding agents
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/discord bots/">
+        discord bots
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/knowledge base/">
+        knowledge base
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this post, I share how I built Sage, a community-wide Discord chat agent, by simply wrapping a standard coding agent inside a persistent container. I'll walk you through the surprisingly straightforward architecture: a websocket, a subprocess, and a single hand-curated markdown file. We'll explore how multiplayer settings shift the rules around grounding, consistency, and cost, and why keeping the stack boring actually makes it more reliable. If you've ever wondered how to scale an AI assistant beyond a single user without overcomplicating things, what's the simplest way you could start building one for your own community?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I've been building and testing a Discord bot for the private community around the <a href="https://learn-anything.nonlinearlabs.ai">Learn Anything with AI retreat</a>. It's called Sage, and its job is to be a growable knowledge assistant for the community. It answers the questions that come up over and over (when is the retreat, what does the week look like, what's the deposit policy), points people at the right resources, and does it all in a consistent voice. As the community grows, the knowledge it answers from grows with it.</p>
+<p>I had a second goal with this build, and it's the one I care about more. Almost all the energy in coding agents right now goes toward one-on-one use: you at a terminal with your agent. I wanted to find out how hard it is to build the multiplayer version, an agent that an entire community can talk to. I expected that to be the hard part, but it's actually the easy part: just stick a coding agent inside a container, wrap an API around it, and connect it to a chat platform. That's the whole idea. Everything else is detail. You can use very simple tech to build genuinely useful AI applications.</p>
+<h2 id="one-agent-a-whole-community">One agent, a whole community</h2><p>Talk to your own coding agent and the conversation is private: your context, your files. A community agent has to work for everyone at once, and that changes the requirements.</p>
+<p>Grounding has to be shared. If I ask Sage about the deposit policy today and you ask tomorrow, we should get the same answer, drawn from the same source of truth. The voice has to stay consistent, because the bot is speaking for the community, not for itself. Spending has to be bounded, because one enthusiastic member shouldn't be able to run up anyone's bill. And the answers happen in public. Anyone can scroll up and check what the bot said, so wrong answers get caught by everyone, every participant in the chat room.</p>
+<p>Every one of those requirements is plain code: an allowlist, a budget counter, a reply post-filter. Nothing there takes more than an afternoon to write.</p>
+<h2 id="the-architecture-a-coding-agent-in-a-container">The architecture: a coding agent in a container</h2><p>Sage runs as a single warm container on <a href="https://modal.com">Modal</a>. Warm means always on, because the container holds a persistent websocket connection to Discord's gateway; if the container slept, member messages would pile up undelivered. Three things live inside it:</p>
+<ol>
+<li>A small FastAPI app that gives Modal an HTTP endpoint to route to. It doubles as the health check that CI pings after every deploy.</li>
+<li>The Discord gateway client on its own thread, listening to the event stream.</li>
+<li>The <a href="https://github.com/earendil-works/pi-coding-agent">pi coding agent</a>, installed with npm exactly like you'd install it on your own laptop.</li>
+</ol>
+<p>When a member @mentions Sage, here's the entire path their message travels. Discord delivers it over the websocket to the container. A handful of checks run in plain code: is this channel on the allowlist, is this member under their daily ask budget, is the cap on simultaneous agent runs intact. If the checks pass, the question is piped into the pi coding agent over stdin, with its working directory set to the knowledge base and its tools limited to read, grep, find, and ls. The agent searches the notes itself and drafts an answer. A few more lines of plain code post-filter the draft (strip @everyone pings, cap the word count, check for prompt-leak artifacts), and the container posts the reply back to the channel.</p>
+<div class="mermaid">
+graph TD
+    A["member @mentions Sage"] --> B{"channel allowlisted?"}
+    B -- "no" --> Z["stay silent"]
+    B -- "yes" --> C{"under the member's daily budget?"}
+    C -- "no" --> Z
+    C -- "yes" --> D["typing indicator on"]
+    D --> E["one pi agent run: grep the KB, draft an answer"]
+    E --> F["post-filters: strip pings, cap length"]
+    F --> G["reply posts; typing off"]
+</div><p>Here is the actual agent invocation, trimmed to the essentials:</p>
+<div class="hll"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="s2">&quot;pi&quot;</span><span class="p">,</span> <span class="s2">&quot;--provider&quot;</span><span class="p">,</span> <span class="s2">&quot;zai&quot;</span><span class="p">,</span> <span class="s2">&quot;--model&quot;</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span>
+        <span class="s2">&quot;--tools&quot;</span><span class="p">,</span> <span class="s2">&quot;read,grep,find,ls&quot;</span><span class="p">,</span>  <span class="c1"># search and read, never mutate</span>
+        <span class="s2">&quot;--offline&quot;</span><span class="p">,</span> <span class="s2">&quot;--no-session&quot;</span><span class="p">,</span>     <span class="c1"># hermetic: no startup network calls</span>
+        <span class="s2">&quot;--mode&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="nb">input</span><span class="o">=</span><span class="n">member_question</span><span class="p">,</span>  <span class="c1"># the question arrives as stdin, not argv</span>
+    <span class="n">cwd</span><span class="o">=</span><span class="s2">&quot;/sage-kb&quot;</span><span class="p">,</span>         <span class="c1"># the knowledge base IS the working directory</span>
+    <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">reply</span> <span class="o">=</span> <span class="n">post_filter</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+</pre></div>
+<p>Notice what Sage doesn't do: keep its own copy of the conversation. When a question comes in, Sage rebuilds the context on the spot: it walks up the reply chain through Discord's message references, and it reads the recent exchange in the channel straight from Discord's API, capped at a few thousand characters. That context rides along with the question, and once the reply posts, Sage keeps nothing. Discord is already the database of the conversation; replicating it would just mean a second copy to keep in sync. It's the same principle HTMX preaches: use the application state you already have as the data storage.</p>
+<p>The whole stack is a websocket, a subprocess, and a markdown file. If you've wired up a Discord bot before, you'll recognize every piece. The only new part is the handler: instead of writing request-matching logic yourself, you install a full coding agent and let it do the searching.</p>
+<h2 id="the-typing-indicator-a-chef-s-kiss-detail">The typing indicator, a chef's kiss detail</h2><p>Discord shows a little "Sage is typing..." indicator while it works, and getting it right was my favorite implementation detail of the entire build.</p>
+<p>The typing indicator has a quirk. You trigger it by hitting Discord's typing endpoint, and it expires 10 seconds after the last trigger. But an agentic answer takes somewhere between 15 seconds and 2 minutes, because the agent runs several model turns: search, read, think, draft. Fire the trigger once and members get 10 seconds of typing, then silence while the agent keeps working.</p>
+<p>The fix is to re-fire the endpoint on a loop until the answer is ready. discord.py ships a <code>typing()</code> context manager that does exactly this: it holds the loop open for as long as your code runs inside the context, re-firing the trigger every 5 seconds (comfortably inside the 10-second expiry), then closes it out when the reply posts. In Sage, the entire answer path runs inside that context, and the wrapper swallows failures, because a cosmetic indicator must never be the thing that breaks a reply.</p>
+<p>Sixty seconds of silence reads like the bot is broken. Sixty seconds of typing reads like the bot is thinking. Perceived latency is trust.</p>
+<h2 id="the-knowledge-base-is-one-hand-curated-markdown-file">The knowledge base is one hand-curated markdown file</h2><p>Sage's knowledge base is a single hand-curated markdown file. No vector database, no embeddings, no chunking strategy, no retrieval pipeline to tune. Every entry is one section with a heading that names the topic, like this one from the real thing:</p>
+<div class="hll"><pre><span></span><span class="gu">## The Learn Anything retreat</span>
+
+A one-week, in-person retreat for people who want to get on the AI
+curve and learn any field. The announced dates are February 14-20,
+2027, and the announced location is San Diego, California...
+
+&lt;!-- Verified: 2026-09-20 (deposit terms doc) --&gt;
+</pre></div>
+<p>When the facts change, I edit the file and redeploy. When the same question keeps coming up and the file can't answer it, that's the signal to add an entry. Knowledge base growth becomes content curation, the thing communities already know how to do, instead of pipeline engineering.</p>
+<p>The agent answers by searching this file with grep and reading whole sections, deriving search terms from the entire conversation. That matters for follow-ups. If someone asks "when is the retreat" and then says "yeah, tell me more about the build day", the agent works out from context what "the build day" refers to and searches for that.</p>
+<p>One rule is baked into the system prompt: if the notes don't ground the answer, Sage replies, "I don't have that in my community notes yet, so I'd rather not guess. Eric or Daniel will know." For a community assistant that's the right default. A confident hallucination about the refund policy loses the room in one message; "go ask a human" costs nothing.</p>
+<p>The same pattern keeps showing up in enterprise AI: hand-curated context, agentic search over it, and an honesty rule. The KB stays small enough that grep finds everything instantly, and if it ever outgrows one file, the agent searches a directory of files the same way.</p>
+<h2 id="what-it-costs">What it costs</h2><p>Modal bills per second, and a small container idling at default resources meters about 17 cents a day. I pulled the actual billing rows for this post: Sage went live on September 16, and its container has metered about a dollar in the six days since, which paces to about \$5 a month. Modal's Starter plan hands out \$30 a month in free credits, so my out-of-pocket cost is \$0, and every invoice this year confirms it. The model calls cost pennies on top, because Sage runs on a cheap, fast model and short grounded answers don't need a frontier model. That's an always-on knowledge assistant for an entire community, fully covered by free-tier credits.</p>
+<h2 id="kick-the-tires">Kick the tires</h2><p>I extracted the pattern into a standalone repo, stripped of everything retreat-specific: <a href="https://github.com/ericmjl/sage-pattern">github.com/ericmjl/sage-pattern</a>.</p>
+<p>Inside you'll find the Modal deployment code, a dummy knowledge base you can swap for your own, a README explaining the architecture, an AGENTS.md written for coding agents, and a paste-ready prompt you can hand to your own agent to test-drive the deployment against your Discord server and Modal account.</p>
+<p>The models get the headlines. What makes this buildable for one person is that the surrounding tech got boring: one container holding a websocket, one subprocess doing the searching, one markdown file holding what your community knows. Pick a community and go build one!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">-2026-multiplayer-chat-agent</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{A Multiplayer Chat Agent Is Just a Coding Agent in a Container}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{09}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{25}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/9/25/multiplayer-chat-agent}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i>I'm co-teaching a one-week retreat on how to
+        <a href="https://learn-anything.nonlinearlabs.ai/">learn anything with AI</a>
+        with <a href="https://chendaniely.github.io/">Daniel Chen</a>, February 2027.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

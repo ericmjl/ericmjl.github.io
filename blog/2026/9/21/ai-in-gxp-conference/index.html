@@ -1,0 +1,815 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.webp">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="A data scientist walks into a GxP conference">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/ai-in-gxp-conference' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>A data scientist walks into a GxP conference - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">A data scientist walks into a GxP conference</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-09-21</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/gxp/">
+        gxp
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/ai/">
+        ai
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/validation/">
+        validation
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/compliance/">
+        compliance
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/fda/">
+        fda
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/pharmaceuticals/">
+        pharmaceuticals
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/biotech/">
+        biotech
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/machine learning/">
+        machine learning
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/quality assurance/">
+        quality assurance
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this post, I share what I learned at a conference on AI in GxP, the regulations keeping medicines and devices safe, arriving from the research side where the acronym meant nothing to me three months ago. I sketch a map of SOPs, validation, and inspections, and how stochastic AI systems force a rethink: defining a range of acceptable behavior instead of pass/fail checks. I close with what data scientists can offer, from model cards to evaluation harnesses. If regulators set the principles but leave the numbers to us, who gets to decide what "good enough" means?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>I spent September 15 and 16 in Raleigh at a conference on AI in GxP. Three months ago that acronym meant almost nothing to me, and I want to fix that for anyone else who grew up on the research side of science, because I needed this map last week. My world is exploratory analysis, notebooks, and prototypes, where the deliverable is insight and the constraint is my own rigor. GxP is the other side of the house, the body of practice that keeps medicines and medical devices safe for the people who take them. This post is my first pass at a map of that world, drawn from two days of talks and hallway conversations.</p>
+<h2 id="what-gxp-is-for">What GxP is for</h2><p>GxP stands for "good <em>something</em> practice". Examples include: GMP for manufacturing, GLP for laboratories, GCP for clinical trials. The common thread, as I now understand it, is a <strong>promise</strong>: A company making a regulated product commits to making it safely and reliably for patients, and it keeps that promise by writing its own procedures and then following them in a way that is documented and unambiguous.</p>
+<p>That last part surprised me. I had previously assumed an external rulebook issued from on high. Instead, the company authors its own SOPs and then has to live up to them. The regulation demands that a documented process exists and is followed; the company decides what the process says.</p>
+<h2 id="regulations-set-principles-and-companies-write-the-procedures">Regulations set principles, and companies write the procedures</h2><p>As things turn out, the rules surrounding manufacturing processes are less prescriptive than I expected. They state principles rather than recipes, out of a recognition that different products have fundamentally different manufacturing processes; the process for a small molecule drug looks nothing like the one for a cell-based therapy. So the principles stay product-agnostic. Whatever you make, the process has to be documented with enough precision that two trained people would execute it the same way, it has to be justifiable with data and reasoning, and it has to be verifiable when someone comes to audit. One speaker's version: the regulators specify the what, and the how belongs to you.</p>
+<p>That flexibility, however, comes with accountability.</p>
+<h2 id="inspectors-are-professionals-with-a-method">Inspectors are professionals with a method</h2><p>Prior to the conference, I had implicitly (in my head) cast inspectors as villains. The conference replaced that caricature with a picture that is more reassuring and more demanding at the same time: inspectors are trained people who show up with a method. They review the documentation of how things should be done, the SOPs and work instructions. They ask for evidence that work was executed the way the SOP says: records, logbooks, audit trails. And when something deviated from the SOP, they ask for the investigation that followed: the root cause analysis and the remediation.</p>
+<p>Over lunch I talked with someone who has spent years on the industry side of medical device audits, and he walked me through what a serious inspection looks like from the inside. The inspection arrives announced, with an agenda. Each SOP names the specific operator who demonstrates it, and that operator performs it live while a quality lead facilitates. Companies run a war room during the inspection: a facilitator relays questions to subject matter experts watching from a back room, a scribe transcribes the whole day, and the team predicts where the investigator will go next so the documents are pulled before they're requested. The teams that handle regulators well rehearse with mock audits, often staffed by former FDA and EMA auditors, at least once a year per functional area. All of that preparation, he said, rests on one rule: the single unforgivable move during an inspection is making something up.</p>
+<h2 id="validation-becomes-a-range-of-acceptable-behavior">Validation becomes a range of acceptable behavior</h2><p>When it comes to generative AI, and more importantly, inherently stochastic systems that need to be validated, things get more challenging. Classic software validation assumes determinism: same input, same output, every time, so you write the expected result and check against it, pass or fail. Generative AI breaks that assumption on purpose. For example, the same prompt can produce different answers, several of them good.</p>
+<p>One speaker, an IT risk and compliance lead, offered the reframe I keep thinking about: when you validate an AI system, you are really validating a <em>measurement system</em> for the AI. Instead of pass/fail on a single output, <strong>you define a range of acceptable behavior</strong>. In practice that means naming the population of test cases, declaring a threshold for how well the system must do across them, pinning the evaluation harness at a specific commit to do the measuring, and documenting the deviation route for what happens when a case fails. His own project used about a hundred labeled examples over a corpus of regulations and inspection letters, seeded with traps: distractors that were 90 percent similar across drug and device categories, follow-up questions, and prompts whose correct answer was "this falls outside the ingested corpus".</p>
+<p>The evidence changes too. The evidence needed is no longer a screenshot; instead, it is a run record: metrics, outcome distributions, per-call provenance, dated and attributable. And because model versions change under you, prompts get tweaked, and corpora grow, the evidence expires. One speaker quoted a line that captured the whole day for me: "Validation isn't an event. Validation is data."</p>
+<p>The SOP implications followed, and speaker after speaker made the same argument from different directions: AI needs its own SOPs, kept separate from the software-development ones, covering dataset development, model development, testing, and validation. The classic procedure assumes you can write the expected result, run the test, compare, and sign. Force a generative system into that template and every clause fights reality: single expected results, one-time executions, screenshots as evidence. The most fully spelled-out version called for separate AI model validation SOPs alongside the traditional computerized system validation ones, on the argument that the classic risk categories were built for deterministic systems and don't transfer. A separate procedure is what gives the range-of-acceptable-behavior logic a legal home: versioned test sets under change control, run records as evidence, and scheduled requalification when a trigger fires.</p>
+<h2 id="where-the-whole-room-agreed">Where the whole room agreed</h2><p>Lots of speakers at the conference agreed on the following five threads, which ran through nearly every talk:</p>
+<ol>
+<li><strong>Evidence has a shelf life.</strong> One speaker described running nightly GMP releases inside a three-million-line codebase and passing three FDA inspections on 99.9 percent proven test coverage; his team cut validation costs about 65 percent within eighteen months with zero headcount cuts. The line he quoted: <strong>"Validation isn't an event. Validation is data."</strong></li>
+<li><strong>Human gates have to be real.</strong> The enforcement data says the failures are human: 303 FDA warning letters last fiscal year, up 15.9 percent, with the most-cited regulation aimed at quality-unit oversight. The first AI-related CGMP warning letter, issued in April 2026 to a cosmetics lab, turned on exactly that: the company's explanation was "AI did not tell us", which is the sound of nobody reviewing what the AI produced. One speaker's closer deserves a frame on the wall: "untrained humans fail inspections, and untrained AI fails patients." Another warned that "human oversight" can become camouflage for rubber-stamping, the kind of wording inspectors eventually pull on. And when someone asked how to relieve the burden of human review, the compliance lead's answer was blunt: "AI is not gonna get sued. It's the human that is gonna get sued."</li>
+<li><strong>Attribution extends to the AI itself.</strong> ALCOA+ survives the AI era intact. One quality-systems veteran put it crisply: "AI doesn't change the requirements; it just changes the enforcement surface." Her prescription: every autonomous agent gets its own scoped, logged identity instead of hiding inside shared service accounts, and agents become access-control subjects the way people are. The honest open question she left the room with: "Do I need to put my AI agent in Workday?"</li>
+<li><strong>Intended use is the master lever.</strong> The same underlying model reads as high risk when its intended use says it "categorizes and assigns severity to incoming deviations" and as low risk when it "drafts preliminary deviation summaries for QA review". Wording sets the validation burden. Bounding the inputs works the same way: one computer-vision system drew only from fixed cameras under standardized lighting; that constraint turned a potentially years-long validation into a months-long one.</li>
+<li><strong>Evaluation sets need unhappy paths.</strong> Models trained on happy-path data give happy-path answers, and they fail silently when reality shows up with something training never covered. The agreed practice: golden test sets seeded with the ugly cases, graders layered from simple code checks to model checks to human subject-matter experts, and an LLM judge whose agreement with humans is calibrated and monitored over time.</li>
+</ol>
+<h2 id="where-the-room-split">Where the room split</h2><p>The disagreements were just as informative.</p>
+<p><strong>Speed versus defensibility.</strong> One speaker exulted in efficiency; the 65 percent cost cut came with "get rid of your consultants" energy. Another speaker's entire talk was about specifying approval gates and immutable audit trails. Both got nods, and yet nobody reconciled them on stage.</p>
+<p><strong>Is nondeterminism a solved problem?</strong> The head of data at a validation-documents company argued the field has moved past the worry: "maybe it's stochastic... that's pretty much debunked now. It's been done several times before." A manufacturing consultant pushed back from the same stage: "unless you have a frozen AI model that doesn't change, that means that the evolution of the process has to change." A working compromise surfaced in the hallways: treat the LLM as a drafting engine, pin the corpus it draws from, and verify every output against that corpus.</p>
+<p><strong>Consolidation means different things to different functions.</strong> Merging manufacturing, IT, and QA into one team succeeded once in ten projects at one consultancy; the working pattern there keeps the functions separate and plants IT business partners inside them as translators. At the data layer, the prescription flips: consolidate the estate, one governed dataset validated once and reused by every model and agent. Same word, different layers.</p>
+<p><strong>Inspection craft versus inspection polish.</strong> The war room is performance craft, aimed squarely at the auditor's experience. Another speaker's critique cuts at the same target from a different angle: most GxP systems are optimized to be inspection-ready and are lousy at generating insight, which is exactly why AI pilots stall there. The two views cohere only when execution really does match the SOPs; otherwise the war room is polish over a hollow core.</p>
+<p><strong>The ROI math.</strong> "95 percent accurate" doesn't mean 95 percent time savings: you still review 100 percent of the output, and the missing 5 percent is where all the time goes. One panelist reported the industry has a name for the alternative, pilotitis, an addiction to pilots. Another, from a company that is genuinely good at this, said it flatly: "We're in POC hell."</p>
+<h2 id="the-playbooks-people-shared">The playbooks people shared</h2><p>Day two doubled down on the practical, and the recommendations clustered into a pattern: nearly every policy exists to make AI behavior inspectable.</p>
+<p><strong>On usage:</strong> prohibit public AI tools for GxP data and confidential information, disclose when AI touched a document, keep an inventory of every AI system in the company including the shadow ones, and run AI purchases through a GxP and risk assessment before the contract is signed. One speaker went further and treated agents like hires: defined scope, approved training sources only, a CV of versions and validation history, retraining whenever the SOPs change. A pharmacovigilance team runs agent personas this way, one for IT compliance work and one for drug safety.</p>
+<p><strong>On procedure:</strong> the separate-SOP argument grew from two voices to a chorus, with calls for dedicated procedures covering dataset development, model development, AI testing, and AI validation, plus a mock audit by a subject matter expert before any formal one.</p>
+<p><strong>On verification:</strong> the motto was "Never Trust! Always Verify!" It has a regulatory root in 21 CFR 211.68(c), the rule requiring a human check that automated equipment performed properly. The operational pattern: AI drafts, a named human verifies explicitly and separately, and the time AI saves gets budgeted toward that verification. One team's whole pipeline fit in a line I wrote down verbatim: controlled evidence in, fixed prompts, AI analysis, evidence plus rationale out, human review, approved output with an audit trail.</p>
+<p><strong>On honesty:</strong> when evidence is missing, the system says "unable to verify" rather than guessing; findings carry openable citations; regression means three consecutive runs against unchanged evidence with the deltas displayed. And regulators have started saying the same thing out loud: the MHRA's inspectorate blogged in June that companies own the accuracy of AI-drafted submissions regardless of the drafting tool.</p>
+<h2 id="what-data-scientists-can-bring">What data scientists can bring</h2><p>This is the part I care most about, because it is where my field has something to offer.</p>
+<p><strong>Model cards should be standard practice.</strong> In the Q&amp;A after one talk, I asked a speaker whether intended use statements and model cards, the documentation format Google popularized for recording what a model is, what it does, how it was trained, and where it fails, could be one artifact. The speaker's answer: keep the intended use statement as the governance object, and attach the model card as an appendix to the SOP governing that model's use. Model cards are "not exactly perfect in terms of the GxP context, but it adds so much clarity", and they let end users actually risk-assess the model they've been handed. I left convinced. With AI help, the barrier to producing this document is dramatically lowered, and the regulated setting gives us a reason to make it standard.</p>
+<p><strong>AI can lower the documentation lift, carefully.</strong> Validation documentation is expensive to produce, and this is where ML teams have an unfair advantage: we already know how to make AI write things from source. In a hallway conversation, the acceptance-criteria speaker described using an LLM over an ingested regulatory corpus to draft candidate acceptance-criteria statements, then checking every draft against the corpus to confirm each statement traces to real text. The same pattern applies to model cards: let an AI scour the training pipeline's source code and draft the card, then have a named human review and sign it. The warning that keeps this honest came up more than once: documents nobody reviews are how you earn a warning letter, and as one speaker put it, "nobody genuinely reviews a hundred AI-generated documents". So the real design problem is the review workflow, and the writing was never the hard part.</p>
+<p><strong>Our vocabulary is the compliance vocabulary now.</strong> Precision, recall, calibration, thresholds, versioning, commit hashes: these were the words of the day. Regulators set principles and deliberately leave the numbers to the companies, and one speaker observed that "none of the regulators can give us that number", so the threshold is ours to justify. Data scientists are unusually well trained for exactly that kind of justification.</p>
+<p><strong>Prompts are records, and prompts are weak controls.</strong> Hash and version your prompts, log which model version served each call, and treat a prompt instruction as a request rather than a guarantee. The robust controls are the ones a model has no way to argue with: numeric thresholds and system boundaries.</p>
+<h2 id="the-talks-and-speakers">The talks and speakers</h2><p>Here's a list of the talks that I dropped in on. I made sure to double-check the names against the <a href="https://kenx.org/wp-content/uploads/2026/09/AI-in-GxP-2026-Agenda-Compendium-Raleigh.pdf">conference agenda compendium</a>.</p>
+<p>Day one, September 15:</p>
+<table>
+<thead><tr>
+<th>Time</th>
+<th>Session</th>
+<th>Speaker(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8:20-9:00</td>
+<td>Harness the Power: AI-Driven Decision-Making, Data Integrity, and Continuous Validation (keynote)</td>
+<td>William Gargano, Group SVP, RCM Life Sciences and IT</td>
+</tr>
+<tr>
+<td>9:00-10:00</td>
+<td>From Idea to Proof of Concept: How Enterprises Pilot AI in GxP (panel)</td>
+<td>Dori Gonzalez-Acevedo, ProcellaRx (moderator); Tim Roy Kirkelie, Genari AI; Gaurav Walia, PQE Group; Anant Agrawal, CIMCON Software</td>
+</tr>
+<tr>
+<td>10:20-11:00</td>
+<td>Reducing Human Risk in GxP: Building Inspection-Ready AI Systems</td>
+<td>Bharanitharan Rajendran, CTO, Validfor</td>
+</tr>
+<tr>
+<td>11:10-11:50</td>
+<td>Trust Is Not a Framework: Building Observable, Evaluated AI Systems in GxP</td>
+<td>Rosalind Beasley, Co-Founder &amp; CEO, Genari AI</td>
+</tr>
+<tr>
+<td>12:00-12:40</td>
+<td>Building a Scalable, Governable Data Estate for AI (virtual)</td>
+<td>Shelly LaPointe, Quality Systems Director, Stealth Startup</td>
+</tr>
+<tr>
+<td>1:40-2:20</td>
+<td>Unite IT, QA, and Manufacturing to Drive Intelligent GxP Operations</td>
+<td>Ganesh Muralidharan, Global Delivery Head, Vaisesika Systems Consulting</td>
+</tr>
+<tr>
+<td>2:30-3:10</td>
+<td>Defining Acceptance Criteria for AI Validation</td>
+<td>Abhishek Bachchan, Associate Director, IT Security, Risk and Quality, Gilead</td>
+</tr>
+<tr>
+<td>4:10-4:50</td>
+<td>"Intended Use" as the Corporate Governance Foundation for GxP AI</td>
+<td>Ben O'Brien, Business Development Partner, Phanero</td>
+</tr>
+<tr>
+<td>5:00-5:40</td>
+<td>Turn Quality Metrics into Action with Predictive Dashboards</td>
+<td>Gaurav Walia, VP of CSV/CSA/DI &amp; Digital Governance &amp; Local Equity Partner, PQE Group</td>
+</tr>
+</tbody>
+</table>
+<p>Day two, September 16:</p>
+<table>
+<thead><tr>
+<th>Time</th>
+<th>Session</th>
+<th>Speaker(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>9:10-9:50</td>
+<td>Align Intelligent Systems with FDA, EMA, and Annex 11/22 Expectations</td>
+<td>Gaurav Walia, VP of CSV/CSA/DI &amp; Digital Governance &amp; Local Equity Partner, PQE Group</td>
+</tr>
+<tr>
+<td>9:10-9:50</td>
+<td>Expert panel: AI, digital transformation, and the future of the modern laboratory</td>
+<td>Abhishek Bachchan, Gilead (moderator); Steve Ferrell, Valkit.ai; Madhavi Ganesan, PSC Biotech; Joe Ault, Thermo Fisher Scientific</td>
+</tr>
+<tr>
+<td>10:10-10:40</td>
+<td>Using AI to Modernize Internal Audits and Document Review</td>
+<td>Vivekram Apparsundaram, Head of CQV Practice, Zifo Technologies</td>
+</tr>
+<tr>
+<td>11:00-11:40</td>
+<td>10 Steps to Achieving AI Regulatory Compliance</td>
+<td>Robert (Bob) Wherry, VP, AI Compliance, QACV Consulting</td>
+</tr>
+<tr>
+<td>11:50-12:30</td>
+<td>AI GxP Practice: What's Working, What's Not, and What We Should Do Differently</td>
+<td>Binesh Prabhakar, Founder, One Vector</td>
+</tr>
+<tr>
+<td>1:30-2:10</td>
+<td>Establish Continuous Validation Through Real-time Monitoring</td>
+<td>Carolyn Troiano, RiskCortex Limited</td>
+</tr>
+<tr>
+<td>2:20-3:00</td>
+<td>Minimum Viable Product (MVP) for AI in GxP (panel)</td>
+<td>Bryan Ennis, Sware; Robin Stolzberg, Sapio Sciences; Courtney Steele, DeepHow</td>
+</tr>
+<tr>
+<td>3:20-4:00</td>
+<td>Strengthening AI Systems with Built-In Cybersecurity and Access Control</td>
+<td>Aarti (Amy) Arora, Principal, RxT</td>
+</tr>
+<tr>
+<td>4:10-4:50</td>
+<td>From Installation to Validation: Testing Local AI Against GxP Requirements</td>
+<td>Yari Fontebasso, PhD, Principal, AI Governance &amp; IT Compliance, Systera Solutions</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-patients-at-the-end-of-it">The patients at the end of it</h2><p>The moderator of the morning panel closed with a story. At a keynote in June, she was prepping for her next meeting on her phone and mindlessly raised her hand when the speaker asked who lives with a chronic illness. She turned out to be the only one of six hundred people who had, and got pulled on stage. She told the room she's bipolar. "That's who I am," she said, and then reminded a conference hall full of quality and compliance professionals that they are all patients too.</p>
+<p>That's what GxP is for. Somewhere down the line a person takes the product, and the procedures, records, and audits are the mechanism by which the promise to that person gets kept. My instincts developed over nearly two decades in research read all of that as bureaucracy. After a day in that room, I read it as engineering discipline with a patient at the end of it, and I think data science has a lot to contribute!</p>
+<h2 id="a-glossary">A glossary</h2><p>Half the day's difficulty was vocabulary, so here is the pocket glossary I wish I'd had at 8am.</p>
+<table>
+<thead><tr>
+<th>Term</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GxP</td>
+<td>The umbrella for "good practice" regulations: GMP (manufacturing), GLP (laboratories), GCP (clinical trials)</td>
+</tr>
+<tr>
+<td>SOP</td>
+<td>Standard operating procedure. The company's own written, approved how-to for a process</td>
+</tr>
+<tr>
+<td>Work instruction</td>
+<td>Step-level detail beneath an SOP, for a single task</td>
+</tr>
+<tr>
+<td>Deviation</td>
+<td>Any departure from an SOP or specification. Triggers a documented investigation</td>
+</tr>
+<tr>
+<td>CAPA</td>
+<td>Corrective and preventive action: the fix, plus the fix that keeps it from recurring</td>
+</tr>
+<tr>
+<td>Root cause analysis</td>
+<td>The structured investigation into why a deviation happened</td>
+</tr>
+<tr>
+<td>Change control</td>
+<td>The approved process for changing a document, system, or process</td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>Documented evidence that a system does what it's meant to do, for its intended use</td>
+</tr>
+<tr>
+<td>CSV / CSA</td>
+<td>Computerized system validation, and its risk-based successor, computer software assurance</td>
+</tr>
+<tr>
+<td>GAMP 5</td>
+<td>The industry's risk-based framework for validating computerized systems</td>
+</tr>
+<tr>
+<td>21 CFR Part 11</td>
+<td>The FDA rules for electronic records and signatures</td>
+</tr>
+<tr>
+<td>ALCOA+</td>
+<td>Data integrity: Attributable, Legible, Contemporaneous, Original, Accurate, Complete, Enduring, Available</td>
+</tr>
+<tr>
+<td>Audit trail</td>
+<td>The immutable record of who did what, when</td>
+</tr>
+<tr>
+<td>483 / warning letter</td>
+<td>FDA inspection observations, and the escalation when the response falls short</td>
+</tr>
+<tr>
+<td>Intended use</td>
+<td>The documented statement of what a system is for, and where its boundaries sit</td>
+</tr>
+<tr>
+<td>Acceptance criteria</td>
+<td>The pre-declared bar a system must clear to count as validated</td>
+</tr>
+<tr>
+<td>Mock audit</td>
+<td>A rehearsal inspection, ideally staffed by former regulators</td>
+</tr>
+<tr>
+<td>War room</td>
+<td>The live command center supporting the company during a real inspection</td>
+</tr>
+</tbody>
+</table>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-ai-in-gxp-conference</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{A data scientist walks into a GxP conference}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{09}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{21}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/9/21/ai-in-gxp-conference}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p>
+      <i>I'm co-teaching a one-week retreat on how to
+        <a href="https://learn-anything.nonlinearlabs.ai/">learn anything with AI</a>
+        with <a href="https://chendaniely.github.io/">Daniel Chen</a>, February 2027.</i>
+    </p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>

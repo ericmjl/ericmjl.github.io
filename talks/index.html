@@ -1,0 +1,582 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.webp">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+    
+
+    
+    
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+<title>Talks - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/" rel="">Home</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/blog" rel="">Blog</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/books" rel="">Books</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/open-source" rel="">Open Source</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/projects" rel="">Projects</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a class="terminal-prompt" href="/talks" rel="">Talks</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/teaching" rel="">Teaching</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/user-manual" rel="">User Manual</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <!-- Set blinking cursor correctly on navigation -->
+                        
+                        
+                        
+                        
+                        
+                        <a href="/bio" rel="">Bio</a>
+                        
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+<section class="collection-front">
+<header class="collection-head">
+<h1 class="collection-title">Talks</h1>
+<span class="collection-count">17 artifacts</span>
+</header>
+<div class="collection-grid"><article class="artifact-card">
+<a class="card-artwork" href="agentic-data-science-in-a-reproducible-marimo-notebook/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/Ietl5dUXa7c/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="agentic-data-science-in-a-reproducible-marimo-notebook/">Agentic Data Science in a Reproducible Marimo Notebook</a></h2>
+<p class="card-meta">Agents and Engineers Podcast · September 2026</p>
+<div class="card-summary">A conversation on the Agents and Engineers podcast about treating coding agents as collaborators: Marimo Pair, notebooks that outlive an agent&#39;s context window, and reproducible agentic data science.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=Ietl5dUXa7c" rel="noopener" class="action-primary">watch</a></li><li><a href="agentic-data-science-in-a-reproducible-marimo-notebook/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="canvas-chat-non-linear-workflows-for-ai-assisted-data-science-scipy-2026/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/V42Hq61JgcY/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="canvas-chat-non-linear-workflows-for-ai-assisted-data-science-scipy-2026/">Canvas Chat: non-linear workflows for AI-assisted data science</a></h2>
+<p class="card-meta">SciPy 2026 · September 2026</p>
+<div class="card-summary">A SciPy 2026 talk on Canvas Chat, a browser-based tool for non-linear, visual AI-assisted data analysis with Python and LLMs.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=V42Hq61JgcY" rel="noopener" class="action-primary">watch</a></li><li><a href="canvas-chat-non-linear-workflows-for-ai-assisted-data-science-scipy-2026/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="agentic-data-science-live-bayesian-modeling-data-driven-pharma-2026/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/Ol5t2Q2bZwU/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="agentic-data-science-live-bayesian-modeling-data-driven-pharma-2026/">Agentic Data Science: Live Bayesian Modeling with Marimo &amp; Coding Agents</a></h2>
+<p class="card-meta">Data Driven Pharma East 2026 · June 2026</p>
+<div class="card-summary">Pair-programming with a coding agent inside a Marimo notebook to build a Bayesian hierarchical model of protein melting points, live.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=Ol5t2Q2bZwU" rel="noopener" class="action-primary">watch</a></li><li><a href="agentic-data-science-live-bayesian-modeling-data-driven-pharma-2026/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="agentic-data-science-marimo-notebooks-festival-of-genomics-2026/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/SbpkwDF01MM/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="agentic-data-science-marimo-notebooks-festival-of-genomics-2026/">Agentic Data Science with Marimo Notebooks</a></h2>
+<p class="card-meta">Festival of Genomics 2026 · June 2026</p>
+<div class="card-summary">A hands-on Festival of Genomics 2026 workshop on coding agents inside Marimo notebooks, with live protein data analysis and 3D structure visualization.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=SbpkwDF01MM" rel="noopener" class="action-primary">watch</a></li><li><a href="agentic-data-science-marimo-notebooks-festival-of-genomics-2026/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="agentic-data-science-with-marimo-pair/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/DvSxrCcfWFs/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="agentic-data-science-with-marimo-pair/">Agentic Data Science with Marimo Pair</a></h2>
+<p class="card-meta">May 2026</p>
+<div class="card-summary">Marimo as the analysis canvas and Cursor as the coding agent: live notebook EDA and 3D protein visualization.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=DvSxrCcfWFs" rel="noopener" class="action-primary">watch</a></li><li><a href="agentic-data-science-with-marimo-pair/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="productive-patterns-for-agent-assisted-programming-pydata-boston-2025/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/XXR2_pYGNgs/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="productive-patterns-for-agent-assisted-programming-pydata-boston-2025/">Productive Patterns for Agent-Assisted Programming</a></h2>
+<p class="card-meta">PyData Boston 2025 · December 2025</p>
+<div class="card-summary">Battle-tested patterns for AI coding agents: plan, write tests first, let the agent build, document, and repeat.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=XXR2_pYGNgs" rel="noopener" class="action-primary">watch</a></li><li><a href="productive-patterns-for-agent-assisted-programming-pydata-boston-2025/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="ensuring-reproducibility-with-pixi-a-live-demo-and-discussion/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/EQgklFqumGI/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="ensuring-reproducibility-with-pixi-a-live-demo-and-discussion/">Ensuring Reproducibility with Pixi</a></h2>
+<p class="card-meta">prefix · October 2024</p>
+<div class="card-summary">A live demo with Hugo Bowne-Anderson: Pixi lock files, multi-environment workflows, and CUDA-enabled Docker containers for reproducible data science.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=EQgklFqumGI" rel="noopener" class="action-primary">watch</a></li><li><a href="ensuring-reproducibility-with-pixi-a-live-demo-and-discussion/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="software-testing-in-open-source-and-data-science/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/bJGgVoV4GTc/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="software-testing-in-open-source-and-data-science/">Software Testing in Open Source and Data Science</a></h2>
+<p class="card-meta">Data Umbrella · August 2022</p>
+<div class="card-summary">Testing your code, your data, and your pipelines: why software testing matters for open source and data science.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=bJGgVoV4GTc" rel="noopener" class="action-primary">watch</a></li><li><a href="software-testing-in-open-source-and-data-science/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="how-software-skillsets-will-accelerate-your-data-science-work/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/7NEQApSLT1U/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="how-software-skillsets-will-accelerate-your-data-science-work/">How Software Skillsets Will Accelerate Your Data Science Work</a></h2>
+<p class="card-meta">UMBC · May 2022</p>
+<div class="card-summary">Standardize, test, document, and version: software skills that turn data science from solo work into teamwork.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://youtu.be/7NEQApSLT1U" rel="noopener" class="action-primary">watch</a></li><li><a href="https://hackmd.io/@ericmjl/software-ds" rel="noopener">slides</a></li><li><a href="how-software-skillsets-will-accelerate-your-data-science-work/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="computational-biology-in-bioengineering/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/jcqYY8ymL8M/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="computational-biology-in-bioengineering/">Computational Biology in Bioengineering</a></h2>
+<p class="card-meta">UBC · April 2022</p>
+<div class="card-summary">From UBC iGEM to MIT to industry: how network science, deep learning, and Bayesian methods show up in biological engineering.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://youtu.be/jcqYY8ymL8M" rel="noopener" class="action-primary">watch</a></li><li><a href="computational-biology-in-bioengineering/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="an-attempt-at-demystifying-graph-deep-learning/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/cSN-DqPJzY0/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="an-attempt-at-demystifying-graph-deep-learning/">An Attempt at Demystifying Graph Deep Learning</a></h2>
+<p class="card-meta">PyData Global 2021 · January 2022</p>
+<div class="card-summary">Graphs as arrays, message passing, and how they add up to message passing neural networks, explained with lots of pictures and a minimum number of equations.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://youtu.be/cSN-DqPJzY0" rel="noopener" class="action-primary">watch</a></li><li><a href="https://ericmjl.github.io/graph-deep-learning-demystified/#/title-slide" rel="noopener">slides</a></li><li><a href="https://github.com/ericmjl/graph-deep-learning-demystified/" rel="noopener">github</a></li><li><a href="an-attempt-at-demystifying-graph-deep-learning/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="modern-principled-data-science-workflow/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/Dx2vG6qmtPs/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="modern-principled-data-science-workflow/">Modern, Principled Data Science Workflow</a></h2>
+<p class="card-meta">PyData Boston 2020 · July 2020</p>
+<div class="card-summary">Five principles borrowed from software development that accelerate data science projects and amplify their impact.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://ericmjl.github.io/principled-ds-workflow/" rel="noopener" class="action-primary">slides</a></li><li><a href="https://github.com/ericmjl/principled-ds-workflow" rel="noopener">github</a></li><li><a href="https://www.youtube.com/watch?v=Dx2vG6qmtPs" rel="noopener">watch</a></li><li><a href="modern-principled-data-science-workflow/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="testing-for-data-scientists/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/5RKuHvZERLY/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="testing-for-data-scientists/">Testing for Data Scientists</a></h2>
+<p class="card-meta">PyData Ann Arbor 2020 · January 2020</p>
+<div class="card-summary">How data scientists can incorporate testing into their workflow, with Hypothesis for code and Great Expectations for data.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://ericmjl.github.io/testing-for-data-scientists/" rel="noopener" class="action-primary">slides</a></li><li><a href="https://www.youtube.com/watch?v=5RKuHvZERLY" rel="noopener">watch</a></li><li><a href="testing-for-data-scientists/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="beyond-two-groups-generalized-abcde-testing/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/Pt37qA351yk/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="beyond-two-groups-generalized-abcde-testing/">Beyond Two Groups: Generalized A/B[/C/D/E...] Testing</a></h2>
+<p class="card-meta">PyCon 2019 · May 2019</p>
+<div class="card-summary">My PyCon 2019 rant against canned statistical procedures, and how Bayesian estimation with PyMC3 extends A/B testing beyond two groups.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=Pt37qA351yk" rel="noopener" class="action-primary">watch</a></li><li><a href="https://ericmjl.github.io/bayesian-generalized-abcde-testing" rel="noopener">slides</a></li><li><a href="beyond-two-groups-generalized-abcde-testing/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="an-attempt-at-demystifying-bayesian-deep-learning/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/s0S6HFdPtlA/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="an-attempt-at-demystifying-bayesian-deep-learning/">An Attempt at Demystifying Bayesian Deep Learning</a></h2>
+<p class="card-meta">PyData NYC 2017 · December 2017</p>
+<div class="card-summary">In which I show that Bayesian deep learning is nothing special: priors on the weights, explained with pictures and PyMC3 code.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=s0S6HFdPtlA" rel="noopener" class="action-primary">watch</a></li><li><a href="http://ericmjl.github.io/bayesian-deep-learning-demystified" rel="noopener">slides</a></li><li><a href="an-attempt-at-demystifying-bayesian-deep-learning/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="bayesian-statistical-analysis-with-pymc3/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/p1IB4zWq9C8/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="bayesian-statistical-analysis-with-pymc3/">Bayesian Statistical Analysis with Python</a></h2>
+<p class="card-meta">PyCon 2017 · May 2017</p>
+<div class="card-summary">Turn &#34;which statistical test do I use?&#34; into Bayesian estimation problems, with PyMC3 as the workhorse.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=p1IB4zWq9C8" rel="noopener" class="action-primary">watch</a></li><li><a href="https://github.com/ericmjl/bayesian-stats-talk" rel="noopener">notebooks</a></li><li><a href="bayesian-statistical-analysis-with-pymc3/">details</a></li>
+</ul>
+</div>
+</article>
+<article class="artifact-card">
+<a class="card-artwork" href="networks-networks-everywhere/" tabindex="-1" aria-hidden="true">
+<img src="https://i.ytimg.com/vi/TuaAlpfTeZs/hqdefault.jpg" alt="" width="480" height="360" loading="lazy">
+</a>
+<div class="card-body">
+<h2 class="card-title"><a href="networks-networks-everywhere/">Networks, Networks Everywhere</a></h2>
+<p class="card-meta">Big Data Boston 2016 · March 2017</p>
+<div class="card-summary">Networks are everywhere, and representing problems as graphs unlocks ones that are otherwise hard to reason about.</div>
+<ul class="front-actions card-actions">
+<li><a href="https://www.youtube.com/watch?v=TuaAlpfTeZs" rel="noopener" class="action-primary">watch</a></li><li><a href="https://ericmjl.github.io/big-data-boston-2016/" rel="noopener">slides</a></li><li><a href="networks-networks-everywhere/">details</a></li>
+</ul>
+</div>
+</article>
+
+</div>
+</section>
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav">
+            <nav class="terminal-menu" id="local-links">
+                <ul>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                            Resume</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                            LinkedIn</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                            GitHub</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                            Contact Me</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                            Blog RSS</a>
+                    </li>
+                    
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>
