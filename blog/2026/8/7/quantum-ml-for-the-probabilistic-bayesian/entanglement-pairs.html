@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entanglement: A, B, and C</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: monospace; font-size: 13px; line-height: 1.5;
+    color: #222; background: transparent;
+  }
+  .card {
+    background: #fafafa; border: 1px solid #ddd; border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    max-width: 640px; margin: 0 auto; padding: 16px;
+  }
+  .card h1 { font-size: 15px; margin: 0 0 4px; color: #0066cc; }
+  .sub { font-size: 11.5px; color: #999; margin: 0 0 12px; }
+  .seg { display: inline-flex; border: 1px solid #0066cc; border-radius: 5px; overflow: hidden; margin: 0 0 10px; }
+  .seg button {
+    font-family: monospace; font-size: 12px; padding: 5px 12px;
+    border: none; background: #fff; color: #0066cc; cursor: pointer;
+    border-right: 1px solid #0066cc;
+  }
+  .seg button:last-child { border-right: none; }
+  .seg button.on { background: #0066cc; color: #fff; }
+  .seg button:focus { outline: none; }
+  .ctrl { margin-bottom: 10px; }
+  .ctrl label { display: block; font-size: 12px; margin-bottom: 3px; color: #444; }
+  .ctrl .val { color: #0066cc; font-weight: bold; }
+  .ctrl input[type=range] { width: 100%; accent-color: #0066cc; }
+  .row { display: flex; gap: 8px; margin: 6px 0 12px; flex-wrap: wrap; }
+  .btn {
+    font-family: monospace; font-size: 12px; padding: 6px 14px;
+    border: 1px solid #0066cc; border-radius: 5px; background: #0066cc; color: #fff; cursor: pointer;
+  }
+  .btn.ghost { background: #fff; color: #0066cc; }
+  .btn.reset { border-color: #e85d3a; background: #fff; color: #e85d3a; }
+  .btn.reset:hover { background: #e85d3a; color: #fff; }
+  .hist {
+    display: flex; align-items: flex-end; justify-content: center; gap: 8px;
+    height: 170px; padding: 12px 6px 0; margin: 10px 0 8px;
+    background: #fff; border: 1px solid #eee; border-radius: 6px;
+  }
+  .bar-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; flex: 1 1 0; min-width: 0; }
+  .bar { width: 80%; max-width: 40px; transition: height 0.25s ease; border-radius: 4px 4px 0 0; background: #0066cc; }
+  .bar.empty { background: #d9d9d9; }
+  .bar.impossible { background: #f3c9bf; }
+  .bar-label { margin-top: 6px; font-weight: bold; font-size: 11.5px; color: #222; }
+  .bar-count { font-size: 11px; color: #555; }
+  .bar-theory { font-size: 11px; color: #999; }
+  .latest { font-size: 13px; padding: 8px 10px; border-radius: 5px; margin-bottom: 10px; background: #e7f6ee; color: #1a9e5b; border: 1px solid #bfe6d0; }
+  .latest.zero { background: #f4f7fb; color: #888; border-color: #e2e8f0; }
+  .caption { font-size: 11.5px; color: #555; margin: 10px 0 0; padding-top: 10px; border-top: 1px dashed #ddd; line-height: 1.5; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Entanglement: A, B, and C</h1>
+  <p class="sub">A and B can be entangled or independent. C is always on its own.</p>
+
+  <div class="seg" id="entSeg">
+    <button type="button" data-ent="0" class="on">A &amp; B independent</button>
+    <button type="button" data-ent="1">A &amp; B entangled</button>
+  </div>
+
+  <div id="corrRow" class="hidden" style="margin-bottom:10px;">
+    <div style="font-size:12px;color:#444;margin-bottom:3px;">Correlation of the entangled pair</div>
+    <div class="seg" id="corrSeg" style="margin-bottom:0;">
+      <button type="button" data-corr="match" class="on">B = A (match)</button>
+      <button type="button" data-corr="opposite">B = 1 &minus; A (oppose)</button>
+    </div>
+  </div>
+
+  <div class="ctrl">
+    <label>Bias of A &mdash; p(A = 1) = <span class="val" id="pAv">0.50</span></label>
+    <input type="range" id="pA" min="0" max="1" step="0.01" value="0.5">
+  </div>
+  <div class="ctrl" id="pBRow">
+    <label>Bias of B &mdash; p(B = 1) = <span class="val" id="pBv">0.50</span> <span id="pBnote" style="color:#999;">(only used when A &amp; B are independent)</span></label>
+    <input type="range" id="pB" min="0" max="1" step="0.01" value="0.5">
+  </div>
+  <div class="ctrl">
+    <label>Bias of C &mdash; p(C = 1) = <span class="val" id="pCv">0.50</span></label>
+    <input type="range" id="pC" min="0" max="1" step="0.01" value="0.5">
+  </div>
+
+  <div class="row">
+    <button type="button" class="btn" id="measureBtn">Measure once</button>
+    <button type="button" class="btn ghost" id="hundredBtn">Measure 100&times;</button>
+    <button type="button" class="btn reset" id="resetBtn">Reset</button>
+  </div>
+
+  <div class="latest zero" id="latest">No measurements yet.</div>
+
+  <div class="hist" id="hist"></div>
+
+  <p class="caption" id="caption"></p>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  function fit() {
+    var f = window.frameElement;
+    if (!f) return;
+    f.style.height = '0px';
+    f.style.height = document.body.scrollHeight + 'px';
+  }
+
+  var MAX_PX = 130;
+  var state = { ent: false, corr: 'match', pA: 0.5, pB: 0.5, pC: 0.5, counts: {} };
+
+  function $(id) { return document.getElementById(id); }
+  function fmt(p) { return Number(p).toFixed(2); }
+  function bernoulli(p) { return (Math.random() < p) ? 1 : 0; }
+
+  function binLabels() {
+    var arr = [];
+    for (var i = 0; i < 8; i++) arr.push(i.toString(2).padStart(3, '0'));
+    return arr;
+  }
+
+  // P(A,B) marginal
+  function pAB(a, b) {
+    var pa = (a === 1) ? state.pA : (1 - state.pA);
+    if (state.ent) {
+      var allowed = (state.corr === 'match') ? (a === b) : (a !== b);
+      return allowed ? pa : 0;
+    }
+    var pb = (b === 1) ? state.pB : (1 - state.pB);
+    return pa * pb;
+  }
+
+  // P(A,B,C) for a 3-char bitstring
+  function theoretical(bs) {
+    var a = +bs[0], b = +bs[1], c = +bs[2];
+    var pc = (c === 1) ? state.pC : (1 - state.pC);
+    return pAB(a, b) * pc;
+  }
+
+  function measure(times) {
+    for (var t = 0; t < times; t++) {
+      var a = bernoulli(state.pA);
+      var b;
+      if (state.ent) { b = (state.corr === 'match') ? a : (1 - a); }
+      else { b = bernoulli(state.pB); }
+      var c = bernoulli(state.pC);
+      var key = '' + a + b + c;
+      state.counts[key] = (state.counts[key] || 0) + 1;
+    }
+    render();
+  }
+
+  function reset() {
+    state.counts = {};
+    render();
+  }
+
+  function render() {
+    var labels = binLabels();
+    var maxCount = 0;
+    for (var i = 0; i < labels.length; i++) {
+      var c = state.counts[labels[i]] || 0;
+      if (c > maxCount) maxCount = c;
+    }
+    var hist = $('hist');
+    hist.innerHTML = '';
+    for (var k = 0; k < labels.length; k++) {
+      var bs = labels[k];
+      var count = state.counts[bs] || 0;
+      var th = theoretical(bs);
+      var h = (maxCount > 0) ? Math.round((count / maxCount) * MAX_PX) : 0;
+      var col = document.createElement('div');
+      col.className = 'bar-col';
+      var bar = document.createElement('div');
+      bar.className = 'bar';
+      if (th === 0) bar.className = 'bar impossible';
+      else if (count === 0) bar.className = 'bar empty';
+      bar.style.height = h + 'px';
+      col.appendChild(bar);
+      var lbl = document.createElement('div');
+      lbl.className = 'bar-label';
+      lbl.textContent = bs;
+      col.appendChild(lbl);
+      var cn = document.createElement('div');
+      cn.className = 'bar-count';
+      cn.textContent = String(count);
+      col.appendChild(cn);
+      var tv = document.createElement('div');
+      tv.className = 'bar-theory';
+      tv.textContent = (th * 100).toFixed(0) + '%';
+      col.appendChild(tv);
+      hist.appendChild(col);
+    }
+
+    var total = 0;
+    for (var key in state.counts) total += state.counts[key];
+    var el = $('latest');
+    if (total === 0) {
+      el.className = 'latest zero';
+      el.textContent = 'No measurements yet.';
+    } else {
+      // find last drawn — reconstruct from the most-recently incremented is not tracked; show totals instead
+      el.className = 'latest';
+      el.innerHTML = 'samples: <b>' + total + '</b>';
+    }
+
+    var cap = $('caption');
+    if (state.ent) {
+      cap.textContent = 'A and B are entangled, so measuring A pins down B. Any ABC outcome where A and B disagree is impossible, and those bars show 0% (shaded). C is untouched: entanglement is pairwise.';
+    } else {
+      cap.textContent = 'A, B, and C are all independent. The joint distribution factorizes as P(A)\u00B7P(B)\u00B7P(C), so all eight outcomes can occur.';
+    }
+    fit();
+  }
+
+  function setEnt(on) {
+    state.ent = !!on;
+    var btns = $('entSeg').children;
+    for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('on', btns[i].getAttribute('data-ent') === (on ? '1' : '0'));
+    $('corrRow').classList.toggle('hidden', !on);
+    $('pBRow').classList.toggle('hidden', on);
+    state.counts = {};
+    render();
+  }
+
+  function setCorr(c) {
+    state.corr = c;
+    var btns = $('corrSeg').children;
+    for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('on', btns[i].getAttribute('data-corr') === c);
+    state.counts = {};
+    render();
+  }
+
+  // wire toggles
+  var eb = $('entSeg').children;
+  for (var i = 0; i < eb.length; i++) {
+    (function (btn) {
+      btn.addEventListener('click', function () { setEnt(btn.getAttribute('data-ent') === '1'); });
+    })(eb[i]);
+  }
+  var cb = $('corrSeg').children;
+  for (var j = 0; j < cb.length; j++) {
+    (function (btn) {
+      btn.addEventListener('click', function () { setCorr(btn.getAttribute('data-corr')); });
+    })(cb[j]);
+  }
+
+  $('pA').addEventListener('input', function () { state.pA = parseFloat(this.value); $('pAv').textContent = fmt(state.pA); render(); });
+  $('pB').addEventListener('input', function () { state.pB = parseFloat(this.value); $('pBv').textContent = fmt(state.pB); render(); });
+  $('pC').addEventListener('input', function () { state.pC = parseFloat(this.value); $('pCv').textContent = fmt(state.pC); render(); });
+
+  $('measureBtn').addEventListener('click', function () { measure(1); });
+  $('hundredBtn').addEventListener('click', function () { measure(100); });
+  $('resetBtn').addEventListener('click', reset);
+
+  render();
+  fit();
+  window.addEventListener('load', fit);
+})();
+</script>
+</body>
+</html>

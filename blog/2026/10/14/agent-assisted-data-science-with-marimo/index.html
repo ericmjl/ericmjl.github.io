@@ -1,0 +1,767 @@
+<!doctype html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <script>document.documentElement.classList.add('js');</script>
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.webp">
+    <style media="screen">
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        body.dark-mode a {
+            color: #66b3ff;
+        }
+
+        body.dark-mode .terminal-menu {
+            background-color: #1a1a1a;
+        }
+
+        body.dark-mode .terminal-menu li a {
+            color: #ffffff;
+        }
+
+        body.dark-mode .terminal-menu li a:hover {
+            background-color: #333333;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #666;
+        }
+
+        .container {
+            position: relative;
+        }
+    </style>
+    
+<!-- Syntax Highlighter. Use pygments. -->
+<link rel="stylesheet" href="../../../../../static/pygments.css">
+
+
+    
+
+<meta property="og:title" content="Agent-assisted data science with marimo notebooks">
+<meta property='og:url' content='http://ericmjl.github.io/blog//blog/agent-assisted-data-science-with-marimo' />
+
+
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-51WHZQ1VQ8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-51WHZQ1VQ8');
+    </script>
+
+    <!-- PostHog Analytics -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Xr es pi Zr rs Kr Qr capture Ni calculateEventProperties os register register_once register_for_session unregister unregister_for_session ds getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty us ns createPersonProfile hs Vr vs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing ss debug O ls getPageViewId captureTraceFeedback captureTraceMetric qr".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_907JjTIpyrrIxT5wKiahneMoCl6rMc2XNfaYXrGZ3Fe', {
+            api_host: 'https://us.i.posthog.com',
+            defaults: '2025-11-30',
+            person_profiles: 'identified_only',
+        })
+    </script>
+
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.2/dist/terminal.min.css" />
+    <link rel="stylesheet" href="/static/css/custom.css" />
+    <!-- Mathjax -->
+    <!-- <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML">
+        </script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script> -->
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+        </script>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose'
+        });
+    </script>
+    <style>
+        .mermaid {
+            background-color: white;
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+
+
+
+<title>Agent-assisted data science with marimo notebooks - Eric J. Ma's Personal Site</title>
+
+<body>
+    <div class="container">
+        <h1 class="logo">
+            <a href="/">
+                Eric J Ma's Website
+            </a>
+        </h1>
+        <!-- Top Navigation (local links) -->
+
+        <div class="terminal-nav nav-header">
+            <div class="nav-bar">
+                <button type="button" class="nav-toggle" aria-expanded="false"
+                        aria-controls="nav-menu-header" aria-label="Toggle site menu">
+                    <span class="command-prompt" aria-hidden="true">$</span>
+                    <span class="nav-toggle-label">menu</span>
+                    <span class="command-caret" aria-hidden="true"></span>
+                </button>
+                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+            </div>
+            <nav class="terminal-menu">
+                <div class="menu-collapse" id="nav-menu-header">
+                    <ul>
+                        
+                        <li class="menu-item">
+                            <!-- Set blinking cursor correctly on navigation -->
+                            
+                            
+                            
+                            
+                            
+                            <a href="/" rel="">Home</a>
+                            
+                        </li>
+                        
+                        <li class="menu-item">
+                            <!-- Set blinking cursor correctly on navigation -->
+                            
+                            
+                            
+                            
+                            
+                            <a class="terminal-prompt" href="/blog" rel="">Blog</a>
+                            
+                        </li>
+                        
+                        <li class="menu-item">
+                            <!-- Set blinking cursor correctly on navigation -->
+                            
+                            
+                            
+                            
+                            
+                            <a href="/books" rel="">Books</a>
+                            
+                        </li>
+                        
+                        <li class="menu-item">
+                            <!-- Set blinking cursor correctly on navigation -->
+                            
+                            
+                            
+                            
+                            
+                            <a href="/open-source" rel="">Open Source</a>
+                            
+                        </li>
+                        
+                        <li class="menu-item">
+                            <!-- Set blinking cursor correctly on navigation -->
+                            
+                            
+                            
+                            
+                            
+                            <a href="/projects" rel="">Projects</a>
+                            
+                        </li>
+                        
+                        <li class="menu-item">
+                            <!-- Set blinking cursor correctly on navigation -->
+                            
+                            
+                            
+                            
+                            
+                            <a href="/talks" rel="">Talks</a>
+                            
+                        </li>
+                        
+                        <li class="menu-item">
+                            <!-- Set blinking cursor correctly on navigation -->
+                            
+                            
+                            
+                            
+                            
+                            <a href="/teaching" rel="">Teaching</a>
+                            
+                        </li>
+                        
+                        <li class="menu-item">
+                            <!-- Set blinking cursor correctly on navigation -->
+                            
+                            
+                            
+                            
+                            
+                            <a href="/user-manual" rel="">User Manual</a>
+                            
+                        </li>
+                        
+                        <li class="menu-item">
+                            <!-- Set blinking cursor correctly on navigation -->
+                            
+                            
+                            
+                            
+                            
+                            <a href="/bio" rel="">Bio</a>
+                            
+                        </li>
+                        
+                        <li class="menu-item">
+                            <a href="#" id="search-button" title="Search (Ctrl+K)">Search</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Body -->
+        <div id="body">
+            
+
+
+<div class="terminal-card">
+  <header id="post_title" name="post_title">
+<!-- Set title style -->
+<span name="title" id="title">Agent-assisted data science with marimo notebooks</span>
+</header>
+  <div class="card-body">
+    
+<!-- Append author -->
+<small>
+  <p>
+    written by
+    
+    <a class="author" href="https://twitter.com/ericmjl">Eric J. Ma</a>
+    
+    on
+    <span id="pub_date" name="pub_date">2026-10-14</span>
+
+    
+    | tags:
+    <!-- Append tags after author -->
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/marimo/">
+        marimo
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/python/">
+        python
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/agents/">
+        agents
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/notebooks/">
+        notebooks
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/llms/">
+        llms
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/workflows/">
+        workflows
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/sandboxing/">
+        sandboxing
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/reproducibility/">
+        reproducibility
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/data science/">
+        data science
+      </a>
+    </span>
+    <span class="boxed" id="tags" name="tags">
+      <a class="tags" href="../../../../tag/pair programming/">
+        pair programming
+      </a>
+    </span>
+    
+  </p>
+  
+</small>
+
+    <hr>
+
+    
+    
+    <img src="logo.webp" class="banner-image" >
+    
+
+    <!-- NOTE: I am keeping this here just for preview purposes.
+     We must rely on the webp logo for the blog post.
+     Pre-commit hooks will ensure that the png logo is converted to webp.-->
+    
+
+    
+    <div class="blog-summary">
+      <i><p>In this post, I walk through my setup for agentic data science with marimo notebooks: picking a harness and model, writing instruction files that hold the agent to my standards, sandboxing environments with uv or pixi, and pairing the agent with a live notebook in an iterative loop. I also cover custom anywidget viewers, feedback with marimo-lens, and turning the finished notebook into a presentation. It all started as a whiteboard sketch headed for a video and course. What could you discover if an agent typed while you thought out loud?</p>
+</i>
+    </div>
+    
+
+    <span id="post_body" name="post_body">
+      <p>People keep asking me how I do agentic data science with <a href="https://marimo.io">marimo</a> notebooks. Recently I stood at a whiteboard and drew the whole system out: the setup, the tools, the loop you work in with the agent. The drawing came out clean, so I took a photo of it.</p>
+<p>The whole system comes down to one idea: agents do their best data science work when you structure the environment around them. You pick a harness and a model, write instruction files that hold the agent to your standards, load a skill that teaches it the marimo specifics, and give the whole thing a sandboxed environment. Then you pair the agent with a live notebook and spend the session in a loop where you think out loud and the agent types. I've written about <a href="https://ericmjl.github.io/blog/2026/2/1/how-to-do-agentic-data-science/">how to do agentic data science</a> before, and about <a href="https://ericmjl.github.io/blog/2025/4/8/wow-marimo/">why marimo won me over</a>. This one is the concrete, marimo-specific walkthrough.</p>
+<h2 id="the-setup">The setup</h2><p>Four things need to exist before the analysis starts.</p>
+<h3 id="a-harness-and-a-model">A harness and a model</h3><p>The harness is whichever coding agent you like. <a href="https://github.com/openai/codex">Codex</a>, <a href="https://claude.com/product/claude-code">Claude Code</a>, <a href="https://github.com/features/copilot">Copilot</a>, <a href="https://github.com/earendil-works/pi">pi</a>, they all work. The more interesting choice is the model behind it. You want speed, so the session stays conversational, and you want intelligence, so you're not dealing with dumb mistakes the agent makes along the way. It's a very tough balance to strike.</p>
+<p>My current ranking, fastest to slowest, is Composer 2.5, Grok 4.6 fast, GLM 5.3 Flash, and GPT 5.6 on medium effort. The further down the list you go, the more work the model can handle in one shot, the more prompting it needs to keep moving, and the longer you wait for feedback from the agent. For interactive notebook sessions, I lean toward the fast end of that list.</p>
+<h3 id="instruction-files">Instruction files</h3><p>Instruction files do the most work in this setup. Your <a href="https://agents.md/">AGENTS.md</a> file tells the agent what a good notebook looks like, and mine holds the agent to three standards.</p>
+<p>First among them is the sandwich: markdown, then code, then output, then more markdown. Every piece of code the agent writes arrives wrapped in narration, before and after, so the notebook reads like a document even while it's under construction. In the AGENTS.md, the rule reads:</p>
+<div class="hll"><pre><span></span><span class="k">-</span><span class="w"> </span>Every code cell must be sandwiched between markdown cells that
+  explain what the code does and why. A markdown cell precedes the
+  code cell to describe intent, and a markdown cell follows to
+  provide context for the results or transitions to the next step.
+</pre></div>
+<p>Upon prompting, the agent comes back with a sentence of setup, the code cell, the chart, and a one-line read of what the chart shows.</p>
+<p>Named cells are the second. When you drive a session by talking, "clean up the plotting cell" only works if the agent can find the plotting cell. So the AGENTS.md says:</p>
+<div class="hll"><pre><span></span><span class="k">-</span><span class="w"> </span>Every cell must have a descriptive name. Use
+  <span class="sb">`@app.cell(name=&quot;descriptive_name&quot;)`</span> instead of bare <span class="sb">`@app.cell`</span>
+  or unnamed <span class="sb">`def _()`</span>.
+</pre></div>
+<p>Names give both of you the vocabulary to point at things.</p>
+<p>Third, code stays hidden by default. I've tried keeping all the code visible, and man, the notebook gets hard to read fast. The AGENTS.md rule is to hide all code cells unless I ask otherwise, and marimo makes that enforceable with a flag right on the cell decorator:</p>
+<div class="hll"><pre><span></span><span class="nd">@app</span><span class="o">.</span><span class="n">cell</span><span class="p">(</span><span class="n">hide_code</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_</span><span class="p">():</span>
+    <span class="n">mo</span><span class="o">.</span><span class="n">md</span><span class="p">(</span><span class="s2">&quot;This cell&#39;s narration shows; its code stays folded away.&quot;</span><span class="p">)</span>
+    <span class="k">return</span>
+</pre></div>
+<p>The narration and outputs stay in view, and you can always inspect any cell when you want to see the machinery.</p>
+<h3 id="the-marimo-pair-skill">The marimo-pair skill</h3><p>For marimo knowledge specifically, I use the official <a href="https://github.com/marimo-team/marimo-pair">marimo-pair</a> skill rather than writing my own instructions from scratch. The marimo team maintains it, their docs call it the recommended way to collaborate with agents on notebooks, and it stays current as marimo evolves. The reason it's so useful is that pairing is a skill on the agent's side too: marimo-pair teaches the agent how to drive a live notebook according to marimo's own best practices. I was curious how well the skill held up across models, so I <a href="https://ericmjl.github.io/blog/2026/4/8/benchmarking-llms-with-marimo-pair/">benchmarked it across a stack of LLMs</a>, measuring cost, task progress, and instruction adherence for each one.</p>
+<p>Install it with:</p>
+<div class="hll"><pre><span></span>npx<span class="w"> </span>skills<span class="w"> </span>add<span class="w"> </span>marimo-team/marimo-pair
+</pre></div>
+<p>My recommendation: install it into each repository where you do data science, rather than globally. The skills CLI asks you to choose a scope when you add a skill, so pick the project there. Every installed skill carries a description that gets surfaced to the agent at the start of a session, so a growing pile of global skills bloats every session, including the ones where you're using the agent for non-data-science work. Keeping marimo-pair scoped to the repos where the notebooks live keeps everything else lean.</p>
+<h3 id="a-sandboxed-environment">A sandboxed environment</h3><p>Run marimo through a fast environment tool like <a href="https://docs.astral.sh/uv/">uv</a> or <a href="https://pixi.sh">pixi</a>, in sandbox mode. Sandbox mode is the piece that makes environments a non-issue: marimo records the notebook's dependencies into the notebook file itself, as <a href="https://peps.python.org/pep-0723/">PEP 723</a> inline script metadata, and prepares an isolated environment from those requirements. Every <code>.py</code> notebook then carries its own environment with it, so when the agent installs what an analysis needs, the notebook file records it, and anyone opening that notebook later gets the same setup.</p>
+<h2 id="the-workflow">The workflow</h2><p>Once the setup exists, every session has the same shape.</p>
+<ol>
+<li><strong>Fire up marimo.</strong> Usually that's <code>uvx marimo edit --sandbox notebook.py</code>, or <code>pixi exec marimo edit --sandbox notebook.py</code> for the pixi equivalent.</li>
+<li><strong>Pair the agent with the notebook.</strong> Pairing gives the agent access to the live kernel: it can read cells, write cells, run them, and inspect the results, while you watch everything happen in your browser.</li>
+<li><strong>State the analysis goal.</strong> I use "analysis" loosely here. Maybe the goal is understanding, and you want to slice the data a few ways before committing to anything. Maybe it's building the best model possible, and you send the agent off on an agentic loop to get there. Whatever it is, say the goal out loud first.</li>
+<li><strong>The agent writes a markdown blurb at the top.</strong> With the goal stated, it drafts the notebook's opening narration, so the notebook records what you're doing and why from the very first cell.</li>
+<li><strong>Iterate, one idea unit at a time.</strong> An idea unit is one plot, one table view, one statistical test, or one model fit. Keep each unit small, small enough that you can imagine what the code might look like, because that's what makes the agent's work reviewable. Act on hypotheses: "I suspect the effect is concentrated in this subgroup, make a view that shows it." Because the AGENTS.md established the sandwich, everything the agent adds slots into the narrative.</li>
+<li><strong>Build custom viewers when the data calls for them.</strong> This is where you can get ambitious, and I'd encourage you to go beyond what you think is usable. With <a href="https://anywidget.dev">anywidget</a>, the agent can build custom data viewers for awkward data: an email viewer for inspecting eval sets, or a 3D protein viewer. A purpose-built viewer beats scrolling through a dataframe.</li>
+</ol>
+<iframe src="protein-anywidget.html" width="100%" height="540" style="border:0;" loading="lazy" title="Anywidget 3D protein viewer running in marimo WebAssembly"></iframe><p><em>This is a true anywidget running in a marimo notebook compiled to WebAssembly: a Python class whose JavaScript side loads 3Dmol and renders the structure, the kind of viewer an agent can build for your data. It's ubiquitin (PDB 1UBQ); drag to rotate, scroll to zoom. The notebook source is <a href="protein-anywidget.py"><code>protein-anywidget.py</code></a>.</em></p>
+<p>Sometimes the right move is to step out of the loop for a moment and set up a separate notebook that trains in the background while you keep iterating in the foreground.</p>
+<p>Domain skills plug in here too. When an analysis needs R2D2, which puts the prior on model fit itself, I have a skill with the R2D2 papers baked in, alongside PyMC implementation examples, so the agent works from the primary sources instead of its memory of them. (I've written about <a href="https://ericmjl.github.io/blog/2025/8/6/stop-guessing-at-priors-r2d2s-automated-approach-to-bayesian-modeling/">why R2D2 is worth your attention</a> before.)</p>
+<p>This loop is interactive by design. You iterate with the agent, in plain language, and marimo's reactivity re-runs whatever depends on the cell you just changed. The creative work happens inside that loop. The mechanics are easy to demonstrate: a table, a plot, a custom viewer. Where the analysis goes from there comes out of your problem.</p>
+<h2 id="giving-feedback-with-marimo-lens">Giving feedback with marimo-lens</h2><p>Notebooks need editing like any draft. When mine needs sprucing up, I use <a href="https://marimo-team.github.io/marimo-lens/">marimo-lens</a>: point at a cell's output, say a bar in a chart or a row in a table, drop a note right there, and keep reading. Lens hands the agent your selection together with the code and data behind it, so the agent sees what you see, revises, and brings the result back into view for you to judge. It keeps feedback attached to the output you're looking at, which is what goes missing when you say "that spike in the chart, fix it" in a chat box.</p>
+<p>It works in both directions, too. After the agent fixes things, it posts a message back onto the notebook right where you pointed, a small note you can review, so its answer lands next to the output it changed.</p>
+<p><img src="marimo-lens-annotations.webp" alt="marimo Lens annotations over a live heat map"></p>
+<p><em>You point at part of a rendered result in marimo-lens, and the selection, your note, and the code behind the output go to the agent together. Here the selections are boxes drawn over a heat map during my live demo, as written up in <a href="https://ericmjl.github.io/blog/2026/10/14/live-demoing-data-science-in-the-age-of-agents/">the live-demoing post</a>.</em></p>
+<h2 id="showing-the-work">Showing the work</h2><p>A finished analysis needs a presentation layer, and the notebook you built is already most of the way there. <a href="https://koaning.github.io/wigglystuff/reference/cell-tour/">CellTour</a>, a code tour widget from <a href="https://koaning.github.io/wigglystuff/">WigglyStuff</a>, walks you through the notebook one popover at a time, pointing at each cell by name. marimo also exports a notebook configured with its slides layout as a <a href="https://docs.marimo.io/guides/apps/">reveal.js deck</a>, and Marimo Studio builds custom apps, reports, and presentations on top of the notebook's data and outputs. The same artifact you analyzed with becomes the artifact you present, which is one of my favorite parts of this workflow.</p>
+<h2 id="wrapping-up">Wrapping up</h2><p>Zooming out, the three marimo tools are part of a loop between you and the agent. <code>marimo-pair</code> is how you get the agent to work within the notebook. <code>marimo-lens</code> is how you give feedback to the agent. And <code>marimo-studio</code> is how you take what you need from the notebook and deliver it to your audience. All three of them interact with that one artifact, the <code>.py</code> file, and you only have to interact with an intelligent and fast agent, from first cell to final slide.</p>
+<p>Best of all, everything in that loop is a plain-text artifact too! The notebook is a <code>.py</code> file, the slides are an HTML export, the app is the same notebook served somewhere, and all of it goes into git and deploys from there. How to deploy marimo notebooks deserves a post of its own; stay tuned!</p>
+
+    </span>
+
+    
+    
+    
+    
+    
+
+    <hr>
+
+    <i>Cite this blog post:</i>
+    <div class="hll" style="position: relative;">
+    <button class="copy-button" onclick="copyCitation()" title="Copy citation">
+      <span class="copy-icon">📋</span>
+    </button>
+    <pre>
+<span id="citation-text"><span><span style="color: darkblue; font-weight: bold">@article</span>{
+    <span style="color: black; font-weight: bold">ericmjl-2026-agent-assisted-data-science-with-marimo</span>,
+    <span style="color: green; font-weight:bold">author</span> = <span style="color: maroon">{Eric J. Ma}</span>,
+    <span style="color: green; font-weight:bold">title</span> = <span style="color: maroon">{Agent-assisted data science with marimo notebooks}</span>,
+    <span style="color: green; font-weight:bold">year</span> = <span style="color: maroon">{2026}</span>,
+    <span style="color: green; font-weight:bold">month</span> = <span style="color: maroon">{10}</span>,
+    <span style="color: green; font-weight:bold">day</span> = <span style="color: maroon">{14}</span>,
+    <span style="color: green; font-weight:bold">howpublished</span> = <span style="color: maroon">{\url{https://ericmjl.github.io}}</span>,
+    <span style="color: green; font-weight:bold">journal</span> = <span style="color: maroon">{Eric J. Ma's Blog}</span>,
+    <span style="color: green; font-weight:bold">url</span> = <span style="color: maroon">{https://ericmjl.github.io/blog/2026/10/14/agent-assisted-data-science-with-marimo}</span>,
+}
+  </span></pre>
+    </div>
+
+    <script>
+    function copyCitation() {
+      const citationElement = document.getElementById('citation-text');
+      const text = citationElement.textContent;
+
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+
+      // Remove the temporary textarea
+      document.body.removeChild(textarea);
+
+      // Visual feedback
+      const button = document.querySelector('.copy-button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span class="copy-icon">✓</span>';
+      button.style.backgroundColor = '#4CAF50';
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+      }, 2000);
+    }
+    </script>
+
+    <style>
+    .copy-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: transparent;
+      color: #666;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    .copy-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .copy-icon {
+      font-size: 14px;
+    }
+    </style>
+    <hr>
+    <p>
+      <i>I send out a newsletter with tips and tools
+        for data scientists. Come check it out at
+        <a href="https://dspn.substack.com">Substack</a>.</i>
+    </p>
+    <p class="blog-todo-comment"># TODO(eric): learn how to
+        <a href="https://learn-anything.nonlinearlabs.ai/">learn anything</a>.
+        feb 2027.</p>
+    <p>
+      <i><span>If you would like to sponsor the coffee that goes into making my posts,
+        please consider </span>
+        <a href="https://github.com/sponsors/ericmjl">GitHub Sponsors</a>!</i>
+    </p>
+
+  </div>
+  <div class="giscus" id="giscus-container"></div>
+  <script>
+    // Determine theme from localStorage or fallback to light
+    var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+    var giscusScript = document.createElement('script');
+    giscusScript.src = 'https://giscus.app/client.js';
+    giscusScript.setAttribute('data-repo', 'ericmjl/website');
+    giscusScript.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnk2MDIzMzAxNg==');
+    giscusScript.setAttribute('data-category', 'Comments');
+    giscusScript.setAttribute('data-category-id', 'DIC_kwDOA5cVOM4Crqx4');
+    giscusScript.setAttribute('data-mapping', 'pathname');
+    giscusScript.setAttribute('data-strict', '1');
+    giscusScript.setAttribute('data-reactions-enabled', '1');
+    giscusScript.setAttribute('data-emit-metadata', '0');
+    giscusScript.setAttribute('data-input-position', 'top');
+    giscusScript.setAttribute('data-theme', theme);
+    giscusScript.setAttribute('data-lang', 'en');
+    giscusScript.crossOrigin = 'anonymous';
+    giscusScript.async = true;
+    document.getElementById('giscus-container').appendChild(giscusScript);
+  </script>
+</div>
+
+
+
+        </div>
+
+        <!-- Bottom Navigation (external links) -->
+        <div class="terminal-nav nav-footer">
+            <div class="nav-bar">
+                <button type="button" class="nav-toggle" aria-expanded="false"
+                        aria-controls="nav-menu-footer" aria-label="Toggle footer links">
+                    <span class="command-prompt" aria-hidden="true">$</span>
+                    <span class="nav-toggle-label">links</span>
+                    <span class="command-caret" aria-hidden="true"></span>
+                </button>
+            </div>
+            <nav class="terminal-menu">
+                <div class="menu-collapse" id="nav-menu-footer">
+                    <ul>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://ericmjl.github.io/resume" rel="">
+                                Resume</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://www.linkedin.com/in/ericmjl" rel="">
+                                LinkedIn</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="http://github.com/ericmjl" rel="">
+                                GitHub</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://ericmjl--shortmail-run-app.modal.run/send/cce87ae9c1d7" rel="">
+                                Contact Me</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://ericmjl.github.io/blog.xml" rel="">
+                                Blog RSS</a>
+                        </li>
+                        
+                    </ul>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Retreat prompt: persistent, understated callout (issue #311).
+             Sits after the footer link list; remove after 2027-02-20. -->
+        
+<!-- RETREAT-CALLOUT: remove after the retreat ends 2027-02-20; see templates/macros/retreat.html -->
+<a class="retreat-prompt"
+   href="https://learn-anything.nonlinearlabs.ai/"
+   aria-label="Learn Anything with AI: a five-day, in-person retreat co-taught with Daniel Chen, February 14-20, 2027">
+    <span class="retreat-command">
+        <span class="command-prompt" aria-hidden="true">$</span>
+        <span class="retreat-command-text">learn anything --with ai --feb 2027</span>
+        <span class="command-caret" aria-hidden="true"></span>
+    </span>
+    <span class="retreat-output">
+        <span class="retreat-output-inner">
+            <span class="retreat-output-line">&rarr; 5 days &middot; in person &middot; a small cohort</span>
+            <span class="retreat-output-line">&rarr; feb 14-20, 2027 &middot; learn-anything.nonlinearlabs.ai</span>
+        </span>
+    </span>
+</a>
+<script>
+(function () {
+  var prompt = document.querySelector('.retreat-prompt');
+  if (!prompt) return;
+
+  // The element's performance is observable from day one.
+  prompt.addEventListener('click', function () {
+    if (window.posthog) posthog.capture('retreat_prompt_click');
+  });
+
+  // Reduced motion: no typing, static caret (CSS handles the rest).
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var textEl = prompt.querySelector('.retreat-command-text');
+  var full = textEl.textContent;
+  var typed = false;
+
+  function type() {
+    if (typed) return;
+    typed = true;
+    prompt.classList.add('is-typing');
+    var i = 0;
+    var timer = setInterval(function () {
+      i += 1;
+      textEl.textContent = full.slice(0, i);
+      if (i >= full.length) {
+        clearInterval(timer);
+        prompt.classList.remove('is-typing');
+      }
+    }, 28);
+  }
+
+  if (!('IntersectionObserver' in window)) { type(); return; }
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        observer.disconnect();
+        type();
+      }
+    });
+  }, { threshold: 0.5 });
+  observer.observe(prompt);
+})();
+</script>
+
+
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function setGiscusTheme(theme) {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme
+                        }
+                    }
+                },
+                'https://giscus.app'
+            );
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+                setGiscusTheme('light');
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+                setGiscusTheme('dark');
+            }
+        }
+
+        // Check for saved theme preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.querySelector('.theme-toggle');
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+                setTimeout(() => setGiscusTheme('dark'), 500);
+            } else {
+                setTimeout(() => setGiscusTheme('light'), 500);
+            }
+        });
+    </script>
+
+    <!-- Collapsing mobile navigation: the toggles render only below 900px
+         and only when JS is present (html.js); without JS both menus stay
+         expanded, exactly as they were before. -->
+    <script>
+        (function () {
+            var mq = window.matchMedia('(max-width: 900px)');
+            var toggles = Array.prototype.slice.call(document.querySelectorAll('.nav-toggle'));
+
+            function panelFor(toggle) {
+                return document.getElementById(toggle.getAttribute('aria-controls'));
+            }
+
+            function setOpen(toggle, open) {
+                toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+                panelFor(toggle).classList.toggle('is-open', open);
+            }
+
+            toggles.forEach(function (toggle) {
+                toggle.addEventListener('click', function () {
+                    setOpen(toggle, toggle.getAttribute('aria-expanded') !== 'true');
+                });
+                // Navigating or opening search should not leave the panel open behind it.
+                panelFor(toggle).addEventListener('click', function (e) {
+                    if (e.target.closest('a')) setOpen(toggle, false);
+                });
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key !== 'Escape') return;
+                toggles.forEach(function (toggle) {
+                    if (toggle.getAttribute('aria-expanded') === 'true') {
+                        setOpen(toggle, false);
+                        toggle.focus();
+                    }
+                });
+            });
+
+            // Leaving the mobile breakpoint restores the resting (closed) state.
+            if (mq.addEventListener) {
+                mq.addEventListener('change', function (e) {
+                    if (!e.matches) toggles.forEach(function (t) { setOpen(t, false); });
+                });
+            }
+        })();
+    </script>
+
+    <!-- Search functionality -->
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
+    <script src="/static/js/search.js"></script>
+</body>
