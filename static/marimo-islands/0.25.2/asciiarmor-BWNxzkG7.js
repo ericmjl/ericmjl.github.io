@@ -1,0 +1,33 @@
+import { r as e } from "./rolldown-runtime-Cb76FRpK.js";
+//#region ../node_modules/.pnpm/@codemirror+legacy-modes@6.5.4/node_modules/@codemirror/legacy-modes/mode/asciiarmor.js
+var t = /* @__PURE__ */ e({ asciiArmor: () => r });
+function n(e) {
+	var t = e.match(/^\s*\S/);
+	return e.skipToEnd(), t ? "error" : null;
+}
+var r = {
+	name: "asciiarmor",
+	token: function(e, t) {
+		var r;
+		if (t.state == "top") return e.sol() && (r = e.match(/^-----BEGIN (.*)?-----\s*$/)) ? (t.state = "headers", t.type = r[1], "tag") : n(e);
+		if (t.state == "headers") {
+			if (e.sol() && e.match(/^\w+:/)) return t.state = "header", "atom";
+			var i = n(e);
+			return i && (t.state = "body"), i;
+		}
+		if (t.state == "header") return e.skipToEnd(), t.state = "headers", "string";
+		if (t.state == "body") return e.sol() && (r = e.match(/^-----END (.*)?-----\s*$/)) ? r[1] == t.type ? (t.state = "end", "tag") : "error" : e.eatWhile(/[A-Za-z0-9+\/=]/) ? null : (e.next(), "error");
+		if (t.state == "end") return n(e);
+	},
+	blankLine: function(e) {
+		e.state == "headers" && (e.state = "body");
+	},
+	startState: function() {
+		return {
+			state: "top",
+			type: null
+		};
+	}
+};
+//#endregion
+export { t as n, r as t };

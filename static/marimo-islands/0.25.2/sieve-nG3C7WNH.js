@@ -1,0 +1,62 @@
+import { r as e } from "./rolldown-runtime-Cb76FRpK.js";
+//#region ../node_modules/.pnpm/@codemirror+legacy-modes@6.5.4/node_modules/@codemirror/legacy-modes/mode/sieve.js
+var t = /* @__PURE__ */ e({ sieve: () => l });
+function n(e) {
+	for (var t = {}, n = e.split(" "), r = 0; r < n.length; ++r) t[n[r]] = !0;
+	return t;
+}
+var r = n("if elsif else stop require"), i = n("true false not");
+function a(e, t) {
+	var n = e.next();
+	if (n == "/" && e.eat("*")) return t.tokenize = s, s(e, t);
+	if (n === "#") return e.skipToEnd(), "comment";
+	if (n == "\"") return t.tokenize = c(n), t.tokenize(e, t);
+	if (n == "(") return t._indent.push("("), t._indent.push("{"), null;
+	if (n === "{") return t._indent.push("{"), null;
+	if (n == ")" && (t._indent.pop(), t._indent.pop()), n === "}") return t._indent.pop(), null;
+	if (n == "," || n == ";" || /[{}\(\),;]/.test(n)) return null;
+	if (/\d/.test(n)) return e.eatWhile(/[\d]/), e.eat(/[KkMmGg]/), "number";
+	if (n == ":") return e.eatWhile(/[a-zA-Z_]/), e.eatWhile(/[a-zA-Z0-9_]/), "operator";
+	e.eatWhile(/\w/);
+	var a = e.current();
+	return a == "text" && e.eat(":") ? (t.tokenize = o, "string") : r.propertyIsEnumerable(a) ? "keyword" : i.propertyIsEnumerable(a) ? "atom" : null;
+}
+function o(e, t) {
+	return t._multiLineString = !0, e.sol() ? (e.next() == "." && e.eol() && (t._multiLineString = !1, t.tokenize = a), "string") : (e.eatSpace(), e.peek() == "#" ? (e.skipToEnd(), "comment") : (e.skipToEnd(), "string"));
+}
+function s(e, t) {
+	for (var n = !1, r; (r = e.next()) != null;) {
+		if (n && r == "/") {
+			t.tokenize = a;
+			break;
+		}
+		n = r == "*";
+	}
+	return "comment";
+}
+function c(e) {
+	return function(t, n) {
+		for (var r = !1, i; (i = t.next()) != null && !(i == e && !r);) r = !r && i == "\\";
+		return r || (n.tokenize = a), "string";
+	};
+}
+var l = {
+	name: "sieve",
+	startState: function(e) {
+		return {
+			tokenize: a,
+			baseIndent: e || 0,
+			_indent: []
+		};
+	},
+	token: function(e, t) {
+		return e.eatSpace() ? null : (t.tokenize || a)(e, t);
+	},
+	indent: function(e, t, n) {
+		var r = e._indent.length;
+		return t && t[0] == "}" && r--, r < 0 && (r = 0), r * n.unit;
+	},
+	languageData: { indentOnInput: /^\s*\}$/ }
+};
+//#endregion
+export { t as n, l as t };
